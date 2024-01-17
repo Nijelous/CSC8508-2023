@@ -1,0 +1,129 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\CMakeFiles\VulkanRendering.dir\cmake_pch.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanBuffers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanCompute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanComputePipelineBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanDescriptorSetLayoutBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanDynamicRenderBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanTextureBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanPipelineBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanRenderPassBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanShaderBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanBufferBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanBuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanCompute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanComputePipelineBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanDescriptorSetLayoutBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanDynamicRenderBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanTextureBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanPipelineBuilderBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanPipelineBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanRenderPassBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanShaderBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\VulkanBufferBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\SmartTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\CMakeFiles\VulkanRendering.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\CMakeFiles\VulkanRendering.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Code\My Graphics Repos\CSC8503\VulkanRendering\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{60595489-F1D1-38DE-8BB0-7A3C942795F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{DE9A16D8-3C61-3536-8199-E1E95AF59AEE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{229F6C2F-5E0D-3368-97A5-0F937605F804}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

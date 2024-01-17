@@ -1,0 +1,10 @@
+^C:\USERS\SQUIR\DESKTOP\GAMING TECH\CSC8503 2023\CMAKEFILES\6F85C03C322A24275B0AA9FCAA042F29\GENERATE.STAMP.RULE
+setlocal
+C:\Users\squir\Downloads\cmake-3.28.0-rc5-windows-x86_64\cmake-3.28.0-rc5-windows-x86_64\bin\cmake.exe "-SC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" "-BC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/CSC8503.sln"
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

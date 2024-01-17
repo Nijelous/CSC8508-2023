@@ -1,0 +1,15 @@
+*.vsidx
+*.ipch
+*.db
+/.vs/CSC8503/FileContentIndex/read.lock
+/.vs
+/Build
+/out/build/x64-Debug
+/CSC8503/CMakeFiles/CSC8503.dir
+/CSC8503/CSC8503.dir
+/CSC8503CoreClasses/CMakeFiles/CSC8503CoreClasses.dir
+/CSC8503CoreClasses/CSC8503CoreClasses.dir
+/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir
+/NCLCoreClasses/NCLCoreClasses.dir
+/OpenGLRendering/OpenGLRendering.dir
+/OpenGLRendering/CMakeFiles/OpenGLRendering.dir
