@@ -13,6 +13,9 @@ namespace NCL {
 	namespace CSC8503 {
 		class TutorialGame		{
 		public:
+			// enum created to track what state the game is in
+			// 
+			// author: Ewan Squire
 			enum CurrentState {
 				MenuScreen,
 				PhysicsMenu,
@@ -24,6 +27,10 @@ namespace NCL {
 				LoseScreen,
 				WinScreen
 			};
+
+			// public functions for pushfown automata to use to change game state via above enum
+			// 
+			// Author: Ewan Squire
 			void SetToMainMenu() { currentLevel = MenuScreen; }
 			void SetToPhysicsMenu() { currentLevel = PhysicsMenu; }
 			void SetToPathfindingMenu() { currentLevel = PathfindingMenu; }

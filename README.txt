@@ -1,19 +1,15 @@
-Features added since live demonstration:
+The following files do not contain any code that has been written or editted by myself:
 
-- object orientation of character now matches the cameras position instead of being set to face one direction
-- player can now jump with the use of raycasting by pressing SPACE
-- orientation constraint added on OBB bridge
-- Networking level now has collectable objects that are synced and will give both players
-  their own unqiue point totals and after they are collected the person with the most points wins
-- physics level now shows of all collision detection done (AABB, sphere, OBB) and the implemented constraints
+- Assets
+- CMake
+- CMakeFiles
+- NCLCoreClasses
+- OpenGL rendering
+- VulkanRendering
 
-Key presses:
-- BACK to skip a level
-- SPACE to move through menus
-- F9 t start as Player 1 / server in networking level
-- F10 t start as Player 2 / client in networking level
+All code that is mine should be marked with an author tag and a brief description of what it does, look at last commit to see all notations added
 
-CMAKE Instructions:
+CMAKE Instructions for getting code on own machine:
 
 1: Install CMakeLinks to an external site. (if you can), or extract the zipLinks to an external site.to a folder somewhere - the exe will be in the /bin/ sub folder. 
 

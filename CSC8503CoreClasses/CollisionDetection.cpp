@@ -57,7 +57,6 @@ bool CollisionDetection::RayBoxIntersection(const Ray&r, const Vector3& boxPos, 
 	Vector3 tVals(-1,-1,-1);
 
 	// find three closest box planes
-	// i gives us either the x, y, or z axis of the vector3's
 	for (int i = 0; i < 3; i++) {
 		if (rayDir[i] > 0)
 			tVals[i] = (boxMin[i] - rayPos[i]) / rayDir[i];
@@ -66,18 +65,15 @@ bool CollisionDetection::RayBoxIntersection(const Ray&r, const Vector3& boxPos, 
 	}
 
 	float bestT = tVals.GetMaxElement();
-	// end function if all rays are in opposite direction
 	if (bestT < 0.0f)
 		return false;
 
 	Vector3 intersection = rayPos + (rayDir * bestT);
 	const float epsilon = 0.0001f; // leeway given in calculation
 	for (int i = 0; i < 3; i++) {
-		// if intersection is not within the boxes planes on any axis then no collision
 		if (intersection[i] + epsilon < boxMin[i] || intersection[i] - epsilon > boxMax[i])
 			return false;
 	}
-	// if within all axis then return true and set collision point and distance from point
 	collision.collidedAt = intersection;
 	collision.rayDistance = bestT;
 	return true;
@@ -89,25 +85,24 @@ bool CollisionDetection::RayAABBIntersection(const Ray&r, const Transform& world
 	return RayBoxIntersection(r,boxPos, boxSize, collision);
 }
 
+// returns true if a given ray collides with a given OBB
+// 
+// Author: Ewan Squire
 bool CollisionDetection::RayOBBIntersection(const Ray&r, const Transform& worldTransform, const OBBVolume& volume, RayCollision& collision) {
 	// get the boxes position and orientation
 	Quaternion orientation = worldTransform.GetOrientation();
 	Vector3 position = worldTransform.GetPosition();
 
-	// get transform and inverse transform
 	Matrix3 transform = Matrix3(orientation);
 	Matrix3 invTransform = Matrix3(orientation.Conjugate());
 
 	// translate ray into boxes local space
 	Vector3 localRayPos = r.GetPosition() - position;
-	// use temp ray and use inverse transform to orient the ray to match the boxes
 	Ray tempRay(invTransform * localRayPos, invTransform * r.GetDirection());
 
-	// can now treat box as if it is AABB as rays axis match its
 	bool collided = RayBoxIntersection(tempRay, Vector3(), volume.GetHalfDimensions(), collision);
 
 	if (collided)
-		// transform collided at point back into world space from local space
 		collision.collidedAt = transform * collision.collidedAt + position;;
 
 	return collided;
@@ -117,32 +112,29 @@ bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& wor
 	Vector3 spherePos = position;
 	float sphereRadius = volume.GetRadius();
 
-	// get the direction between the rays orgin and the spheres origin
 	Vector3 dir = (spherePos - r.GetPosition());
-	// next project the spheres origin onto our ray direction vector
 	float sphereProj = Vector3::Dot(dir, r.GetDirection());
 
-	// if spherePos is < 0 then ray is travelling opposite direction to sphere
 	if (sphereProj < 0.0f)
 		return false;
 
 	// get closest point on ray and sphere radius
 	Vector3 point = r.GetPosition() + (r.GetDirection() * sphereProj);
-	// get distance from spheres position to the rays closest point
 	float sphereDist = (point - spherePos).Length();
-	// if rays closest point is greater than sphere radius there can be no collision
 	if (sphereDist > sphereRadius)
 		return false;
 
 	float offset = sqrt((sphereRadius * sphereRadius) - (sphereDist * sphereDist));
 
-	// if collision occurs find get where the ray hit the sphere and how far it was
 	collision.rayDistance = sphereProj - (offset);
 	collision.collidedAt = r.GetPosition() + (r.GetDirection() * collision.rayDistance);
 
 	return true;
 }
 
+// returns true if a given ray intersects with a given capsule
+//
+// Author: Ewan Squire
 bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& worldTransform, const CapsuleVolume& volume, RayCollision& collision) {
 	// get the plane to compare ray to
 	Vector3 upperSphereOrigin = worldTransform.GetPosition();
@@ -151,7 +143,6 @@ bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& w
 	Vector3 B = r.GetPosition() - worldTransform.GetPosition();
 	Vector3 plane = Vector3::Cross(A, B) + worldTransform.GetPosition();
 
-	// get which case it is
 	int givenCase = 0;
 
 	// is it upper sphere
@@ -371,6 +362,11 @@ bool CollisionDetection::SphereIntersection(const SphereVolume& volumeA, const T
 // https://www.youtube.com/watch?v=Zgf1DYrmSnk&list=PLSlpr6o9vURwq3oxVZSimY8iC-cdd3kIs&index=6
 // https://www.youtube.com/watch?v=SUyG3aV_vpM&list=PLSlpr6o9vURwq3oxVZSimY8iC-cdd3kIs&index=7
 // https://stackoverflow.com/questions/5900320/separating-axis-theorem-finding-which-edge-normals-to-use
+// 
+// Returns true if two given OBBs intersect with one another
+// 
+// Author: Ewan Squire
+// 
 //OBB/OBB Collision
 bool CollisionDetection::OBBIntersection(const OBBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
@@ -397,7 +393,6 @@ bool CollisionDetection::OBBIntersection(const OBBVolume& volumeA, const Transfo
 			float projectA = Vector3::Dot(edgeNormals[i], OBB_A[j]) / edgeNormals[i].Length();
 			float projectB = Vector3::Dot(edgeNormals[i], OBB_B[j]) / edgeNormals[i].Length();
 
-			// check if given projection is greater or less than current max or min
 			minA = std::min(minA, projectA);
 			maxA = std::max(maxA, projectA);
 
@@ -408,9 +403,7 @@ bool CollisionDetection::OBBIntersection(const OBBVolume& volumeA, const Transfo
 		// true if either B is within A's range or B is within A's range when projected on axis
 		bool collision = (minA <= minB && minB <= maxA) || (minB <= minA && minA <= maxB);
 
-		// if there is no collision on any single axis then objects are not colliding
 		if (!collision) {
-			// clear uneeded heap data and return false
 			delete OBB_A;
 			delete OBB_B;
 			delete edgeNormals;
@@ -431,7 +424,6 @@ bool CollisionDetection::OBBIntersection(const OBBVolume& volumeA, const Transfo
 		edgeNormalWithMinOverlap = -edgeNormalWithMinOverlap;
 
 	// if loop finishes then collision has occured
-	// fill in collision data
 	collisionInfo.AddContactPoint(Vector3(), Vector3(), edgeNormalWithMinOverlap, minimumPenetration);
 
 	
@@ -444,6 +436,9 @@ bool CollisionDetection::OBBIntersection(const OBBVolume& volumeA, const Transfo
 	return true;
 }
 
+// Gets the Normals of every edge in every OBB as well as the result of each edge normal Crosses with one another
+//
+// Author: Ewan Squire
 Vector3* CollisionDetection::GetOBBEdgeNormals(const Transform& transformA, const Transform& transformB) {
 	Vector3* edgeNormals = new Vector3[15];
 
@@ -465,24 +460,25 @@ Vector3* CollisionDetection::GetOBBEdgeNormals(const Transform& transformA, cons
 		for (int j = 3; j < 6; j++) {
 			edgeNormals[startPoint] = Vector3::Cross(edgeNormals[i], edgeNormals[j]).Normalised();
 			startPoint++;
-			//std::cout << edgeNormals[startPoint-1] << std::endl;
 		}
 	}
 
 	return edgeNormals;
 }
 
+// returns an array of Vector3's that contains the location of all vertices in the given OBB in world space
+//
+// Author: Ewan Squire
 Vector3* CollisionDetection::GetOBBVertices(const OBBVolume& OBB_volume, const Transform& OBB_transform) {
 	// define OBB points around (0,0) first
 	
 	Vector3* OBBVertices = new Vector3[8];
 
-	// get bottom vertices
 	OBBVertices[0] = Vector3(-OBB_volume.GetHalfDimensions().x, -OBB_volume.GetHalfDimensions().y, -OBB_volume.GetHalfDimensions().z);
 	OBBVertices[1] = Vector3(-OBB_volume.GetHalfDimensions().x, -OBB_volume.GetHalfDimensions().y,  OBB_volume.GetHalfDimensions().z);
 	OBBVertices[2] = Vector3( OBB_volume.GetHalfDimensions().x, -OBB_volume.GetHalfDimensions().y, -OBB_volume.GetHalfDimensions().z);
 	OBBVertices[3] = Vector3( OBB_volume.GetHalfDimensions().x, -OBB_volume.GetHalfDimensions().y,  OBB_volume.GetHalfDimensions().z);
-	// get top vertices
+
 	OBBVertices[4] = Vector3(-OBB_volume.GetHalfDimensions().x,  OBB_volume.GetHalfDimensions().y, -OBB_volume.GetHalfDimensions().z);
 	OBBVertices[5] = Vector3(-OBB_volume.GetHalfDimensions().x,  OBB_volume.GetHalfDimensions().y,  OBB_volume.GetHalfDimensions().z);
 	OBBVertices[6] = Vector3( OBB_volume.GetHalfDimensions().x,  OBB_volume.GetHalfDimensions().y, -OBB_volume.GetHalfDimensions().z);
@@ -505,10 +501,8 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 	Vector3 boxSize = volumeA.GetHalfDimensions();
 
 	Vector3 delta = worldTransformB.GetPosition() - worldTransformA.GetPosition();
-	// spheres closest point to the box (even if not touching)
 	Vector3 closestPointOnBox = Maths::Clamp(delta, -boxSize, boxSize);
 
-	// how far sphere is from the closest point
 	Vector3 localPoint = delta - closestPointOnBox;
 	float distance = localPoint.Length();
 
@@ -528,6 +522,9 @@ bool CollisionDetection::AABBSphereIntersection(const AABBVolume& volumeA, const
 }
 
 //AABB - OBB Collision
+// Returns true if a given AABB is colliding with a given OBB
+// 
+//Author: Ewan Squire
 bool CollisionDetection::AABBOBBIntersection(const AABBVolume& volumeA, const Transform& worldTransformA,
 	const OBBVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
 
@@ -552,16 +549,17 @@ bool CollisionDetection::AABBCapsuleIntersection(const CapsuleVolume& volumeA, c
 }
 
 //OBB - Sphere Collision
+// Returns true if a given Sphere is colliding with a given OBB
+// 
+//Author: Ewan Squire
 bool  CollisionDetection::OBBSphereIntersection(const OBBVolume& volumeA, const Transform& worldTransformA,
 	const SphereVolume& volumeB, const Transform& worldTransformB, CollisionInfo& collisionInfo) {
 
-	// get the boxes position and orientation
 	Quaternion OBB_orientation = worldTransformA.GetOrientation();
 	Vector3 OBB_position = worldTransformA.GetPosition();
 
 	Vector3 spherePos = worldTransformB.GetPosition();
 
-	// get transform and inverse transform
 	Matrix3 transform = Matrix3(OBB_orientation);
 	Matrix3 invTransform = Matrix3(OBB_orientation.Conjugate());
 
@@ -570,7 +568,6 @@ bool  CollisionDetection::OBBSphereIntersection(const OBBVolume& volumeA, const 
 	// translate OBB into local space
 	Vector3 localOBBPos = invTransform * OBB_position;
 
-	// treat OBB as AABB to check for collision
 	Vector3 boxSize = volumeA.GetHalfDimensions();
 	Vector3 delta = localSpherePos - localOBBPos;
 	Vector3 closestPointOnBox = Maths::Clamp(delta, -boxSize, boxSize);

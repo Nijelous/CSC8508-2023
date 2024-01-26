@@ -85,15 +85,19 @@ void NetworkedGame::UpdateAsServer(float dt) {
 	packetsToSnapshot = 5;
 	}
 	else {
-		// delta packet
 		// use delta packets
 		//BroadcastSnapshot(true);
+		
 		// dont use delta packets
 		BroadcastSnapshot(false);
 	}
 
 	thisServer->UpdateServer();
 }
+
+// Tracks clients key presses and send sthem to server for it to compute
+//
+// Author: Ewan Squire
 void NetworkedGame::UpdateAsClient(float dt) {
 	ClientPacket newPacket;
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
@@ -145,14 +149,9 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		if (!o) {
 			continue;
 		}
-		//TODO - you'll need some way of determining
-		//when a player has sent the server an acknowledgement
-		//and store the lastID somewhere. A map between player
-		//and an int could work, or it could be part of a 
-		//NetworkPlayer struct.
-		// 
-		// if not a delta packet (therefore full packet) add to full state
+		// line added by me
 		int playerState = latestClientFullState;
+		// line added by me
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, playerState)) {
 			thisServer->SendGlobalPacket(*newPacket);
@@ -194,6 +193,9 @@ void NetworkedGame::StartLevel() {
 
 }
 
+// Server or client checks for incoming packets and unpacks them
+//
+// Author: Ewan Squire
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	if (type == Full_State) {
 		FullPacket* realPacket = (FullPacket*)payload;

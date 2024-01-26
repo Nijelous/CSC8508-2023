@@ -10,6 +10,10 @@
 #include "State.h"
 #include "StateTransition.h"
 
+// class that generates levels and menus for the game
+// All code related to this class is written by myself
+//
+// Author: Ewan Squire
 namespace NCL {
 	namespace CSC8503 {
 		class LevelGenerator : public NetworkedGame
@@ -65,9 +69,19 @@ namespace NCL {
 
 			void InitWorld();
 
+			// character conroller functions
+
+			void MoveCharacter(float dt, GameObject* characterControlled, float speed);
+
+			void CharacterJump(float dt, GameObject* characterControlled);
+
+			void CharacterCamera(float dt);
+
 			void CharacterController(float dt, GameObject* characterController, float speed);
 
 			Quaternion GetObjectRotation(Vector3 objectPos, Vector3 camPos);
+
+			Quaternion Matrix3ToQuaternion(Matrix3 m);
 
 			// generate game objects
 			GameObject* GeneratePlayerObject(const Vector3& position, const std::string& objectName);
@@ -92,6 +106,8 @@ namespace NCL {
 			// methods for pathfinding
 			void GenerateLevelWalls(const std::string& filename);
 
+			void SetUpAI();
+
 			vector<Vector3> testNodes;
 			void CreatePath();
 
@@ -100,16 +116,6 @@ namespace NCL {
 			void ChaseObject(GameObject* chasing, GameObject* chased, float speed);
 
 			// networking functions
-
-			void UpdateCharacters() {
-				if (networkRole == Server) {
-
-				}
-
-				if (networkRole == Client) {
-
-				}
-			}
 
 			void CreatePlayer1() override;
 

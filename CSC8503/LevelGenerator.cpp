@@ -123,58 +123,68 @@ void LevelGenerator::UpdateNetworkingGame(float dt) {
 	CheckPlayerHitGoal();
 }
 
-void LevelGenerator::InitWorld() {
-	//GeneratePathfindingLevel();
+void LevelGenerator::InitWorld() {}
+
+void LevelGenerator::MoveCharacter(float dt, GameObject* characterControlled, float speed) {
+	Vector3 cameraPos = world->GetMainCamera().GetPosition();
+	Vector3 characterPos = characterControlled->GetTransform().GetPosition();
+
+	Vector3 fwdAxis = cameraPos - characterPos;
+
+	Vector3 rightAxis = Vector3::Cross(fwdAxis, Vector3(0, 1, 0));
+
+	fwdAxis = MakeForceUnfiform(fwdAxis, speed);
+	rightAxis = MakeForceUnfiform(rightAxis, speed);
+
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)) {
+		characterControlled->GetPhysicsObject()->AddForce(-fwdAxis);
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)) {
+		characterControlled->GetPhysicsObject()->AddForce(fwdAxis);
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)) {
+		characterControlled->GetPhysicsObject()->AddForce(rightAxis);
+	}
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)) {
+		characterControlled->GetPhysicsObject()->AddForce(-rightAxis);
+	}
+}
+
+void LevelGenerator::CharacterJump(float dt, GameObject* characterControlled) {
+	RayCollision closestCollision;
+	Vector3 rayPos = characterControlled->GetTransform().GetPosition();
+	Vector3 rayDirection = Vector3(0, -1, 0);
+	Ray r = Ray(rayPos, rayDirection);
+
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::SPACE)) {
+		if (world->Raycast(r, closestCollision, true, characterControlled)) {
+			if ((characterControlled->GetTransform().GetPosition().y - closestCollision.collidedAt.y) <= 1.5f)
+				characterControlled->GetPhysicsObject()->AddForce(Vector3(0, 1000, 0));
+		}
+	}
+}
+
+void LevelGenerator::CharacterCamera(float dt) {
+	if (!inSelectionMode) {
+		if (controller.GetAxis(3) > 0.0f)
+			RotateCameraAroundPLayer(true, controller.GetAxis(3) * 1, dt);
+		if (controller.GetAxis(3) < 0.0f)
+			RotateCameraAroundPLayer(false, controller.GetAxis(3) * -1, dt);
+	}
 }
 
 void LevelGenerator::CharacterController(float dt, GameObject* characterControlled, float speed) {
 	if (lockedObject) {
-		Vector3 cameraPos = world->GetMainCamera().GetPosition();
-		Vector3 characterPos = characterControlled->GetTransform().GetPosition();
-		Vector3 temp = Vector3(cameraPos.x, characterPos.y, cameraPos.z);
+		MoveCharacter(dt, characterControlled, speed);
 
-		Vector3 fwdAxis = cameraPos - characterPos;
+		CharacterJump(dt, characterControlled);
 
-		Vector3 rightAxis = Vector3::Cross(fwdAxis, Vector3(0,1,0));
+		CharacterCamera(dt);
 
-		fwdAxis = MakeForceUnfiform(fwdAxis, speed);
-		rightAxis = MakeForceUnfiform(rightAxis, speed);
-
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::W)) {
-			characterControlled->GetPhysicsObject()->AddForce(-fwdAxis);
-		}
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::S)) {
-			characterControlled->GetPhysicsObject()->AddForce( fwdAxis);
-		}
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::A)) {
-			characterControlled->GetPhysicsObject()->AddForce( rightAxis);
-		}
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::D)) {
-			characterControlled->GetPhysicsObject()->AddForce(-rightAxis);
-		}
-
-		RayCollision closestCollision;
-		Vector3 rayPos = characterControlled->GetTransform().GetPosition();
-		Vector3 rayDirection = Vector3(0,-1,0);
-		Ray r = Ray(rayPos, rayDirection);
-
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::SPACE)) {
-			if (world->Raycast(r, closestCollision, true, characterControlled)) {
-				if ((characterControlled->GetTransform().GetPosition().y - closestCollision.collidedAt.y) <= 1.5f)
-					characterControlled->GetPhysicsObject()->AddForce(Vector3(0, 1000, 0));
-			}
-		}
-
-		if (!inSelectionMode) {
-			if (controller.GetAxis(3) > 0.0f)
-				RotateCameraAroundPLayer(true, controller.GetAxis(3) * 1, dt);
-			if (controller.GetAxis(3) < 0.0f)
-				RotateCameraAroundPLayer(false, controller.GetAxis(3) * -1, dt);
-		}
+		Quaternion rotation = GetObjectRotation(characterControlled->GetTransform().GetPosition(), world->GetMainCamera().GetPosition());
+		Quaternion flip = Quaternion(0, 0, 1.0f, 0);
+		characterControlled->GetTransform().SetOrientation(rotation * flip);
 	}
-	Quaternion rotation = GetObjectRotation(characterControlled->GetTransform().GetPosition(), world->GetMainCamera().GetPosition());
-	Quaternion flip = Quaternion(0, 0, 1.0f, 0);
-	characterControlled->GetTransform().SetOrientation(rotation * flip);
 }
 
 // made using these sources
@@ -197,8 +207,11 @@ Quaternion LevelGenerator::GetObjectRotation(Vector3 objectPos, Vector3 camPos) 
 	m.SetColumn(1, column2);
 	m.SetColumn(2, column3);
 
-	Quaternion rotation = Quaternion();
+	return Matrix3ToQuaternion(m);
+}
 
+Quaternion LevelGenerator::Matrix3ToQuaternion(Matrix3 m) {
+	Quaternion rotation = Quaternion();
 	float trace = m.GetColumn(0)[0] + m.GetColumn(1)[1] + m.GetColumn(2)[2];
 	if (trace > 0) {
 		float s = 0.5f / sqrtf(trace + 1.0f);
@@ -395,6 +408,62 @@ void LevelGenerator::GenerateLevelWalls(const std::string& filename) {
 			}
 		}
 	}
+}
+
+void LevelGenerator::SetUpAI() {
+	stateMachine = new StateMachine();
+
+	trackPlayer = new State([&](float dt)->void {
+		Debug::DrawLine(playerObject->GetTransform().GetPosition(), enemyObject->GetTransform().GetPosition(), Debug::RED);
+		CreatePath();
+		MoveObjectOnPath(enemySpeed);
+		}
+	);
+
+	chasePlayer = new State([&](float dt) {
+		Debug::DrawLine(playerObject->GetTransform().GetPosition(), enemyObject->GetTransform().GetPosition(), Debug::GREEN);
+		ChaseObject(enemyObject, playerObject, enemySpeed);
+		}
+	);
+
+	trackToChase = new StateTransition(trackPlayer, chasePlayer, [&](void)->bool {
+		RayCollision closestCollision;
+		Vector3 rayPos = enemyObject->GetTransform().GetPosition();
+		Vector3 rayDirection = playerObject->GetTransform().GetPosition() - rayPos;
+		rayDirection.Normalise();
+		Ray r = Ray(rayPos, rayDirection);
+
+		if (world->Raycast(r, closestCollision, true)) {
+			GameObject* temp = (GameObject*)closestCollision.node;
+			if (temp->GetName() == "Player Object") {
+				return true;
+			}
+		}
+		return false;
+		}
+	);
+
+	chaseToTrack = new StateTransition(chasePlayer, trackPlayer, [&](void)->bool {
+		RayCollision closestCollision;
+		Vector3 rayPos = enemyObject->GetTransform().GetPosition();
+		Vector3 rayDirection = (playerObject->GetTransform().GetPosition() - rayPos);
+		rayDirection.Normalise();
+		Ray r = Ray(rayPos, rayDirection);
+
+		if (world->Raycast(r, closestCollision, true)) {
+			GameObject* temp = (GameObject*)closestCollision.node;
+			if (temp->GetName() != "Player Object") {
+				return true;
+			}
+		}
+		return false;
+		}
+	);
+
+	stateMachine->AddState(trackPlayer);
+	stateMachine->AddState(chasePlayer);
+	stateMachine->AddTransition(trackToChase);
+	stateMachine->AddTransition(chaseToTrack);
 }
 
 void LevelGenerator::CreatePath() {
@@ -607,8 +676,8 @@ void LevelGenerator::DisplayNetworkingMenu() {
 
 	Debug::Print("NETWORKING LEVEL", Vector2(40, 50), Debug::BLACK);
 	Debug::Print("PRESS SPACE TO CONTINUE", Vector2(35, 55), Debug::BLACK);
-	Debug::Print("PRESS F9 TO START GAME AS SERVER/P1", Vector2(22, 60), Debug::BLACK);
-	Debug::Print("PRESS F0 TO START GAME AS CLIENT/P2", Vector2(22, 65), Debug::BLACK);
+	Debug::Print("PRESS  F9 TO START GAME AS SERVER/P1", Vector2(22, 60), Debug::BLACK);
+	Debug::Print("PRESS F10 TO START GAME AS CLIENT/P2", Vector2(22, 65), Debug::BLACK);
 	Debug::Print("THE PERSON WHO GETS THE MOST POINTS AFTER", Vector2(15, 70), Debug::BLACK);
 	Debug::Print("ALL GOALS HAVE BEEN COLLECTED WILL WIN", Vector2(18, 75), Debug::BLACK);
 }
@@ -676,59 +745,7 @@ void LevelGenerator::GeneratePathfindingLevel() {
 	floor->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 	GenerateLevelWalls("TestGrid1.txt");
 
-	stateMachine = new StateMachine();
-
-	trackPlayer = new State([&](float dt)->void {
-		Debug::DrawLine(playerObject->GetTransform().GetPosition(), enemyObject->GetTransform().GetPosition(), Debug::RED);
-		CreatePath();
-		MoveObjectOnPath(enemySpeed);
-		}
-	);
-
-	chasePlayer = new State([&](float dt) {
-		Debug::DrawLine(playerObject->GetTransform().GetPosition(), enemyObject->GetTransform().GetPosition(), Debug::GREEN);
-		ChaseObject(enemyObject, playerObject, enemySpeed);
-		}
-	);
-
-	trackToChase = new StateTransition(trackPlayer, chasePlayer, [&](void)->bool {
-		RayCollision closestCollision;
-		Vector3 rayPos = enemyObject->GetTransform().GetPosition();
-		Vector3 rayDirection = playerObject->GetTransform().GetPosition() - rayPos;
-		rayDirection.Normalise();
-		Ray r = Ray(rayPos, rayDirection);
-
-		if (world->Raycast(r, closestCollision, true)) {
-			GameObject* temp = (GameObject*)closestCollision.node;
-			if (temp->GetName() == "Player Object") {
-				return true;
-			}
-		}
-		return false;
-		}
-	);
-
-	chaseToTrack = new StateTransition(chasePlayer, trackPlayer, [&](void)->bool {
-		RayCollision closestCollision;
-		Vector3 rayPos = enemyObject->GetTransform().GetPosition();
-		Vector3 rayDirection = (playerObject->GetTransform().GetPosition() - rayPos);
-		rayDirection.Normalise();
-		Ray r = Ray(rayPos, rayDirection);
-
-		if (world->Raycast(r, closestCollision, true)) {
-			GameObject* temp = (GameObject*)closestCollision.node;
-			if (temp->GetName() != "Player Object") {
-				return true;
-			}
-		}
-		return false;
-		}
-	);
-
-	stateMachine->AddState(trackPlayer);
-	stateMachine->AddState(chasePlayer);
-	stateMachine->AddTransition(trackToChase);
-	stateMachine->AddTransition(chaseToTrack);
+	SetUpAI();
 
 	LockCameraToObject(playerObject);
 	world->GetMainCamera().SetPosition(playerObject->GetTransform().GetPosition() + lockedOffset);
@@ -848,5 +865,4 @@ void LevelGenerator::CheckPlayerHitGoal() {
 
 void LevelGenerator::EnemyChasePlayer() {
 	enemyObject->GetPhysicsObject()->ClearForces();
-
 }

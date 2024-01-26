@@ -17,6 +17,9 @@ OrientationConstraint::~OrientationConstraint()
 
 }
 
+// Ensures that two objects orientations are constrained if an orientation constraint is created
+//
+// Author: Ewan Squire
 void OrientationConstraint::UpdateConstraint(float dt) {
 	Vector3 eulerA = objectA->GetTransform().GetOrientation().ToEuler();
 	Vector3 eulerB = objectB->GetTransform().GetOrientation().ToEuler();
