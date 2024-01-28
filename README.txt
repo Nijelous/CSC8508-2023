@@ -1,3 +1,10 @@
+All code that is mine should be marked with an author tag and a brief description of what it does. Look at last commit to see all notations added.
+
+The following files are completely mine:
+
+- LevelGenerator.h
+- LevelGenerator.cpp
+
 The following files do not contain any code that has been written or editted by myself:
 
 - Assets
@@ -6,8 +13,6 @@ The following files do not contain any code that has been written or editted by 
 - NCLCoreClasses
 - OpenGL rendering
 - VulkanRendering
-
-All code that is mine should be marked with an author tag and a brief description of what it does, look at last commit to see all notations added
 
 CMAKE Instructions for getting code on own machine:
 
