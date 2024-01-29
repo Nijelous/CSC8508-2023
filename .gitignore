@@ -22,15 +22,15 @@ ALL_BUILD.vcxproj
 ALL_BUILD.vcxproj.filters
 CSC8503/CSC8503.vcxproj
 CSC8503/CSC8503.vcxproj.filters
+CSC8503/CSC8503.vcxproj.user
 ZERO_CHECK.vcxproj
 ZERO_CHECK.vcxproj.filters
 *.vcxproj
-CSC8503/CSC8503.vcxproj.filters
-CSC8503/CSC8503.vcxproj.user
 CSC8503/SHADER_FILES.vcxproj.filters
 CSC8503CoreClasses/CSC8503CoreClasses.vcxproj.filters
 CSC8503CoreClasses/CSC8503CoreClasses.vcxproj.user
 OpenGLRendering/OpenGLRendering.vcxproj.filters
+NCLCoreClasses\NCLCoreClasses.vcxproj.filters
 cmake_install.cmake
 CSC8503/cmake_install.cmake
 CSC8503CoreClasses/cmake_install.cmake
