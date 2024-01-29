@@ -30,7 +30,7 @@ CSC8503/SHADER_FILES.vcxproj.filters
 CSC8503CoreClasses/CSC8503CoreClasses.vcxproj.filters
 CSC8503CoreClasses/CSC8503CoreClasses.vcxproj.user
 OpenGLRendering/OpenGLRendering.vcxproj.filters
-NCLCoreClasses\NCLCoreClasses.vcxproj.filters
+NCLCoreClasses/NCLCoreClasses.vcxproj.filters
 cmake_install.cmake
 CSC8503/cmake_install.cmake
 CSC8503CoreClasses/cmake_install.cmake
