@@ -1,252 +1,252 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\cmake_pch.cxx">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\cmake_pch.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Assets.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Assets.cpp">
       <Filter>Asset Handling</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\SimpleFont.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\SimpleFont.cpp">
       <Filter>Asset Handling</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureLoader.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureLoader.cpp">
       <Filter>Asset Handling</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureWriter.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureWriter.cpp">
       <Filter>Asset Handling</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Maths.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Maths.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix2.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix2.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix3.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix3.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix4.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix4.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Plane.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Plane.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Frustum.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Frustum.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Quaternion.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Quaternion.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2i.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2i.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3I.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3I.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4I.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4I.cpp">
       <Filter>Maths</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshAnimation.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshAnimation.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mesh.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mesh.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MshLoader.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MshLoader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshMaterial.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshMaterial.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\RendererBase.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\RendererBase.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Shader.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Texture.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Texture.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Camera.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\GameTimer.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\GameTimer.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Keyboard.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Keyboard.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mouse.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mouse.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Window.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Window.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Controller.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Controller.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\KeyboardMouseController.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\KeyboardMouseController.cpp">
       <Filter>Windowing and Input</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Keyboard.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Keyboard.cpp">
       <Filter>Windowing and Input\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Mouse.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Mouse.cpp">
       <Filter>Windowing and Input\Win32</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Window.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Window.cpp">
       <Filter>Windowing and Input\Win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Assets.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Assets.h">
       <Filter>Asset Handling</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\SimpleFont.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\SimpleFont.h">
       <Filter>Asset Handling</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureLoader.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureLoader.h">
       <Filter>Asset Handling</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureWriter.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureWriter.h">
       <Filter>Asset Handling</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Camera.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Maths.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Maths.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix2.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix2.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix3.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix3.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix4.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix4.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Plane.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Plane.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Frustum.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Frustum.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Quaternion.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Quaternion.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\NewVector.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\NewVector.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2i.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2i.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3I.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3I.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4I.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4I.h">
       <Filter>Maths</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshAnimation.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshAnimation.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mesh.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mesh.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MshLoader.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MshLoader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshMaterial.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshMaterial.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\RendererBase.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\RendererBase.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Shader.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Texture.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Texture.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\GameTimer.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\GameTimer.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Keyboard.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Keyboard.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mouse.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mouse.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Window.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Window.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Controller.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Controller.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\KeyboardMouseController.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\KeyboardMouseController.h">
       <Filter>Windowing and Input</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Keyboard.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Keyboard.h">
       <Filter>Windowing and Input\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Mouse.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Mouse.h">
       <Filter>Windowing and Input\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Window.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Window.h">
       <Filter>Windowing and Input\Win32</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Debug\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Debug\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Release\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Release\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Asset Handling">
-      <UniqueIdentifier>{ACAA175C-C7C8-33F5-845A-25478FE8E78E}</UniqueIdentifier>
+      <UniqueIdentifier>{EE029ABD-4BA7-3CB3-AD85-FD6010342214}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{C671862C-1C20-387D-AABF-4D36BE59C7E0}</UniqueIdentifier>
+      <UniqueIdentifier>{56A9A4A7-F82C-3302-AF30-CEFB5FE4D7CD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Maths">
-      <UniqueIdentifier>{49309E75-7F56-39AB-B347-6159AD86D2A9}</UniqueIdentifier>
+      <UniqueIdentifier>{DC404486-68F5-3BDA-A65C-15E715A3FB48}</UniqueIdentifier>
     </Filter>
     <Filter Include="Precompile Header File">
-      <UniqueIdentifier>{7840F0B3-91F4-3D63-8757-36EFE3A8D66A}</UniqueIdentifier>
+      <UniqueIdentifier>{00C79EED-1054-3EAE-A2E9-95151DD8708E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Rendering">
-      <UniqueIdentifier>{B3B17E87-19EA-38CF-B41B-2797BDA77C7D}</UniqueIdentifier>
+      <UniqueIdentifier>{00BC0A67-5EE8-3510-93BA-2B6D87248C88}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{574D1E81-E5C4-375B-8594-863283DCF81E}</UniqueIdentifier>
+      <UniqueIdentifier>{781B6CBF-947F-3500-B326-01F824ACEE56}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windowing and Input">
-      <UniqueIdentifier>{9488139D-B5A4-3974-B2F1-CD6DAAAEEA06}</UniqueIdentifier>
+      <UniqueIdentifier>{8AF33055-3113-39F0-9D85-7B93DF679701}</UniqueIdentifier>
     </Filter>
     <Filter Include="Windowing and Input\Win32">
-      <UniqueIdentifier>{356611D1-1084-33C3-B1AB-9B707311C219}</UniqueIdentifier>
+      <UniqueIdentifier>{B6BCFB0D-A666-3C48-8AB1-AC6193799DA3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

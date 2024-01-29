@@ -1,72 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\CMakeFiles\CSC8503.dir\cmake_pch.cxx">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\CMakeFiles\CSC8503.dir\cmake_pch.cxx">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\GameTechRenderer.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\GameTechRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\Main.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\NetworkedGame.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\NetworkedGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\NetworkPlayer.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\NetworkPlayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\StateGameObject.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\StateGameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\TutorialGame.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\LevelGenerator.cpp">
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\CSC8503\TutorialGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\GameTechRenderer.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\GameTechRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\NetworkedGame.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\NetworkedGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\NetworkPlayer.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\NetworkPlayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\StateGameObject.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\StateGameObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\TutorialGame.h">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\TutorialGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\LevelGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\PushdownStates.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\CMakeFiles\CSC8503.dir\Debug\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\CMakeFiles\CSC8503.dir\Debug\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\CMakeFiles\CSC8503.dir\Release\cmake_pch.hxx">
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\CSC8503\CMakeFiles\CSC8503.dir\Release\cmake_pch.hxx">
       <Filter>Precompile Header File</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\CSC8503\CMakeLists.txt" />
+    <CustomBuild Include="C:\Users\squir\Desktop\Team Project\CSC8503\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{C671862C-1C20-387D-AABF-4D36BE59C7E0}</UniqueIdentifier>
+      <UniqueIdentifier>{56A9A4A7-F82C-3302-AF30-CEFB5FE4D7CD}</UniqueIdentifier>
     </Filter>
     <Filter Include="Precompile Header File">
-      <UniqueIdentifier>{7840F0B3-91F4-3D63-8757-36EFE3A8D66A}</UniqueIdentifier>
+      <UniqueIdentifier>{00C79EED-1054-3EAE-A2E9-95151DD8708E}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{574D1E81-E5C4-375B-8594-863283DCF81E}</UniqueIdentifier>
+      <UniqueIdentifier>{781B6CBF-947F-3500-B326-01F824ACEE56}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

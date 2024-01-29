@@ -1,6 +1,6 @@
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/CMakeFiles/ALL_BUILD.dir
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/CMakeFiles/ZERO_CHECK.dir
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/CSC8503CoreClasses/CMakeFiles/CSC8503CoreClasses.dir
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/OpenGLRendering/CMakeFiles/OpenGLRendering.dir
-C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/CSC8503/CMakeFiles/CSC8503.dir
+C:/Users/squir/Desktop/Team Project/CMakeFiles/ALL_BUILD.dir
+C:/Users/squir/Desktop/Team Project/CMakeFiles/ZERO_CHECK.dir
+C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir
+C:/Users/squir/Desktop/Team Project/CSC8503CoreClasses/CMakeFiles/CSC8503CoreClasses.dir
+C:/Users/squir/Desktop/Team Project/OpenGLRendering/CMakeFiles/OpenGLRendering.dir
+C:/Users/squir/Desktop/Team Project/CSC8503/CMakeFiles/CSC8503.dir

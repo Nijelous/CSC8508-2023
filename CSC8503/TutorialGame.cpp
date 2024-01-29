@@ -102,13 +102,11 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	UpdateKeys();
-	if ((currentLevel == Physics) || (currentLevel == Pathfinding) || (currentLevel == Networking)) {
-		if (useGravity) {
-			Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
-		}
-		else {
-			Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
-		}
+	if (useGravity) {
+		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
+	}
+	else {
+		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
 	}
 
 	RayCollision closestCollision;
@@ -268,13 +266,10 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
-	//InitOBBAABB();
-	//testStateObject = AddStateObjectToWorld(Vector3(0,10,0), "State Object");
-	//BridgeConstraintTest();
+	InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 
-	//InitGameExamples();
-	//InitDefaultFloor();
+	InitGameExamples();
+	InitDefaultFloor();
 }
 
 /*
@@ -595,8 +590,7 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	if (inSelectionMode) {
-		if ((currentLevel == Physics) || (currentLevel == Pathfinding) || (currentLevel == Networking))
-			Debug::Print("Press Q to change to camera mode!", Vector2(5, 85));
+		Debug::Print("Press Q to change to camera mode!", Vector2(5, 85));
 
 		if (Window::GetMouse()->ButtonDown(NCL::MouseButtons::Left)) {
 			if (selectionObject) {	//set colour to deselected;
@@ -629,8 +623,7 @@ bool TutorialGame::SelectObject() {
 		}
 	}
 	else {
-		if ((currentLevel == Physics) || (currentLevel == Pathfinding) || (currentLevel == Networking))
-			Debug::Print("Press Q to change to select mode!", Vector2(5, 85));
+		Debug::Print("Press Q to change to select mode!", Vector2(5, 85));
 	}
 	return false;
 }
@@ -643,8 +636,7 @@ line - after the third, they'll be able to twist under torque aswell.
 */
 
 void TutorialGame::MoveSelectedObject() {
-	if ((currentLevel == Physics) || (currentLevel == Pathfinding) || (currentLevel == Networking))
-		Debug::Print("Click Force:" + std::to_string(forceMagnitude), Vector2(5, 90));
+	Debug::Print("Click Force:" + std::to_string(forceMagnitude), Vector2(5, 90));
 	forceMagnitude += Window::GetMouse()->GetWheelMovement() * 100.0f;
 
 	if (!selectionObject) {

@@ -1,4 +1,4 @@
-# Install script for directory: C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses
+# Install script for directory: C:/Users/squir/Desktop/Team Project/NCLCoreClasses
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

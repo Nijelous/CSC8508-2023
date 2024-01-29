@@ -14,7 +14,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EBF48ACF-ABC2-362D-9BDD-6BFBC59FB207}</ProjectGuid>
+    <ProjectGuid>{E19470ED-D855-335F-BE9A-CE8733785251}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.22621.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -42,11 +42,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NCLCoreClasses.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NCLCoreClasses</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NCLCoreClasses.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NCLCoreClasses</TargetName>
     <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
@@ -61,16 +61,16 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <Optimization>Disabled</Optimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/NCLCoreClasses.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>C:/Users/squir/Desktop/Team Project/NCLCoreClasses/NCLCoreClasses.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ASSETROOTLOCATION="C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ASSETROOTLOCATION="C:/Users/squir/Desktop/Team Project/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ASSETROOTLOCATION=\"C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ASSETROOTLOCATION=\"C:/Users/squir/Desktop/Team Project/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -92,18 +92,18 @@
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile>C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/NCLCoreClasses.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile>C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>C:/Users/squir/Desktop/Team Project/NCLCoreClasses/NCLCoreClasses.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <UseFullPaths>false</UseFullPaths>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION="C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION="C:/Users/squir/Desktop/Team Project/Assets/";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <DebugInformationFormat>
       </DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION=\"C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ASSETROOTLOCATION=\"C:/Users/squir/Desktop/Team Project/Assets/\";NOMINMAX;WIN32_LEAN_AND_MEAN;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
     </ResourceCompile>
     <Midl>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,11 +118,11 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeLists.txt">
+    <CustomBuild Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-C:\Users\squir\Downloads\cmake-3.28.0-rc5-windows-x86_64\cmake-3.28.0-rc5-windows-x86_64\bin\cmake.exe "-SC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" "-BC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" --check-stamp-file "C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/generate.stamp"
+C:\Users\squir\Downloads\cmake-3.28.0-rc5-windows-x86_64\cmake-3.28.0-rc5-windows-x86_64\bin\cmake.exe "-SC:/Users/squir/Desktop/Team Project" "-BC:/Users/squir/Desktop/Team Project" --check-stamp-file "C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -131,11 +131,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-C:\Users\squir\Downloads\cmake-3.28.0-rc5-windows-x86_64\cmake-3.28.0-rc5-windows-x86_64\bin\cmake.exe "-SC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" "-BC:/Users/squir/Desktop/Gaming Tech/CSC8503 2023" --check-stamp-file "C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/generate.stamp"
+C:\Users\squir\Downloads\cmake-3.28.0-rc5-windows-x86_64\cmake-3.28.0-rc5-windows-x86_64\bin\cmake.exe "-SC:/Users/squir/Desktop/Team Project" "-BC:/Users/squir/Desktop/Team Project" --check-stamp-file "C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -144,268 +144,268 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\cmake_pch.cxx">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\cmake_pch.cxx">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/NCLCoreClasses.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/NCLCoreClasses.dir/Debug/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
-      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/NCLCoreClasses.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/NCLCoreClasses.dir/Release/cmake_pch.pch</PrecompiledHeaderOutputFile>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Assets.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Assets.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Assets.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\SimpleFont.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Assets.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\SimpleFont.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\SimpleFont.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureLoader.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\SimpleFont.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureLoader.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureLoader.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureWriter.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureLoader.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureWriter.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\TextureWriter.h" />
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Camera.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Maths.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\TextureWriter.h" />
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Camera.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Maths.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Maths.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix2.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Maths.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix2.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix2.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix3.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix2.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix3.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix3.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix4.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix3.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix4.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Matrix4.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Plane.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Matrix4.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Plane.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Plane.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Frustum.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Plane.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Frustum.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Frustum.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Quaternion.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Frustum.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Quaternion.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Quaternion.h" />
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\NewVector.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Quaternion.h" />
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\NewVector.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2i.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2i.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector2i.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3I.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector2i.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3I.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector3I.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4I.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector3I.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4I.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Vector4I.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshAnimation.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Vector4I.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshAnimation.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshAnimation.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mesh.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshAnimation.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mesh.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mesh.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MshLoader.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mesh.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MshLoader.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MshLoader.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshMaterial.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MshLoader.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshMaterial.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\MeshMaterial.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\RendererBase.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\MeshMaterial.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\RendererBase.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\RendererBase.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Shader.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\RendererBase.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Shader.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Shader.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Texture.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Shader.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Texture.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Texture.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Camera.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Texture.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Camera.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\GameTimer.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\GameTimer.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\GameTimer.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Keyboard.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\GameTimer.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Keyboard.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Keyboard.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mouse.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Keyboard.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mouse.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Mouse.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Window.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Mouse.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Window.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Window.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Controller.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Window.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Controller.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Controller.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\KeyboardMouseController.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Controller.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\KeyboardMouseController.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\KeyboardMouseController.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Keyboard.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\KeyboardMouseController.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Keyboard.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Keyboard.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Mouse.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Keyboard.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Mouse.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Mouse.h" />
-    <ClCompile Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Window.cpp">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Mouse.h" />
+    <ClCompile Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Window.cpp">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Debug/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ScanSourceforModuleDependencies>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Gaming Tech/CSC8503 2023/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:/Users/squir/Desktop/Team Project/NCLCoreClasses/CMakeFiles/NCLCoreClasses.dir/Release/cmake_pch.hxx;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <ScanSourceforModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ScanSourceforModuleDependencies>
     </ClCompile>
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\Win32Window.h" />
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Debug\cmake_pch.hxx" />
-    <ClInclude Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Release\cmake_pch.hxx" />
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\Win32Window.h" />
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Debug\cmake_pch.hxx" />
+    <ClInclude Include="C:\Users\squir\Desktop\Team Project\NCLCoreClasses\CMakeFiles\NCLCoreClasses.dir\Release\cmake_pch.hxx" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="C:\Users\squir\Desktop\Gaming Tech\CSC8503 2023\ZERO_CHECK.vcxproj">
-      <Project>{3EC6402A-2B7E-36E0-BB9A-247761EFA8EA}</Project>
+    <ProjectReference Include="C:\Users\squir\Desktop\Team Project\ZERO_CHECK.vcxproj">
+      <Project>{B12F0413-9CB9-355F-AB21-6C78CB7E2C35}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>

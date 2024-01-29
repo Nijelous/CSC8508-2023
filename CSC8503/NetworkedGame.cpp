@@ -36,8 +36,6 @@ void NetworkedGame::StartAsServer() {
 	thisServer->RegisterPacketHandler(Received_State, this);
 
 	StartLevel();
-
-	networkRole = Server;
 }
 
 void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
@@ -50,8 +48,6 @@ void NetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	thisClient->RegisterPacketHandler(Player_Disconnected, this);
 
 	StartLevel();
-
-	networkRole = Client;
 }
 
 void NetworkedGame::UpdateGame(float dt) {
@@ -65,13 +61,12 @@ void NetworkedGame::UpdateGame(float dt) {
 		}
 		timeToNextPacket += 1.0f / 20.0f; //20hz server/client update
 	}
-	if (currentLevel == Networking) {
-		if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyCodes::F9)) {
-			CreatePlayer1();
-		}
-		if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyCodes::F10)) {
-			CreatePlayer2();
-		}
+
+	if (!thisServer && Window::GetKeyboard()->KeyPressed(KeyCodes::F9)) {
+		std::cout << "Start As Server!" << std::endl;
+	}
+	if (!thisClient && Window::GetKeyboard()->KeyPressed(KeyCodes::F10)) {
+		std::cout << "Start As Client!" << std::endl;
 	}
 
 	TutorialGame::UpdateGame(dt);
@@ -105,30 +100,7 @@ void NetworkedGame::UpdateAsClient(float dt) {
 		newPacket.buttonstates[0] = ' ';
 		// ID of last full state package recieved
 	}
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)) {
-		newPacket.buttonstates[1] = 'W';
-	}
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)) {
-		newPacket.buttonstates[2] = 'A';
-	}
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)) {
-		newPacket.buttonstates[3] = 'S';
-	}
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)) {
-		newPacket.buttonstates[4] = 'D';
-	}
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::SPACE)) {
-		newPacket.buttonstates[5] = ' ';
-	}
-
-	if (!inSelectionMode) {
-		if (controller.GetAxis(3) > 0.0f)
-			RotateCameraAroundPLayer(true, controller.GetAxis(3) * 1, dt);
-		if (controller.GetAxis(3) < 0.0f)
-			RotateCameraAroundPLayer(false, controller.GetAxis(3) * -1, dt);
-	}
-	newPacket.lastID = latestServerFullState;
-	newPacket.cameraPosition = world->GetMainCamera().GetPosition();
+	newPacket.lastID = 0;
 
 	thisClient->SendPacket(newPacket);
 
@@ -150,7 +122,7 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 			continue;
 		}
 		// line added by me
-		int playerState = latestClientFullState;
+		int playerState = 0;
 		// line added by me
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, playerState)) {
@@ -197,57 +169,7 @@ void NetworkedGame::StartLevel() {
 //
 // Author: Ewan Squire
 void NetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-	if (type == Full_State) {
-		FullPacket* realPacket = (FullPacket*)payload;
-		// if client 
-		latestServerFullState = realPacket->fullState.stateID;
-
-		std::vector<GameObject*>::const_iterator first;
-		std::vector<GameObject*>::const_iterator last;
-
-		world->GetObjectIterators(first, last);
-		for (auto i = first; i != last; ++i) {
-			NetworkObject* o = (*i)->GetNetworkObject();
-			if (!o) {
-				continue;
-			}
-			if (o->GetnetworkID() == realPacket->objectID) {
-				o->ReadPacket(*payload);
-			}
-		}
-	}
-	if (type == Delta_State) {
-		DeltaPacket* realPacket = (DeltaPacket*)payload;
-
-		std::vector<GameObject*>::const_iterator first;
-		std::vector<GameObject*>::const_iterator last;
-
-		world->GetObjectIterators(first, last);
-		for (auto i = first; i != last; ++i) {
-			NetworkObject* o = (*i)->GetNetworkObject();
-			if (!o) {
-				continue;
-			}
-			if (o->GetnetworkID() == realPacket->objectID) {
-				o->ReadPacket(*payload);
-			}
-		}
-	}
-	if (type == Received_State) {
-		// client -> Server packet
-		ClientPacket* realPacket = (ClientPacket*)payload;
-		lastPlayer2Input = ClientInput(	realPacket->lastID, 
-										realPacket->buttonstates[0], 
-										realPacket->buttonstates[1],
-										realPacket->buttonstates[2],
-										realPacket->buttonstates[3],
-										realPacket->buttonstates[4],
-										realPacket->buttonstates[5],
-										realPacket->buttonstates[6],
-										realPacket->buttonstates[7],
-										realPacket->cameraPosition);
-		latestClientFullState = realPacket->lastID;
-	}
+	
 }
 
 void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
