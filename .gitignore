@@ -35,4 +35,10 @@ cmake_install.cmake
 CSC8503/cmake_install.cmake
 CSC8503CoreClasses/cmake_install.cmake
 OpenGLRendering/cmake_install.cmake
+NCLCoreClasses/Debug
+NCLCoreClasses/NCLCoreClasses.dir/Debug
+CSC8503/CSC8503.dir/Debug
+OpenGLRendering/Debug
+OpenGLRendering/OpenGLRendering.dir/Debug
+x64/Debug
 CSC8503.sln
