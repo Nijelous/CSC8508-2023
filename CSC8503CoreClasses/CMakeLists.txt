@@ -57,6 +57,18 @@ set(Collision_Detection
 )
 source_group("Collision Detection" FILES ${Collision_Detection})
 
+set(Level
+    "ILevelManager.h"
+    "ILevelManager.cpp"
+    "LevelManager.h"
+    "LevelManager.cpp"
+    "Level.h"
+    "Level.cpp"
+    "Room.h"
+    "Room.cpp"
+)
+source_group("Level" FILES ${Level})
+
 set(Networking
     "GameClient.h"  
     "GameClient.cpp"
@@ -133,6 +145,7 @@ set(ALL_FILES
     ${AI_State_Machine}
     ${AI_Pathfinding}
     ${Collision_Detection}
+    ${Level}
     ${Networking}
     ${Physics}
     ${enet_Files}   
