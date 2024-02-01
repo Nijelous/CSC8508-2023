@@ -57,6 +57,14 @@ set(Collision_Detection
 )
 source_group("Collision Detection" FILES ${Collision_Detection})
 
+set(Lights
+"BaseLight.h" 
+"DirectionalLight.h"
+"PointLight.h"
+"SpotLight.h"
+)
+source_group("Lights" FILES ${Lights})
+
 set(Networking
     "GameClient.h"  
     "GameClient.cpp"
@@ -135,7 +143,8 @@ set(ALL_FILES
     ${Collision_Detection}
     ${Networking}
     ${Physics}
-    ${enet_Files}   
+    ${enet_Files}
+    ${Lights}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
