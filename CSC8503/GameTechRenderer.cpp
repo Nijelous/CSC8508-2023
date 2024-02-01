@@ -139,9 +139,10 @@ void GameTechRenderer::BuildObjectList() {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsActive()) {
-			const RenderObject* g = o->GetRenderObject();
-				if (g && mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius())) {
-					activeObjects.emplace_back(g);
+			const RenderObject* rendObj = o->GetRenderObject();
+			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
+				if (rendObj && isInFrustum) {
+					activeObjects.emplace_back(rendObj);
 				}
 			}
 		}
@@ -149,7 +150,7 @@ void GameTechRenderer::BuildObjectList() {
 }
 
 void GameTechRenderer::SortObjectList() {
-	//std::sort(activeObjects.begin(), activeObjects.end(), )
+
 }
 
 void GameTechRenderer::RenderShadowMap() {
