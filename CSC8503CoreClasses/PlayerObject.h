@@ -4,10 +4,18 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		class PlayerObject
+		class PlayerObject : public GameObject
 		{
-			PlayerObject();
+		public:
+			PlayerObject(const std::string& name = "");
 			~PlayerObject();
+
+		protected:
+
+
+		private:
+
+
 		};
 	}
 }
