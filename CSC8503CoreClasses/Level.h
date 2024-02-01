@@ -22,7 +22,7 @@ namespace NCL {
 			int mCCTVCount;
 			Vector3 mPrisonPosition;
 			std::unique_ptr<Vector3[]> mPlayerStartPositions;
-			//std::vector<Vector3> mLights;
+			//std::vector<Lights> mLights;
 			//NavMesh
 			//std::vector<Vector3> mItemPositions;
 			//std::vector<Vent> mVents;
