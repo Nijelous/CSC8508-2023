@@ -58,8 +58,6 @@ set(Collision_Detection
 source_group("Collision Detection" FILES ${Collision_Detection})
 
 set(Level
-    "ILevelManager.h"
-    "ILevelManager.cpp"
     "LevelManager.h"
     "LevelManager.cpp"
     "Level.h"
