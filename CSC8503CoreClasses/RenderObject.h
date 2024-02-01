@@ -13,8 +13,8 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader);
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, Vector4 colour);
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, float cullSphereRadius);
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, Vector4 colour, float cullSphereRadius);
 			~RenderObject();
 
 			void SetDefaultTexture(Texture* t) {
@@ -45,12 +45,17 @@ namespace NCL {
 				return colour;
 			}
 
+			float GetCullSphereRadius() const {
+				return mCullSphereRadius;
+			}
+
 		protected:
 			Mesh*		mesh;
 			Texture*	texture;
 			Shader*		shader;
 			Transform*	transform;
 			Vector4		colour;
+			float		mCullSphereRadius;
 		};
 	}
 }
