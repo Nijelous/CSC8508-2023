@@ -6,7 +6,8 @@ namespace NCL {
 	namespace CSC8503 {
 		class PlayerObject
 		{
-
+			PlayerObject();
+			~PlayerObject();
 		};
 	}
 }
