@@ -65,6 +65,16 @@ set(Lights
 )
 source_group("Lights" FILES ${Lights})
 
+set(Level
+    "LevelManager.h"
+    "LevelManager.cpp"
+    "Level.h"
+    "Level.cpp"
+    "Room.h"
+    "Room.cpp"
+)
+source_group("Level" FILES ${Level})
+
 set(Networking
     "GameClient.h"  
     "GameClient.cpp"
@@ -141,6 +151,7 @@ set(ALL_FILES
     ${AI_State_Machine}
     ${AI_Pathfinding}
     ${Collision_Detection}
+    ${Level}
     ${Networking}
     ${Physics}
     ${enet_Files}
