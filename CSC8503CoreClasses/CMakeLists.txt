@@ -62,6 +62,10 @@ set(Level
     "ILevelManager.cpp"
     "LevelManager.h"
     "LevelManager.cpp"
+    "Level.h"
+    "Level.cpp"
+    "Room.h"
+    "Room.cpp"
 )
 source_group("Level" FILES ${Level})
 
