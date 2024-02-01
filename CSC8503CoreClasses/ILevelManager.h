@@ -10,7 +10,7 @@ namespace NCL {
 		protected:
 			virtual void UpdateLevel() = 0;
 			virtual void LoadLevel(int id) = 0;
-			virtual float GetDistanceToCamera(Vector3& objectPosition) = 0; //Array Size = 4
+			virtual float GetSqDistanceToCamera(Vector3& objectPosition) = 0;
 		};
 	}
 }
