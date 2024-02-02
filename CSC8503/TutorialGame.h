@@ -99,6 +99,8 @@ namespace NCL {
 				lockedObject = o;
 			}
 
+			vector<GameObject*> mGameObjects;
+
 			GameObject* objClosest = nullptr;
 
 			PlayerObject* tempPlayer;

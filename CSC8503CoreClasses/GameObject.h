@@ -80,6 +80,8 @@ namespace NCL::CSC8503 {
 			return worldID;
 		}
 
+		virtual void UpdateObject(float dt);
+
 	protected:
 		Transform			transform;
 

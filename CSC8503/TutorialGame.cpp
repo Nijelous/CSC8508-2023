@@ -142,6 +142,12 @@ void TutorialGame::UpdateGame(float dt) {
 	if (testStateObject)
 		testStateObject->Update(dt);
 
+	if (mGameObjects.size() > 0) {
+		for (int i = 0; i < mGameObjects.size(); i++) {
+			mGameObjects[i]->UpdateObject(dt);
+		}
+	}
+
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
@@ -505,7 +511,11 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 
+	guard->SetPlayer(tempPlayer);
+	guard->SetGameWorld(world);
+
 	world->AddGameObject(guard);
+	mGameObjects.push_back(guard);
 
 	return guard;
 }
