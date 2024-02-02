@@ -21,25 +21,25 @@ namespace NCL::CSC8503 {
 		~AnimationObject();
 
 		MeshMaterial* GetMeshMaterial() const {
-			return material;
+			return mMaterial;
 		}
 
 		void setMaterial(MeshMaterial* newMaterial) {
-			material = newMaterial;
+			mMaterial = newMaterial;
 		}
 
 		MeshAnimation* GetMeshAnimation() const {
-			return animation;
+			return mAnimation;
 		}
 
 		void setMeshAnimation(MeshAnimation* newAnimation) {
-			animation = newAnimation;
+			mAnimation = newAnimation;
 		}
 
 		
 
 		void setMeshAnimationStop(MeshAnimation* newAnimation) {
-			animation = newAnimation;
+			mAnimation = newAnimation;
 
 		}
 		
@@ -48,21 +48,21 @@ namespace NCL::CSC8503 {
 		
 		 
 	protected:
-		Transform			transform;
+		Transform			mTransform;
 
-		CollisionVolume* boundingVolume;
-		PhysicsObject* physicsObject;
-		RenderObject* renderObject;
-		NetworkObject* networkObject;
+		CollisionVolume* mBoundingVolume;
+		PhysicsObject* mPhysicsObject;
+		RenderObject* mRenderObject;
+		NetworkObject* mNetworkObject;
 
 		bool		isActive;
 		int			worldID;
-		std::string	name;
+		std::string	mName;
 		
 		Vector3 broadphaseAABB;
 
-		MeshAnimation* animation;
-		MeshMaterial* material;
+		MeshAnimation* mAnimation;
+		MeshMaterial* mMaterial;
 	
 	
 	};

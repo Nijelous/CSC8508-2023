@@ -7,26 +7,26 @@
 
 
 AnimationObject::AnimationObject(const std::string& objectName) {
-	name = objectName;
-	worldID = -1;
-	isActive = true;
-	boundingVolume = nullptr;
-	physicsObject = nullptr;
-	renderObject = nullptr;
-	networkObject = nullptr;
-	animation = nullptr;
-	material = nullptr;
+	mName = objectName;
+	mWorldID = 2;
+	mIsActive = true;
+	mBoundingVolume = nullptr;
+	mPhysicsObject = nullptr;
+	mRenderObject = nullptr;
+	mNetworkObject = nullptr;
+	mAnimation = nullptr;
+	mMaterial = nullptr;
 	
 	
 }
 
 AnimationObject::~AnimationObject() {
-	delete boundingVolume;
-	delete physicsObject;
-	delete renderObject;
-	delete networkObject;
-	delete animation;
-	delete material;
+	delete mBoundingVolume;
+	delete mPhysicsObject;
+	delete mRenderObject;
+	delete mNetworkObject;
+	delete mAnimation;
+	delete mMaterial;
 }
 
 void AnimationObject::setMeshAnimationRun() {
