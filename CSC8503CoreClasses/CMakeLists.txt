@@ -98,6 +98,7 @@ source_group("Physics" FILES ${Physics})
 set(Header_Files
     "Debug.h"
     "GameObject.h"
+    "PlayerObject.h"
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
@@ -107,6 +108,7 @@ source_group("Header Files" FILES ${Header_Files})
 set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
+    "PlayerObject.cpp"
     "GameWorld.cpp"
     "RenderObject.cpp"
     "Transform.cpp"
