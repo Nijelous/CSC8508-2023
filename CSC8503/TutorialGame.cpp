@@ -409,7 +409,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	//tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, nullptr, basicShader));
+	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, nullptr, basicShader));
 	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
 
 	tempPlayer->GetPhysicsObject()->SetInverseMass(inverseMass);

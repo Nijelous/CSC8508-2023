@@ -8,8 +8,8 @@ namespace NCL {
 
 		class PlayerObject : public GameObject {
 		public:
-			PlayerObject(GameWorld* world, const std::string& objName = "", int movementSpeed = 500);
-			~PlayerObject();
+					PlayerObject(GameWorld* world, const std::string& objName = "", int movementSpeed = 500);
+					~PlayerObject();
 
 			void	UpdateObject(float dt);
 
@@ -18,7 +18,7 @@ namespace NCL {
 
 		private:
 
-			void AttachCameraToPlayer(GameWorld* world);
+			void	AttachCameraToPlayer(GameWorld* world);
 
 			void	MovePlayer(float dt);
 

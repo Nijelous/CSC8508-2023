@@ -47,6 +47,6 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		physicsObject->AddForce(rightAxis * mMovementSpeed);
-	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
-	StopSliding();
 }
+
+
