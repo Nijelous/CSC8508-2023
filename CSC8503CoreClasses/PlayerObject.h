@@ -22,10 +22,6 @@ namespace NCL {
 
 			void	MovePlayer(float dt);
 
-			Vector3	GetForwardAxis();
-
-			Vector3	GetRightAxis();
-
 			int mMovementSpeed;
 
 			GameWorld* mGameWorld;
