@@ -6,12 +6,14 @@
 #include "PlayerObject.h"
 
 #include "Window.h"
+#include "GameWorld.h"
 
 using namespace NCL::CSC8503;
 
-PlayerObject::PlayerObject(const std::string& objName, int movementSpeed) {
+PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int movementSpeed) {
 	name = objName;
 	mMovementSpeed = movementSpeed;
+	mGameWorld = world;
 }
 
 PlayerObject::~PlayerObject() {
@@ -21,6 +23,13 @@ PlayerObject::~PlayerObject() {
 void PlayerObject::UpdateObject(float dt)
 {
 	MovePlayer(dt);
+	AttachCameraToPlayer(mGameWorld);
+}
+
+void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
+	Vector3 offset = GetTransform().GetPosition();
+	offset.y += 3;
+	world->GetMainCamera().SetPosition(offset);
 }
 
 void PlayerObject::MovePlayer(float dt) {

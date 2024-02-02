@@ -4,9 +4,11 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		class GameWorld;
+
 		class PlayerObject : public GameObject {
 		public:
-			PlayerObject(const std::string& objName = "", int movementSpeed = 500);
+			PlayerObject(GameWorld* world, const std::string& objName = "", int movementSpeed = 500);
 			~PlayerObject();
 
 			void	UpdateObject(float dt);
@@ -16,6 +18,8 @@ namespace NCL {
 
 		private:
 
+			void AttachCameraToPlayer(GameWorld* world);
+
 			void	MovePlayer(float dt);
 
 			Vector3	GetForwardAxis();
@@ -23,6 +27,8 @@ namespace NCL {
 			Vector3	GetRightAxis();
 
 			int mMovementSpeed;
+
+			GameWorld* mGameWorld;
 		};
 	}
 }
