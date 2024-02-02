@@ -9,9 +9,11 @@
 
 #include "StateGameObject.h"
 #include "AnimationObject.h"
+#include "GuardObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
+		class PlayerObject;
 		class TutorialGame		{
 		public:
 			TutorialGame();
@@ -56,7 +58,9 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
-			
+
+			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& objectName);
+
 			StateGameObject* AddStateObjectToWorld(const Vector3& position, const std::string& objectName);
 			StateGameObject* testStateObject;
 
@@ -105,6 +109,8 @@ namespace NCL {
 			}
 
 			GameObject* objClosest = nullptr;
+
+			PlayerObject* tempPlayer;
 		};
 	}
 }

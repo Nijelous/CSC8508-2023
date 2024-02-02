@@ -40,6 +40,14 @@ namespace NCL::CSC8503 {
 		}
 	};
 
+	
+	struct SyncPlayerListPacket : public GamePacket {
+		int playerList[4];
+		
+		SyncPlayerListPacket(std::vector<int>& serverPlayers);
+		void SyncPlayerList(std::vector<int>& clientPlayerList) const;
+	};
+
 	class NetworkObject		{
 	public:
 		NetworkObject(GameObject& o, int id);
