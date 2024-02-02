@@ -485,6 +485,31 @@ StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, co
 	return apple;
 }
 
+GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::string& objectName) {
+	//unique_ptr<GuardObject> guard(new GuardObject(objectName));
+	GuardObject* guard = new GuardObject(objectName);
+
+	float meshSize = 3.0f;
+	float inverseMass = 0.5f;
+
+	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
+	guard->SetBoundingVolume((CollisionVolume*)volume);
+
+	guard->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition(position);
+
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume()));
+
+	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
+	guard->GetPhysicsObject()->InitSphereInertia(false);
+
+	world->AddGameObject(guard);
+
+	return guard;
+}
+
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -20, 0), "Floor Object");
 }
@@ -493,6 +518,7 @@ void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0), "Player Object");
 	AddEnemyToWorld(Vector3(5, 5, 0), "Enemy Object");
 	AddBonusToWorld(Vector3(10, 5, 0), "Bonus Object");
+	AddGuardToWorld(Vector3(10, 5, 5), "Guard Object");
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
