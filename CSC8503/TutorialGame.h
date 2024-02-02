@@ -11,6 +11,7 @@
 
 namespace NCL {
 	namespace CSC8503 {
+		class PlayerObject;
 		class TutorialGame		{
 		public:
 			TutorialGame();
@@ -96,6 +97,8 @@ namespace NCL {
 			}
 
 			GameObject* objClosest = nullptr;
+
+			PlayerObject* tempPlayer;
 		};
 	}
 }

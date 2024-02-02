@@ -8,6 +8,8 @@
 #include "OrientationConstraint.h"
 #include "StateGameObject.h"
 
+#include "PlayerObject.h"
+
 
 using namespace NCL;
 using namespace CSC8503;
@@ -99,6 +101,8 @@ void TutorialGame::UpdateGame(float dt) {
 		world->GetMainCamera().SetPitch(angles.x);
 		world->GetMainCamera().SetYaw(angles.y);
 	}
+
+	tempPlayer->UpdateObject(dt);
 
 	UpdateKeys();
 	if (useGravity) {
@@ -265,7 +269,7 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	InitMixedGridWorld(5, 5, 3.5f, 3.5f);
+	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 
 	InitGameExamples();
 	InitDefaultFloor();
@@ -393,27 +397,27 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::string& objectName) {
-	float meshSize		= 1.0f;
+	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
 
-	GameObject* character = new GameObject(objectName);
-	SphereVolume* volume  = new SphereVolume(1.0f);
+	tempPlayer = new PlayerObject(world, objectName, 20);
+	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
 
-	character->SetBoundingVolume((CollisionVolume*)volume);
+	tempPlayer->SetBoundingVolume((CollisionVolume*)volume);
 
-	character->GetTransform()
+	tempPlayer->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), charMesh, nullptr, basicShader));
-	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
+	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, nullptr, basicShader));
+	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
 
-	character->GetPhysicsObject()->SetInverseMass(inverseMass);
-	character->GetPhysicsObject()->InitSphereInertia(false);
+	tempPlayer->GetPhysicsObject()->SetInverseMass(inverseMass);
+	tempPlayer->GetPhysicsObject()->InitSphereInertia(false);
 
-	world->AddGameObject(character);
+	world->AddGameObject(tempPlayer);
 
-	return character;
+	return tempPlayer;
 }
 
 GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position, const std::string& objectName) {
