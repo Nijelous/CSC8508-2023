@@ -9,12 +9,18 @@ class BaseLight {
 public:
 	BaseLight() {};
 	virtual ~BaseLight() = 0 {};
-	Vector4 GetColour() const { return colour; }
-	void SetColour(const Vector4& val) { colour = val; }
-	std::string GetName() const { return name; }
+	Vector4 GetColour() const { 
+		return mColour; 
+	}
+	void SetColour(const Vector4& val) { 
+		mColour = val; 
+	}
+	std::string GetName() const { 
+		return mName; 
+	}
 
 protected:
-	Vector4 colour;
-	Vector4 intensity;
-	std::string name;
+	Vector4 mColour;
+	Vector4 mIntensity;
+	std::string mName;
 };

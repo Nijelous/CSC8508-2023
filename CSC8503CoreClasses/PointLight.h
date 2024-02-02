@@ -7,20 +7,27 @@ using namespace Maths;
 class PointLight : public BaseLight
 {
 public:
-	PointLight(const Vector3& position, const Vector4& colour, float radius)
-	{
-		this->position = position;
-		this->colour = colour;
-		this->radius = radius;
-		name = "point";
+	PointLight(const Vector3& position, const Vector4& colour, float radius) {
+		this->mPosition = position;
+		this->mColour = colour;
+		this->mRadius = radius;
+		mName = "point";
 	}
 
-	~PointLight(void) {};
-	Vector3 GetPosition() const { return position; }
-	void SetPosition(const Vector3& val) { position = val; }
-	float GetRadius() const { return radius; }
-	void SetRadius(float val) { radius = val; }
+	~PointLight() {};
+	Vector3 GetPosition() const { 
+		return mPosition; 
+	}
+	void SetPosition(const Vector3& val) { 
+		mPosition = val; 
+	}
+	float GetRadius() const { 
+		return mRadius; 
+	}
+	void SetRadius(float val) { 
+		mRadius = val; 
+	}
 protected:
-	Vector3 position;
-	float radius;
+	Vector3 mPosition;
+	float mRadius;
 };
