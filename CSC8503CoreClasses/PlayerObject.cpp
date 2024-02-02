@@ -33,11 +33,11 @@ void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 }
 
 void PlayerObject::MovePlayer(float dt) {
-	Vector3 fwdAxis = GetForwardAxis();
-	Vector3 rightAxis = GetRightAxis();
+	Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
+	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::W))
-		physicsObject->AddForce(-fwdAxis * mMovementSpeed);
+		physicsObject->AddForce(fwdAxis * mMovementSpeed);
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::S))
 		physicsObject->AddForce(fwdAxis * mMovementSpeed);
@@ -46,15 +46,7 @@ void PlayerObject::MovePlayer(float dt) {
 		physicsObject->AddForce(rightAxis * mMovementSpeed);
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
-		physicsObject->AddForce(-rightAxis * mMovementSpeed);
-}
-
-Vector3 PlayerObject::GetForwardAxis() {
-	// to be changed
-	return Vector3(0,0,-1);
-}
-
-Vector3 PlayerObject::GetRightAxis() {
-	// to be changed
-	return Vector3(1,0,0);
+		physicsObject->AddForce(rightAxis * mMovementSpeed);
+	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
+	StopSliding();
 }
