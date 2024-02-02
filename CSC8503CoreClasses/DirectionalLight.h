@@ -4,14 +4,14 @@
 using namespace NCL;
 using namespace Maths;
 
-class DirectionLight : public BaseLight
+class DirectionLight : public Light
 {
 public:
 	DirectionLight(Vector3 direction, const Vector4& colour) {
 		direction.Normalise();
 		this->mDirection = direction;
 		this->mColour = colour;
-		mName = "direction";
+		mType = Direction;
 	}
 
 	~DirectionLight(void) {};

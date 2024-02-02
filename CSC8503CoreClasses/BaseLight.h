@@ -5,22 +5,35 @@
 using namespace NCL;
 using namespace Maths;
 
-class BaseLight {
+class Light {
 public:
-	BaseLight() {};
-	virtual ~BaseLight() = 0 {};
+
+	enum Type {
+		Spot,
+		Point,
+		Direction
+	};
+
+	virtual ~Light() = 0 {};
 	Vector4 GetColour() const { 
 		return mColour; 
 	}
+
+	const float* GetColourAddress() const {
+		const float *address = &mColour.x;
+		return address;
+	}
+
+
 	void SetColour(const Vector4& val) { 
 		mColour = val; 
 	}
-	std::string GetName() const { 
-		return mName; 
+	Type GetType() const { 
+		return mType; 
 	}
 
 protected:
 	Vector4 mColour;
 	Vector4 mIntensity;
-	std::string mName;
+	Type mType;
 };
