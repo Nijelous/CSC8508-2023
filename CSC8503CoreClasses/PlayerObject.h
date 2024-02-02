@@ -22,6 +22,10 @@ namespace NCL {
 
 			void	MovePlayer(float dt);
 
+			void	MatchCameraRotation();
+
+			void StopSliding();
+
 			int mMovementSpeed;
 
 			GameWorld* mGameWorld;
