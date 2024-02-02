@@ -48,9 +48,17 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		physicsObject->AddForce(rightAxis * mMovementSpeed);
+
+	StopSliding();
 }
 
 void PlayerObject::MatchCameraRotation() {
 	Matrix4 yawRotation = Matrix4::Rotation(mGameWorld->GetMainCamera().GetYaw(), Vector3(0, 1, 0));
 	GetTransform().SetOrientation(yawRotation);
 }
+
+void PlayerObject::StopSliding() {
+	if (physicsObject->GetForce() == Vector3(0, 0, 0))
+		physicsObject->SetLinearVelocity(Vector3(0, 0, 0));
+}
+

@@ -24,6 +24,8 @@ namespace NCL {
 
 			void	MatchCameraRotation();
 
+			void StopSliding();
+
 			int mMovementSpeed;
 
 			GameWorld* mGameWorld;
