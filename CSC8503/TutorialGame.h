@@ -8,6 +8,7 @@
 #include "PhysicsSystem.h"
 
 #include "StateGameObject.h"
+#include "AnimationObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -55,9 +56,11 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
-
+			
 			StateGameObject* AddStateObjectToWorld(const Vector3& position, const std::string& objectName);
 			StateGameObject* testStateObject;
+
+			AnimationObject* AddAnimationObjectToWorld(const Vector3& position, const std::string& objectName);
 
 #ifdef USEVULKAN
 			GameTechVulkanRenderer*	renderer;
@@ -76,6 +79,12 @@ namespace NCL {
 
 			GameObject* selectionObject = nullptr;
 
+			//Animation Object test
+			AnimationObject* animationObject = nullptr;
+			Mesh* soldierMesh = nullptr;
+			Shader* soldierShader = nullptr;
+
+
 			Mesh*	capsuleMesh = nullptr;
 			Mesh*	cubeMesh	= nullptr;
 			Mesh*	sphereMesh	= nullptr;
@@ -87,7 +96,7 @@ namespace NCL {
 			Mesh*	charMesh	= nullptr;
 			Mesh*	enemyMesh	= nullptr;
 			Mesh*	bonusMesh	= nullptr;
-
+			
 			//Coursework Additional functionality	
 			GameObject* lockedObject	= nullptr;
 			Vector3 lockedOffset		= Vector3(0, 3, 20);

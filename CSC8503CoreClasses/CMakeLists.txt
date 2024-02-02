@@ -3,6 +3,14 @@ set(PROJECT_NAME CSC8503CoreClasses)
 ################################################################################
 # Source groups
 ################################################################################
+
+set(Animation
+    "AnimationObject.cpp"
+    "AnimationObject.h"
+    
+)
+source_group("Animation" FILES ${Animation})
+
 set(AI_Behaviour_Tree
     "BehaviourAction.h"
     "BehaviourNode.h"
@@ -94,6 +102,8 @@ set(Header_Files
 )
 source_group("Header Files" FILES ${Header_Files})
 
+
+
 set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
@@ -102,6 +112,8 @@ set(Source_Files
     "Transform.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
+
+
 
 set(enet_Files
     #"./enet/callbacks.h"
@@ -127,6 +139,7 @@ source_group("eNet" FILES ${enet_Files})
 
 set(ALL_FILES
     ${Header_Files}
+    ${Animation}
     ${Source_Files}
     ${AI_Behaviour_Tree}
     ${AI_Pushdown_Automata}

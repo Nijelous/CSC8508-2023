@@ -54,12 +54,14 @@ void TutorialGame::InitialiseAssets() {
 	sphereMesh	= renderer->LoadMesh("sphere.msh");
 	capsuleMesh = renderer->LoadMesh("Capsule.msh");
 	charMesh	= renderer->LoadMesh("goat.msh");
+	soldierMesh = renderer->LoadMesh("Role_T.msh");
 	enemyMesh	= renderer->LoadMesh("Keeper.msh");
 	bonusMesh	= renderer->LoadMesh("apple.msh");
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 
 	basicTex	= renderer->LoadTexture("checkerboard.png");
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
+	soldierShader = renderer->LoadShader("SkinningVertex.glsl", "TexturedFragment.glsl");
 
 	InitCamera();
 	InitWorld();
@@ -75,6 +77,7 @@ TutorialGame::~TutorialGame()	{
 
 	delete basicTex;
 	delete basicShader;
+	delete soldierShader;
 
 	delete physics;
 	delete renderer;
@@ -300,6 +303,8 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 	return floor;
 }
 
+
+
 /*
 
 Builds a game object that uses a sphere mesh for its graphics, and a bounding sphere for its
@@ -384,7 +389,8 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 
 	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
-
+	
+	
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
 	cube->GetPhysicsObject()->InitCubeInertia();
 
@@ -481,12 +487,38 @@ StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, co
 	return apple;
 }
 
+//Animation Object test----------------------------------------
+AnimationObject* TutorialGame::AddAnimationObjectToWorld(const Vector3& position, const std::string& objectName)
+{
+	AnimationObject* animation = new AnimationObject(objectName);
+
+	AABBVolume* volume = new AABBVolume(Vector3(1, 1, 1));
+	animation->SetBoundingVolume((CollisionVolume*)volume);
+	animation->GetTransform()
+		.SetScale(Vector3(2, 2, 2))
+		.SetPosition(position);
+
+	animation->SetRenderObject(new RenderObject(&animation->GetTransform(), soldierMesh, nullptr, basicShader));
+	animation->SetPhysicsObject(new PhysicsObject(&animation->GetTransform(), animation->GetBoundingVolume()));
+
+	animation->GetPhysicsObject()->SetInverseMass(1.0f);
+	animation->GetPhysicsObject()->InitSphereInertia(false);
+
+	world->AddGameObject(animation);
+
+	return animation;
+	
+	
+}
+//End of test-----------------------------------------------------
+
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -20, 0), "Floor Object");
 }
 
 void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0), "Player Object");
+	AddAnimationObjectToWorld(Vector3(15, 15, 5), "Animation Object");
 	AddEnemyToWorld(Vector3(5, 5, 0), "Enemy Object");
 	AddBonusToWorld(Vector3(10, 5, 0), "Bonus Object");
 }
@@ -511,6 +543,7 @@ void TutorialGame::InitMixedGridWorld(int numRows, int numCols, float rowSpacing
 			Vector3 position = Vector3(x * colSpacing, 10.0f, z * rowSpacing);
 
 			if (rand() % 2) {
+				/*AddAABBCubeToWorld(position, cubeDims, 1.0f, "Cube Object");*/
 				AddAABBCubeToWorld(position, cubeDims, 1.0f, "Cube Object");
 				//AddCapsuleToWorld(position, halfHeight, sphereRadius, 2.0f, "Capsule Object");
 			}
@@ -596,6 +629,7 @@ bool TutorialGame::SelectObject() {
 			if (selectionObject) {	//set colour to deselected;
 				selectionObject->GetRenderObject()->SetColour(Vector4(1, 1, 1, 1));
 				selectionObject = nullptr;
+				
 			}
 
 			Ray ray = CollisionDetection::BuildRayFromMouse(world->GetMainCamera());
@@ -603,7 +637,7 @@ bool TutorialGame::SelectObject() {
 			RayCollision closestCollision;
 			if (world->Raycast(ray, closestCollision, true)) {
 				selectionObject = (GameObject*)closestCollision.node;
-
+				
 				selectionObject->GetRenderObject()->SetColour(Vector4(0, 1, 0, 1));
 				return true;
 			}
