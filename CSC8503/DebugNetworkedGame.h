@@ -30,8 +30,8 @@ namespace NCL
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
-            GameClient* GetClient();
-            GameServer* GetServer();
+            GameClient* GetClient() const;
+            GameServer* GetServer() const;
         protected:
             bool isClientConnectedToServer = false;
             bool isGameStarted = false;
