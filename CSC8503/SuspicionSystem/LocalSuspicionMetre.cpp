@@ -37,7 +37,7 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
     //If the foundCause is not already int the activeSusCauses vector of that player
     if (foundCause != mActiveLocalSusCauseVector[playerNo].end())
     {
-        mActiveLocalSusCauseVector[playerNo].erase(foundCause, mActiveLocalSusCauseVector[playerNo].end());
+        mActiveLocalSusCauseVector[playerNo].erase(foundCause);
         return true;
     }
 
