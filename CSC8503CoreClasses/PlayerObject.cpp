@@ -24,6 +24,7 @@ void PlayerObject::UpdateObject(float dt)
 {
 	MovePlayer(dt);
 	AttachCameraToPlayer(mGameWorld);
+	MatchCameraRotation();
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
@@ -49,4 +50,7 @@ void PlayerObject::MovePlayer(float dt) {
 		physicsObject->AddForce(rightAxis * mMovementSpeed);
 }
 
-
+void PlayerObject::MatchCameraRotation() {
+	Matrix4 yawRotation = Matrix4::Rotation(mGameWorld->GetMainCamera().GetYaw(), Vector3(0, 1, 0));
+	GetTransform().SetOrientation(yawRotation);
+}
