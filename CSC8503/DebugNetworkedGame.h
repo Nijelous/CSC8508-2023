@@ -25,7 +25,8 @@ namespace NCL
             void StartAsClient(char a, char b, char c, char d);
 
             void UpdateGame(float dt) override;
-
+            
+            void SetIsGameStarted(bool isGameStarted);
             void StartLevel();
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
