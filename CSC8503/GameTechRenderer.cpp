@@ -112,6 +112,9 @@ void GameTechRenderer::LoadSkybox() {
 }
 
 void GameTechRenderer::RenderFrame() {
+	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
+	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
+	mFrameFrustum = mFrameFrustum.FromViewProjMatrix(projMatrix * viewMatrix);
 	glEnable(GL_CULL_FACE);
 	glClearColor(1, 1, 1, 1);
 	BuildObjectList();
@@ -136,9 +139,10 @@ void GameTechRenderer::BuildObjectList() {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsActive()) {
-				const RenderObject* g = o->GetRenderObject();
-				if (g) {
-					activeObjects.emplace_back(g);
+			const RenderObject* rendObj = o->GetRenderObject();
+			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
+				if (rendObj && isInFrustum) {
+					activeObjects.emplace_back(rendObj);
 				}
 			}
 		}

@@ -5,6 +5,7 @@
 #include "OGLMesh.h"
 
 #include "GameWorld.h"
+#include <Frustum.h>
 
 namespace NCL {
 	class Maths::Vector3;
@@ -75,6 +76,8 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			Frustum mFrameFrustum;
 		};
 	}
 }
