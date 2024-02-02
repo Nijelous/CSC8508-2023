@@ -1,9 +1,10 @@
 #pragma once
-#include "Room.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
+		class Vent;
+		class Room;
 		class Level {
 		public:
 			Level(int levelID);
@@ -25,7 +26,7 @@ namespace NCL {
 			//std::vector<Lights> mLights;
 			//NavMesh
 			//std::vector<Vector3> mItemPositions;
-			//std::vector<Vent> mVents;
+			std::vector<Vent*> mVents;
 		};
 	}
 }

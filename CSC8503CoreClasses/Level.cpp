@@ -1,4 +1,6 @@
 #include "Level.h"
+#include "Room.h"
+#include "Vent.h"
 
 using namespace NCL::CSC8503;
 
@@ -15,5 +17,5 @@ Level::Level(int levelID) {
 	//mLights = std::vector<Vector3>();
 	//NavMesh
 	//mItemPositions = std::vector<Vector3>();
-	//std::vector<Vent> mVents;
+	mVents = std::vector<Vent*>();
 }

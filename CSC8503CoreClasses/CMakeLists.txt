@@ -64,6 +64,8 @@ set(Level
     "Level.cpp"
     "Room.h"
     "Room.cpp"
+    "Vent.h"
+    "Vent.cpp"
 )
 source_group("Level" FILES ${Level})
 
