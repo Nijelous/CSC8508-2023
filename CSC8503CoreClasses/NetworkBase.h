@@ -15,7 +15,8 @@ enum BasicNetworkMessages {
 	Player_Connected,
 	Player_Disconnected,
 	Shutdown,
-	VariableUpdate
+	VariableUpdate,
+	SyncPlayers
 };
 
 struct GamePacket {
