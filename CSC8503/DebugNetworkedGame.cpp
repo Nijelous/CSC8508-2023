@@ -230,12 +230,7 @@ void DebugNetworkedGame::SendGameStatusPacket() {
 }
 
 void DebugNetworkedGame::InitWorld() {
-    world->ClearAndErase();
-    physics->Clear();
-
-    InitDefaultFloor();
-    
-   //SpawnPlayers();
+    TutorialGame::InitWorld();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {
