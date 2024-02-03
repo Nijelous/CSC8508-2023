@@ -9,18 +9,18 @@ class GlobalSuspicionMetre :
 public:
     const enum instantGlobalSusCause
     {
-        allarmTriggered, flagCaptured
+        alarmTriggered, flagCaptured
     };
 
-    const enum activeGlobalSusCause
+    const enum continuousGlobalSusCause
     {
         passiveRecovery
     };
 
     void AddInstantGlobalSusCause(instantGlobalSusCause inCause);
 
-    bool AddActiveGlobalSusCause(activeGlobalSusCause inCause);
-    bool RemoveActiveGlobalSusCause(activeGlobalSusCause inCause);
+    void AddContinuousGlobalSusCause(continuousGlobalSusCause inCause);
+    void RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause);
 
     float GetGlobalSusMeter()
     {
@@ -38,15 +38,15 @@ private:
         {allarmTriggered,3}, {flagCaptured, 2}
     };
 
-    std::map<activeGlobalSusCause, float>  mActiveCauseSusSeverityMap =
+    std::map<continuousGlobalSusCause, float>  mContinuousCauseSusSeverityMap =
     {
         {passiveRecovery, -1}
     };
 
     float mGlobalSusMeter;
     float mGlobalRecoveryCooldown;
-    std::vector<activeGlobalSusCause> mActiveGlobalSusCauseVector;
+    std::vector<continuousGlobalSusCause> mContinuousGlobalSusCauseVector;
 
-    void ChangePlayerGlobalSusMetre(float ammount);
+    void ChangePlayerGlobalSusMetre(float amount);
 };
 

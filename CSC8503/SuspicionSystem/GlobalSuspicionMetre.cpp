@@ -6,51 +6,44 @@ void GlobalSuspicionMetre::AddInstantGlobalSusCause(instantGlobalSusCause inCaus
     ChangePlayerGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
 }
 
-bool GlobalSuspicionMetre::AddActiveGlobalSusCause(activeGlobalSusCause inCause)
+bool GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause)
 {
-    auto foundCause = std::find(mActiveGlobalSusCauseVector.begin(), mActiveGlobalSusCauseVector.end(), inCause);
+    auto* foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
-    //If the foundCause is not already in the mActiveGlobalSusCauseVector vector of that player
-    if (foundCause == mActiveGlobalSusCauseVector.end())
+    if (*foundCause == mContinuousGlobalSusCauseVector.end())
     {
-        mActiveGlobalSusCauseVector.push_back(inCause);
-        return true;
+        mContinuousGlobalSusCauseVector.push_back(inCause);
     }
-
-    return false;
 }
 
-bool GlobalSuspicionMetre::RemoveActiveGlobalSusCause(activeGlobalSusCause inCause)
+void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause)
 {
-    auto foundCause = std::find(mActiveGlobalSusCauseVector.begin(), mActiveGlobalSusCauseVector.end(), inCause);
+    auto* foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
-    //If the foundCause is not already in the mActiveGlobalSusCauseVector vector of that player
-    if (foundCause == mActiveGlobalSusCauseVector.end())
+    if (*foundCause != mContinuousGlobalSusCauseVector.end())
     {
-        mActiveGlobalSusCauseVector.erase(foundCause);
-        return true;
+        mContinuousGlobalSusCauseVector.erase(foundCause);
     }
-    return false;
 };
 
 void GlobalSuspicionMetre::Update(float dt)
 {
-    for (activeGlobalSusCause thisCause : mActiveGlobalSusCauseVector)
+    for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
     {
-        ChangePlayerGlobalSusMetre(mActiveCauseSusSeverityMap[thisCause]);
+        ChangePlayerGlobalSusMetre(mContinuousCauseSusSeverityMap[thisCause]);
     }
 
     if (mGlobalRecoveryCooldown == DT_UNTIL_GlOBAL_RECOVERY)
-        RemoveActiveGlobalSusCause(passiveRecovery);
+        RemoveContinuousGlobalSusCause(passiveRecovery);
 
     mGlobalRecoveryCooldown -= dt;
     mGlobalRecoveryCooldown = std::max(mGlobalRecoveryCooldown, 0.0f);
 
     if (mGlobalRecoveryCooldown == 0)
-        AddActiveGlobalSusCause(passiveRecovery);
+        AddContinuousGlobalSusCause(passiveRecovery);
 }
 
-void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float ammount)
+void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount)
 {
     mGlobalSusMeter += ammount;
     mGlobalSusMeter = std::clamp(mGlobalSusMeter,
@@ -59,5 +52,4 @@ void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float ammount)
 
     if (ammount < 0)
         mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
-}
-;
+};
