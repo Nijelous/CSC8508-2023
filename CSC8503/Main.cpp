@@ -29,6 +29,7 @@ using namespace CSC8503;
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include "DebugNetworkedGame.h"
 
 int main() {
 	Window*w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
@@ -40,7 +41,27 @@ int main() {
 	w->ShowOSPointer(false);
 	w->LockMouseToWindow(true);
 
-	TutorialGame* g = new TutorialGame();
+	TutorialGame* g = nullptr;
+	//erendgrmnc: make the bool below true for network test.
+	bool isNetworkTestActive = false;
+	bool isServer = false;
+	if (isNetworkTestActive)
+	{
+		g = new DebugNetworkedGame();
+		auto* networkedGame = (DebugNetworkedGame*)g;
+		if (isServer)
+		{
+			networkedGame->StartAsServer();
+		}
+		else
+		{
+			networkedGame->StartAsClient(127,0,0,1);
+		}
+	}
+	else
+	{
+		g = new TutorialGame();
+	}
 	w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
 	while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)) {
 		float dt = w->GetTimer().GetTimeDeltaSeconds();
