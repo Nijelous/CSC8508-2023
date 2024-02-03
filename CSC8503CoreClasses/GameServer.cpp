@@ -9,6 +9,10 @@ GameServer::GameServer(int onPort, int maxClients)	{
 	clientMax	= maxClients;
 	clientCount = 0;
 	netHandle	= nullptr;
+	peers = new int[clientMax];
+	for (int i = 0; i < clientMax; ++i){
+		peers[i] = -1;
+	}
 	Initialise();
 }
 
@@ -58,6 +62,17 @@ bool GameServer::SendVariableUpdatePacket(VariablePacket& packet) {
 	return true;
 }
 
+bool GameServer::GetPeer(int peerNumber, int& peerId) const
+{
+	if (peerNumber >= clientMax)
+		return false;
+	if (peers[peerNumber] == -1) {
+		return false;
+	}
+	peerId = peers[peerNumber];
+	return true;
+}
+
 void GameServer::UpdateServer() {
 	if (!netHandle) { return; }
 
@@ -84,4 +99,20 @@ void GameServer::UpdateServer() {
 
 void GameServer::SetGameWorld(GameWorld &g) {
 	gameWorld = &g;
+}
+
+void GameServer::AddPeer(int peerNumber) const
+{
+	int emptyIndex = clientMax;
+	for (int i = 0; i < clientMax; i++) {
+		if (peers[i] == peerNumber){
+			return;
+		}
+		if (peers[i] == -1) {
+			emptyIndex = std::min(i, emptyIndex);
+		}
+	}
+	if (emptyIndex < clientMax){
+		peers[emptyIndex] = peerNumber;
+	}
 }
