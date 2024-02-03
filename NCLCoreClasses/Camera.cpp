@@ -39,6 +39,16 @@ void Camera::UpdateCamera(float dt) {
 
 }
 
+Vector3 Camera::GetForwardVector() {
+	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
+	return yawRotation * Vector3(0, 0, -activeController->GetNamedAxis("Forward"));
+}
+
+Vector3 Camera::GetRightVector() {
+	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
+	return yawRotation * Vector3(activeController->GetNamedAxis("Sidestep"), 0, 0);
+}
+
 /*
 Generates a view matrix for the camera's viewpoint. This matrix can be sent
 straight to the shader...it's already an 'inverse camera' matrix.

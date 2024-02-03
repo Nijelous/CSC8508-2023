@@ -3,6 +3,31 @@
 using namespace NCL;
 using namespace CSC8503;
 
+SyncPlayerListPacket::SyncPlayerListPacket(std::vector<int>& serverPlayers) {
+	type = BasicNetworkMessages::SyncPlayers;
+	size = sizeof(SyncPlayerListPacket);
+
+	for (int i = 0; i < 4; i++) {
+		playerList[i] = serverPlayers[i];
+	}
+}
+
+void SyncPlayerListPacket::SyncPlayerList(std::vector<int>& clientPlayerList) const
+{
+//TODO(erendgrmnc): Add config for max player number.
+	
+	for (int i = 0; i < 4; ++i) {
+		clientPlayerList[i] = playerList[i];
+	}
+}
+
+GameStatePacket::GameStatePacket(bool val) {
+	type = BasicNetworkMessages::GameState;
+	size = sizeof(GameStatePacket);
+
+	isGameStarted = val;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
