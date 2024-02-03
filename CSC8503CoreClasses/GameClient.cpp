@@ -6,10 +6,15 @@ using namespace CSC8503;
 GameClient::GameClient()	{
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
 	timerSinceLastPacket = 0.0f;
+	peerId = -1;
 }
 
 GameClient::~GameClient()	{
 	enet_host_destroy(netHandle);
+}
+
+int GameClient::GetPeerID() const {
+	return peerId;
 }
 
 bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum) {
@@ -34,6 +39,8 @@ bool GameClient::UpdateClient() {
 	ENetEvent event;
 	while (enet_host_service(netHandle, &event, 0) > 0) {
 		if (event.type == ENET_EVENT_TYPE_CONNECT) {
+			//erendgrmnc: I remember +1 is needed because when counting server as a player, outgoing peer Id is not increasing.
+			peerId = netPeer->outgoingPeerID + 1;
 			std::cout << "Connected to server!" << std::endl;
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
