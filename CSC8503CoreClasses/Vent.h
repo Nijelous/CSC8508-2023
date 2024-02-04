@@ -8,7 +8,7 @@ namespace NCL {
             Vent();
             void ConnectVent(Vent* vent);
             bool IsOpen() { return mIsOpen; }
-            void ToggleOpen() { mIsOpen == !mIsOpen; }
+            void ToggleOpen() { mIsOpen = !mIsOpen; }
         protected:
             bool mIsOpen;
             Vent* mConnectedVent;

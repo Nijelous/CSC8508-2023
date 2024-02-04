@@ -1,10 +1,10 @@
 #pragma once
+#include "Room.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
 		class Vent;
-		class Room;
 		class GameObject;
 		class Level {
 		public:
@@ -24,7 +24,7 @@ namespace NCL {
 			std::vector<Vector3> mCCTVRotations;
 			int mCCTVCount;
 			Vector3 mPrisonPosition;
-			std::unique_ptr<Vector3[]> mPlayerStartPositions;
+			Vector3* mPlayerStartPositions;
 			//std::vector<Lights> mLights;
 			//NavMesh
 			std::vector<Vector3> mItemPositions;

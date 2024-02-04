@@ -1,5 +1,4 @@
 #include "Level.h"
-#include "Room.h"
 #include "Vent.h"
 #include "GameObject.h"
 
@@ -14,7 +13,7 @@ Level::Level(int levelID) {
 	mCCTVPositions = std::vector<Vector3>();
 	mCCTVCount = 0;
 	mPrisonPosition = Vector3(0, 0, 0);
-	mPlayerStartPositions = std::make_unique_for_overwrite<Vector3[]>(4);
+	mPlayerStartPositions = new Vector3[4];
 	//mLights = std::vector<Light*>();
 	//NavMesh
 	mItemPositions = std::vector<Vector3>();
