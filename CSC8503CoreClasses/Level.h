@@ -6,6 +6,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class Vent;
 		class GameObject;
+		class Light;
 		class Level {
 		public:
 			Level(int levelID);
@@ -20,12 +21,11 @@ namespace NCL {
 			std::map<Vector3, Room> mRoomList;
 			std::vector<std::vector<Vector3>> mGuardPaths;
 			int mGuardCount;
-			std::vector<Vector3> mCCTVPositions;
-			std::vector<Vector3> mCCTVRotations;
+			std::vector<Matrix4> mCCTVTransforms;
 			int mCCTVCount;
 			Vector3 mPrisonPosition;
 			Vector3* mPlayerStartPositions;
-			//std::vector<Lights> mLights;
+			std::vector<Light*> mLights;
 			//NavMesh
 			std::vector<Vector3> mItemPositions;
 			std::vector<Vent*> mVents;
