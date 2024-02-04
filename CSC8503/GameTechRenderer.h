@@ -7,6 +7,11 @@
 #include "GameWorld.h"
 #include <Frustum.h>
 
+#include "MeshAnimation.h"
+#include "MeshMaterial.h"
+
+
+
 namespace NCL {
 	class Maths::Vector3;
 	class Maths::Vector4;
@@ -21,6 +26,9 @@ namespace NCL {
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
+			MeshAnimation* LoadAnimation(const std::string& name);
+			MeshMaterial* LoadMaterial(const std::string& name);
+			
 
 		protected:
 			void NewRenderLines();
@@ -39,6 +47,8 @@ namespace NCL {
 			void RenderSkybox();
 
 			void LoadSkybox();
+
+			void LoadAnimation();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);

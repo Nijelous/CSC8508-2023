@@ -8,6 +8,7 @@ namespace NCL::CSC8503 {
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
+	class AnimationObject;
 
 	class GameObject	{
 	public:
@@ -87,6 +88,7 @@ namespace NCL::CSC8503 {
 		PhysicsObject*		physicsObject;
 		RenderObject*		renderObject;
 		NetworkObject*		networkObject;
+		AnimationObject*  animationObject;
 
 		bool		isActive;
 		int			worldID;

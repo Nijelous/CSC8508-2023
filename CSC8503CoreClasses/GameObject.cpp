@@ -3,6 +3,7 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
+#include "AnimationObject.h"
 
 using namespace NCL::CSC8503;
 
@@ -14,6 +15,7 @@ GameObject::GameObject(const std::string& objectName)	{
 	physicsObject	= nullptr;
 	renderObject	= nullptr;
 	networkObject	= nullptr;
+	animationObject = nullptr;
 }
 
 GameObject::~GameObject()	{
@@ -21,6 +23,7 @@ GameObject::~GameObject()	{
 	delete physicsObject;
 	delete renderObject;
 	delete networkObject;
+	delete animationObject;
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {

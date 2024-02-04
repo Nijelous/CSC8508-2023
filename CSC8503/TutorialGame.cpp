@@ -268,7 +268,7 @@ void TutorialGame::InitCamera() {
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
-
+	
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 
 	InitGameExamples();

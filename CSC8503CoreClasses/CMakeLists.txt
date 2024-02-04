@@ -107,6 +107,7 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
+    "AnimationObject.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -117,6 +118,7 @@ set(Source_Files
     "GameWorld.cpp"
     "RenderObject.cpp"
     "Transform.cpp"
+    "AnimationObject.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
