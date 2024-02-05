@@ -13,21 +13,24 @@ namespace NCL {
 			void Shutdown();
 
 			void SetGameWorld(GameWorld &g);
+			void AddPeer(int peerNumber) const;
 
 			bool SendGlobalPacket(int msgID);
 			bool SendGlobalPacket(GamePacket& packet);
 			bool SendVariableUpdatePacket(VariablePacket& packet);
+			bool GetPeer(int peerNumber, int& peerId) const;
 
 			virtual void UpdateServer();
 
 		protected:
-			int			port;
-			int			clientMax;
-			int			clientCount;
-			GameWorld*	gameWorld;
+			int			mPort;
+			int			mClientMax;
+			int			mClientCount;
+			int*        mPeers;
+			GameWorld*	mGameWorld;
 
-			int incomingDataRate;
-			int outgoingDataRate;
+			int mIncomingDataRate;
+			int mOutgoingDataRate;
 		};
 	}
 }
