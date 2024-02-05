@@ -29,8 +29,8 @@ GameStartStatePacket::GameStartStatePacket(bool val) {
 }
 
 GameEndStatePacket::GameEndStatePacket(bool val){
-	type = BasicNetworkMessages::GameStartState;
-	size = sizeof(GameStartStatePacket);
+	type = BasicNetworkMessages::GameEndState;
+	size = sizeof(GameEndStatePacket);
 
 	isGameEnded = val;
 }
