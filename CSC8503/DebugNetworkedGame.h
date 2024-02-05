@@ -3,10 +3,8 @@
 #include "NetworkBase.h"
 #include "TutorialGame.h"
 
-namespace NCL
-{
-    namespace CSC8503
-    {
+namespace NCL{
+    namespace CSC8503{
         class GameServer;
         class GameClient;
         class NetworkPlayer;
@@ -14,18 +12,17 @@ namespace NCL
         struct FullPacket;
         struct ClientPlayerInputPacket;
         struct AddPlayerScorePacket;
-        
-        class DebugNetworkedGame : public TutorialGame, public PacketReceiver
-        {
+
+        class DebugNetworkedGame : public TutorialGame, public PacketReceiver{
         public:
             DebugNetworkedGame();
             ~DebugNetworkedGame();
-            
+
             void StartAsServer();
             void StartAsClient(char a, char b, char c, char d);
 
             void UpdateGame(float dt) override;
-            
+
             void SetIsGameStarted(bool isGameStarted);
             void StartLevel();
 
@@ -33,6 +30,7 @@ namespace NCL
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;
+
         protected:
             bool isClientConnectedToServer = false;
             bool isGameStarted = false;
@@ -52,26 +50,27 @@ namespace NCL
             void SpawnPlayers();
             NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
 
-            void HandleFullPacket(FullPacket* fullPacket );
+            void HandleFullPacket(FullPacket* fullPacket);
 
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
 
-            std::map<int, int> stateIDs;
+            std::map<int, int> mStateIDs;
 
-            GameServer* thisServer;
-            GameClient* thisClient;
-            float timeToNextPacket;
-            int packetsToSnapshot;
+            GameServer* mThisServer;
+            GameClient* mThisClient;
+            float mTimeToNextPacket;
+            int mPacketsToSnapshot;
 
-            std::vector<NetworkObject*> networkObjects;
+            std::vector<NetworkObject*> mNetworkObjects;
 
-            std::vector<int> playerList;
-            std::map<int, NetworkPlayer*> serverPlayers;
-            GameObject* localPlayer;
+            std::vector<int> mPlayerList;
+            std::map<int, NetworkPlayer*> mServerPlayers;
+            GameObject* mLocalPlayer;
 
-            int networkObjectCache = 10;
+            int mNetworkObjectCache = 10;
+
         private:
         };
     }

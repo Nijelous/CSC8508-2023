@@ -7,98 +7,87 @@
 #include "GameClient.h"
 #include "NetworkObject.h"
 
-namespace
-{
+namespace{
     constexpr int MAX_PLAYER = 4;
 }
 
-DebugNetworkedGame::DebugNetworkedGame()
-{
-    thisServer = nullptr;
-    thisClient = nullptr;
+DebugNetworkedGame::DebugNetworkedGame(){
+    mThisServer = nullptr;
+    mThisClient = nullptr;
 
     NetworkBase::Initialise();
-    timeToNextPacket = 0.0f;
-    packetsToSnapshot = 0;
+    mTimeToNextPacket = 0.0f;
+    mPacketsToSnapshot = 0;
 
     for (int i = 0; i < MAX_PLAYER; i++){
-        playerList.push_back(-1);
+        mPlayerList.push_back(-1);
     }
 }
 
-DebugNetworkedGame::~DebugNetworkedGame() {
+DebugNetworkedGame::~DebugNetworkedGame(){
 }
 
-void DebugNetworkedGame::StartAsServer() {
-    thisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
+void DebugNetworkedGame::StartAsServer(){
+    mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
 
-    thisServer->RegisterPacketHandler(Received_State, this);
-    thisServer->RegisterPacketHandler(String_Message, this);
+    mThisServer->RegisterPacketHandler(Received_State, this);
+    mThisServer->RegisterPacketHandler(String_Message, this);
 }
 
-void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d)
-{
-    thisClient = new GameClient();
-    int peer = thisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
+void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
+    mThisClient = new GameClient();
+    int peer = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
-    thisClient->RegisterPacketHandler(Delta_State, this);
-    thisClient->RegisterPacketHandler(Full_State, this);
-    thisClient->RegisterPacketHandler(Player_Connected, this);
-    thisClient->RegisterPacketHandler(Player_Disconnected, this);
-    thisClient->RegisterPacketHandler(String_Message, this);
-    thisClient->RegisterPacketHandler(GameState, this);
-    thisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
+    mThisClient->RegisterPacketHandler(Delta_State, this);
+    mThisClient->RegisterPacketHandler(Full_State, this);
+    mThisClient->RegisterPacketHandler(Player_Connected, this);
+    mThisClient->RegisterPacketHandler(Player_Disconnected, this);
+    mThisClient->RegisterPacketHandler(String_Message, this);
+    mThisClient->RegisterPacketHandler(GameState, this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
 }
 
-void DebugNetworkedGame::UpdateGame(float dt)
-{
-    timeToNextPacket -= dt;
-    if (timeToNextPacket < 0) {
-        if (thisServer) {
+void DebugNetworkedGame::UpdateGame(float dt){
+    mTimeToNextPacket -= dt;
+    if (mTimeToNextPacket < 0){
+        if (mThisServer){
             UpdateAsServer(dt);
         }
-        else if (thisClient) {
+        else if (mThisClient){
             UpdateAsClient(dt);
         }
-        timeToNextPacket += 1.0f / 20.0f; //20hz server/client update
+        mTimeToNextPacket += 1.0f / 20.0f; //20hz server/client update
 
-        if (thisServer)
-        {
+        if (mThisServer){
             SyncPlayerList();
         }
     }
-    if (isGameStarted) {
+    if (isGameStarted){
         TutorialGame::UpdateGame(dt);
     }
-    else
-    {
-        if (thisServer)
-        {
+    else{
+        if (mThisServer){
             Debug::Print(" Waiting for player to join ...", Vector2(5, 95), Debug::RED);
-            if (Window::GetKeyboard()->KeyPressed(KeyCodes::S))
-            {
+            if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)){
                 SetIsGameStarted(true);
             }
         }
-        else
-        {
+        else{
             Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
         }
         renderer->Render();
     }
-    if (thisServer)
-    {
-        thisServer->UpdateServer();
+    if (mThisServer){
+        mThisServer->UpdateServer();
     }
-    if (thisClient)
-    {
-        thisClient->UpdateClient();
+    if (mThisClient){
+        mThisClient->UpdateClient();
     }
 }
 
-void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
+void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
     this->isGameStarted = isGameStarted;
-    if (thisServer) {
+    if (mThisServer){
         SendGameStatusPacket();
     }
     if (isGameStarted){
@@ -106,71 +95,70 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
     }
 }
 
-void DebugNetworkedGame::StartLevel() {
+void DebugNetworkedGame::StartLevel(){
     Debug::Print("Game Started", Vector2(10, 5));
     InitWorld();
 }
 
-void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-    switch (type)
-    {
+void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source){
+    switch (type){
     case BasicNetworkMessages::String_Message: {
-            int a = 0;
-            break;
+        int a = 0;
+        break;
     }
     case BasicNetworkMessages::GameState: {
-            GameStatePacket* packet = (GameStatePacket*)payload;
-            SetIsGameStarted(packet->isGameStarted);
-            break;
+        GameStatePacket* packet = (GameStatePacket*)payload;
+        SetIsGameStarted(packet->isGameStarted);
+        break;
     }
     case BasicNetworkMessages::Full_State: {
-            FullPacket* packet = (FullPacket*)payload;
-            HandleFullPacket(packet); 
-            break;
+        FullPacket* packet = (FullPacket*)payload;
+        HandleFullPacket(packet);
+        break;
     }
     default:
         break;
     }
 }
 
-GameClient* DebugNetworkedGame::GetClient() const {
-    return thisClient;
+GameClient* DebugNetworkedGame::GetClient() const{
+    return mThisClient;
 }
 
-GameServer* DebugNetworkedGame::GetServer() const {
-    return thisServer;
+GameServer* DebugNetworkedGame::GetServer() const{
+    return mThisServer;
 }
 
-void DebugNetworkedGame::UpdateAsServer(float dt) {
-    packetsToSnapshot--;
-    if (packetsToSnapshot < 0) {
+void DebugNetworkedGame::UpdateAsServer(float dt){
+    mPacketsToSnapshot--;
+    if (mPacketsToSnapshot < 0){
         BroadcastSnapshot(false);
-        packetsToSnapshot = 5;
+        mPacketsToSnapshot = 5;
     }
-    else {
+    else{
         BroadcastSnapshot(true);
     }
 }
 
-void DebugNetworkedGame::UpdateAsClient(float dt) {
-    thisClient->UpdateClient();
+void DebugNetworkedGame::UpdateAsClient(float dt){
+    mThisClient->UpdateClient();
 
     int peer = GetPlayerPeerID();
     StringPacket newPacket("Client sends it regards :O ");
-    if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-        thisClient->SendPacket(newPacket);
+    if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)){
+        mThisClient->SendPacket(newPacket);
     }
 }
 
-void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
+void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame){
     std::vector<GameObject*>::const_iterator first;
     std::vector<GameObject*>::const_iterator last;
 
     world->GetObjectIterators(first, last);
 
-    for (auto i = first; i != last; ++i) {
+    for (auto i = first; i != last; ++i){
         NetworkObject* o = (*i)->GetNetworkObject();
-        if (!o) {
+        if (!o){
             continue;
         }
         //TODO - you'll need some way of determining
@@ -180,19 +168,19 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
         //NetworkPlayer struct. 
         int playerState = o->GetLatestNetworkState().stateID;
         GamePacket* newPacket = nullptr;
-        if (o->WritePacket(&newPacket, deltaFrame, playerState)) {
-            thisServer->SendGlobalPacket(*newPacket);
+        if (o->WritePacket(&newPacket, deltaFrame, playerState)){
+            mThisServer->SendGlobalPacket(*newPacket);
             delete newPacket;
         }
     }
 }
 
-void DebugNetworkedGame::UpdateMinimumState() {
+void DebugNetworkedGame::UpdateMinimumState(){
     //Periodically remove old data from the server
     int minID = INT_MAX;
     int maxID = 0; //we could use this to see if a player is lagging behind?
 
-    for (auto i : stateIDs) {
+    for (auto i : mStateIDs){
         minID = std::min(minID, i.second);
         maxID = std::max(maxID, i.second);
     }
@@ -202,74 +190,70 @@ void DebugNetworkedGame::UpdateMinimumState() {
     std::vector<GameObject*>::const_iterator last;
     world->GetObjectIterators(first, last);
 
-    for (auto i = first; i != last; ++i) {
+    for (auto i = first; i != last; ++i){
         NetworkObject* o = (*i)->GetNetworkObject();
-        if (!o) {
+        if (!o){
             continue;
         }
         o->UpdateStateHistory(minID); //clear out old states so they arent taking up memory...
     }
 }
 
-int DebugNetworkedGame::GetPlayerPeerID(int peerId) {
-    if (peerId == -2) {
-        peerId = thisClient->GetPeerID();
+int DebugNetworkedGame::GetPlayerPeerID(int peerId){
+    if (peerId == -2){
+        peerId = mThisClient->GetPeerID();
     }
     for (int i = 0; i < 4; ++i){
-        if (playerList[i] == peerId)
-        {
+        if (mPlayerList[i] == peerId){
             return i;
         }
     }
     return -1;
 }
 
-void DebugNetworkedGame::SendGameStatusPacket() {
+void DebugNetworkedGame::SendGameStatusPacket(){
     GameStatePacket state(isGameStarted);
-	thisServer->SendGlobalPacket(state);
+    mThisServer->SendGlobalPacket(state);
 }
 
-void DebugNetworkedGame::InitWorld() {
+void DebugNetworkedGame::InitWorld(){
     TutorialGame::InitWorld();
 }
 
-void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {
+void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID){
     //TODO(erendgrmc)
 }
 
-void DebugNetworkedGame::SpawnPlayers() {
-    
+void DebugNetworkedGame::SpawnPlayers(){
 }
 
-NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum)
-{
+NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum){
     return nullptr;
 }
 
-void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket) {
-    for (int i = 0; i < networkObjects.size(); i++) {
-        if (networkObjects[i]->GetnetworkID() == fullPacket->objectID) {
-            networkObjects[i]->ReadPacket(*fullPacket);
+void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
+    for (int i = 0; i < mNetworkObjects.size(); i++){
+        if (mNetworkObjects[i]->GetnetworkID() == fullPacket->objectID){
+            mNetworkObjects[i]->ReadPacket(*fullPacket);
         }
     }
 }
 
-void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet) {
-    
+void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet){
 }
 
-void DebugNetworkedGame::SyncPlayerList() {
+void DebugNetworkedGame::SyncPlayerList(){
     int peerId;
-    playerList[0] = 0;
-    for (int i = 0; i < 3; ++i) {
-        if (thisServer->GetPeer(i, peerId)) {
-            playerList[i + 1] = peerId;
+    mPlayerList[0] = 0;
+    for (int i = 0; i < 3; ++i){
+        if (mThisServer->GetPeer(i, peerId)){
+            mPlayerList[i + 1] = peerId;
         }
         else{
-            playerList[i + 1] = -1;
+            mPlayerList[i + 1] = -1;
         }
     }
 
-    SyncPlayerListPacket packet(playerList);
-    thisServer->SendGlobalPacket(packet);
+    SyncPlayerListPacket packet(mPlayerList);
+    mThisServer->SendGlobalPacket(packet);
 }
