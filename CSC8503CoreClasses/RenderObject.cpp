@@ -4,6 +4,7 @@
 using namespace NCL::CSC8503;
 using namespace NCL;
 
+
 RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, float cullSphereRadius) {
 	if (!tex) {
 		bool a = true;
