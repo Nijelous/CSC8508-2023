@@ -83,6 +83,7 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+	testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
 	}
@@ -269,9 +270,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
+	AddPlayerToWorld(Vector3(100,-17,100), "Player");
 
-	InitGameExamples();
+	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+
+	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
 	InitDefaultFloor();
 }
 
@@ -400,7 +404,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
   
-	tempPlayer = new PlayerObject(world, objectName, 20);
+	tempPlayer = new PlayerObject(world, objectName, 50);
 	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
 
 	tempPlayer->SetBoundingVolume((CollisionVolume*)volume);
@@ -409,7 +413,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), cubeMesh, nullptr, basicShader, meshSize));
 	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
 
 

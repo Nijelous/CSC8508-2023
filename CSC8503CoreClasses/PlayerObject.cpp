@@ -48,7 +48,7 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		physicsObject->AddForce(rightAxis * mMovementSpeed);
-
+	
 	StopSliding();
 }
 
@@ -58,7 +58,9 @@ void PlayerObject::MatchCameraRotation() {
 }
 
 void PlayerObject::StopSliding() {
-	if (physicsObject->GetForce() == Vector3(0, 0, 0))
+	if ((physicsObject->GetLinearVelocity().Length() < 1) && (physicsObject->GetForce() == Vector3(0,0,0))) {
+		std::cout << "Player Stopped" << std::endl;
 		physicsObject->SetLinearVelocity(Vector3(0, 0, 0));
+	}
 }
 

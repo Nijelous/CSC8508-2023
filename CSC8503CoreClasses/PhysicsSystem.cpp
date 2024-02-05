@@ -206,7 +206,8 @@ void PhysicsSystem::BasicCollisionDetection() {
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
 				if (!((*i)->GetBoundingVolume()->applyPhysics && (*j)->GetBoundingVolume()->applyPhysics))
 					continue;
-				ImpulseResolveCollision(*info.a, *info.b, info.point);
+				float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
+				FrictionImpulse(*info.a, *info.b, info.point, j);
 				info.framesLeft = numCollisionFrames;
 				allCollisions.insert(info);
 			}
@@ -220,51 +221,139 @@ In tutorial 5, we start determining the correct response to a collision,
 so that objects separate back out. 
 
 */
-void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+float PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject* physB = b.GetPhysicsObject();
-
-	Transform& transformA = a.GetTransform();
-	Transform& transformB = b.GetTransform();
 
 	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
 
 	// both objects are static
 	if (totalMass == 0)
-		return;
+		return 0;
 
-	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
-	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
-
+	SeperateObjects(a, b, p, totalMass);
+	
+	// local collision points
 	Vector3 relativeA = p.localA;
 	Vector3 relativeB = p.localB;
-
-	Vector3 angVelocityA = Vector3::Cross(physA->GetAngularVelocity(), relativeA);
-	Vector3 angVelocityB = Vector3::Cross(physB->GetAngularVelocity(), relativeB);
-
-	Vector3 fullVelocityA = physA->GetLinearVelocity() + angVelocityA;
-	Vector3 fullVelocityB = physB->GetLinearVelocity() + angVelocityB;
-
-	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
+	
+	Vector3 contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB);
 
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
-
-	// calculate inertia
-	Vector3 inertiaA = Vector3::Cross(physA->GetInertiaTensor() * Vector3::Cross(relativeA, p.normal), relativeA);
-	Vector3 inertiaB = Vector3::Cross(physB->GetInertiaTensor() * Vector3::Cross(relativeB, p.normal), relativeB);
-	float angularEffect = Vector3::Dot(inertiaA + inertiaB, p.normal);
+	float angularEffect = CalculateInertia(physA, physB,  relativeA,  relativeB,  p.normal);
 
 	float cRestitution = 0.66f; // loss of kinetic energy
 
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
-
-	Vector3 fullImpulse = p.normal * j;
+	Vector3 fullImpulse = p.normal * j * physA->GetElasticity();
 
 	// apply impulse in opposite directions for collision responce
 	physA->ApplyLinearImpulse(-fullImpulse);
 	physB->ApplyLinearImpulse(fullImpulse);
 	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+
+	return j;
+}
+
+void PhysicsSystem::FrictionImpulse(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float j) const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	Vector3 relativeA = p.localA;
+	Vector3 relativeB = p.localB;
+
+	Vector3 contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB);
+	Vector3 tangent = CalculateFrictionDirection(contactVelocity, p.normal);
+	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, tangent);
+
+	float impulseForce = Vector3::Dot(contactVelocity, tangent);
+	float jt = -impulseForce / (totalMass + angularEffect);
+
+	jt = abs(jt);
+	j = abs(j);
+
+	float friction = CalculateFriction(physA, physB);
+
+	Vector3 fullFrictionImpulse = CalculateFrictionImpulse(tangent, jt, j, friction);
+
+	Debug::DrawLine(Vector3(0,0,0), Vector3(0,1,0), Debug::RED, 1);
+	Debug::DrawLine(Vector3(0,0,0), Vector3(0,0,0) + (fullFrictionImpulse), Debug::CYAN, 1);
+
+	// apply impulse in opposite directions for collision responce
+	physA->ApplyLinearImpulse(fullFrictionImpulse);
+	physB->ApplyLinearImpulse(-fullFrictionImpulse);
+	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, fullFrictionImpulse));
+	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, -fullFrictionImpulse));
+}
+
+void PhysicsSystem::SeperateObjects(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float totalMass) const {
+	Transform& transformA = a.GetTransform();
+	Transform& transformB = b.GetTransform();
+
+	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (a.GetPhysicsObject()->GetInverseMass() / totalMass)));
+	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (b.GetPhysicsObject()->GetInverseMass() / totalMass)));
+}
+
+bool PhysicsSystem::CheckFrictionShuldBeApplied(float aVelocity, float bVelocity, float totalMass) const {
+	if (aVelocity < 5.5 && bVelocity < 5.5)
+		return false;
+	if (totalMass == 0)
+		return false;
+	return true;
+}
+
+Vector3 PhysicsSystem::CalculateCollisionVelocity(Vector3 contactPointA, Vector3 contactPointB, PhysicsObject* physA, PhysicsObject* physB) const {
+	Vector3 angVelocityA = Vector3::Cross(physA->GetAngularVelocity(), contactPointA);
+	Vector3 angVelocityB = Vector3::Cross(physB->GetAngularVelocity(), contactPointB);
+
+	Vector3 fullVelocityA = physA->GetLinearVelocity() + angVelocityA;
+	Vector3 fullVelocityB = physB->GetLinearVelocity() + angVelocityB;
+
+	return fullVelocityB - fullVelocityA;
+}
+
+Vector3 PhysicsSystem::CalculateFrictionDirection(Vector3 contactVelocity, Vector3 collisionNormal) const {
+	// get direction of friction
+	float impulseForce = Vector3::Dot(contactVelocity, collisionNormal);
+	Vector3 tangent = contactVelocity - (collisionNormal * impulseForce);
+	tangent.Normalise();
+	return tangent;
+}
+
+float PhysicsSystem::CalculateInertia(PhysicsObject* physA, PhysicsObject* physB, Vector3 contactPointA, Vector3 contactPointB, Vector3 angle) const {
+	Vector3 inertiaA = Vector3::Cross(physA->GetInertiaTensor() * Vector3::Cross(contactPointA, angle), contactPointA);
+	Vector3 inertiaB = Vector3::Cross(physB->GetInertiaTensor() * Vector3::Cross(contactPointB, angle), contactPointB);
+	return Vector3::Dot(inertiaA + inertiaB, angle);
+}
+
+float PhysicsSystem::CalculateFriction(PhysicsObject* physA, PhysicsObject* physB) const {
+	float frictionA;
+	float frictionB;
+
+	if (physA->GetForce() == Vector3(0, 0, 0) && physA->GetInverseMass() > 0)
+		frictionA = physA->GetStaticFriction();
+	else
+		frictionA = physA->GetDynamicFriction();
+
+	if (physB->GetForce() == Vector3(0, 0, 0) && physB->GetInverseMass() > 0)
+		frictionB = physB->GetStaticFriction();
+	else
+		frictionB = physB->GetDynamicFriction();
+
+	float friction = (frictionA + frictionB) / 2;
+	return friction;
+}
+
+Vector3 PhysicsSystem::CalculateFrictionImpulse(Vector3 tangent, float jt, float j, float friction) const {
+	Vector3 fullFrictionImpulse;
+	if (jt <= j) {
+		fullFrictionImpulse = tangent * jt * friction;
+	}
+	else {
+		fullFrictionImpulse = tangent * j * friction;
+	}
+	return fullFrictionImpulse;
 }
 
 /*

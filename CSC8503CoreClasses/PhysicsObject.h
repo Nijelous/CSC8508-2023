@@ -65,13 +65,19 @@ namespace NCL {
 				return inverseInteriaTensor;
 			}
 
+			float GetStaticFriction() { return staticFriction; }
+			float GetDynamicFriction() { return dynamicFriction; }
+
+			float GetElasticity() { return elasticity; }
+
 		protected:
 			const CollisionVolume* volume;
 			Transform*		transform;
 
 			float inverseMass;
 			float elasticity;
-			float friction;
+			float staticFriction;
+			float dynamicFriction;
 
 			//linear stuff
 			Vector3 linearVelocity;
