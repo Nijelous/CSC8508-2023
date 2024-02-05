@@ -14,6 +14,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex,
 	this->shader	= shader;
 	this->colour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	this->mCullSphereRadius = cullSphereRadius;
+	mSqDistToCam = FLT_MAX;
 }
 
 RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, Vector4 colour, float cullSphereRadius) {
@@ -26,6 +27,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex,
 	this->shader = shader;	
 	this->colour = colour;
 	this->mCullSphereRadius = cullSphereRadius;
+	mSqDistToCam = FLT_MAX;
 }
 
 RenderObject::~RenderObject() {

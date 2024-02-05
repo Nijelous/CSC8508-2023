@@ -152,7 +152,7 @@ void GameTechRenderer::BuildObjectList() {
 }
 
 void GameTechRenderer::SortObjectList() {
-
+	std::sort(activeObjects.begin(), activeObjects.end(), RenderObject::CompareBySqCamDist);
 }
 
 void GameTechRenderer::RenderShadowMap() {
