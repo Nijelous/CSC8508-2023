@@ -23,7 +23,7 @@ void GuardObject::RaycastToPlayer() {
 	Vector3 dir = (mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
 	RayCollision closestCollision;
 	Ray r = Ray(this->GetTransform().GetPosition(), dir);
-	if (mWorld->Raycast(r, closestCollision, true)) {
+	if (mWorld->Raycast(r, closestCollision, true, this)) {
 		Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 	}
 }

@@ -355,7 +355,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass, const std::string& objectName) {
 	GameObject* capsule = new GameObject(objectName);
 
-	Vector3 capsuleSize = Vector3(radius, (halfHeight * 2), radius);
+	Vector3 capsuleSize = Vector3(radius * 2, (halfHeight * 2), radius * 2);
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
 	capsule->SetBoundingVolume((CollisionVolume*)volume);
 
