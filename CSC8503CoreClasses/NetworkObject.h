@@ -48,6 +48,12 @@ namespace NCL::CSC8503 {
 		void SyncPlayerList(std::vector<int>& clientPlayerList) const;
 	};
 
+	struct GameStatePacket : public GamePacket {
+		bool isGameStarted = false;
+		GameStatePacket(bool val);
+	};
+
+
 	class NetworkObject		{
 	public:
 		NetworkObject(GameObject& o, int id);

@@ -5,7 +5,10 @@
 #include "OGLMesh.h"
 
 #include "GameWorld.h"
-#include <Frustum.h>
+#include "Frustum.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 namespace NCL {
 	class Maths::Vector3;
@@ -22,9 +25,12 @@ namespace NCL {
 			Texture*	LoadTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
 
+			void AddLight(Light* light);
+
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
+			
 
 			void RenderFrame()	override;
 
@@ -43,6 +49,11 @@ namespace NCL {
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
+			void SendLightDataToShader(OGLShader* shader);
+			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
+			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
+			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
+
 			vector<const RenderObject*> activeObjects;
 
 			OGLShader*  debugShader;
@@ -55,10 +66,6 @@ namespace NCL {
 			GLuint		shadowTex;
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;
-
-			Vector4		lightColour;
-			float		lightRadius;
-			Vector3		lightPosition;
 
 			//Debug data storage things
 			vector<Vector3> debugLineData;
@@ -76,6 +83,7 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+			vector<Light*> mLights;
 
 			Frustum mFrameFrustum;
 		};

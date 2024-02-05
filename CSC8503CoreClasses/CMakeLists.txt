@@ -62,6 +62,14 @@ set(Collision_Detection
 )
 source_group("Collision Detection" FILES ${Collision_Detection})
 
+set(Lights
+"BaseLight.h" 
+"DirectionalLight.h"
+"PointLight.h"
+"SpotLight.h"
+)
+source_group("Lights" FILES ${Lights})
+
 set(Level
     "LevelManager.h"
     "LevelManager.cpp"
@@ -69,6 +77,8 @@ set(Level
     "Level.cpp"
     "Room.h"
     "Room.cpp"
+    "Vent.h"
+    "Vent.cpp"
 )
 source_group("Level" FILES ${Level})
 
@@ -153,7 +163,8 @@ set(ALL_FILES
     ${Level}
     ${Networking}
     ${Physics}
-    ${enet_Files}   
+    ${enet_Files}
+    ${Lights}
     ${AI_Guard}
 )
 
