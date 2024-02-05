@@ -13,36 +13,44 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, float cullSphereRadius);
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, Vector4 colour, float cullSphereRadius);
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader, float cullSphereRadius);
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* sahder, Vector4 colour, float cullSphereRadius);
 			~RenderObject();
 
-			void SetDefaultTexture(Texture* t) {
-				texture = t;
+			void SetAlbedoTexture(Texture* t) {
+				mAlbedoTex = t;
 			}
 
-			Texture* GetDefaultTexture() const {
-				return texture;
+			Texture* GetAlbedoTexture() const {
+				return mAlbedoTex;
+			}
+
+			void SetNormalTexture(Texture* t) {
+				mNormalTex = t;
+			}
+
+			Texture* GetNormalTexture() const {
+				return mNormalTex;
 			}
 
 			Mesh*	GetMesh() const {
-				return mesh;
+				return mMesh;
 			}
 
 			Transform*		GetTransform() const {
-				return transform;
+				return mTransform;
 			}
 
 			Shader*		GetShader() const {
-				return shader;
+				return mShader;
 			}
 
 			void SetColour(const Vector4& c) {
-				colour = c;
+				mColour = c;
 			}
 
 			Vector4 GetColour() const {
-				return colour;
+				return mColour;
 			}
 
 			float GetCullSphereRadius() const {
@@ -50,11 +58,12 @@ namespace NCL {
 			}
 
 		protected:
-			Mesh*		mesh;
-			Texture*	texture;
-			Shader*		shader;
-			Transform*	transform;
-			Vector4		colour;
+			Mesh*		mMesh;
+			Texture* mAlbedoTex;
+			Texture* mNormalTex;
+			Shader*		mShader;
+			Transform*	mTransform;
+			Vector4		mColour;
 			float		mCullSphereRadius;
 		};
 	}
