@@ -2,7 +2,7 @@
 
 uniform vec4 		objectColour;
 uniform sampler2D 	mainTex;
-uniform sampler2D bumpTex;
+uniform sampler2D normTex;
 uniform sampler2DShadow shadowTex;
 
 uniform vec3	lightPos;
@@ -30,7 +30,7 @@ void main(void)
 {
 	float shadow = 1.0; // New !
 	mat3 TBN = mat3(normalize(IN.tangent), normalize(IN.binormal), normalize(IN.normal));
-	vec3 bumpNormal = texture(bumpTex, IN.texCoord).rgb;
+	vec3 bumpNormal = texture(normTex, IN.texCoord).rgb;
 	bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
 	
 	if( IN . shadowProj . w > 0.0) { // New !

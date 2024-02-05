@@ -247,6 +247,9 @@ void GameTechRenderer::RenderCamera() {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
 		}
 
+		if ((*i).GetNormalTexture()) {
+			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
+		}
 		if (activeShader != shader) {
 			projLocation	= glGetUniformLocation(shader->GetProgramID(), "projMatrix");
 			viewLocation	= glGetUniformLocation(shader->GetProgramID(), "viewMatrix");

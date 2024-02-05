@@ -60,8 +60,10 @@ void TutorialGame::InitialiseAssets() {
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 
 	basicTex	= renderer->LoadTexture("checkerboard.png");
-	mKeeperAlbedo = renderer->LoadTexture("Barren Reds.jpg");
-	mKeeperNormal = renderer->LoadTexture("Barren RedsDOT3.jpg");
+	mKeeperAlbedo = renderer->LoadTexture("fleshy_albedo.png");
+	mKeeperNormal = renderer->LoadTexture("fleshy_normal.png");
+	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
+	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
@@ -295,7 +297,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex,nullptr, basicShader, 120));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, 120));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
