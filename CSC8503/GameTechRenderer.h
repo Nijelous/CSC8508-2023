@@ -45,6 +45,7 @@ namespace NCL {
 			void RenderSkybox();
 			void SetUpFBOs();
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
+			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourTex, GLuint& normalTex, GLuint& depthTex, bool depth = false);
 
 			void LoadSkybox();
 

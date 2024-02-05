@@ -319,11 +319,22 @@ void GameTechRenderer::SetUpFBOs() {
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mGBufferDepthTex, 0);
 	glDrawBuffers(2, buffers);
 
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) return;
+
+	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mLightAlbedoTex,0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mLightSpecularTex, 0);
+	glDrawBuffers(2, buffers);
 }
 
 void GameTechRenderer::GenerateScreenTexture(GLuint& fbo, bool depth) {
 
 }
+
+void GameTechRenderer::BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourTex, GLuint& normalTex, GLuint& depthTex, bool depth) {
+
+}
+
 
 Mesh* GameTechRenderer::LoadMesh(const std::string& name) {
 	OGLMesh* mesh = new OGLMesh();
