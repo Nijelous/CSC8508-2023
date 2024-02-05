@@ -43,6 +43,8 @@ namespace NCL {
 			void RenderShadowMap();
 			void RenderCamera(); 
 			void RenderSkybox();
+			void SetUpFBOs();
+			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 
 			void LoadSkybox();
 
@@ -69,6 +71,15 @@ namespace NCL {
 
 			//Debug data storage things
 			vector<Vector3> debugLineData;
+
+			//Deferred rendering stuff
+			GLuint mGBufferFBO;
+			GLuint mGBufferColourTex;
+			GLuint mGBufferNormalTex;
+			GLuint mGBufferDepthTex;
+			GLuint mLightFBO;
+			GLuint mLightAlbedoTex;
+			GLuint mLightSpecularTex;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;

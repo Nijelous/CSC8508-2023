@@ -71,6 +71,14 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
+
+	glDeleteFramebuffers(1, &mGBufferFBO);
+	glDeleteFramebuffers(1, &mLightFBO);
+	glDeleteTextures(1, &mGBufferColourTex);
+	glDeleteTextures(1, &mGBufferNormalTex);
+	glDeleteTextures(1, &mGBufferDepthTex);
+	glDeleteTextures(1, &mLightAlbedoTex);
+	glDeleteTextures(1, &mLightSpecularTex);
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -292,6 +300,29 @@ void GameTechRenderer::RenderCamera() {
 			DrawBoundMesh((uint32_t)i);
 		}
 	}
+}
+
+void GameTechRenderer::SetUpFBOs() {
+	glGenFramebuffers(1, &mGBufferFBO);
+	glGenFramebuffers(1, &mLightFBO);
+	GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+
+	GenerateScreenTexture(mGBufferColourTex);
+	GenerateScreenTexture(mGBufferNormalTex);
+	GenerateScreenTexture(mGBufferDepthTex, true);
+	GenerateScreenTexture(mLightAlbedoTex);
+	GenerateScreenTexture(mLightSpecularTex);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, mGBufferFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mGBufferColourTex, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mGBufferNormalTex, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mGBufferDepthTex, 0);
+	glDrawBuffers(2, buffers);
+
+}
+
+void GameTechRenderer::GenerateScreenTexture(GLuint& fbo, bool depth) {
+
 }
 
 Mesh* GameTechRenderer::LoadMesh(const std::string& name) {
