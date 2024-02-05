@@ -9,9 +9,10 @@
 #include "StateGameObject.h"
 
 
-
+#include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
+using namespace irrklang;
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
@@ -160,6 +161,10 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::G)) {
 		useGravity = !useGravity; //Toggle gravity!
 		physics->UseGravity(useGravity);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::J)) {
+		ISoundEngine* engine = createIrrKlangDevice();
+		engine->play2D("../Assets/Sound/ophelia.mp3", true);
 	}
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint

@@ -1,0 +1,15 @@
+﻿  Building Custom Rule C:/Users/c3012795/TeamProject/CSC8508-2023/OpenGLRendering/CMakeLists.txt
+  cmake_pch.cxx
+  OGLTexture.h
+  OGLShader.h
+  OGLRenderer.h
+  OGLMesh.h
+  OGLComputeShader.h
+  OGLTexture.cpp
+  OGLShader.cpp
+  OGLRenderer.cpp
+  OGLMesh.cpp
+  OGLComputeShader.cpp
+  gl.h
+  gl.c
+  OpenGLRendering.vcxproj -> C:\Users\c3012795\TeamProject\CSC8508-2023\OpenGLRendering\Release\OpenGLRendering.lib
