@@ -134,60 +134,39 @@ bool CollisionDetection::RaySphereIntersection(const Ray&r, const Transform& wor
 
 // returns true if a given ray intersects with a given capsule
 //
-// Author: Ewan Squire
+// Author: Alex Fall
 bool CollisionDetection::RayCapsuleIntersection(const Ray& r, const Transform& worldTransform, const CapsuleVolume& volume, RayCollision& collision) {
-	// get the plane to compare ray to
-	Vector3 upperSphereOrigin = worldTransform.GetPosition();
-	upperSphereOrigin.y += volume.GetRadius() - volume.GetHalfHeight();
-	Vector3 A = upperSphereOrigin - worldTransform.GetPosition();
-	Vector3 B = r.GetPosition() - worldTransform.GetPosition();
-	Vector3 plane = Vector3::Cross(A, B) + worldTransform.GetPosition();
+	Quaternion orientation = worldTransform.GetOrientation().Normalised();
+	Vector3 position = worldTransform.GetPosition();
+	float radius = volume.GetRadius();
 
-	int givenCase = 0;
+	Vector3 capsuleDir = Matrix3(orientation) * Vector3(0, 1, 0);
+	Vector3 capsuleMax = position + (capsuleDir * volume.GetHalfHeight());
+	Vector3 capsuleMin = position - (capsuleDir * volume.GetHalfHeight());
 
-	// is it upper sphere
-	Vector3 capsuleTop = worldTransform.GetPosition();
-	capsuleTop.y += volume.GetRadius();
-	Vector3 vA = r.GetPosition() - upperSphereOrigin;
-	Vector3 vB = worldTransform.GetPosition() - upperSphereOrigin;
-	if (Vector3::Dot(vA, vB) < 0) {
-		SphereVolume tempSphere = SphereVolume(volume.GetRadius() - volume.GetHalfHeight());
-		if (RaySphereIntersection(r, worldTransform, tempSphere, collision, upperSphereOrigin))
-			return true;
+	Vector3 thirdPoint = position + Vector3(1, 1, -(r.GetDirection().x + r.GetDirection().y) / r.GetDirection().z);
+	Plane p = Plane::PlaneFromTri(capsuleMax, capsuleMin, thirdPoint);
+
+	float ln = Vector3::Dot(p.GetNormal(), r.GetDirection());
+	Vector3 planePointDir = p.GetPointOnPlane() - r.GetPosition();
+	float d = Vector3::Dot(planePointDir, p.GetNormal()) / ln;
+
+	Vector3 rayPoint = r.GetPosition() + (r.GetDirection() * d);
+	Vector3 pointToCapsuleDir = rayPoint - position;
+	float proj = Vector3::Dot(capsuleDir, pointToCapsuleDir);
+
+	Vector3 capsulePoint = position + (capsuleDir * proj);
+	if ((capsulePoint - position).Length() > volume.GetHalfHeight()) {
+		if ((capsulePoint - capsuleMax).Length() > (capsulePoint - capsuleMin).Length()) capsulePoint = capsuleMin;
+		else capsulePoint = capsuleMax;
 	}
 
-	// is it lower sphere
-	Vector3 lowerSphereOrigin = worldTransform.GetPosition();
-	lowerSphereOrigin.y -= volume.GetRadius() - volume.GetHalfHeight();
-	Vector3 capsuleBottom = worldTransform.GetPosition();
-	capsuleBottom.y -= volume.GetRadius();
-	vA = r.GetPosition() - lowerSphereOrigin;
-	vB = worldTransform.GetPosition() - lowerSphereOrigin;
-	if (Vector3::Dot(vA, vB) < 0) {
-		SphereVolume tempSphere = SphereVolume(volume.GetRadius() - volume.GetHalfHeight());
-		if (RaySphereIntersection(r, worldTransform, tempSphere, collision, lowerSphereOrigin))
-			return true;
-	}
+	Transform sphereTransform = Transform();
+	sphereTransform.SetPosition(capsulePoint);
 
-	// is it middle cylinder
+	SphereVolume sv = SphereVolume(radius);
 
-	// find closest point on ray to capsules center
-	Vector3 dir = (worldTransform.GetPosition() - r.GetPosition());
-	float cylinderProj = Vector3::Dot(dir, r.GetDirection());
-	Vector3 point = r.GetPosition() + (r.GetDirection() * cylinderProj);
-
-	// d = point on capsules midline with y = to closest point
-	Vector3 d = lowerSphereOrigin + Vector3(0,  1, 0) * (Vector3::Dot(point - lowerSphereOrigin, Vector3(0, 1, 0)));
-	bool withinYAxis = lowerSphereOrigin.y <= d.y && d.y <= upperSphereOrigin.y;
-
-	// closest point is within cylinder y axis and inside capsule radius then collision has occured
-	if (((point - d).Length() <= (volume.GetRadius() - volume.GetHalfHeight())) && withinYAxis) {
-		Vector3 capsuleBoxPos = worldTransform.GetPosition();
-		Vector3 capsuleBoxSize = Vector3(volume.GetRadius() - volume.GetHalfHeight(), volume.GetHalfHeight(), volume.GetRadius() - volume.GetHalfHeight());
-		if (RayBoxIntersection(r, capsuleBoxPos, capsuleBoxSize, collision))
-			return true;
-	}
-	return false;
+	return RaySphereIntersection(r, sphereTransform, sv, collision, capsulePoint);
 }
 
 // objects collisions settled here

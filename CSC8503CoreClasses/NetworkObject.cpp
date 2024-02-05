@@ -21,6 +21,20 @@ void SyncPlayerListPacket::SyncPlayerList(std::vector<int>& clientPlayerList) co
 	}
 }
 
+GameStartStatePacket::GameStartStatePacket(bool val) {
+	type = BasicNetworkMessages::GameStartState;
+	size = sizeof(GameStartStatePacket);
+
+	isGameStarted = val;
+}
+
+GameEndStatePacket::GameEndStatePacket(bool val){
+	type = BasicNetworkMessages::GameStartState;
+	size = sizeof(GameStartStatePacket);
+
+	isGameEnded = val;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;

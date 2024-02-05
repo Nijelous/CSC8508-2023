@@ -10,9 +10,10 @@
 
 #include "PlayerObject.h"
 
-
+#include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
+using namespace irrklang;
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
@@ -60,6 +61,11 @@ void TutorialGame::InitialiseAssets() {
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 
 	basicTex	= renderer->LoadTexture("checkerboard.png");
+	mKeeperAlbedo = renderer->LoadTexture("fleshy_albedo.png");
+	mKeeperNormal = renderer->LoadTexture("fleshy_normal.png");
+	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
+	mFloorNormal = renderer->LoadTexture("panel_normal.png");
+
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
 	InitCamera();
@@ -76,6 +82,10 @@ TutorialGame::~TutorialGame()	{
 
 	delete basicTex;
 	delete basicShader;
+	delete mKeeperAlbedo;
+	delete mKeeperNormal;
+	delete mFloorAlbedo;
+	delete mFloorNormal;
 
 	delete physics;
 	delete renderer;
@@ -164,6 +174,10 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::G)) {
 		useGravity = !useGravity; //Toggle gravity!
 		physics->UseGravity(useGravity);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P)) {
+		ISoundEngine* engine = createIrrKlangDevice();
+		engine->play2D("../Assets/Sound/ophelia.mp3", true);
 	}
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
@@ -294,7 +308,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader, 120));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, 120));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -325,7 +339,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader,radius));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, nullptr, basicShader,radius));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -347,7 +361,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 		.SetScale(capsuleSize)
 		.SetPosition(position);
 
-	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader, halfHeight));
+	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, nullptr, basicShader, halfHeight));
 	capsule->SetPhysicsObject(new PhysicsObject(&capsule->GetTransform(), capsule->GetBoundingVolume()));
 
 	capsule->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -368,7 +382,7 @@ GameObject* TutorialGame::AddOBBCubeToWorld(const Vector3& position, Vector3 dim
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -389,7 +403,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -413,7 +427,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), cubeMesh, nullptr, basicShader, meshSize));
+	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
 	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
 
 
@@ -438,7 +452,7 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -458,7 +472,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, basicShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -478,7 +492,7 @@ StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, co
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), cubeMesh, nullptr, basicShader, 1));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, 1));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -489,6 +503,31 @@ StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, co
 	return apple;
 }
 
+GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::string& objectName) {
+	//unique_ptr<GuardObject> guard(new GuardObject(objectName));
+	GuardObject* guard = new GuardObject(objectName);
+
+	float meshSize = 3.0f;
+	float inverseMass = 0.5f;
+
+	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
+	guard->SetBoundingVolume((CollisionVolume*)volume);
+
+	guard->GetTransform()
+		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetPosition(position);
+
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume()));
+
+	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
+	guard->GetPhysicsObject()->InitSphereInertia(false);
+
+	world->AddGameObject(guard);
+
+	return guard;
+}
+
 void TutorialGame::InitDefaultFloor() {
 	AddFloorToWorld(Vector3(0, -20, 0), "Floor Object");
 }
@@ -497,6 +536,7 @@ void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0), "Player Object");
 	AddEnemyToWorld(Vector3(5, 5, 0), "Enemy Object");
 	AddBonusToWorld(Vector3(10, 5, 0), "Bonus Object");
+	AddGuardToWorld(Vector3(10, 5, 5), "Guard Object");
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {
