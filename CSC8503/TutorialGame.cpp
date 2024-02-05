@@ -83,6 +83,8 @@ TutorialGame::~TutorialGame()	{
 	delete basicShader;
 	delete mKeeperAlbedo;
 	delete mKeeperNormal;
+	delete mFloorAlbedo;
+	delete mFloorNormal;
 
 	delete physics;
 	delete renderer;

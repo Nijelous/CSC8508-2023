@@ -14,7 +14,7 @@ namespace NCL {
 		{
 		public:
 			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader, float cullSphereRadius);
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* sahder, Vector4 colour, float cullSphereRadius);
+			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader, Vector4 colour, float cullSphereRadius);
 			~RenderObject();
 
 			void SetAlbedoTexture(Texture* t) {
