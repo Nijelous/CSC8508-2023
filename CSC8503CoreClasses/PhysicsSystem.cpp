@@ -263,28 +263,32 @@ void PhysicsSystem::FrictionImpulse(GameObject& a, GameObject& b, CollisionDetec
 	Vector3 relativeA = p.localA;
 	Vector3 relativeB = p.localB;
 
-	Vector3 contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB);
+	Vector3 contactVelocity;
+
+	contactVelocity = (GetIsCapsule(a) || GetIsCapsule(b) ? contactVelocity = physB->GetLinearVelocity() - physA->GetLinearVelocity() : contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB));
+
 	Vector3 tangent = CalculateFrictionDirection(contactVelocity, p.normal);
 	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, tangent);
 
 	float impulseForce = Vector3::Dot(contactVelocity, tangent);
-	float jt = -impulseForce / (totalMass + angularEffect);
-
-	jt = abs(jt);
+	
 	j = abs(j);
 
 	float friction = CalculateFriction(physA, physB);
 
-	Vector3 fullFrictionImpulse = CalculateFrictionImpulse(tangent, jt, j, friction);
-
-	Debug::DrawLine(Vector3(0,0,0), Vector3(0,1,0), Debug::RED, 1);
-	Debug::DrawLine(Vector3(0,0,0), Vector3(0,0,0) + (fullFrictionImpulse), Debug::CYAN, 1);
+	Vector3 fullFrictionImpulse = CalculateFrictionImpulse(tangent, j, friction);
 
 	// apply impulse in opposite directions for collision responce
 	physA->ApplyLinearImpulse(fullFrictionImpulse);
 	physB->ApplyLinearImpulse(-fullFrictionImpulse);
 	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, fullFrictionImpulse));
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, -fullFrictionImpulse));
+}
+
+bool PhysicsSystem::GetIsCapsule(GameObject& obj) const {
+	if (obj.GetBoundingVolume()->type == VolumeType::Capsule)
+		return true;
+	return false;
 }
 
 void PhysicsSystem::SeperateObjects(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float totalMass) const {
@@ -340,19 +344,14 @@ float PhysicsSystem::CalculateFriction(PhysicsObject* physA, PhysicsObject* phys
 		frictionB = physB->GetStaticFriction();
 	else
 		frictionB = physB->GetDynamicFriction();
-
-	float friction = (frictionA + frictionB) / 2;
-	return friction;
+	return (frictionA + frictionB) / 2;
 }
 
-Vector3 PhysicsSystem::CalculateFrictionImpulse(Vector3 tangent, float jt, float j, float friction) const {
+Vector3 PhysicsSystem::CalculateFrictionImpulse(Vector3 tangent, float j, float friction) const {
 	Vector3 fullFrictionImpulse;
-	if (jt <= j) {
-		fullFrictionImpulse = tangent * jt * friction;
-	}
-	else {
-		fullFrictionImpulse = tangent * j * friction;
-	}
+
+	fullFrictionImpulse = tangent * j * friction;
+
 	return fullFrictionImpulse;
 }
 

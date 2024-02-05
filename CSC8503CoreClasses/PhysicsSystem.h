@@ -40,6 +40,8 @@ namespace NCL {
 
 			void FrictionImpulse(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float j) const;
 
+			bool GetIsCapsule(GameObject& obj) const;
+
 			void SeperateObjects(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float totalMass) const;
 
 			bool CheckFrictionShuldBeApplied(float aVelocity, float bVelocity, float totalMass) const;
@@ -52,7 +54,7 @@ namespace NCL {
 
 			float CalculateFriction(PhysicsObject* physA, PhysicsObject* physB) const;
 
-			Vector3 CalculateFrictionImpulse(Vector3 tangent, float jt, float j, float friction) const;
+			Vector3 CalculateFrictionImpulse(Vector3 tangent, float j, float friction) const;
 
 			GameWorld& gameWorld;
 

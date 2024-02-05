@@ -4,14 +4,16 @@
 using namespace NCL;
 using namespace CSC8503;
 
-PhysicsObject::PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume)	{
+PhysicsObject::PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume, float inverseMass, float dynamicFriction, float staticFriction, float elasticity)	{
 	transform	= parentTransform;
 	volume		= parentVolume;
 
-	inverseMass = 1.0f;
-	elasticity	= 0.3f;
-	staticFriction = 50;
-	dynamicFriction = 0.8;
+	this->inverseMass = inverseMass;
+	this->elasticity = elasticity;
+	// friction when stopping
+	this->staticFriction = staticFriction;
+	// friction when moving
+	this->dynamicFriction = dynamicFriction;
 }
 
 PhysicsObject::~PhysicsObject()	{
