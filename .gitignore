@@ -17,7 +17,6 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps 
-x64/Debug
 CSC8503CoreClasses/CSC8503CoreClasses.dir/Debug
 ALL_BUILD.vcxproj
 ALL_BUILD.vcxproj.filters
@@ -38,9 +37,16 @@ CSC8503CoreClasses/cmake_install.cmake
 OpenGLRendering/cmake_install.cmake
 NCLCoreClasses/Debug
 NCLCoreClasses/NCLCoreClasses.dir/Debug
+NCLCoreClasses/Release
+NCLCoreClasses/NCLCoreClasses.dir/Release
 CSC8503/CSC8503.dir/Debug
+CSC8503/CSC8503.dir/Release
+CSC8503CoreClasses/CSC8503CoreClasses.dir/Release
 OpenGLRendering/Debug
 OpenGLRendering/OpenGLRendering.dir/Debug
+OpenGLRendering/Release
+OpenGLRendering/OpenGLRendering.dir/Release
 x64/Debug/
+x64/Release/
 CSC8503.sln
 
