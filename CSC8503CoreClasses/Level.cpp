@@ -11,7 +11,34 @@ Level::Level(std::string levelPath) {
 	std::ifstream levelFile(levelPath);
 	std::string line;
 	while (getline(levelFile, line)) {
-		std::cout << line << "\n";
+		std::string output = "";
+		int count = 0;
+		for (char c : line) {
+			if (c == '[' || c == '{') {
+				if (!output.empty()) {
+					for (int i = 0; i < count; i++) std::cout << "\t";
+					std::cout << output << "\n";
+				}
+				count++;
+				output = "";
+			}
+			else if (c == ']' || c == '}') {
+				if (!output.empty()) {
+					for (int i = 0; i < count; i++) std::cout << "\t";
+					std::cout << output << "\n";
+				}
+				count--;
+				output = "";
+				if (c == ']') break;
+			}
+			else if (c == ',') {
+				output += '\n';
+				for (int i = 0; i < count; i++) output += '\t';
+			}
+			else {
+				output += c;
+			}
+		}
 	}
 	mLevelName = "";
 	std::map<Vector3, GameObject*> mTileMap;
