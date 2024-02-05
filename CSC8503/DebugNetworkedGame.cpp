@@ -97,7 +97,16 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
 
 void DebugNetworkedGame::StartLevel(){
     Debug::Print("Game Started", Vector2(10, 5));
+    
     InitWorld();
+
+    for (auto& event : mOnGameStarts){
+        event();
+    }
+}
+
+void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event){
+    mOnGameStarts.push_back(event);
 }
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source){
