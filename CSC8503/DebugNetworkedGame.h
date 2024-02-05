@@ -26,6 +26,8 @@ namespace NCL{
             void SetIsGameStarted(bool isGameStarted);
             void StartLevel();
 
+            void AddEventOnGameStarts(std::function<void()> event);
+
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
             GameClient* GetClient() const;
@@ -55,6 +57,8 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
+
+            std::vector<std::function<void()>> mOnGameStarts;
 
             std::map<int, int> mStateIDs;
 
