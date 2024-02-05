@@ -9,7 +9,7 @@ namespace NCL {
 		class Light;
 		class Level {
 		public:
-			Level(int levelID);
+			Level(std::string levelPath);
 			~Level() {}
 			int GetGuardCount() const { return mGuardCount; }
 			int GetCCTVCount() const { return mCCTVCount; }

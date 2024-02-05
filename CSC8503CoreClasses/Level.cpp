@@ -2,10 +2,17 @@
 #include "Vent.h"
 #include "GameObject.h"
 #include "BaseLight.h"
+#include <fstream>
 
 using namespace NCL::CSC8503;
 
-Level::Level(int levelID) {
+Level::Level(std::string levelPath) {
+	std::cout << levelPath << "\n";
+	std::ifstream levelFile(levelPath);
+	std::string line;
+	while (getline(levelFile, line)) {
+		std::cout << line << "\n";
+	}
 	mLevelName = "";
 	std::map<Vector3, GameObject*> mTileMap;
 	mRoomList = std::map<Vector3, Room>();
