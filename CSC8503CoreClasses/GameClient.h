@@ -20,10 +20,10 @@ namespace NCL {
 
 			bool UpdateClient();
 		protected:
-			int peerId;
+			int mPeerId;
 			
-			_ENetPeer*	netPeer;
-			float timerSinceLastPacket;
+			_ENetPeer*	mNetPeer;
+			float mTimerSinceLastPacket;
 		};
 	}
 }

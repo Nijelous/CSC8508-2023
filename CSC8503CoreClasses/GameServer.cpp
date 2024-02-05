@@ -5,13 +5,13 @@ using namespace NCL;
 using namespace CSC8503;
 
 GameServer::GameServer(int onPort, int maxClients)	{
-	port		= onPort;
-	clientMax	= maxClients;
-	clientCount = 0;
+	mPort		= onPort;
+	mClientMax	= maxClients;
+	mClientCount = 0;
 	netHandle	= nullptr;
-	peers = new int[clientMax];
-	for (int i = 0; i < clientMax; ++i){
-		peers[i] = -1;
+	mPeers = new int[mClientMax];
+	for (int i = 0; i < mClientMax; ++i){
+		mPeers[i] = -1;
 	}
 	Initialise();
 }
@@ -30,9 +30,9 @@ bool GameServer::Initialise() {
 	// create game server
 	ENetAddress address;
 	address.host = ENET_HOST_ANY;
-	address.port = port;
+	address.port = mPort;
 
-	netHandle = enet_host_create(&address, clientMax, 1, 0, 0);
+	netHandle = enet_host_create(&address, mClientMax, 1, 0, 0);
 
 	// if server is not set up then diplay error message and return false
 	if (!netHandle) {
@@ -64,12 +64,12 @@ bool GameServer::SendVariableUpdatePacket(VariablePacket& packet) {
 
 bool GameServer::GetPeer(int peerNumber, int& peerId) const
 {
-	if (peerNumber >= clientMax)
+	if (peerNumber >= mClientMax)
 		return false;
-	if (peers[peerNumber] == -1) {
+	if (mPeers[peerNumber] == -1) {
 		return false;
 	}
-	peerId = peers[peerNumber];
+	peerId = mPeers[peerNumber];
 	return true;
 }
 
@@ -98,21 +98,21 @@ void GameServer::UpdateServer() {
 }
 
 void GameServer::SetGameWorld(GameWorld &g) {
-	gameWorld = &g;
+	mGameWorld = &g;
 }
 
 void GameServer::AddPeer(int peerNumber) const
 {
-	int emptyIndex = clientMax;
-	for (int i = 0; i < clientMax; i++) {
-		if (peers[i] == peerNumber){
+	int emptyIndex = mClientMax;
+	for (int i = 0; i < mClientMax; i++) {
+		if (mPeers[i] == peerNumber){
 			return;
 		}
-		if (peers[i] == -1) {
+		if (mPeers[i] == -1) {
 			emptyIndex = std::min(i, emptyIndex);
 		}
 	}
-	if (emptyIndex < clientMax){
-		peers[emptyIndex] = peerNumber;
+	if (emptyIndex < mClientMax){
+		mPeers[emptyIndex] = peerNumber;
 	}
 }

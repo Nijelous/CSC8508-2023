@@ -23,14 +23,14 @@ namespace NCL {
 			virtual void UpdateServer();
 
 		protected:
-			int			port;
-			int			clientMax;
-			int			clientCount;
-			int*        peers;
-			GameWorld*	gameWorld;
+			int			mPort;
+			int			mClientMax;
+			int			mClientCount;
+			int*        mPeers;
+			GameWorld*	mGameWorld;
 
-			int incomingDataRate;
-			int outgoingDataRate;
+			int mIncomingDataRate;
+			int mOutgoingDataRate;
 		};
 	}
 }

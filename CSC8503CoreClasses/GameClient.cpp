@@ -5,8 +5,8 @@ using namespace CSC8503;
 
 GameClient::GameClient()	{
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
-	timerSinceLastPacket = 0.0f;
-	peerId = -1;
+	mTimerSinceLastPacket = 0.0f;
+	mPeerId = -1;
 }
 
 GameClient::~GameClient()	{
@@ -14,7 +14,7 @@ GameClient::~GameClient()	{
 }
 
 int GameClient::GetPeerID() const {
-	return peerId;
+	return mPeerId;
 }
 
 bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum) {
@@ -22,10 +22,10 @@ bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum
 	address.port = portNum;
 	address.host = (d << 24) | (c << 16) | (b << 8) | (a);
 
-	netPeer = enet_host_connect(netHandle, &address, 2, 0);
+	mNetPeer = enet_host_connect(netHandle, &address, 2, 0);
 
 	// returm false if net peer is null
-	return netPeer != nullptr;
+	return mNetPeer != nullptr;
 }
 
 bool GameClient::UpdateClient() {
@@ -33,27 +33,27 @@ bool GameClient::UpdateClient() {
 	if (netHandle == nullptr)
 		return false;
 
-	timerSinceLastPacket++;
+	mTimerSinceLastPacket++;
 
 	// handle incoming packets
 	ENetEvent event;
 	while (enet_host_service(netHandle, &event, 0) > 0) {
 		if (event.type == ENET_EVENT_TYPE_CONNECT) {
 			//erendgrmnc: I remember +1 is needed because when counting server as a player, outgoing peer Id is not increasing.
-			peerId = netPeer->outgoingPeerID + 1;
+			mPeerId = mNetPeer->outgoingPeerID + 1;
 			std::cout << "Connected to server!" << std::endl;
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
 			//std::cout << "Client Packet recieved..." << std::endl;
 			GamePacket* packet = (GamePacket*)event.packet->data;
 			ProcessPacket(packet);
-			timerSinceLastPacket = 0.0f;
+			mTimerSinceLastPacket = 0.0f;
 		}
 		// once packet data is handled we can destroy packet and go to next
 		enet_packet_destroy(event.packet);
 	}
 	// return false if client is no longer receiving packets
-	if (timerSinceLastPacket > 20.0f) {
+	if (mTimerSinceLastPacket > 20.0f) {
 		return false;
 	}
 	return true;
@@ -62,5 +62,5 @@ bool GameClient::UpdateClient() {
 void GameClient::SendPacket(GamePacket&  payload) {
 	// defines packet to send and sends packet
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
-	enet_peer_send(netPeer, 0, dataPacket);
+	enet_peer_send(mNetPeer, 0, dataPacket);
 }
