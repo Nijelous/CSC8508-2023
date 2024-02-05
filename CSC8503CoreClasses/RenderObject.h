@@ -57,6 +57,18 @@ namespace NCL {
 				return mCullSphereRadius;
 			}
 
+			float GetSqDistToCam() const {
+				return mSqDistToCam;
+			}
+
+			void SetSqDistToCam(float sqDist) {
+				mSqDistToCam = sqDist;
+			}
+
+			static bool CompareBySqCamDist(const RenderObject* a, const RenderObject* b) {
+				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
+			}
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
@@ -65,6 +77,7 @@ namespace NCL {
 			Transform*	mTransform;
 			Vector4		mColour;
 			float		mCullSphereRadius;
+			float mSqDistToCam;
 		};
 	}
 }
