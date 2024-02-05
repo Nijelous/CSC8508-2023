@@ -6,7 +6,7 @@
 using namespace NCL::CSC8503;
 
 Level::Level(int levelID) {
-	mLevelID = levelID;
+	mLevelName = "";
 	std::map<Vector3, GameObject*> mTileMap;
 	mRoomList = std::map<Vector3, Room>();
 	mGuardPaths = std::vector<std::vector<Vector3>>();

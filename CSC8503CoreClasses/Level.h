@@ -16,7 +16,7 @@ namespace NCL {
 			Vector3 GetPrisonPosition() const { return mPrisonPosition; }
 			Vector3 GetPlayerStartPosition(int player) { return mPlayerStartPositions[player]; }
 		protected:
-			int mLevelID;
+			std::string mLevelName;
 			std::map<Vector3, GameObject*> mTileMap;
 			std::map<Vector3, Room> mRoomList;
 			std::vector<std::vector<Vector3>> mGuardPaths;
