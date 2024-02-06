@@ -24,7 +24,7 @@ in Vertex
 	vec3 worldPos;
 } IN;
 
-out vec4 fragColor;
+out vec4 fragColor[2];
 
 void main(void)
 {
@@ -36,31 +36,8 @@ void main(void)
 	if( IN . shadowProj . w > 0.0) { // New !
 		shadow = textureProj ( shadowTex , IN . shadowProj ) * 0.5f;
 	}
+	
+	fragColor[0] = texture2D(mainTex,IN.texCoord);
+	fragColor[1] = vec4(bumpNormal.xyz * 0.5 + 0.5, 1.0);
 
-	vec3  incident = normalize ( lightPos - IN.worldPos );
-	float lambert  = max (0.0 , dot ( incident , bumpNormal )) * 0.9; 
-	
-	vec3 viewDir = normalize ( cameraPos - IN . worldPos );
-	vec3 halfDir = normalize ( incident + viewDir );
-
-	float rFactor = max (0.0 , dot ( halfDir , bumpNormal ));
-	float sFactor = pow ( rFactor , 80.0 );
-	
-	vec4 albedo = IN.colour;
-	
-	if(hasTexture) {
-	 albedo *= texture(mainTex, IN.texCoord);
-	}
-	
-	albedo.rgb = pow(albedo.rgb, vec3(2.2));
-	
-	fragColor.rgb = albedo.rgb * 0.05f; //ambient
-	
-	fragColor.rgb += albedo.rgb * lightColour.rgb * lambert * shadow; //diffuse light
-	
-	fragColor.rgb += lightColour.rgb * sFactor * shadow; //specular light
-	
-	fragColor.rgb = pow(fragColor.rgb, vec3(1.0 / 2.2f));
-	
-	fragColor.a = albedo.a;
 }

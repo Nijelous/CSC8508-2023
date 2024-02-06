@@ -47,13 +47,16 @@ namespace NCL {
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
 			void LoadDefRendShaders();
+			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void CombineBuffers();
 			
 			void LoadSkybox();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
-			void SendLightDataToShader(OGLShader* shader);
+			void SendLightDataToShader(Light* l, OGLShader* shader);
 			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
@@ -84,6 +87,8 @@ namespace NCL {
 			GLuint mLightSpecularTex;
 			Shader* mLightShader;
 			Shader* mCombineShader;
+			const OGLMesh* mSphereMesh;
+			OGLMesh* mQuad;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;
