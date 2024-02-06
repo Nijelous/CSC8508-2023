@@ -13,11 +13,11 @@ namespace NCL {
 			void Update(float dt);
 
 			void UseGravity(bool state) {
-				applyGravity = state;
+				mApplyGravity = state;
 			}
 
 			void SetGlobalDamping(float d) {
-				globalDamping = d;
+				mGlobalDamping = d;
 			}
 
 			void SetGravity(const Vector3& g);
@@ -56,18 +56,18 @@ namespace NCL {
 
 			Vector3 CalculateFrictionImpulse(Vector3 tangent, float j, float friction) const;
 
-			GameWorld& gameWorld;
+			GameWorld& mGameWorld;
 
-			bool	applyGravity;
-			Vector3 gravity;
-			float	dTOffset;
-			float	globalDamping;
+			bool	mApplyGravity;
+			Vector3 mGravity;
+			float	mDTOffset;
+			float	mGlobalDamping;
 
-			std::set<CollisionDetection::CollisionInfo> allCollisions;
-			std::set<CollisionDetection::CollisionInfo> broadphaseCollisions;
-			std::vector<CollisionDetection::CollisionInfo> broadphaseCollisionsVec;
-			bool useBroadPhase		= true;
-			int numCollisionFrames	= 5;
+			std::set<CollisionDetection::CollisionInfo> mAllCollisions;
+			std::set<CollisionDetection::CollisionInfo> mBroadphaseCollisions;
+			std::vector<CollisionDetection::CollisionInfo> mBroadphaseCollisionsVec;
+			bool mUseBroadPhase		= true;
+			int mNumCollisionFrames	= 5;
 		};
 	}
 }

@@ -13,27 +13,27 @@ namespace NCL {
 			~PhysicsObject();
 
 			Vector3 GetLinearVelocity() const {
-				return linearVelocity;
+				return mLinearVelocity;
 			}
 
 			Vector3 GetAngularVelocity() const {
-				return angularVelocity;
+				return mAngularVelocity;
 			}
 
 			Vector3 GetTorque() const {
-				return torque;
+				return mTorque;
 			}
 
 			Vector3 GetForce() const {
-				return force;
+				return mForce;
 			}
 
 			void SetInverseMass(float invMass) {
-				inverseMass = invMass;
+				mInverseMass = invMass;
 			}
 
 			float GetInverseMass() const {
-				return inverseMass;
+				return mInverseMass;
 			}
 
 			void ApplyAngularImpulse(const Vector3& force);
@@ -49,11 +49,11 @@ namespace NCL {
 			void ClearForces();
 
 			void SetLinearVelocity(const Vector3& v) {
-				linearVelocity = v;
+				mLinearVelocity = v;
 			}
 
 			void SetAngularVelocity(const Vector3& v) {
-				angularVelocity = v;
+				mAngularVelocity = v;
 			}
 
 			void InitCubeInertia();
@@ -62,32 +62,32 @@ namespace NCL {
 			void UpdateInertiaTensor();
 
 			Matrix3 GetInertiaTensor() const {
-				return inverseInteriaTensor;
+				return mInverseInteriaTensor;
 			}
 
-			float GetStaticFriction() { return staticFriction; }
-			float GetDynamicFriction() { return dynamicFriction; }
+			float GetStaticFriction() { return mStaticFriction; }
+			float GetDynamicFriction() { return mDynamicFriction; }
 
-			float GetElasticity() { return elasticity; }
+			float GetElasticity() { return mElasticity; }
 
 		protected:
-			const CollisionVolume* volume;
-			Transform*		transform;
+			const CollisionVolume* mVolume;
+			Transform*		mTransform;
 
-			float inverseMass;
-			float elasticity;
-			float staticFriction;
-			float dynamicFriction;
+			float mInverseMass;
+			float mElasticity;
+			float mStaticFriction;
+			float mDynamicFriction;
 
 			//linear stuff
-			Vector3 linearVelocity;
-			Vector3 force;
+			Vector3 mLinearVelocity;
+			Vector3 mForce;
 			
 			//angular stuff
-			Vector3 angularVelocity;
-			Vector3 torque;
-			Vector3 inverseInertia;
-			Matrix3 inverseInteriaTensor;
+			Vector3 mAngularVelocity;
+			Vector3 mTorque;
+			Vector3 mInverseInertia;
+			Matrix3 mInverseInteriaTensor;
 		};
 	}
 }
