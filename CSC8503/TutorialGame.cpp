@@ -153,6 +153,12 @@ void TutorialGame::UpdateGame(float dt) {
 	if (testStateObject)
 		testStateObject->Update(dt);
 
+	if (mGameObjects.size() > 0) {
+		for (int i = 0; i < mGameObjects.size(); i++) {
+			mGameObjects[i]->UpdateObject(dt);
+		}
+	}
+
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
@@ -353,7 +359,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass, const std::string& objectName) {
 	GameObject* capsule = new GameObject(objectName);
 
-	Vector3 capsuleSize = Vector3(radius, (halfHeight * 2), radius);
+	Vector3 capsuleSize = Vector3(radius * 2, (halfHeight * 2), radius * 2);
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
 	capsule->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -523,7 +529,11 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 
+	guard->SetPlayer(tempPlayer);
+	guard->SetGameWorld(world);
+
 	world->AddGameObject(guard);
+	mGameObjects.push_back(guard);
 
 	return guard;
 }
