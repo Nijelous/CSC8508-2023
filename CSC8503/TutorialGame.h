@@ -72,7 +72,7 @@ namespace NCL {
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
-			LevelManager* levelManager;
+			LevelManager* mLevelManager;
 
 			KeyboardMouseController controller;
 

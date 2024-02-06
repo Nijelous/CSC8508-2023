@@ -27,7 +27,7 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 
 	physics		= new PhysicsSystem(*world);
 
-	levelManager = new LevelManager();
+	mLevelManager = new LevelManager();
 
 	forceMagnitude	= 10.0f;
 	useGravity		= true;
