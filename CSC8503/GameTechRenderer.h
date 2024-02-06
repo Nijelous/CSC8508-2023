@@ -45,8 +45,9 @@ namespace NCL {
 			void RenderSkybox();
 			void SetUpFBOs();
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
-			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourTex, GLuint& normalTex, GLuint& depthTex, bool depth = false);
-
+			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
+			void LoadDefRendShaders();
+			
 			void LoadSkybox();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
@@ -81,6 +82,8 @@ namespace NCL {
 			GLuint mLightFBO;
 			GLuint mLightAlbedoTex;
 			GLuint mLightSpecularTex;
+			Shader* mLightShader;
+			Shader* mCombineShader;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;

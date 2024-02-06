@@ -53,6 +53,8 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	skyboxMesh->UploadToGPU();
 
 	LoadSkybox();
+	SetUpFBOs();
+	LoadDefRendShaders();
 
 	glGenVertexArrays(1, &lineVAO);
 	glGenVertexArrays(1, &textVAO);
@@ -79,6 +81,9 @@ GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &mGBufferDepthTex);
 	glDeleteTextures(1, &mLightAlbedoTex);
 	glDeleteTextures(1, &mLightSpecularTex);
+
+	delete mLightShader;
+	delete mCombineShader;
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -119,6 +124,11 @@ void GameTechRenderer::LoadSkybox() {
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+void GameTechRenderer::LoadDefRendShaders() {
+	mLightShader = LoadShader("light.VERT", "light.FRAG");
+	mCombineShader = LoadShader("combine.VERT", "combine.FRAG");
 }
 
 void GameTechRenderer::RenderFrame() {
@@ -304,8 +314,7 @@ void GameTechRenderer::RenderCamera() {
 
 void GameTechRenderer::SetUpFBOs() {
 	glGenFramebuffers(1, &mGBufferFBO);
-	glGenFramebuffers(1, &mLightFBO);
-	GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glGenFramebuffers(1, &mLightFBO);	
 
 	GenerateScreenTexture(mGBufferColourTex);
 	GenerateScreenTexture(mGBufferNormalTex);
@@ -313,26 +322,42 @@ void GameTechRenderer::SetUpFBOs() {
 	GenerateScreenTexture(mLightAlbedoTex);
 	GenerateScreenTexture(mLightSpecularTex);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, mGBufferFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mGBufferColourTex, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mGBufferNormalTex, 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, mGBufferDepthTex, 0);
-	glDrawBuffers(2, buffers);
+	BindTexAttachmentsToBuffers(mGBufferFBO, mGBufferColourTex, mGBufferNormalTex, &mGBufferDepthTex);
+	BindTexAttachmentsToBuffers(mLightFBO, mLightAlbedoTex, mLightSpecularTex);
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glEnable(GL_BLEND);
+}
+
+void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	GLuint format = depth ? GL_DEPTH_COMPONENT24 : GL_RGBA8;
+	GLuint type = depth ? GL_DEPTH_COMPONENT : GL_RGBA;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, format, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, type, GL_UNSIGNED_BYTE, NULL);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+
+void GameTechRenderer::BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colour0, GLuint& colour1, GLuint* depthTex) {
+	GLenum buffers[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colour0, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, colour1, 0);
+	if (depthTex) {
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, *depthTex, 0);
+	}
+	glDrawBuffers(2, buffers);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) return;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mLightAlbedoTex,0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, mLightSpecularTex, 0);
-	glDrawBuffers(2, buffers);
-}
-
-void GameTechRenderer::GenerateScreenTexture(GLuint& fbo, bool depth) {
-
-}
-
-void GameTechRenderer::BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourTex, GLuint& normalTex, GLuint& depthTex, bool depth) {
-
 }
 
 
