@@ -296,6 +296,8 @@ void TutorialGame::InitWorld() {
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 
+	AddGuardToWorld(Vector3(30, 5, 5), "Guard Object");
+
 	InitDefaultFloor();
 }
 
@@ -546,7 +548,6 @@ void TutorialGame::InitGameExamples() {
 	AddPlayerToWorld(Vector3(0, 5, 0), "Player Object");
 	AddEnemyToWorld(Vector3(5, 5, 0), "Enemy Object");
 	AddBonusToWorld(Vector3(10, 5, 0), "Bonus Object");
-	AddGuardToWorld(Vector3(10, 5, 5), "Guard Object");
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {

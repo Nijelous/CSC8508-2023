@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include "GameWorld.h"
+#include "BehaviourAction.h"
+#include "BehaviourSequence.h"
 #include <string>
 using namespace std;
 
@@ -28,6 +30,12 @@ namespace NCL {
             GameObject* mSightedObject;
             GameObject* mPlayer;
             GameWorld* mWorld;
+        private:
+            void BehaviourTree();
+            void ChasePlayerSetup();
+
+            BehaviourSequence* mRootSequence;
+            BehaviourAction* mChasePlayer;
         };
     }
 }
