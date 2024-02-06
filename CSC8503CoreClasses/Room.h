@@ -9,15 +9,13 @@ namespace NCL {
 
 		class Room {
 		public:
-			Room(){}
+			Room() { mType = INVALID; }
 			Room(int type);
 			Room(std::string roomPath);
 			~Room() {}
 			RoomType GetType() const { return mType; }
+			friend class JsonParser;
 		protected:
-			void WriteVariable(std::vector<std::map<std::string, float>>& keyValuePairs);
-			void WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents);
-
 			std::string mRoomName;
 			RoomType mType;
 			std::map<Vector3, TileType> mTileMap;
