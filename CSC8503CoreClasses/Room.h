@@ -7,10 +7,12 @@ namespace NCL {
 		class Light;
 		enum RoomType {
 			Medium,
-			MAX
+			INVALID
 		};
 		class Room {
 		public:
+			Room(){}
+			Room(int type);
 			Room(std::string roomPath);
 			~Room() {}
 			RoomType GetType() const { return mType; }
