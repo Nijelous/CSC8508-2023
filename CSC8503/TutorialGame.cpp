@@ -15,6 +15,11 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace irrklang;
 
+namespace {
+	constexpr float PLAYER_MESH_SIZE = 3.0f;
+	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+}
+
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
 #ifdef USEVULKAN
@@ -93,7 +98,9 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+	if (testSphere != nullptr){
+		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
 	}
@@ -159,6 +166,10 @@ void TutorialGame::UpdateGame(float dt) {
 
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
+}
+
+GameWorld* TutorialGame::GetGameWorld() const{
+	return world;
 }
 
 void TutorialGame::UpdateKeys() {
@@ -231,6 +242,23 @@ void TutorialGame::LockedObjectMovement() {
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::NEXT)) {
 		selectionObject->GetPhysicsObject()->AddForce(Vector3(0,-10,0));
 	}
+}
+
+void TutorialGame::CreatePlayerObjectComponents(PlayerObject& playerObject,  const Vector3& position) const{
+	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
+
+	playerObject.SetBoundingVolume((CollisionVolume*)volume);
+
+	playerObject.GetTransform()
+		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
+		.SetPosition(position);
+
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, PLAYER_MESH_SIZE));
+	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume()));
+
+
+	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
+	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 }
 
 void TutorialGame::DebugObjectMovement() {
@@ -415,24 +443,8 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::string& objectName) {
-	float meshSize		= 3.0f;
-	float inverseMass	= 0.5f;
-  
 	tempPlayer = new PlayerObject(world, objectName, 50);
-	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
-
-	tempPlayer->SetBoundingVolume((CollisionVolume*)volume);
-
-	tempPlayer->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
-
-	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
-	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
-
-
-	tempPlayer->GetPhysicsObject()->SetInverseMass(inverseMass);
-	tempPlayer->GetPhysicsObject()->InitSphereInertia(false);
+	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
 
