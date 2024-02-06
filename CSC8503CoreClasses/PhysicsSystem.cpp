@@ -265,7 +265,9 @@ void PhysicsSystem::FrictionImpulse(GameObject& a, GameObject& b, CollisionDetec
 
 	Vector3 contactVelocity;
 
-	contactVelocity = (GetIsCapsule(a) || GetIsCapsule(b) ? contactVelocity = physB->GetLinearVelocity() - physA->GetLinearVelocity() : contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB));
+	contactVelocity = (GetIsCapsule(a) || GetIsCapsule(b) ? 
+		physB->GetLinearVelocity() - physA->GetLinearVelocity() : 
+		 CalculateCollisionVelocity(relativeA, relativeB, physA, physB));
 
 	Vector3 tangent = CalculateFrictionDirection(contactVelocity, p.normal);
 	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, tangent);
@@ -300,9 +302,9 @@ void PhysicsSystem::SeperateObjects(GameObject& a, GameObject& b, CollisionDetec
 }
 
 bool PhysicsSystem::CheckFrictionShuldBeApplied(float aVelocity, float bVelocity, float totalMass) const {
-	if (aVelocity < 5.5 && bVelocity < 5.5)
+	if (aVelocity < 1 && bVelocity < 1)
 		return false;
-	if (totalMass == 0)
+	if (totalMass <= 0)
 		return false;
 	return true;
 }
