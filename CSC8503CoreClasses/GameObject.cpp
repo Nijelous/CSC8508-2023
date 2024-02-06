@@ -51,3 +51,7 @@ void GameObject::UpdateBroadphaseAABB() {
 		mBroadphaseAABB = mat * halfSizes;
 	}
 }
+
+void GameObject::UpdateObject(float dt) {
+
+}
