@@ -1,6 +1,5 @@
 #include "Level.h"
 #include "Vent.h"
-#include "GameObject.h"
 #include "BaseLight.h"
 #include "DirectionalLight.h"
 #include "SpotLight.h"

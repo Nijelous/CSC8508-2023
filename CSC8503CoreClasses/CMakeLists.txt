@@ -75,6 +75,8 @@ set(Level
     "LevelManager.cpp"
     "Level.h"
     "Level.cpp"
+    "LevelEnums.h"
+    "LevelEnums.cpp"
     "Room.h"
     "Room.cpp"
     "Vent.h"

@@ -5,13 +5,8 @@ using namespace NCL::Maths;
 namespace NCL {
 	namespace CSC8503 {
 		class Vent;
-		class GameObject;
 		class Light;
-
-		enum TileType {
-			Wall,
-			Floor
-		};
+		class Room;
 
 		class Level {
 		public:

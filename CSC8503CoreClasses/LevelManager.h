@@ -1,11 +1,10 @@
 #pragma once
 #include "Level.h"
-#include "Room.h"
-
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
+
 		class LevelManager {
 		public:
 			LevelManager();
