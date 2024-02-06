@@ -9,6 +9,7 @@
 
 #include "StateGameObject.h"
 #include "GuardObject.h"
+#include "LevelManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -70,6 +71,8 @@ namespace NCL {
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+
+			LevelManager* mLevelManager;
 
 			KeyboardMouseController controller;
 
