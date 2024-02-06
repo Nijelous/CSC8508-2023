@@ -8,6 +8,7 @@
 #include "PhysicsSystem.h"
 
 #include "StateGameObject.h"
+#include "GuardObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -57,6 +58,8 @@ namespace NCL {
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
 
+			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& objectName);
+
 			StateGameObject* AddStateObjectToWorld(const Vector3& position, const std::string& objectName);
 			StateGameObject* testStateObject;
 
@@ -82,6 +85,10 @@ namespace NCL {
 			Mesh*	sphereMesh	= nullptr;
 
 			Texture*	basicTex	= nullptr;
+			Texture* mKeeperAlbedo = nullptr;
+			Texture* mKeeperNormal = nullptr;
+			Texture* mFloorAlbedo = nullptr;
+			Texture* mFloorNormal = nullptr;
 			Shader*		basicShader = nullptr;
 
 			//Coursework Meshes
