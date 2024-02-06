@@ -31,6 +31,7 @@ namespace NCL {
 			//NavMesh
 			std::vector<Vector3> mItemPositions;
 			std::vector<Vent*> mVents;
+			std::vector<int> mVentConnections;
 		};
 	}
 }
