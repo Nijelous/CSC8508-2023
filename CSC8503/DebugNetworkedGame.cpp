@@ -43,8 +43,9 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(Player_Connected, this);
     mThisClient->RegisterPacketHandler(Player_Disconnected, this);
     mThisClient->RegisterPacketHandler(String_Message, this);
-    mThisClient->RegisterPacketHandler(GameState, this);
+    mThisClient->RegisterPacketHandler(GameStartState, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
@@ -63,6 +64,19 @@ void DebugNetworkedGame::UpdateGame(float dt){
         }
     }
     if (isGameStarted){
+        //TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
+        if (mIsGameFinished){
+            Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
+            renderer->Render();
+            return;
+        }
+        
+        //DEBUG END GAME
+        if (mThisServer){
+            if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)){
+                SetIsGameFinished(true);
+            }
+        }
         TutorialGame::UpdateGame(dt);
     }
     else{
@@ -88,10 +102,17 @@ void DebugNetworkedGame::UpdateGame(float dt){
 void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
     this->isGameStarted = isGameStarted;
     if (mThisServer){
-        SendGameStatusPacket();
+        SendStartGameStatusPacket();
     }
     if (isGameStarted){
         StartLevel();
+    }
+}
+
+void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
+    mIsGameFinished = isGameFinished;
+    if (mThisServer){
+        SendFinishGameStatusPacket();
     }
 }
 
@@ -115,8 +136,8 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         int a = 0;
         break;
     }
-    case BasicNetworkMessages::GameState: {
-        GameStatePacket* packet = (GameStatePacket*)payload;
+    case BasicNetworkMessages::GameStartState: {
+        GameStartStatePacket* packet = (GameStartStatePacket*)payload;
         SetIsGameStarted(packet->isGameStarted);
         break;
     }
@@ -125,7 +146,16 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         HandleFullPacket(packet);
         break;
     }
+    case BasicNetworkMessages::GameEndState:{
+        GameEndStatePacket* packet = (GameEndStatePacket*)payload;
+        SetIsGameFinished(packet->isGameEnded);
+        break;
+    }
+    case BasicNetworkMessages::SyncPlayers:{
+        break;
+    }
     default:
+        std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
         break;
     }
 }
@@ -220,9 +250,14 @@ int DebugNetworkedGame::GetPlayerPeerID(int peerId){
     return -1;
 }
 
-void DebugNetworkedGame::SendGameStatusPacket(){
-    GameStatePacket state(isGameStarted);
+void DebugNetworkedGame::SendStartGameStatusPacket(){
+    GameStartStatePacket state(isGameStarted);
     mThisServer->SendGlobalPacket(state);
+}
+
+void DebugNetworkedGame::SendFinishGameStatusPacket(){
+    GameEndStatePacket packet(mIsGameFinished);
+    mThisServer->SendGlobalPacket(packet);
 }
 
 void DebugNetworkedGame::InitWorld(){

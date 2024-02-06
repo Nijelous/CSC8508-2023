@@ -39,7 +39,6 @@ namespace NCL::CSC8503 {
 			cameraPosition = Vector3(0,0,0);
 		}
 	};
-
 	
 	struct SyncPlayerListPacket : public GamePacket {
 		int playerList[4];
@@ -48,13 +47,18 @@ namespace NCL::CSC8503 {
 		void SyncPlayerList(std::vector<int>& clientPlayerList) const;
 	};
 
-	struct GameStatePacket : public GamePacket {
+	struct GameStartStatePacket : public GamePacket {
 		bool isGameStarted = false;
-		GameStatePacket(bool val);
+		GameStartStatePacket(bool val);
+	};
+
+	struct GameEndStatePacket : public GamePacket{
+		bool isGameEnded = false;
+		GameEndStatePacket(bool val);
 	};
 
 
-	class NetworkObject		{
+	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
 		virtual ~NetworkObject();

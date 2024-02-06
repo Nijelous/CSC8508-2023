@@ -108,6 +108,8 @@ namespace NCL {
 			GameObject* objClosest = nullptr;
 
 			PlayerObject* tempPlayer;
+
+			GameObject* testSphere;
 		};
 	}
 }

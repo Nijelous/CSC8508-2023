@@ -8,7 +8,7 @@ using namespace NCL;
 using namespace CSC8503;
 
 StateGameObject::StateGameObject(const std::string objectName) {
-	name = objectName;
+	mName = objectName;
 
 	counter = 0.0f;
 	stateMachine = new StateMachine();
