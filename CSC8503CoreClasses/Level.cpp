@@ -10,96 +10,85 @@
 using namespace NCL::CSC8503;
 
 Level::Level(std::string levelPath) {
-	mLevelName = levelPath;
+	mLevelName = levelPath.substr(24, levelPath.size()-29);
 	mPlayerStartPositions = new Vector3[4];
-	mLights = std::vector<Light*>();
 	std::ifstream levelFile(levelPath);
 	std::string line;
-	while (getline(levelFile, line)) {
-		std::string output = "";
-		std::string currentKey = "";
-		int indents = 0;
-		int maxIndents = 0;
-		bool writingKey = false;
-		bool writingValue = false;
-		std::vector<std::map<std::string, float>> keyValuePairs = std::vector<std::map<std::string, float>>();
-		for (char c : line) {
-			switch (c) {
-			case '"':
-				writingKey = !writingKey;
-				if (!writingKey) {
-					if (keyValuePairs.size() <= maxIndents || indents < maxIndents) {
-						keyValuePairs[indents - 1][output] = 0;
-					}
-					else {
-						keyValuePairs[keyValuePairs.size() - 1][output] = 0;
-					}
-					currentKey = output;
-					output = "";
-				}
-				else if (writingKey && indents == 1) {
-					maxIndents = 1;
-				}
-				break;
-			case '{':
-				indents++;
-				if(indents > maxIndents) maxIndents++;
-				writingValue = false;
-				keyValuePairs.push_back(std::map<std::string, float>());
-				break;
-			case '}':
-				if (writingValue) {
-					if (keyValuePairs.size() <= maxIndents || indents < maxIndents) {
-						keyValuePairs[indents - 1][currentKey] = std::stof(output);
-					}
-					else {
-						keyValuePairs[keyValuePairs.size() - 1][currentKey] = std::stof(output);
-					}
-					writingValue = false;
-					output = "";
-				}
-				indents--;
-				break;
-			case ',':
-				if (writingValue) {
-					if (keyValuePairs.size() <= maxIndents || indents < maxIndents) {
-						keyValuePairs[indents - 1][currentKey] = std::stof(output);
-					}
-					else {
-						keyValuePairs[keyValuePairs.size() - 1][currentKey] = std::stof(output);
-					}
-					writingValue = false;
-					output = "";
-				}
-				if (indents == 1) {
-					WriteValue(keyValuePairs);
-					while (keyValuePairs.size() > 1) {
-						keyValuePairs.pop_back();
-					}
-				}
-				break;
-			case ':':
-				writingValue = true;
-				break;
-			case '[':
-			case ']':
-				break;
-			default:
-				output += c;
-				break;
+	getline(levelFile, line);
+
+	std::string output = "";
+	std::string currentKey = "";
+
+	int indents = 0;
+	int maxIndents = 0;
+	bool writingKey = false;
+	bool writingValue = false;
+
+	std::vector<std::map<std::string, float>> keyValuePairs = std::vector<std::map<std::string, float>>();
+	for (char c : line) {
+		switch (c) {
+		case '"':
+			writingKey = !writingKey;
+			currentKey = output;
+			WriteValue(!writingKey, &keyValuePairs, output, &output, indents, maxIndents);
+			if (writingKey && indents == 1) {
+				maxIndents = 1;
 			}
+			break;
+		case '{':
+			indents++;
+			if (indents > maxIndents) maxIndents++;
+			writingValue = false;
+			keyValuePairs.push_back(std::map<std::string, float>());
+			break;
+		case '}':
+			WriteValue(writingValue, &keyValuePairs, currentKey, &output, indents, maxIndents);
+			writingValue = false;
+			indents--;
+			break;
+		case ',':
+			WriteValue(writingValue, &keyValuePairs, currentKey, &output, indents, maxIndents);
+			writingValue = false;
+			if (indents == 1) {
+				WriteVariable(keyValuePairs);
+				while (keyValuePairs.size() > 1) {
+					keyValuePairs.pop_back();
+				}
+			}
+			break;
+		case ':':
+			writingValue = true;
+			break;
+		case '[':
+		case ']':
+			break;
+		default:
+			output += c;
+			break;
 		}
-		WriteValue(keyValuePairs);
-		for (int i = 0; i < mVentConnections.size(); i++) {
-			mVents[i]->ConnectVent(mVents[mVentConnections[i]]);
-		}
+	}
+	WriteVariable(keyValuePairs);
+	for (int i = 0; i < mVentConnections.size(); i++) {
+		mVents[i]->ConnectVent(mVents[mVentConnections[i]]);
 	}
 }
 
-void Level::WriteValue(std::vector<std::map<std::string, float>>& keyValuePairs) {
+void Level::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents) {
+	if (writingValue) {
+		if (keyValuePairs->size() <= maxIndents || indents < maxIndents) {
+			(*keyValuePairs)[indents - 1][key] = std::atof(value->c_str());
+		}
+		else {
+			(*keyValuePairs)[keyValuePairs->size() - 1][key] = std::atof(value->c_str());
+		}
+		*value = "";
+	}
+}
+
+void Level::WriteVariable(std::vector<std::map<std::string, float>>& keyValuePairs) {
 	switch (keyValuePairs[0].size()) {
 	case 1:
-		mTileMap[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = new GameObject();
+		mTileMap[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = (TileType)keyValuePairs[1]["type"];
 		break;
 	case 2:
 		mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = Room((int)keyValuePairs[1]["type"]);
