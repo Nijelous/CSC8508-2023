@@ -13,7 +13,6 @@ namespace NCL {
             ~GuardObject();
 
             virtual void UpdateObject(float dt) override;
-            void RaycastToPlayer();
 
             void SetPlayer(GameObject* newPlayer) {
                 mPlayer = newPlayer;
@@ -23,6 +22,10 @@ namespace NCL {
                 mWorld = newWorld;
             }
         protected:
+            void RaycastToPlayer();
+            Vector3 AngleOfSight();
+
+            GameObject* mSightedObject;
             GameObject* mPlayer;
             GameWorld* mWorld;
         };
