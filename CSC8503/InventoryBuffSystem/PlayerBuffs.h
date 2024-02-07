@@ -30,7 +30,7 @@ namespace InventoryBuffSystem {
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguise,10},{buff2,4}
+			{disguise,10},{buff2,4},{slow,4}
 		};
 
 		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap =
