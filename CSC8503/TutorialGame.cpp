@@ -519,7 +519,7 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, basicShader, meshSize));
+	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, nullptr, basicShader, meshSize));
 	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
 	
 	animTest->SetAnimationObject(new AnimationObject(mSoldierAnimation, mSoldierMaterial));
