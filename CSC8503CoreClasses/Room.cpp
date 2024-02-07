@@ -25,3 +25,10 @@ Room::Room(std::string roomPath) {
 
 	parser.ParseJson(line, nullptr, this);
 }
+
+Room::~Room() {
+	for (int i = 0; i < mLights.size(); i++) {
+		delete(mLights[i]);
+		mLights[i] = NULL;
+	}
+}

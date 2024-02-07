@@ -12,7 +12,7 @@ namespace NCL {
 			Room() { mType = INVALID; }
 			Room(int type);
 			Room(std::string roomPath);
-			~Room() {}
+			~Room();
 			RoomType GetType() const { return mType; }
 			friend class JsonParser;
 		protected:

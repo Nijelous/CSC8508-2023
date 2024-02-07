@@ -22,3 +22,14 @@ Level::Level(std::string levelPath) {
 		mVents[i]->ConnectVent(mVents[mVentConnections[i]]);
 	}
 }
+
+Level::~Level() {
+	for (int i = 0; i < mLights.size(); i++) {
+		delete(mLights[i]);
+		mLights[i] = NULL;
+	}
+	for (int i = 0; i < mVents.size(); i++) {
+		delete(mVents[i]);
+		mVents[i] = NULL;
+	}
+}

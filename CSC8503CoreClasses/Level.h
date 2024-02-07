@@ -11,7 +11,7 @@ namespace NCL {
 		class Level {
 		public:
 			Level(std::string levelPath);
-			~Level() {}
+			~Level();
 			int GetGuardCount() const { return mGuardCount; }
 			int GetCCTVCount() const { return mCCTVCount; }
 			Vector3 GetPrisonPosition() const { return mPrisonPosition; }
