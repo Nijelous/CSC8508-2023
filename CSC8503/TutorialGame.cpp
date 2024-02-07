@@ -342,6 +342,7 @@ void TutorialGame::InitWorld() {
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 
 	InitDefaultFloor();
+	AddAnimationTest(Vector3(50, 0, 50), "test");
 }
 
 /*

@@ -43,6 +43,7 @@ void AnimationSystem::UpdateCurrentFrames(float dt)
 {
 	for ( auto& a : animationObjects) {
 		(*a).Update(dt);
+		
 	}
 }
 
