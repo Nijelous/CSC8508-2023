@@ -10,9 +10,10 @@
 #include "StateGameObject.h"
 #include "PlayerObject.h"
 
-
+#include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
+using namespace irrklang;
 
 TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
@@ -26,6 +27,8 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 
 	physics		= new PhysicsSystem(*world);
 	mAnimation   = new AnimationSystem(*world);
+
+	mLevelManager = new LevelManager();
 
 	forceMagnitude	= 10.0f;
 	useGravity		= true;
@@ -61,6 +64,11 @@ void TutorialGame::InitialiseAssets() {
 	capsuleMesh = renderer->LoadMesh("capsule.msh");
 
 	basicTex	= renderer->LoadTexture("checkerboard.png");
+	mKeeperAlbedo = renderer->LoadTexture("fleshy_albedo.png");
+	mKeeperNormal = renderer->LoadTexture("fleshy_normal.png");
+	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
+	mFloorNormal = renderer->LoadTexture("panel_normal.png");
+
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
@@ -88,6 +96,10 @@ TutorialGame::~TutorialGame()	{
 
 	delete basicTex;
 	delete basicShader;
+	delete mKeeperAlbedo;
+	delete mKeeperNormal;
+	delete mFloorAlbedo;
+	delete mFloorNormal;
 
 	delete physics;
 	delete renderer;
@@ -96,6 +108,7 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
+	testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
 	}
@@ -155,6 +168,12 @@ void TutorialGame::UpdateGame(float dt) {
 	if (testStateObject)
 		testStateObject->Update(dt);
 
+	if (mGameObjects.size() > 0) {
+		for (int i = 0; i < mGameObjects.size(); i++) {
+			mGameObjects[i]->UpdateObject(dt);
+		}
+	}
+
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
@@ -176,6 +195,10 @@ void TutorialGame::UpdateKeys() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::G)) {
 		useGravity = !useGravity; //Toggle gravity!
 		physics->UseGravity(useGravity);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P)) {
+		ISoundEngine* engine = createIrrKlangDevice();
+		engine->play2D("../Assets/Sound/ophelia.mp3", true);
 	}
 	//Running certain physics updates in a consistent order might cause some
 	//bias in the calculations - the same objects might keep 'winning' the constraint
@@ -281,10 +304,15 @@ void TutorialGame::InitCamera() {
 void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
-	
+
 	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
 
-	InitGameExamples();
+	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+
+	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+
+	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
 	InitDefaultFloor();
 }
 
@@ -303,7 +331,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 		.SetScale(floorSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, basicTex, basicShader, 120));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, 120));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -334,7 +362,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, basicShader,radius));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, nullptr, basicShader,radius));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -348,7 +376,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass, const std::string& objectName) {
 	GameObject* capsule = new GameObject(objectName);
 
-	Vector3 capsuleSize = Vector3(radius, (halfHeight * 2), radius);
+	Vector3 capsuleSize = Vector3(radius * 2, (halfHeight * 2), radius * 2);
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
 	capsule->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -356,7 +384,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 		.SetScale(capsuleSize)
 		.SetPosition(position);
 
-	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, basicShader, halfHeight));
+	capsule->SetRenderObject(new RenderObject(&capsule->GetTransform(), capsuleMesh, basicTex, nullptr, basicShader, halfHeight));
 	capsule->SetPhysicsObject(new PhysicsObject(&capsule->GetTransform(), capsule->GetBoundingVolume()));
 
 	capsule->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -377,7 +405,7 @@ GameObject* TutorialGame::AddOBBCubeToWorld(const Vector3& position, Vector3 dim
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 	
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -398,7 +426,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -413,7 +441,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
   
-	tempPlayer = new PlayerObject(world, objectName, 20);
+	tempPlayer = new PlayerObject(world, objectName, 50);
 	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
 
 	tempPlayer->SetBoundingVolume((CollisionVolume*)volume);
@@ -422,7 +450,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	tempPlayer->SetRenderObject(new RenderObject(&tempPlayer->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
 	tempPlayer->SetPhysicsObject(new PhysicsObject(&tempPlayer->GetTransform(), tempPlayer->GetBoundingVolume()));
 
 
@@ -447,7 +475,7 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	character->SetRenderObject(new RenderObject(&character->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
 	character->SetPhysicsObject(new PhysicsObject(&character->GetTransform(), character->GetBoundingVolume()));
 
 	character->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -467,7 +495,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, nullptr, basicShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, basicShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -515,7 +543,7 @@ StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, co
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), cubeMesh, nullptr, basicShader, 1));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, 1));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -540,14 +568,18 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, nullptr, basicShader, meshSize));
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume()));
 
 	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 	
 
+	guard->SetPlayer(tempPlayer);
+	guard->SetGameWorld(world);
+
 	world->AddGameObject(guard);
+	mGameObjects.push_back(guard);
 
 	return guard;
 }

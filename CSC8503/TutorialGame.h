@@ -10,6 +10,7 @@
 
 #include "StateGameObject.h"
 #include "GuardObject.h"
+#include "LevelManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -74,6 +75,8 @@ namespace NCL {
 			GameWorld*			world;
 			
 
+			LevelManager* mLevelManager;
+
 			KeyboardMouseController controller;
 
 			bool useGravity;
@@ -88,6 +91,10 @@ namespace NCL {
 			Mesh*	sphereMesh	= nullptr;
 			
 			Texture*	basicTex	= nullptr;
+			Texture* mKeeperAlbedo = nullptr;
+			Texture* mKeeperNormal = nullptr;
+			Texture* mFloorAlbedo = nullptr;
+			Texture* mFloorNormal = nullptr;
 			Shader*		basicShader = nullptr;
 
 
@@ -111,9 +118,13 @@ namespace NCL {
 				lockedObject = o;
 			}
 
+			vector<GameObject*> mGameObjects;
+
 			GameObject* objClosest = nullptr;
 
 			PlayerObject* tempPlayer;
+
+			GameObject* testSphere;
 
 		};
 	}

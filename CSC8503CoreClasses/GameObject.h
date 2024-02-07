@@ -16,57 +16,57 @@ namespace NCL::CSC8503 {
 		~GameObject();
 
 		void SetBoundingVolume(CollisionVolume* vol) {
-			boundingVolume = vol;
+			mBoundingVolume = vol;
 		}
 
 		const CollisionVolume* GetBoundingVolume() const {
-			return boundingVolume;
+			return mBoundingVolume;
 		}
 
 		bool IsActive() const {
-			return isActive;
+			return mIsActive;
 		}
 
 		void SetActive() {
-			isActive = !isActive;
+			mIsActive = !mIsActive;
 		}
 
 		Transform& GetTransform() {
-			return transform;
+			return mTransform;
 		}
 
 		RenderObject* GetRenderObject() const {
-			return renderObject;
+			return mRenderObject;
 		}
 
 		PhysicsObject* GetPhysicsObject() const {
-			return physicsObject;
+			return mPhysicsObject;
 		}
 
 		NetworkObject* GetNetworkObject() const {
-			return networkObject;
+			return mNetworkObject;
 		}
-
+    
+    void SetNetworkObject(NetworkObject* netObj) { networkObject = netObj; }
+    
 		AnimationObject* GetAnimationObject() const {
-			return animationObject;
+			return mAnimationObject;
 		}
-
-		void setNetworkObject(NetworkObject* netObj) { networkObject = netObj; }
 
 		void SetRenderObject(RenderObject* newObject) {
-			renderObject = newObject;
+			mRenderObject = newObject;
 		}
 
 		void SetPhysicsObject(PhysicsObject* newObject) {
-			physicsObject = newObject;
+			mPhysicsObject = newObject;
 		}
 
 		void SetAnimationObject(AnimationObject* newObject) {
-			animationObject = newObject;
+			mAnimationObject = newObject;
 		}
 
 		const std::string& GetName() const {
-			return name;
+			return mName;
 		}
 
 		virtual void OnCollisionBegin(GameObject* otherObject) {
@@ -82,27 +82,33 @@ namespace NCL::CSC8503 {
 		void UpdateBroadphaseAABB();
 
 		void SetWorldID(int newID) {
-			worldID = newID;
+			mWorldID = newID;
 		}
 
 		int		GetWorldID() const {
-			return worldID;
+			return mWorldID;
 		}
+    
+		virtual void UpdateObject(float dt);
+
+		bool GetIsPlayer() { return mIsPlayer; }
 
 	protected:
-		Transform			transform;
+		Transform			mTransform;
 
-		CollisionVolume*	boundingVolume;
-		PhysicsObject*		physicsObject;
-		RenderObject*		renderObject;
-		NetworkObject*		networkObject;
-		AnimationObject*  animationObject;
+		CollisionVolume*	mBoundingVolume;
+		PhysicsObject*		mPhysicsObject;
+		RenderObject*		mRenderObject;
+		NetworkObject*		mNetworkObject;
+    AnimationObject* mAnimationObject
 
-		bool		isActive;
-		int			worldID;
-		std::string	name;
+		bool		mIsActive;
+		int			mWorldID;
+		std::string	mName;
 
-		Vector3 broadphaseAABB;
+		Vector3 mBroadphaseAABB;
+
+		bool mIsPlayer;
 	};
 }
 

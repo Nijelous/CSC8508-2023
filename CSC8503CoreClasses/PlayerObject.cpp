@@ -11,9 +11,11 @@
 using namespace NCL::CSC8503;
 
 PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int movementSpeed) {
-	name = objName;
+	mName = objName;
 	mMovementSpeed = movementSpeed;
 	mGameWorld = world;
+
+	mIsPlayer = true;
 }
 
 PlayerObject::~PlayerObject() {
@@ -38,17 +40,17 @@ void PlayerObject::MovePlayer(float dt) {
 	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::W))
-		physicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::S))
-		physicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::A))
-		physicsObject->AddForce(rightAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
-		physicsObject->AddForce(rightAxis * mMovementSpeed);
-
+		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+	
 	StopSliding();
 }
 
@@ -58,7 +60,8 @@ void PlayerObject::MatchCameraRotation() {
 }
 
 void PlayerObject::StopSliding() {
-	if (physicsObject->GetForce() == Vector3(0, 0, 0))
-		physicsObject->SetLinearVelocity(Vector3(0, 0, 0));
+	if ((mPhysicsObject->GetLinearVelocity().Length() < 1) && (mPhysicsObject->GetForce() == Vector3(0,0,0))) {
+		mPhysicsObject->SetLinearVelocity(Vector3(0, 0, 0));
+	}
 }
 
