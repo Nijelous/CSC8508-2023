@@ -10,9 +10,10 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
-//const int MAX_PLAYERS = 4;
+
 namespace InventoryBuffSystem
 {
+	const int MAX_PLAYERS = 4;
 	const int MAX_INVENTORY_SLOTS = 4;
 	class PlayerInventory
 	{
@@ -36,11 +37,9 @@ namespace InventoryBuffSystem
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 	private:
 
-		std::vector<item> itemsInRandomPool;
-
-		std::map<item, float> itemInitDurationMap =
+		std::vector<item> mItemsInRandomPool=
 		{
-			{disguise,10},{item2,4}
+			item2
 		};
 
 		std::map<item, std::function<void(int playerNo)>> mOnItemAddedFunctionMap =

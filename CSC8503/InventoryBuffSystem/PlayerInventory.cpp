@@ -4,9 +4,9 @@
 
 	void PlayerInventory::Init()
 	{
-		for (int playerNo = 0; playerNo < 4; playerNo++)
+		for (int playerNo = 0; playerNo < MAX_PLAYERS; playerNo++)
 		{
-			for (int invSlot = 0; invSlot < 2; invSlot++)
+			for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 			{
 				mPlayerInventory[playerNo][invSlot] = none;
 			}
@@ -16,7 +16,7 @@
 
 	void PlayerInventory::AddItemToPlayer(item inItem, int playerNo)
 	{
-		for (int invSlot = 0; invSlot < 2; invSlot++)
+		for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 		{
 			if (mPlayerInventory[playerNo][invSlot] == none)
 			{
@@ -88,6 +88,6 @@
 	PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed)
 	{
 		std::mt19937 rng(seed);
-		std::shuffle(itemsInRandomPool.begin(), itemsInRandomPool.end(), rng);
-		return itemsInRandomPool[0];
+		std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), rng);
+		return mItemsInRandomPool[0];
 	}
