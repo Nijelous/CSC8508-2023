@@ -8,6 +8,7 @@ namespace NCL::CSC8503 {
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
+	class AnimationObject;
 
 	class GameObject	{
 	public:
@@ -45,8 +46,12 @@ namespace NCL::CSC8503 {
 		NetworkObject* GetNetworkObject() const {
 			return mNetworkObject;
 		}
-
-		void setNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
+    
+    void SetNetworkObject(NetworkObject* netObj) { networkObject = netObj; }
+    
+		AnimationObject* GetAnimationObject() const {
+			return mAnimationObject;
+		}
 
 		void SetRenderObject(RenderObject* newObject) {
 			mRenderObject = newObject;
@@ -54,6 +59,10 @@ namespace NCL::CSC8503 {
 
 		void SetPhysicsObject(PhysicsObject* newObject) {
 			mPhysicsObject = newObject;
+		}
+
+		void SetAnimationObject(AnimationObject* newObject) {
+			mAnimationObject = newObject;
 		}
 
 		const std::string& GetName() const {
@@ -91,6 +100,7 @@ namespace NCL::CSC8503 {
 		PhysicsObject*		mPhysicsObject;
 		RenderObject*		mRenderObject;
 		NetworkObject*		mNetworkObject;
+    AnimationObject* mAnimationObject
 
 		bool		mIsActive;
 		int			mWorldID;
