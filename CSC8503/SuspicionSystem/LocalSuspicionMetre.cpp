@@ -13,7 +13,7 @@ void LocalSuspicionMetre::Init()
 
 void LocalSuspicionMetre::AddInstantLocalSusCause(instantLocalSusCause inCause, int playerNo)
 {
-    ChangePlayerLocalSusMetre(playerNo, instantLocalSusCauseSeverityMap[inCause]);
+    ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
 };
 
 bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, int playerNo)
@@ -50,7 +50,7 @@ void LocalSuspicionMetre::Update(float dt)
     {
         for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
         {
-            ChangePlayerLocalSusMetre(playerNo, activeLocalSusCauseSeverityMap[thisCause]);
+            ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause]);
         }
 
         if (mRecoveryCooldowns[playerNo] == DT_UNTIL_LOCAL_RECOVERY)

@@ -43,12 +43,12 @@ public:
     void Update(float dt);
 
 private:
-    std::map<instantLocalSusCause, float>  instantLocalSusCauseSeverityMap =
+    std::map<instantLocalSusCause, float>  mInstantLocalSusCauseSeverityMap =
     {
         {soundEmitted, 2}, {flagCapture, 40}
     };
 
-    std::map<activeLocalSusCause, float>  activeLocalSusCauseSeverityMap =
+    std::map<activeLocalSusCause, float>  mActiveLocalSusCauseSeverityMap =
     {
         {guardsLOS, 3}, {cameraLOS, 3}
     };
