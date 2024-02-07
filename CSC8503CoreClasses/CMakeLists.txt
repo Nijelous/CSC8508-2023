@@ -102,7 +102,7 @@ source_group("Networking" FILES ${Networking})
 
 set(Physics
     "constraint.h"  
-     "constraint.h"  
+    "constraint.h"  
     "PositionConstraint.cpp"
     "PositionConstraint.h"
     "OrientationConstraint.cpp"
@@ -121,6 +121,8 @@ set(Header_Files
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
+    "AnimationObject.h"
+    "AnimationSystem.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -131,6 +133,8 @@ set(Source_Files
     "GameWorld.cpp"
     "RenderObject.cpp"
     "Transform.cpp"
+    "AnimationObject.cpp"
+    "AnimationSystem.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

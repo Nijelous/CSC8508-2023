@@ -3,10 +3,12 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
+#include "AnimationObject.h"
 
 using namespace NCL::CSC8503;
 
 GameObject::GameObject(const std::string& objectName)	{
+
 	mName			= objectName;
 	mWorldID			= -1;
 	mIsActive		= true;
@@ -14,6 +16,7 @@ GameObject::GameObject(const std::string& objectName)	{
 	mPhysicsObject	= nullptr;
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
+  mAnimationObject = nullptr;
 
 	mIsPlayer = false;
 }
@@ -23,6 +26,7 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
+  delete mAnimationObject;
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
