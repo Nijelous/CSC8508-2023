@@ -48,7 +48,6 @@ namespace NCL {
 
 			void LoadSkybox();
 
-			void LoadAnimation();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);

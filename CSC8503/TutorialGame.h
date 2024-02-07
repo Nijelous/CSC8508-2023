@@ -6,6 +6,7 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
+#include "AnimationSystem.h"
 
 #include "StateGameObject.h"
 #include "GuardObject.h"
@@ -57,6 +58,7 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
+			GameObject* AddAnimationTest(const Vector3& position, const std::string& objectName);
 
 			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& objectName);
 
@@ -70,6 +72,7 @@ namespace NCL {
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			
 
 			KeyboardMouseController controller;
 
@@ -83,9 +86,21 @@ namespace NCL {
 			Mesh*	capsuleMesh = nullptr;
 			Mesh*	cubeMesh	= nullptr;
 			Mesh*	sphereMesh	= nullptr;
-
+			
 			Texture*	basicTex	= nullptr;
 			Shader*		basicShader = nullptr;
+
+
+			//Animation Thing
+			Mesh* soldierMesh = nullptr;
+			MeshAnimation* soldierAnimation = nullptr;
+			MeshMaterial* soldierMaterial = nullptr;
+			Shader* soldierShader = nullptr;
+			vector<GLuint> matTextures;
+			AnimationSystem* animation;
+
+			int currentFrame;
+			float frameTime;
 
 			//Coursework Meshes
 			Mesh*	charMesh	= nullptr;
@@ -102,6 +117,7 @@ namespace NCL {
 			GameObject* objClosest = nullptr;
 
 			PlayerObject* tempPlayer;
+
 		};
 	}
 }

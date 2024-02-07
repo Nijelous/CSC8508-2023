@@ -47,6 +47,10 @@ namespace NCL::CSC8503 {
 			return networkObject;
 		}
 
+		AnimationObject* GetAnimationObject() const {
+			return animationObject;
+		}
+
 		void setNetworkObject(NetworkObject* netObj) { networkObject = netObj; }
 
 		void SetRenderObject(RenderObject* newObject) {
@@ -55,6 +59,10 @@ namespace NCL::CSC8503 {
 
 		void SetPhysicsObject(PhysicsObject* newObject) {
 			physicsObject = newObject;
+		}
+
+		void SetAnimationObject(AnimationObject* newObject) {
+			animationObject = newObject;
 		}
 
 		const std::string& GetName() const {

@@ -403,6 +403,16 @@ Shader* GameTechRenderer::LoadShader(const std::string& vertex, const std::strin
 	return new OGLShader(vertex, fragment);
 }
 
+MeshAnimation* NCL::CSC8503::GameTechRenderer::LoadAnimation(const std::string& name)
+{
+	return new MeshAnimation(name);
+}
+
+MeshMaterial* NCL::CSC8503::GameTechRenderer::LoadMaterial(const std::string& name)
+{
+	return new MeshMaterial(name);
+}
+
 void GameTechRenderer::SetDebugStringBufferSizes(size_t newVertCount) {
 	if (newVertCount > textCount) {
 		textCount = newVertCount;
