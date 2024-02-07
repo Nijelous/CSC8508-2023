@@ -22,6 +22,8 @@ namespace NCL {
 
 			virtual void UpdateGame(float dt);
 
+			GameWorld* GetGameWorld() const;
+		
 		protected:
 			virtual void InitialiseAssets();
 
@@ -49,6 +51,8 @@ namespace NCL {
 			void MoveSelectedObject();
 			void DebugObjectMovement();
 			void LockedObjectMovement();
+
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
 			GameObject* AddFloorToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, bool applyPhysicsfloat, float inverseMass = 10.0f, const std::string& objectName = "");
@@ -124,7 +128,8 @@ namespace NCL {
 
 			PlayerObject* tempPlayer;
 
-			GameObject* testSphere;
+
+			GameObject* testSphere = nullptr;
 
 		};
 	}

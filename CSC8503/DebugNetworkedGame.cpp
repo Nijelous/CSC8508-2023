@@ -6,12 +6,29 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "NetworkObject.h"
+#include "NetworkPlayer.h"
+#include "NetworkObject.h"
+#include "PhysicsObject.h"
+#include "RenderObject.h"
 
 namespace{
     constexpr int MAX_PLAYER = 4;
+    
+    constexpr const char* PLAYER_PREFIX = "Player";
+
+    //TODO(erendgrmnc): remove after level data is usable.
+    std::vector<Vector3> PLAYER_START_POSITIONS =
+    {
+        Vector3(100,-17,100),
+        Vector3(100,-17,85),
+        Vector3(60,-17,100),
+        Vector3(40,-17,100),
+        
+    };
+    
 }
 
-DebugNetworkedGame::DebugNetworkedGame(){
+DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(){
     mThisServer = nullptr;
     mThisClient = nullptr;
 
@@ -73,7 +90,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
         
         //DEBUG END GAME
         if (mThisServer){
-            if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)){
+            if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)){
                 SetIsGameFinished(true);
             }
         }
@@ -152,6 +169,8 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         break;
     }
     case BasicNetworkMessages::SyncPlayers:{
+        SyncPlayerListPacket* packet = (SyncPlayerListPacket*)payload;
+        packet->SyncPlayerList(mPlayerList);
         break;
     }
     default:
@@ -261,7 +280,15 @@ void DebugNetworkedGame::SendFinishGameStatusPacket(){
 }
 
 void DebugNetworkedGame::InitWorld(){
-    TutorialGame::InitWorld();
+    world->ClearAndErase();
+    physics->Clear();
+    testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+
+    AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
+    InitDefaultFloor();
+
+    SpawnPlayers();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID){
@@ -269,10 +296,63 @@ void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* player
 }
 
 void DebugNetworkedGame::SpawnPlayers(){
+    
+    for (int i = 0; i < 4; i++)		{
+        if (mPlayerList[i] != -1) {
+            auto* netPlayer = AddPlayerObject(PLAYER_START_POSITIONS[i], i);
+            mServerPlayers.emplace(i, netPlayer);
+        }
+        else
+        {
+            mServerPlayers.emplace(i, nullptr);
+        }
+    }
+    if (mThisServer) {
+        mLocalPlayer = mServerPlayers[0];
+    }
+    else
+    {
+        mLocalPlayer = mServerPlayers[GetPlayerPeerID()];
+    }
+    tempPlayer = (PlayerObject*)mLocalPlayer;
+    //localPlayer->GetRenderObject()->SetVisibility(false);
+    LockCameraToObject(mLocalPlayer);
 }
 
 NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum){
-    return nullptr;
+
+    //Set Player Obj Name
+    char buffer[256]; // Adjust the size according to your needs
+    strcpy_s(buffer, sizeof(buffer), _strdup(PLAYER_PREFIX));
+    strcat_s(buffer, sizeof(buffer), std::to_string(playerNum).c_str());
+    
+    auto* netPlayer = new NetworkPlayer(this, playerNum, buffer);
+    CreatePlayerObjectComponents(*netPlayer, position);
+
+    auto* networkComponet = new NetworkObject(*netPlayer, playerNum);
+    netPlayer->SetNetworkObject(networkComponet);
+    mNetworkObjects.push_back(netPlayer->GetNetworkObject());
+    world->AddGameObject(netPlayer);
+
+    Vector4 colour;
+    switch (playerNum)
+    {
+    case 0:
+        colour = Vector4(1, 0, 0, 1); // RED
+        break;
+    case 1:
+        colour = Vector4(0, 1, 0, 1); //Green
+        break;
+    case 2:
+        colour = Vector4(0, 0, 1, 1); //Blue
+        case 3:
+            colour = Vector4(1, 1, 0, 1); //Yellow
+        default:
+            break;
+    }
+
+    netPlayer->GetRenderObject()->SetColour(colour);
+    return netPlayer;
 }
 
 void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
@@ -300,4 +380,7 @@ void DebugNetworkedGame::SyncPlayerList(){
 
     SyncPlayerListPacket packet(mPlayerList);
     mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SetItemsLeftToZero(){
 }
