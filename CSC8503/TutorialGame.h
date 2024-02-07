@@ -9,6 +9,7 @@
 
 #include "StateGameObject.h"
 #include "GuardObject.h"
+#include "LevelManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -75,6 +76,8 @@ namespace NCL {
 			PhysicsSystem*		physics;
 			GameWorld*			world;
 
+			LevelManager* mLevelManager;
+
 			KeyboardMouseController controller;
 
 			bool useGravity;
@@ -106,6 +109,8 @@ namespace NCL {
 			void LockCameraToObject(GameObject* o) {
 				lockedObject = o;
 			}
+
+			vector<GameObject*> mGameObjects;
 
 			GameObject* objClosest = nullptr;
 

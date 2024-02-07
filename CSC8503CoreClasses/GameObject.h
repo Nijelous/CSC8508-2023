@@ -79,6 +79,8 @@ namespace NCL::CSC8503 {
 		int		GetWorldID() const {
 			return mWorldID;
 		}
+    
+		virtual void UpdateObject(float dt);
 
 		bool GetIsPlayer() { return mIsPlayer; }
 
