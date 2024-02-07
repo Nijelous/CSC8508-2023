@@ -1,6 +1,8 @@
 #include "LocalSuspicionMetre.h"
 #include <algorithm>
 
+using namespace SuspicionSystem;
+
 void LocalSuspicionMetre::Init()
 {
     for (int i = 0; i < MAX_PLAYERS; i++)
@@ -37,7 +39,7 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
     //If the foundCause is not already int the activeSusCauses vector of that player
     if (foundCause != mActiveLocalSusCauseVector[playerNo].end())
     {
-        mActiveLocalSusCauseVector[playerNo].erase(foundCause, mActiveLocalSusCauseVector[playerNo].end());
+        mActiveLocalSusCauseVector[playerNo].erase(foundCause);
         return true;
     }
 
