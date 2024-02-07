@@ -14,7 +14,7 @@ using namespace InventoryBuffSystem;
 namespace InventoryBuffSystem
 {
 	const int MAX_PLAYERS = 4;
-	const int MAX_INVENTORY_SLOTS = 4;
+	const int MAX_INVENTORY_SLOTS = 2;
 	class PlayerInventory
 	{
 	public:
