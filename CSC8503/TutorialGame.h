@@ -92,15 +92,12 @@ namespace NCL {
 
 
 			//Animation Thing
-			Mesh* soldierMesh = nullptr;
-			MeshAnimation* soldierAnimation = nullptr;
-			MeshMaterial* soldierMaterial = nullptr;
-			Shader* soldierShader = nullptr;
-			vector<GLuint> matTextures;
-			AnimationSystem* animation;
+			Mesh* mSoldierMesh = nullptr;
+			MeshAnimation* mSoldierAnimation = nullptr;
+			MeshMaterial* mSoldierMaterial = nullptr;
+			Shader* mSoldierShader = nullptr;
+			AnimationSystem* mAnimation;
 
-			int currentFrame;
-			float frameTime;
 
 			//Coursework Meshes
 			Mesh*	charMesh	= nullptr;

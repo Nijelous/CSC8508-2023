@@ -48,7 +48,7 @@ namespace NCL {
             }
 
             int	GetCurrentFrame() {
-                return currentFrame;
+                return mCurrentFrame;
             }
            
             void SetAnimationState(mAnimationState animationState) {
@@ -65,9 +65,9 @@ namespace NCL {
             MeshMaterial* mMaterial;
             mAnimationState mState;
 
-            int		currentFrame;
-            int		nextFrame;
-            float	frameTime;
+            int		mCurrentFrame;
+            int		mNextFrame;
+            float	mFrameTime;
             bool    mIsAnimation = false;
         };
     }

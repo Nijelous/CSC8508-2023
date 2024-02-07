@@ -9,9 +9,9 @@ AnimationObject::AnimationObject(MeshAnimation* animation, MeshMaterial* materia
 
 	mIsAnimation = true;
 	mState = stand;
-	currentFrame = 0;
-	nextFrame = 0;
-	frameTime = 0.0f;
+	mCurrentFrame = 0;
+	mNextFrame = 0;
+	mFrameTime = 0.0f;
 }
 
 AnimationObject::~AnimationObject() {
@@ -21,11 +21,11 @@ AnimationObject::~AnimationObject() {
 }
 
 void AnimationObject::Update(float dt){
-	frameTime -= dt;
-	while (frameTime < 0.0f) {
-		currentFrame = (currentFrame + 1) % mAnimation->GetFrameCount();
-		nextFrame = (currentFrame + 1) % mAnimation->GetFrameCount();
-		frameTime += mAnimation->GetFrameTime();
+	mFrameTime -= dt;
+	while (mFrameTime < 0.0f) {
+		mCurrentFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();
+		mNextFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();
+		mFrameTime += mAnimation->GetFrameTime();
 		//std::cout << currentFrame << std::endl; test
 	}
 }

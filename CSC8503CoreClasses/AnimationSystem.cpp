@@ -25,7 +25,8 @@ void AnimationSystem::Update(float dt)
 }
 
 void AnimationSystem::GetAllAnimationObjects()
-{
+{	animationObjects.clear();
+
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsActive()) {

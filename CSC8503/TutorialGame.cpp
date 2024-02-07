@@ -25,7 +25,7 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 #endif
 
 	physics		= new PhysicsSystem(*world);
-	animation   = new AnimationSystem(*world);
+	mAnimation   = new AnimationSystem(*world);
 
 	forceMagnitude	= 10.0f;
 	useGravity		= true;
@@ -63,10 +63,10 @@ void TutorialGame::InitialiseAssets() {
 	basicTex	= renderer->LoadTexture("checkerboard.png");
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
-	soldierMesh = renderer->LoadMesh("Role_T.msh");
-	soldierAnimation = renderer->LoadAnimation("Role_T.anm");
-	soldierMaterial = renderer->LoadMaterial("Role_T.mat");
-	soldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
+	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
+	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
+	mSoldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
 
 
 
@@ -81,10 +81,10 @@ TutorialGame::~TutorialGame()	{
 	delete charMesh;
 	delete enemyMesh;
 	delete bonusMesh;
-	delete soldierAnimation;
-	delete soldierMaterial;
-	delete soldierMesh;
-	delete soldierShader;
+	delete mSoldierAnimation;
+	delete mSoldierMaterial;
+	delete mSoldierMesh;
+	delete mSoldierShader;
 
 	delete basicTex;
 	delete basicShader;
@@ -92,6 +92,7 @@ TutorialGame::~TutorialGame()	{
 	delete physics;
 	delete renderer;
 	delete world;
+	delete mAnimation;
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -157,7 +158,7 @@ void TutorialGame::UpdateGame(float dt) {
 	world->UpdateWorld(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
-	animation->Update(dt);
+	mAnimation->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
 }
@@ -490,10 +491,10 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), soldierMesh, nullptr, basicShader, meshSize));
+	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, basicShader, meshSize));
 	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
 	
-	animTest->SetAnimationObject(new AnimationObject(soldierAnimation, soldierMaterial));
+	animTest->SetAnimationObject(new AnimationObject(mSoldierAnimation, mSoldierMaterial));
 	
 
 	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);
