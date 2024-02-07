@@ -17,6 +17,7 @@ namespace NCL {
 			Vector3 GetPrisonPosition() const { return mPrisonPosition; }
 			Vector3 GetPlayerStartPosition(int player) { return mPlayerStartPositions[player]; }
 			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
+			std::map<Vector3, Room> GetRooms() const { return mRoomList; }
 			friend class JsonParser;
 		protected:
 			std::string mLevelName;

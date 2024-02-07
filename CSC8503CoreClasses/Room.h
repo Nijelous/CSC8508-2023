@@ -14,6 +14,7 @@ namespace NCL {
 			Room(std::string roomPath);
 			~Room();
 			RoomType GetType() const { return mType; }
+			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
 			friend class JsonParser;
 		protected:
 			std::string mRoomName;
