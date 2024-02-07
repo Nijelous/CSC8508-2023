@@ -37,7 +37,7 @@ void GuardObject::RaycastToPlayer() {
 }
 
 Vector3 GuardObject::AngleOfSight() {
-	Vector3 rightAxis = this->transform.GetMatrix().GetColumn(0);
+	Vector3 rightAxis = this->mTransform.GetMatrix().GetColumn(0);
 	Vector3 fwdAxis = Vector3::Cross(Vector3(0, 1, 0), rightAxis);
 	return fwdAxis;
 }
