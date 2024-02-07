@@ -47,7 +47,7 @@ namespace NCL::CSC8503 {
 			return mNetworkObject;
 		}
     
-    void SetNetworkObject(NetworkObject* netObj) { networkObject = netObj; }
+    void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
     
 		AnimationObject* GetAnimationObject() const {
 			return mAnimationObject;
@@ -100,7 +100,7 @@ namespace NCL::CSC8503 {
 		PhysicsObject*		mPhysicsObject;
 		RenderObject*		mRenderObject;
 		NetworkObject*		mNetworkObject;
-    AnimationObject* mAnimationObject
+		AnimationObject* mAnimationObject;
 
 		bool		mIsActive;
 		int			mWorldID;
