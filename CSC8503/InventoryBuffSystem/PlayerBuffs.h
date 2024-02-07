@@ -2,6 +2,9 @@
 #include <functional>
 #include <random>
 #include <map>
+#include "../SuspicionSystem/SuspicionSystem.h"
+
+using namespace SuspicionSystem;
 
 namespace InventoryBuffSystem {
 		const int MAX_PLAYERS = 4;
@@ -10,7 +13,7 @@ namespace InventoryBuffSystem {
 	public:
 		enum buff
 		{
-			disguise, buff2
+			disguise, slow, buff2
 		};
 
 		void Init();
@@ -34,12 +37,12 @@ namespace InventoryBuffSystem {
 		{
 			{disguise, [](int playerNo)
 				{
-
+					SuspicionSystem::mLocalSuspicionMetre->AddActiveLocalSusCause(disguise,playerNo);
 				}
 			},
-			{buff2, [](int playerNo)
+			{slow, [](int playerNo)
 				{
-
+					//Lower PlayerNo's movement speed
 				}
 			},
 		};
@@ -62,12 +65,12 @@ namespace InventoryBuffSystem {
 		{
 			{disguise, [](int playerNo)
 				{
-
+					SuspicionSystem::mLocalSuspicionMetre->RemoveActiveLocalSusCause(disguise,playerNo);
 				}
 			},
-			{buff2, [](int playerNo)
+			{slow, [](int playerNo)
 				{
-
+					//Increase playerNo's movement speed to normal
 				}
 			},
 		};
