@@ -40,8 +40,8 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	//Set up the light properties
 	Vector4 lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	float lightRadius = 10000.0f;
-	Vector3 lightPosition = Vector3(0.0f, 10.0f, 0.0f);
+	float lightRadius = 1000.0f;
+	Vector3 lightPosition = Vector3(0.0f, 5.0f, -5.0f);
 	PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
 	AddLight(pointL);
 
@@ -165,7 +165,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsActive() && o->GetName() != "Player Object") {
 			const RenderObject* rendObj = o->GetRenderObject();
 			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
 				if (rendObj && isInFrustum) {
