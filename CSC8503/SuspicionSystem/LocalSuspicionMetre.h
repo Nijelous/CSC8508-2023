@@ -60,6 +60,6 @@ namespace SuspicionSystem{
 
         std::vector<activeLocalSusCause> mActiveLocalSusCauseVector[MAX_PLAYERS];
 
-        void ChangePlayerLocalSusMetre(int playerNo, float ammount);
+        void ChangePlayerLocalSusMetre(int playerNo, float amount);
     };
 }
