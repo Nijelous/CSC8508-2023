@@ -4,6 +4,10 @@
 #include <thread>
 #include <atomic>
 
+namespace NCL::CSC8503{
+	struct PlayerInputs;
+}
+
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
@@ -19,6 +23,8 @@ namespace NCL {
 			void SendPacket(GamePacket&  payload);
 
 			bool UpdateClient();
+
+			void WriteAndSendClientInputPacket(int lastId, const PlayerInputs& playerInputs);
 		protected:
 			int mPeerId;
 			
