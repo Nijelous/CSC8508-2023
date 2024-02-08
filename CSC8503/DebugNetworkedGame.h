@@ -6,6 +6,7 @@
 
 namespace NCL{
     namespace CSC8503{
+        struct DeltaPacket;
         class GameServer;
         class GameClient;
         class NetworkPlayer;
@@ -49,7 +50,11 @@ namespace NCL{
 
             void SendStartGameStatusPacket();
             void SendFinishGameStatusPacket();
+
+            void InitialiseAssets() override;
+            
             void InitWorld() override;
+            
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
@@ -57,6 +62,8 @@ namespace NCL{
             NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
+
+            void HandleDeltaPacket(DeltaPacket* deltaPacket);
 
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 

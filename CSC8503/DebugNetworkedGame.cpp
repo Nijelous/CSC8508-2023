@@ -28,7 +28,7 @@ namespace{
     
 }
 
-DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(){
+DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(false){
     mThisServer = nullptr;
     mThisClient = nullptr;
 
@@ -39,12 +39,14 @@ DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(){
     for (int i = 0; i < MAX_PLAYER; i++){
         mPlayerList.push_back(-1);
     }
+    InitialiseAssets();
 }
 
 DebugNetworkedGame::~DebugNetworkedGame(){
 }
 
 void DebugNetworkedGame::StartAsServer(){
+    mThisClient = nullptr;
     mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
 
     mThisServer->RegisterPacketHandler(Received_State, this);
@@ -53,6 +55,7 @@ void DebugNetworkedGame::StartAsServer(){
 
 void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient = new GameClient();
+    mThisServer = nullptr;
     int peer = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
     mThisClient->RegisterPacketHandler(Delta_State, this);
@@ -161,6 +164,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
     case BasicNetworkMessages::Full_State: {
         FullPacket* packet = (FullPacket*)payload;
         HandleFullPacket(packet);
+        break;
+    }
+    case BasicNetworkMessages::Delta_State: {
+        DeltaPacket* deltaPacket = (DeltaPacket*)payload;
+        HandleDeltaPacket(deltaPacket);
         break;
     }
     case BasicNetworkMessages::GameEndState:{
@@ -279,6 +287,12 @@ void DebugNetworkedGame::SendFinishGameStatusPacket(){
     mThisServer->SendGlobalPacket(packet);
 }
 
+void DebugNetworkedGame::InitialiseAssets(){
+    LoadAssetFiles();
+
+    InitCamera();
+}
+
 void DebugNetworkedGame::InitWorld(){
     world->ClearAndErase();
     physics->Clear();
@@ -316,7 +330,6 @@ void DebugNetworkedGame::SpawnPlayers(){
     }
     tempPlayer = (PlayerObject*)mLocalPlayer;
     //localPlayer->GetRenderObject()->SetVisibility(false);
-    LockCameraToObject(mLocalPlayer);
 }
 
 NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum){
@@ -332,8 +345,9 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
     auto* networkComponet = new NetworkObject(*netPlayer, playerNum);
     netPlayer->SetNetworkObject(networkComponet);
     mNetworkObjects.push_back(netPlayer->GetNetworkObject());
+    mGameObjects.push_back(netPlayer);
     world->AddGameObject(netPlayer);
-
+    
     Vector4 colour;
     switch (playerNum)
     {
@@ -359,6 +373,14 @@ void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
     for (int i = 0; i < mNetworkObjects.size(); i++){
         if (mNetworkObjects[i]->GetnetworkID() == fullPacket->objectID){
             mNetworkObjects[i]->ReadPacket(*fullPacket);
+        }
+    }
+}
+
+void DebugNetworkedGame::HandleDeltaPacket(DeltaPacket* deltaPacket){
+    for (int i = 0; i < mNetworkObjects.size(); i++){
+        if (mNetworkObjects[i]->GetnetworkID() == deltaPacket->objectID){
+            mNetworkObjects[i]->ReadPacket(*deltaPacket);
         }
     }
 }
