@@ -40,7 +40,7 @@ namespace NCL {
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();
-            BehaviourAction* ConfiscateItems();
+            BehaviourAction* ConfiscateItems(float timer);
             BehaviourAction* SendToPrison();
 
             BehaviourSequence* mRootSequence;
