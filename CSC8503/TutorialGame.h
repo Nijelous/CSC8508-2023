@@ -17,7 +17,7 @@ namespace NCL {
 		class PlayerObject;
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame(bool isInitingAssets = true);
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -26,6 +26,7 @@ namespace NCL {
 		
 		protected:
 			virtual void InitialiseAssets();
+			virtual void LoadAssetFiles();
 
 			void InitCamera();
 			void UpdateKeys();
