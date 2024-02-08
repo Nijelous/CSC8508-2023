@@ -40,7 +40,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	//Set up the light properties
 	Vector4 lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	float lightRadius = 1000.0f;
+	float lightRadius = 60.0f;
 	Vector3 lightPosition = Vector3(0.0f, 5.0f, -5.0f);
 	PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
 	AddLight(pointL);
@@ -143,18 +143,20 @@ void GameTechRenderer::RenderFrame() {
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
 	mFrameFrustum = mFrameFrustum.FromViewProjMatrix(projMatrix * viewMatrix);
 	glEnable(GL_CULL_FACE);
-	glClearColor(1, 1, 1, 1);
+	glEnable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
 	//RenderShadowMap();
 	RenderCamera();
-	RenderSkybox();	
+	//RenderSkybox();	
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	NewRenderLines();
-	NewRenderText();
+	//NewRenderLines();
+	//NewRenderText();
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

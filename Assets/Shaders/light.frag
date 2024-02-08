@@ -25,8 +25,6 @@ void main(void)
 	float dist = length(lightPos - worldPos);
 	float atten = 1.0 - clamp(dist / lightRadius, 0.0, 1.0);
 
-	diffuseOutput = vec4(1.0, 0.0, 0.0, 1.0);
-
 	if(atten == 0.0) { discard; }
 
 	vec3 normal = normalize(texture(normTex, texCoord.xy).xyz * 2.0 - 1.0);
@@ -38,7 +36,7 @@ void main(void)
 	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
 	specFactor = pow(specFactor, 60.0);
 	vec3 attenuated = lightColour.xyz * atten;
-	//diffuseOutput = vec4(attenuated * lambert, 1.0);
+	diffuseOutput = vec4(attenuated * lambert, 1.0);
 
 	specularOutput = vec4(attenuated * specFactor * 0.33, 1.0);
 
