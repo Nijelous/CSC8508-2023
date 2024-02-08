@@ -1,12 +1,23 @@
 #pragma once
 #include "GameObject.h"
-#include "GameClient.h"
 #include "PlayerObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
 		class NetworkedGame;
 
+		struct PlayerInputs{
+			bool isSprinting = false;
+			bool isCrouching = false;
+			bool isLeftHandUsed = false;
+			bool isRightHandUsed = false;
+
+			int leftHandItemId = 0;
+			int rightHandItemId = 0;
+			
+			bool movementButtons[4] = {false};
+		};
+		
 		class NetworkPlayer : public PlayerObject{
 		public:
 			NetworkPlayer(NetworkedGame* game, int num);
@@ -24,6 +35,9 @@ namespace NCL {
 		protected:
 			NetworkedGame* game;
 			int playerNum;
+			
+			void HandleMovement(float dt, const PlayerInputs& playerInputs);
+			
 		};
 	}
 }
