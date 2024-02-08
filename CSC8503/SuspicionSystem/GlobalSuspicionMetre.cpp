@@ -45,11 +45,11 @@ void GlobalSuspicionMetre::Update(float dt)
 
 void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount)
 {
-    mGlobalSusMeter += ammount;
+    mGlobalSusMeter += amount;
     mGlobalSusMeter = std::clamp(mGlobalSusMeter,
         0.0f,
         100.0f);
 
-    if (ammount < 0)
+    if (amount < 0)
         mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
 };

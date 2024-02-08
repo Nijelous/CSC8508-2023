@@ -35,7 +35,7 @@ public:
 private:
     std::map<instantGlobalSusCause, float>  mInstantCauseSusSeverityMap =
     {
-        {allarmTriggered,3}, {flagCaptured, 2}
+        {alarmTriggered,3}, {flagCaptured, 2}
     };
 
     std::map<continuousGlobalSusCause, float>  mContinuousCauseSusSeverityMap =
