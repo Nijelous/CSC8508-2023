@@ -341,6 +341,8 @@ void TutorialGame::InitWorld() {
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 
+	AddGuardToWorld(Vector3(30, 5, 5), "Guard Object");
+
 	InitDefaultFloor();
 }
 
