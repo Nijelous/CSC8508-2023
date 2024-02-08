@@ -114,7 +114,7 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 	if (testSphere != nullptr){
-		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+		testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
@@ -333,13 +333,14 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
-
-	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+	AddPlayerToWorld(Vector3(100,0,100), "Player");
+	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
+	AddGuardToWorld(Vector3(30, 5, 5), "Guard Object");
 
 	InitDefaultFloor();
 }
@@ -466,6 +467,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::string& objectName) {
+
 	tempPlayer = new PlayerObject(world, objectName, 50);
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
