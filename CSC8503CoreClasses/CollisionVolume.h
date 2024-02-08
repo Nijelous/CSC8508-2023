@@ -21,6 +21,8 @@ namespace NCL {
 
 		virtual void SetHalfHeight(float newHalfHeight) {}
 
+		virtual void SetRadius(float radius) {}
+
 		VolumeType type;
 		bool applyPhysics;
 	};

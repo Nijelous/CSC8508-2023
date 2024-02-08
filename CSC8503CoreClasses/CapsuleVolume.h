@@ -18,7 +18,7 @@ namespace NCL {
             return radius;
         }
 
-        void SetRadius(float newRadius) {
+        void SetRadius(float newRadius) override {
             radius = newRadius;
         }
 
