@@ -18,7 +18,6 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
-	mPlayerPosition = Vector3(0, 0, 0);
 }
 
 LevelManager::~LevelManager() {
@@ -48,10 +47,6 @@ void LevelManager::LoadLevel(int id, GameWorld* world, Mesh* mesh, Texture* albe
 		}
 	}
 	mActiveLevel = id;
-}
-
-float LevelManager::GetSqDistanceToCamera(Vector3& objectPosition) {
-	return (objectPosition - mPlayerPosition).LengthSquared();
 }
 
 void LevelManager::LoadMap(GameWorld* world, const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition, 

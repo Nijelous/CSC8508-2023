@@ -96,7 +96,7 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+	testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
 	}
@@ -293,15 +293,17 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
+	//mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
 
-	AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
+	//AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
 
-	//testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+	AddPlayerToWorld(Vector3(100, -17, 100), "Player");
 
-	//AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
-	//InitDefaultFloor();
+	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
+	InitDefaultFloor();
 }
 
 /*
