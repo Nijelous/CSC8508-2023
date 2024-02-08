@@ -275,7 +275,7 @@ void TutorialGame::CreatePlayerObjectComponents(PlayerObject& playerObject,  con
 		.SetPosition(position);
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, PLAYER_MESH_SIZE));
-	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 0, 5));
+	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -468,7 +468,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::string& objectName) {
 
-	tempPlayer = new PlayerObject(world, objectName, 50);
+	tempPlayer = new PlayerObject(world, objectName);
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
