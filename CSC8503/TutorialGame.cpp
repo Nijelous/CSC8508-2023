@@ -275,7 +275,7 @@ void TutorialGame::CreatePlayerObjectComponents(PlayerObject& playerObject,  con
 		.SetPosition(position);
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, PLAYER_MESH_SIZE));
-	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume()));
+	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 0, 5));
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -333,14 +333,14 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	AddPlayerToWorld(Vector3(100,0,100), "Player");
+	AddPlayerToWorld(Vector3(100,-17,100), "Player");
 	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 
-	AddGuardToWorld(Vector3(30, 5, 5), "Guard Object");
+	AddGuardToWorld(Vector3(30, -17, 5), "Guard Object");
 
 	InitDefaultFloor();
 }
@@ -583,7 +583,7 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 		.SetPosition(position);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
-	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume()));
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
 
 	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
