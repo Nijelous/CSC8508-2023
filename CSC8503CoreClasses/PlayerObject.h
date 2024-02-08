@@ -28,8 +28,6 @@ namespace NCL {
 
 			void	AttachCameraToPlayer(GameWorld* world);
 
-			void	MovePlayer(float dt);
-
 			void	ToggleCrouch();
 
 			void	ActivateSprint();	
