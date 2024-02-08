@@ -6,9 +6,11 @@
 #include "GameTechVulkanRenderer.h"
 #endif
 #include "PhysicsSystem.h"
+#include "AnimationSystem.h"
 
 #include "StateGameObject.h"
 #include "GuardObject.h"
+#include "LevelManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -20,6 +22,8 @@ namespace NCL {
 
 			virtual void UpdateGame(float dt);
 
+			GameWorld* GetGameWorld() const;
+		
 		protected:
 			virtual void InitialiseAssets();
 
@@ -48,6 +52,8 @@ namespace NCL {
 			void DebugObjectMovement();
 			void LockedObjectMovement();
 
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
+
 			GameObject* AddFloorToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddSphereToWorld(const Vector3& position, float radius, bool applyPhysicsfloat, float inverseMass = 10.0f, const std::string& objectName = "");
 			GameObject* AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass = 10.0f, const std::string& objectName = "");
@@ -57,6 +63,7 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
+			GameObject* AddAnimationTest(const Vector3& position, const std::string& objectName);
 
 			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& objectName);
 
@@ -70,6 +77,9 @@ namespace NCL {
 #endif
 			PhysicsSystem*		physics;
 			GameWorld*			world;
+			
+
+			LevelManager* mLevelManager;
 
 			KeyboardMouseController controller;
 
@@ -83,13 +93,22 @@ namespace NCL {
 			Mesh*	capsuleMesh = nullptr;
 			Mesh*	cubeMesh	= nullptr;
 			Mesh*	sphereMesh	= nullptr;
-
+			
 			Texture*	basicTex	= nullptr;
 			Texture* mKeeperAlbedo = nullptr;
 			Texture* mKeeperNormal = nullptr;
 			Texture* mFloorAlbedo = nullptr;
 			Texture* mFloorNormal = nullptr;
 			Shader*		basicShader = nullptr;
+
+
+			//Animation Thing
+			Mesh* mSoldierMesh = nullptr;
+			MeshAnimation* mSoldierAnimation = nullptr;
+			MeshMaterial* mSoldierMaterial = nullptr;
+			Shader* mSoldierShader = nullptr;
+			AnimationSystem* mAnimation;
+
 
 			//Coursework Meshes
 			Mesh*	charMesh	= nullptr;
@@ -109,7 +128,9 @@ namespace NCL {
 
 			PlayerObject* tempPlayer;
 
-			GameObject* testSphere;
+
+			GameObject* testSphere = nullptr;
+
 		};
 	}
 }

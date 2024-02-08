@@ -15,12 +15,11 @@ namespace NCL {
 
 		protected:
 
+            virtual void MovePlayer(float dt);
 
 		private:
 
 			void	AttachCameraToPlayer(GameWorld* world);
-
-			void	MovePlayer(float dt);
 
 			void	MatchCameraRotation();
 

@@ -158,6 +158,8 @@ namespace NCL::Maths {
 		inline bool	operator==(const Vector3& vec)const { return (vec.x == x && vec.y == y && vec.z == z) ? true : false; };
 		inline bool	operator!=(const Vector3& vec)const { return (vec.x == x && vec.y == y && vec.z == z) ? false : true; };
 
+		inline bool operator<(const Vector3& rhs) const { return this->x == rhs.x ? (this->y == rhs.y ? this->z < rhs.z : this->y < rhs.y) : this->x < rhs.x; }
+
 		inline friend std::ostream& operator<<(std::ostream& o, const Vector3& vec) {
 			o << "Vector3(" << vec.x << "," << vec.y << "," << vec.z << ")\n";
 			return o;
