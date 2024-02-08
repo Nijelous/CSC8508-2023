@@ -39,7 +39,7 @@ namespace NCL {
 			void MatchCameraRotation();
 
 			void StopSliding();
-			
+
 			void	ToggleCrouch();
 
 			void	ActivateSprint();	
