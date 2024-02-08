@@ -35,6 +35,27 @@ GameEndStatePacket::GameEndStatePacket(bool val){
 	isGameEnded = val;
 }
 
+ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs){
+	type = BasicNetworkMessages::ClientPlayerInputState;
+	size = sizeof(ClientPlayerInputPacket);
+
+	this->playerInputs.isCrouching = playerInputs.isCrouching;
+	this->playerInputs.isSprinting = playerInputs.isSprinting;
+	this->playerInputs.isLeftHandUsed = playerInputs.isLeftHandUsed;
+	this->playerInputs.isRightHandUsed = playerInputs.isRightHandUsed;
+
+	this->playerInputs.leftHandItemId = playerInputs.leftHandItemId;
+	this->playerInputs.rightHandItemId = playerInputs.rightHandItemId;
+	
+	this->playerInputs.movementButtons[0] = playerInputs.movementButtons[0];
+	this->playerInputs.movementButtons[1] = playerInputs.movementButtons[1];
+	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[3];
+	this->playerInputs.movementButtons[3] = playerInputs.movementButtons[3];
+	
+	this-> lastId = lastId;
+	this->mouseXLook = mouseXLook;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;

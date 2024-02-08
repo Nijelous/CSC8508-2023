@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "NetworkBase.h"
 #include "NetworkState.h"
+#include "../CSC8503/NetworkPlayer.h"
 
 namespace NCL::CSC8503 {
 	class GameObject;
@@ -59,20 +60,10 @@ namespace NCL::CSC8503 {
 
 	struct ClientPlayerInputPacket : public GamePacket{
 		int lastId;
-		bool movementButtons[4]; // {W , A, S, D}
-		bool isCrouchButtonPressed; // {Lctrt } Press
-		bool isSprinting; // {LShift} Hold
-		bool isLeftHandUsed; // {Q} Press
-		bool isRightHandUsed; // {E} Press
-		int leftHandItemId;
-		int rightHandItemId;
+		PlayerInputs playerInputs;
 		float mouseXLook = 0.0f;
 		
-		ClientPlayerInputPacket(int lastId, bool movementButtons[4],
-								bool isCrouchButtonPressed, bool isSprinting,
-								bool isLeftHandUsed, bool isRightHandUsed,
-								int leftHandItemId, int rightHandItemId
-		);
+		ClientPlayerInputPacket(int lastId,  const PlayerInputs& playerInputs);
 	};
 
 	class NetworkObject	{
