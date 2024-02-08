@@ -140,7 +140,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsActive() && !(o->GetIsPlayer())) {
 			const RenderObject* rendObj = o->GetRenderObject();
 			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
 				if (rendObj && isInFrustum) {
