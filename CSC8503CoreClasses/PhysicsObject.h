@@ -3,13 +3,13 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
-	
+
 	namespace CSC8503 {
 		class Transform;
 
-		class PhysicsObject	{
+		class PhysicsObject {
 		public:
-			PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume, float inverseMass = 1.0f, float dynamicFriction = 0.8f, float staticFriction = 10.0f, float elasticity = 1.0f);
+			PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume, float inverseMass = 1.0f, float dynamicFriction = 0, float staticFriction = 0, float elasticity = 1.0f);
 			~PhysicsObject();
 
 			Vector3 GetLinearVelocity() const {
@@ -38,7 +38,7 @@ namespace NCL {
 
 			void ApplyAngularImpulse(const Vector3& force);
 			void ApplyLinearImpulse(const Vector3& force);
-			
+
 			void AddForce(const Vector3& force);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
@@ -72,7 +72,7 @@ namespace NCL {
 
 		protected:
 			const CollisionVolume* mVolume;
-			Transform*		mTransform;
+			Transform* mTransform;
 
 			float mInverseMass;
 			float mElasticity;
@@ -82,7 +82,7 @@ namespace NCL {
 			//linear stuff
 			Vector3 mLinearVelocity;
 			Vector3 mForce;
-			
+
 			//angular stuff
 			Vector3 mAngularVelocity;
 			Vector3 mTorque;

@@ -4,16 +4,23 @@
 #include "RenderObject.h"
 #include "NetworkObject.h"
 #include "PlayerObject.h"
+#include "CapsuleVolume.h"
 
 #include "Window.h"
 #include "GameWorld.h"
 
 using namespace NCL::CSC8503;
 
-PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int movementSpeed) {
+PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
-	mMovementSpeed = movementSpeed;
 	mGameWorld = world;
+
+	mWalkSpeed= walkSpeed;
+	mSprintSpeed = sprintSpeed;
+	mCrouchSpeed = crouchSpeed;
+	mMovementSpeed = walkSpeed;
+	mPlayerState = Walk;
+	mIsCrouched = false;
 
 	mIsPlayer = true;
 }
@@ -50,8 +57,63 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
-	
+
+	ActivateSprint();
+	ToggleCrouch();
+
 	StopSliding();
+}
+
+void PlayerObject::ToggleCrouch() {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL) && mPlayerState == Crouch)
+		StartWalking();
+	else if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL) && mPlayerState == Walk)
+		StartCrouching();
+}
+
+void PlayerObject::ActivateSprint() {
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT))
+		StartSprinting();
+	else if (!mIsCrouched)
+		StartWalking();
+	else if (mIsCrouched)
+		StartCrouching();
+}
+
+void PlayerObject::StartWalking() {
+	if (!(mPlayerState == Walk)) {
+		std::cout << "Walking" << std::endl;
+		mPlayerState = Walk;
+		mIsCrouched = false;
+		mMovementSpeed = mWalkSpeed * 2;
+
+		dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(1.4f);
+	}
+}
+
+void PlayerObject::StartSprinting() {
+	if (!(mPlayerState == Sprint)) {
+		std::cout << "Sprinting" << std::endl;
+		mPlayerState = Sprint;
+		mIsCrouched = false;
+		mMovementSpeed = mSprintSpeed;
+
+		dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(1.4f);
+	}
+}
+
+void PlayerObject::StartCrouching() {
+	if (!(mPlayerState == Crouch)) {
+		std::cout << "Crouching" << std::endl;
+		mPlayerState = Crouch;
+		mIsCrouched = true;
+		mMovementSpeed = mCrouchSpeed;
+
+		dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(0.35f);
+		Vector3 temp = GetTransform().GetPosition();
+		temp.y -= 2;
+		GetTransform().SetPosition(temp);
+	}
 }
 
 void PlayerObject::MatchCameraRotation() {
@@ -61,7 +123,8 @@ void PlayerObject::MatchCameraRotation() {
 
 void PlayerObject::StopSliding() {
 	if ((mPhysicsObject->GetLinearVelocity().Length() < 1) && (mPhysicsObject->GetForce() == Vector3(0,0,0))) {
-		mPhysicsObject->SetLinearVelocity(Vector3(0, 0, 0));
+		float fallingSpeed = mPhysicsObject->GetLinearVelocity().y;
+		mPhysicsObject->SetLinearVelocity(Vector3(0, fallingSpeed, 0));
 	}
 }
 

@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include <map>
+#include <functional>
 #include "NetworkBase.h"
 #include "TutorialGame.h"
+#include "NetworkedGame.h"
 
 namespace NCL{
     namespace CSC8503{
@@ -13,7 +14,7 @@ namespace NCL{
         struct ClientPlayerInputPacket;
         struct AddPlayerScorePacket;
 
-        class DebugNetworkedGame : public TutorialGame, public PacketReceiver{
+        class DebugNetworkedGame : public NetworkedGame{
         public:
             DebugNetworkedGame();
             ~DebugNetworkedGame();
@@ -60,22 +61,10 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
-            
+            void SetItemsLeftToZero() override;
 
-            std::vector<std::function<void()>> mOnGameStarts;
 
-            std::map<int, int> mStateIDs;
-
-            GameServer* mThisServer;
-            GameClient* mThisClient;
-            float mTimeToNextPacket;
-            int mPacketsToSnapshot;
-
-            std::vector<NetworkObject*> mNetworkObjects;
-
-            std::vector<int> mPlayerList;
-            std::map<int, NetworkPlayer*> mServerPlayers;
-            GameObject* mLocalPlayer;
+            std::vector<function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 

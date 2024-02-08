@@ -84,9 +84,15 @@ void GameServer::UpdateServer() {
 
 		if (type == ENetEventType::ENET_EVENT_TYPE_CONNECT) {
 			std::cout << "Server: New client has connected" << std::endl;
+			AddPeer(peer + 1);
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_DISCONNECT) {
 			std::cout << "Server: Client has disconnected" << std::endl;
+			for (int i = 0; i < 3; ++i){
+				if (mPeers[i] == peer+1) {
+					mPeers[i] = -1;
+				}
+			}
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) {
 			//std::cout << "Server: Has recieved packet" << std::endl;
