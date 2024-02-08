@@ -19,6 +19,8 @@ namespace NCL {
 		}
 		~CollisionVolume() {}
 
+		virtual void SetHalfHeight(float newHalfHeight) {}
+
 		VolumeType type;
 		bool applyPhysics;
 	};

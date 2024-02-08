@@ -93,7 +93,6 @@ TutorialGame::~TutorialGame()	{
 }
 
 void TutorialGame::UpdateGame(float dt) {
-	testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
 	}
@@ -284,7 +283,8 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+	AddPlayerToWorld(Vector3(100,0,100), "Player");
+	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
@@ -418,7 +418,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
   
-	tempPlayer = new PlayerObject(world, objectName, 50);
+	tempPlayer = new PlayerObject(world, objectName, 20);
 	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
 
 	tempPlayer->SetBoundingVolume((CollisionVolume*)volume);

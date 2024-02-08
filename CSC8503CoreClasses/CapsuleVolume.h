@@ -18,6 +18,14 @@ namespace NCL {
             return radius;
         }
 
+        void SetRadius(float newRadius) {
+            radius = newRadius;
+        }
+
+        void SetHalfHeight(float newHalfHeight) override {
+            halfHeight = newHalfHeight;
+        }
+
         float GetHalfHeight() const {
             return halfHeight;
         }
