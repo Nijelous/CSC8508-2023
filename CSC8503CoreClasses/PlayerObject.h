@@ -14,20 +14,17 @@ namespace NCL {
 			void	UpdateObject(float dt);
 
 		protected:
-
+			int mMovementSpeed;
+			GameWorld* mGameWorld;
+			
             virtual void MovePlayer(float dt);
+            
+			void AttachCameraToPlayer(GameWorld* world);
 
-		private:
-
-			void	AttachCameraToPlayer(GameWorld* world);
-
-			void	MatchCameraRotation();
+			void MatchCameraRotation();
 
 			void StopSliding();
-
-			int mMovementSpeed;
-
-			GameWorld* mGameWorld;
+		private:
 		};
 	}
 }
