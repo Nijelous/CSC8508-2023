@@ -40,9 +40,9 @@ namespace NCL {
 
 			void StopSliding();
 
-			void	ToggleCrouch();
+			void	ToggleCrouch(bool isCrouching);
 
-			void	ActivateSprint();	
+			void	ActivateSprint(bool isSprinting);	
 
 			void	StartWalking();
 

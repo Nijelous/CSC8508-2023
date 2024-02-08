@@ -58,21 +58,23 @@ void PlayerObject::MovePlayer(float dt) {
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 
-	ActivateSprint();
-	ToggleCrouch();
+	bool isSprinting = Window::GetKeyboard()->KeyPressed(KeyCodes::SHIFT);
+	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
+	ActivateSprint(isSprinting);
+	ToggleCrouch(isCrouching);
 
 	StopSliding();
 }
 
-void PlayerObject::ToggleCrouch() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL) && mPlayerState == Crouch)
+void PlayerObject::ToggleCrouch(bool isCrouching) {
+	if (isCrouching && mPlayerState == Crouch)
 		StartWalking();
-	else if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL) && mPlayerState == Walk)
+	else if (isCrouching && mPlayerState == Walk)
 		StartCrouching();
 }
 
-void PlayerObject::ActivateSprint() {
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT))
+void PlayerObject::ActivateSprint(bool isSprinting) {
+	if (isSprinting)
 		StartSprinting();
 	else if (!mIsCrouched)
 		StartWalking();
