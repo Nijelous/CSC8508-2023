@@ -10,6 +10,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 
+
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 
@@ -64,7 +65,7 @@ namespace NCL {
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
 
 			vector<const RenderObject*> activeObjects;
-
+			
 			OGLShader*  debugShader;
 			OGLShader*  skyboxShader;
 			OGLMesh*	skyboxMesh;
@@ -82,6 +83,13 @@ namespace NCL {
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;
 			vector<Vector2> debugTextUVs;
+
+			//Animation things
+			Shader* mShader;
+			Mesh* mMesh;
+			MeshAnimation* mAnim;
+			MeshMaterial* mMaterial;
+			vector<GLuint>  mMatTextures;
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;

@@ -3,31 +3,47 @@
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projMatrix;
+uniform mat4 textureMatrix;
 
 in vec3 position;
 in vec2 texCoord;
+in vec3 normal;
 in vec4 jointWeights;
 in ivec4 jointIndices;
 
-uniform mat4 joints[128];
+uniform mat4 	joints[110];
 
-out Vertex{
-    vec2 texCoord;
-}OUT;
+//uniform mat4 	otherJoints[128];
 
-void main(void){
-    vec4 localPos = vec4(position,1.0f);
-    vec4 skelPos = vec4(0,0,0,0);
+uniform float frameLerp;
 
-    for(int i= 0; i < 4 ;++i){
-        int jointIndex = jointIndices[i];
-        float jointWeight = jointWeights[i];
+out Vertex {
+	vec2 texCoord;
+	//vec3 normal;
+} OUT;
 
-        skelPos += joints[jointIndex] *localPos*jointWeight;
+void main(void) {
+	vec4 localNormal = vec4(normal, 1.0f);
+	vec4 localPos 	= vec4(position, 1.0f);
+	vec4 skelPos 	= vec4(0,0,0,0);
+	vec4 otherSkelPos 	= vec4(0,0,0,0);
 
-    }
+	//vec4 skelNormal = vec4(0,0,0,0);
+	for(int i = 0; i < 4; ++i) {
+		int   jointIndex 	= jointIndices[i];
+		float jointWeight 	= jointWeights[i];
 
-    mat4 mvp = projMatrix* viewMatrix* modelMatrix;
-    gl_Position = mvp* vec4(skelPos.xyz,1.0);
-    OUT.texCoord = texCoord;
+		skelPos += joints[jointIndex] * localPos * jointWeight;
+
+		//skelNormal += joints[jointIndex] * localNormal * jointWeight;
+	}
+	//skelPos.xyz = position.xyz;
+
+
+	//OUT.normal = mat3(modelMatrix) * normalize(skelNormal.xyz);
+
+	mat4 mvp = projMatrix * viewMatrix * modelMatrix;
+	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
+	OUT.texCoord = texCoord;
+
 }

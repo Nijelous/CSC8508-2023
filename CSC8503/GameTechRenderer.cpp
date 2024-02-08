@@ -4,6 +4,9 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
+#include "AnimationObject.h"
+#include "AnimationSystem.h"
+#include "Mesh.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -133,6 +136,7 @@ void GameTechRenderer::RenderFrame() {
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 }
 
 void GameTechRenderer::BuildObjectList() {
@@ -246,7 +250,7 @@ void GameTechRenderer::RenderCamera() {
 		if ((*i).GetAlbedoTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
 		}
-
+		
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
@@ -263,7 +267,7 @@ void GameTechRenderer::RenderCamera() {
 
 			Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
 			glUniform3fv(cameraLocation, 1, &camPos.x);
-
+	
 			glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
 			glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);			
 			SendLightDataToShader(shader);
@@ -286,11 +290,49 @@ void GameTechRenderer::RenderCamera() {
 
 		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1:0);
 
-		BindMesh((OGLMesh&)*(*i).GetMesh());
-		size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
-		for (size_t i = 0; i < layerCount; ++i) {
-			DrawBoundMesh((uint32_t)i);
+		//Animation basic draw
+
+		
+		if ((*i).GetAnimation()) {
+			vector<Matrix4> frameMatrices;
+				
+			mMesh = (*i).GetMesh();
+			mAnim = (*i).GetAnimation();
+			mShader = (*i).GetShader();
+			int currentFrame = (*i).GetCurrentFrame();
+			const Matrix4* bindPose = mMesh->GetBindPose().data();
+
+			
+			const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
+			const Matrix4* frameData = mAnim->GetJointData(currentFrame);
+			
+			
+			for (unsigned int i = 0; i < mMesh->GetJointCount(); ++i) {
+				frameMatrices.emplace_back(frameData[i] * invBindPose[i]);
+			}
+
+			int j = glGetUniformLocation(shader->GetProgramID(), "joints");
+			glUniformMatrix4fv(j, frameMatrices.size(), false, (float*)frameMatrices.data());
+
+			frameMatrices.clear();
+			BindMesh((OGLMesh&)*(*i).GetMesh());
+			size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
+			for (size_t i = 0; i < layerCount; ++i) {
+				DrawBoundMesh((uint32_t)i);
+			}
+			
+
 		}
+		else {
+
+			BindMesh((OGLMesh&)*(*i).GetMesh());
+			size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
+			for (size_t i = 0; i < layerCount; ++i) {
+				DrawBoundMesh((uint32_t)i);
+			}
+		
+		}
+
 	}
 }
 

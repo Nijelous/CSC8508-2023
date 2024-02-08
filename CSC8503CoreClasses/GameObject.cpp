@@ -16,7 +16,7 @@ GameObject::GameObject(const std::string& objectName)	{
 	mPhysicsObject	= nullptr;
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
-  mAnimationObject = nullptr;
+    mAnimationObject = nullptr;
 
 	mIsPlayer = false;
 }
@@ -26,7 +26,7 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
-  delete mAnimationObject;
+    delete mAnimationObject;
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {

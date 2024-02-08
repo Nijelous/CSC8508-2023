@@ -14,26 +14,33 @@ AnimationSystem::~AnimationSystem()
 
 void AnimationSystem::Clear()
 {
-	animationObjects.clear();
+	animationList.clear();
 }
 
 void AnimationSystem::Update(float dt)
 {
+	
 	GetAllAnimationObjects();
 	UpdateCurrentFrames(dt);
+
 
 }
 
 void AnimationSystem::GetAllAnimationObjects()
-{	animationObjects.clear();
+{	animationList.clear();
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->GetAnimationObject()) {
 				AnimationObject* animObj = o->GetAnimationObject();
-				if (animObj) {
-					animationObjects.emplace_back(animObj);
-				}
+				// if (animObj) {
+					animationList.emplace_back(animObj);
+					
+					o->GetRenderObject()->SetAnimation(o->GetAnimationObject()->GetAnimation());
+					o->GetRenderObject()->SetMaterial(o->GetAnimationObject()->GetMaterial());
+					o->GetRenderObject()->SetCurrentFrame(o->GetAnimationObject()->GetCurrentFrame());
+				//std::cout << animObj << std::endl;
+				// }
 			}
 		}
 	);
@@ -41,16 +48,15 @@ void AnimationSystem::GetAllAnimationObjects()
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
-	for ( auto& a : animationObjects) {
+	for ( auto& a : animationList) {
 		(*a).Update(dt);
-		
 	}
 }
 
 void AnimationSystem::UpdateAnimations()
 {
 	
-	for (auto& a : animationObjects) {
+	for (auto& a : animationList) {
 		AnimationObject::mAnimationState state = (*a).GetAnimationState();
 		switch (state)
 		{

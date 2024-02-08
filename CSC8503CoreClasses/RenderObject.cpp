@@ -15,6 +15,9 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mColour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
+	mAnimation = nullptr;
+	mMaterial = nullptr;
+	mCurrentFrame = 0;
 }
 
 RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedoTex, Texture* normalTex, Shader* shader, Vector4 colour, float cullSphereRadius) {
@@ -27,8 +30,18 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mColour = colour;
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
+	mAnimation = nullptr;
+	mMaterial = nullptr;
+	mCurrentFrame = 0;
 }
 
 RenderObject::~RenderObject() {
+	delete mTransform;
+	delete mMesh;
+	delete mAlbedoTex;
+	delete mNormalTex;
+	delete mShader;
+	delete mAnimation;
+	delete mMaterial;
 
 }

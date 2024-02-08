@@ -79,7 +79,7 @@ void TutorialGame::InitialiseAssets() {
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+	mSoldierShader = renderer->LoadShader("animationScene.vert", "scene.frag");
 
 
 
@@ -182,9 +182,9 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	world->UpdateWorld(dt);
+	mAnimation->Update(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
-	mAnimation->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
 }
@@ -508,7 +508,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, basicShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, mSoldierShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -532,7 +532,7 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, nullptr, basicShader, meshSize));
+	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, nullptr, mSoldierShader, meshSize));
 	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
 	
 	animTest->SetAnimationObject(new AnimationObject(mSoldierAnimation, mSoldierMaterial));

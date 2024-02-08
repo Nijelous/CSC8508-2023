@@ -2,6 +2,8 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "MeshAnimation.h"
+#include "MeshMaterial.h"
 
 namespace NCL {
 	using namespace NCL::Rendering;
@@ -69,15 +71,46 @@ namespace NCL {
 				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
 			}
 
+			void SetAnimation(MeshAnimation* animation) {
+				mAnimation = animation;
+			}
+
+			MeshAnimation* GetAnimation() const{
+				return mAnimation;
+			}
+
+			void SetMaterial(MeshMaterial* material) {
+				mMaterial = material;
+			}
+
+			MeshMaterial* GetMaterial() const{
+				return mMaterial;
+			}
+
+			void SetCurrentFrame(int currentFrame) {
+				mCurrentFrame = currentFrame;
+			}
+
+			int GetCurrentFrame() const  {
+				return mCurrentFrame;
+			}
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
 			Texture* mNormalTex;
 			Shader*		mShader;
 			Transform*	mTransform;
+			MeshAnimation* mAnimation;
+			MeshMaterial* mMaterial;
 			Vector4		mColour;
-			float		mCullSphereRadius;
-			float mSqDistToCam;
+			
+			float	mCullSphereRadius;
+			float	mSqDistToCam;
+
+
+			int		mCurrentFrame;
+			
 		};
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "GameWorld.h"
 #include "MeshAnimation.h"
+#include "RenderObject.h"
 
 
 
@@ -31,7 +32,7 @@ namespace NCL {
 
 
 			GameWorld& gameWorld;
-			vector<AnimationObject*> animationObjects;
+			vector<AnimationObject*> animationList;
 			
 		};
 	}
