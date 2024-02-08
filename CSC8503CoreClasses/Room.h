@@ -15,6 +15,9 @@ namespace NCL {
 			~Room();
 			RoomType GetType() const { return mType; }
 			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
+			std::vector<Light*> GetLights() const { return mLights; }
+			std::vector<Matrix4> GetCCTVTransforms() const { return mCCTVTransforms; }
+			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
 			friend class JsonParser;
 		protected:
 			std::string mRoomName;
