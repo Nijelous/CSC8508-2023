@@ -1,22 +1,35 @@
 #include "Level.h"
 #include "Vent.h"
-#include "GameObject.h"
-#include "BaseLight.h"
+#include "JsonParser.h"
+#include <fstream>
 
 using namespace NCL::CSC8503;
 
-Level::Level(int levelID) {
-	mLevelName = "";
-	std::map<Vector3, GameObject*> mTileMap;
-	mRoomList = std::map<Vector3, Room>();
-	mGuardPaths = std::vector<std::vector<Vector3>>();
-	mGuardCount = 0;
-	mCCTVTransforms = std::vector<Matrix4>();
-	mCCTVCount = 0;
-	mPrisonPosition = Vector3(0, 0, 0);
-	mPlayerStartPositions = new Vector3[4];
-	mLights = std::vector<Light*>();
-	//NavMesh
-	mItemPositions = std::vector<Vector3>();
-	mVents = std::vector<Vent*>();
+constexpr int MAX_PLAYERS = 4;
+
+Level::Level(std::string levelPath) {
+	mLevelName = levelPath.substr(24, levelPath.size()-29);
+	mPlayerStartPositions = new Vector3[MAX_PLAYERS];
+	std::ifstream levelFile(levelPath);
+	std::string line;
+	getline(levelFile, line);
+
+	JsonParser parser = JsonParser();
+
+	parser.ParseJson(line, this, nullptr);
+
+	for (int i = 0; i < mVentConnections.size(); i++) {
+		mVents[i]->ConnectVent(mVents[mVentConnections[i]]);
+	}
+}
+
+Level::~Level() {
+	for (int i = 0; i < mLights.size(); i++) {
+		delete(mLights[i]);
+		mLights[i] = NULL;
+	}
+	for (int i = 0; i < mVents.size(); i++) {
+		delete(mVents[i]);
+		mVents[i] = NULL;
+	}
 }

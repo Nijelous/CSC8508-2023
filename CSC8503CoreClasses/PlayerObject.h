@@ -22,6 +22,7 @@ namespace NCL {
 
 		protected:
 
+            virtual void MovePlayer(float dt);
 
 		private:
 
@@ -38,7 +39,6 @@ namespace NCL {
 			void	StartSprinting();
 
 			void	StartCrouching();
-
 			void	MatchCameraRotation();
 
 			void StopSliding();
