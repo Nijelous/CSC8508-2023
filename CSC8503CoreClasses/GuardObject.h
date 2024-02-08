@@ -31,9 +31,9 @@ namespace NCL {
             GameObject* mPlayer;
             GameWorld* mWorld;
         private:
-            bool CanSeePlayer;
-            bool HasCaughtPlayer;
-            bool HasConfiscatedItems;
+            bool mCanSeePlayer;
+            bool mHasCaughtPlayer;
+            bool mHasConfiscatedItems;
 
             void BehaviourTree();
             void ExecuteBT();

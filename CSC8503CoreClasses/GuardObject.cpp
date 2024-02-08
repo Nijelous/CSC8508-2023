@@ -11,9 +11,9 @@ using namespace CSC8503;
 GuardObject::GuardObject(const std::string& objectName) {
 	mName = objectName;
 	mRootSequence = new BehaviourSequence("Root Sequence");
-	CanSeePlayer = false;
-	HasCaughtPlayer = false;
-	HasConfiscatedItems = false;
+	mCanSeePlayer = false;
+	mHasCaughtPlayer = false;
+	mHasConfiscatedItems = false;
 	BehaviourTree();
 }
 
@@ -40,18 +40,18 @@ void GuardObject::RaycastToPlayer() {
 			mSightedObject = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 			if (mSightedObject == mPlayer) {
-				CanSeePlayer = true;
+				mCanSeePlayer = true;
 			}
 			else {
-				CanSeePlayer = false;
+				mCanSeePlayer = false;
 			}
 		}
 		else {
-			CanSeePlayer = false;
+			mCanSeePlayer = false;
 		}
 	}
 	else {
-		CanSeePlayer = false;
+		mCanSeePlayer = false;
 		mSightedObject = nullptr;
 	}
 }
@@ -88,11 +88,11 @@ BehaviourAction* GuardObject::Patrol() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			if (CanSeePlayer == false) {
+			if (mCanSeePlayer == false) {
 				std::cout << "Lost em";
 				return Success;
 			}
-			else if (CanSeePlayer == true) {
+			else if (mCanSeePlayer == true) {
 				return Failure;
 			}
 		}
@@ -108,21 +108,18 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing){
-			if (CanSeePlayer == true && HasCaughtPlayer == false) {
+			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 				this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 				mPlayer = dynamic_cast<PlayerObject*>(mPlayer);
 				float dist = (direction.x * direction.x) + (direction.y * direction.y) + (direction.z * direction.z);
 				if (dist < 5) {
-					HasCaughtPlayer == true;
+					mHasCaughtPlayer == true;
 					return Failure;
 				}
 			}
-			else if (CanSeePlayer == false && HasCaughtPlayer == false) {
+			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
 				return Success;
-			}
-			else if (CanSeePlayer == true && HasCaughtPlayer == true) {
-				return Failure;
 			}
 			else {
 				return Failure;
@@ -140,7 +137,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			if (CanSeePlayer == true && HasCaughtPlayer == true && HasConfiscatedItems == false) {
+			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == false) {
 				float timer = 5;
 				timer - dt;
 				if (timer == 0) {
@@ -162,7 +159,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			if (CanSeePlayer == true && HasCaughtPlayer == true && HasConfiscatedItems == true) {
+			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == true) {
 				mPlayer->GetTransform().SetPosition(Vector3(mPlayer->GetTransform().GetPosition().x, 100, mPlayer->GetTransform().GetPosition().z));
 				return Success;
 			}
