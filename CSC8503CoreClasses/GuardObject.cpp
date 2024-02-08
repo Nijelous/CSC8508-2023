@@ -69,8 +69,8 @@ void GuardObject::BehaviourTree() {
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
 	FirstSelect->AddChild(ChasePlayerSetup());
-	//FirstSelect->AddChild(CaughtPlayerSequence);
-	//CaughtPlayerSequence->AddChild(ConfiscateItems());
+	FirstSelect->AddChild(CaughtPlayerSequence);
+	CaughtPlayerSequence->AddChild(ConfiscateItems());
 	//CaughtPlayerSequence->AddChild(SendToPrison());
 
 }
@@ -113,7 +113,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 				this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 				mPlayer = dynamic_cast<PlayerObject*>(mPlayer);
 				float dist = (direction.x * direction.x) + (direction.y * direction.y) + (direction.z * direction.z);
-				if (dist < 5) {
+				if (sqrtf(dist) < 5) {
 					mHasCaughtPlayer == true;
 					return Failure;
 				}
@@ -140,6 +140,8 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == false) {
 				float timer = 5;
 				timer - dt;
+				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 				if (timer == 0) {
 					return Success;
 				}
