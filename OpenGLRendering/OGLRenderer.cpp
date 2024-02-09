@@ -51,6 +51,13 @@ OGLRenderer::~OGLRenderer()	{
 #endif
 }
 
+void OGLRenderer::SetTextureRepeating(GLuint target, bool repeating) {
+	glBindTexture(GL_TEXTURE_2D, target);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, repeating ? GL_REPEAT : GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, repeating ? GL_REPEAT : GL_CLAMP);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void OGLRenderer::OnWindowResize(int w, int h)	 {
 	windowSize = Vector2i(w, h);
 

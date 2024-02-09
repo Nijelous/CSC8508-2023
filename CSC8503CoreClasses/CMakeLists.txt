@@ -41,6 +41,11 @@ set(AI_Pathfinding
 )
 source_group("AI\\Pathfinding" FILES ${AI_Pathfinding})
 
+set(AI_Guard
+    "GuardObject.h"
+    "GuardObject.cpp"
+)
+source_group("AI\\Guard" FILES ${AI_Guard})
 
 set(Collision_Detection
     "AABBVolume.h"
@@ -57,13 +62,27 @@ set(Collision_Detection
 )
 source_group("Collision Detection" FILES ${Collision_Detection})
 
+set(Lights
+"BaseLight.h" 
+"DirectionalLight.h"
+"PointLight.h"
+"SpotLight.h"
+)
+source_group("Lights" FILES ${Lights})
+
 set(Level
+    "JsonParser.h"
+    "JsonParser.cpp"
     "LevelManager.h"
     "LevelManager.cpp"
     "Level.h"
     "Level.cpp"
+    "LevelEnums.h"
+    "LevelEnums.cpp"
     "Room.h"
     "Room.cpp"
+    "Vent.h"
+    "Vent.cpp"
 )
 source_group("Level" FILES ${Level})
 
@@ -83,7 +102,7 @@ source_group("Networking" FILES ${Networking})
 
 set(Physics
     "constraint.h"  
-     "constraint.h"  
+    "constraint.h"  
     "PositionConstraint.cpp"
     "PositionConstraint.h"
     "OrientationConstraint.cpp"
@@ -98,18 +117,24 @@ source_group("Physics" FILES ${Physics})
 set(Header_Files
     "Debug.h"
     "GameObject.h"
+    "PlayerObject.h"
     "GameWorld.h"
     "RenderObject.h"
     "Transform.h"
+    "AnimationObject.h"
+    "AnimationSystem.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
 set(Source_Files
     "Debug.cpp"
     "GameObject.cpp"
+    "PlayerObject.cpp"
     "GameWorld.cpp"
     "RenderObject.cpp"
     "Transform.cpp"
+    "AnimationObject.cpp"
+    "AnimationSystem.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -146,7 +171,9 @@ set(ALL_FILES
     ${Level}
     ${Networking}
     ${Physics}
-    ${enet_Files}   
+    ${enet_Files}
+    ${Lights}
+    ${AI_Guard}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)

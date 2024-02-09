@@ -3,42 +3,42 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	class CollisionVolume;
-	
+
 	namespace CSC8503 {
 		class Transform;
 
-		class PhysicsObject	{
+		class PhysicsObject {
 		public:
-			PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume);
+			PhysicsObject(Transform* parentTransform, const CollisionVolume* parentVolume, float inverseMass = 1.0f, float dynamicFriction = 0, float staticFriction = 0, float elasticity = 1.0f);
 			~PhysicsObject();
 
 			Vector3 GetLinearVelocity() const {
-				return linearVelocity;
+				return mLinearVelocity;
 			}
 
 			Vector3 GetAngularVelocity() const {
-				return angularVelocity;
+				return mAngularVelocity;
 			}
 
 			Vector3 GetTorque() const {
-				return torque;
+				return mTorque;
 			}
 
 			Vector3 GetForce() const {
-				return force;
+				return mForce;
 			}
 
 			void SetInverseMass(float invMass) {
-				inverseMass = invMass;
+				mInverseMass = invMass;
 			}
 
 			float GetInverseMass() const {
-				return inverseMass;
+				return mInverseMass;
 			}
 
 			void ApplyAngularImpulse(const Vector3& force);
 			void ApplyLinearImpulse(const Vector3& force);
-			
+
 			void AddForce(const Vector3& force);
 
 			void AddForceAtPosition(const Vector3& force, const Vector3& position);
@@ -49,11 +49,11 @@ namespace NCL {
 			void ClearForces();
 
 			void SetLinearVelocity(const Vector3& v) {
-				linearVelocity = v;
+				mLinearVelocity = v;
 			}
 
 			void SetAngularVelocity(const Vector3& v) {
-				angularVelocity = v;
+				mAngularVelocity = v;
 			}
 
 			void InitCubeInertia();
@@ -62,26 +62,32 @@ namespace NCL {
 			void UpdateInertiaTensor();
 
 			Matrix3 GetInertiaTensor() const {
-				return inverseInteriaTensor;
+				return mInverseInteriaTensor;
 			}
 
-		protected:
-			const CollisionVolume* volume;
-			Transform*		transform;
+			float GetStaticFriction() { return mStaticFriction; }
+			float GetDynamicFriction() { return mDynamicFriction; }
 
-			float inverseMass;
-			float elasticity;
-			float friction;
+			float GetElasticity() { return mElasticity; }
+
+		protected:
+			const CollisionVolume* mVolume;
+			Transform* mTransform;
+
+			float mInverseMass;
+			float mElasticity;
+			float mStaticFriction;
+			float mDynamicFriction;
 
 			//linear stuff
-			Vector3 linearVelocity;
-			Vector3 force;
-			
+			Vector3 mLinearVelocity;
+			Vector3 mForce;
+
 			//angular stuff
-			Vector3 angularVelocity;
-			Vector3 torque;
-			Vector3 inverseInertia;
-			Matrix3 inverseInteriaTensor;
+			Vector3 mAngularVelocity;
+			Vector3 mTorque;
+			Vector3 mInverseInertia;
+			Matrix3 mInverseInteriaTensor;
 		};
 	}
 }

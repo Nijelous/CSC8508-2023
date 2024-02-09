@@ -4,28 +4,29 @@
 using namespace NCL::CSC8503;
 using namespace NCL;
 
-RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, float cullSphereRadius) {
-	if (!tex) {
-		bool a = true;
-	}
-	this->transform	= parentTransform;
-	this->mesh		= mesh;
-	this->texture	= tex;
-	this->shader	= shader;
-	this->colour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-	this->mCullSphereRadius = cullSphereRadius;
+
+RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedoTex, Texture* normalTex, Shader* shader, float cullSphereRadius) {
+
+	mTransform	= parentTransform;
+	mMesh		= mesh;
+	mAlbedoTex	= albedoTex;
+	mNormalTex = normalTex;
+	mShader	= shader;
+	mColour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
+	mCullSphereRadius = cullSphereRadius;
+	mSqDistToCam = FLT_MAX;
 }
 
-RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* tex, Shader* shader, Vector4 colour, float cullSphereRadius) {
-	if (!tex) {
-		bool a = true;
-	}
-	this->transform = parentTransform;
-	this->mesh = mesh;
-	this->texture = tex;
-	this->shader = shader;	
-	this->colour = colour;
-	this->mCullSphereRadius = cullSphereRadius;
+RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedoTex, Texture* normalTex, Shader* shader, Vector4 colour, float cullSphereRadius) {
+
+	mTransform = parentTransform;
+	mMesh = mesh;
+	mAlbedoTex = albedoTex;
+	mNormalTex = normalTex;
+	mShader = shader;	
+	mColour = colour;
+	mCullSphereRadius = cullSphereRadius;
+	mSqDistToCam = FLT_MAX;
 }
 
 RenderObject::~RenderObject() {
