@@ -13,7 +13,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mRootSequence = new BehaviourSequence("Root Sequence");
 	mCanSeePlayer = false;
 	mHasCaughtPlayer = false;
-	mHasConfiscatedItems = false;
+	mHasItems = true;
 	BehaviourTree();
 }
 
@@ -79,6 +79,7 @@ void GuardObject::ExecuteBT() {
 	BehaviourState state = mRootSequence->Execute(1.0f);
 	if (state == Success || state == Failure) {
 		mRootSequence->Reset();
+		mHasCaughtPlayer = false;
 	}
 }
 
@@ -108,11 +109,11 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		}
 		else if (state == Ongoing){
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
+				int GuardCatchingDistanceSquared = 25;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 				this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
-				mPlayer = dynamic_cast<PlayerObject*>(mPlayer);
-				float dist = (direction.x * direction.x) + (direction.y * direction.y) + (direction.z * direction.z);
-				if (sqrtf(dist) < 5) {
+				float dist = direction.LengthSquared();
+				if (dist < GuardCatchingDistanceSquared) {
 					mHasCaughtPlayer = true;
 					return Failure;
 				}
@@ -137,14 +138,23 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == false) {
-				std::cout << "Gotem\n";
-				std::cout << mTimer;
+			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasItems == true) {
 				mTimer -= dt;
-				Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
-				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+				Vector3 direction = mPlayer->GetTransform().GetPosition();
+				//mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+				mPlayer->GetTransform().SetPosition(Vector3(direction.x, direction.y, direction.z));
 				if (mTimer == 0) {
-					mHasConfiscatedItems = true;
+					mHasItems = false;
+					return Success;
+				}
+			}
+			else if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasItems == false) {
+				mTimer -= dt;
+				Vector3 direction = mPlayer->GetTransform().GetPosition();
+				//mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+				mPlayer->GetTransform().SetPosition(Vector3(direction.x, direction.y, direction.z));
+				if (mTimer == 0) {
+					mHasItems = false;
 					return Success;
 				}
 			}
@@ -161,8 +171,9 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 BehaviourAction* GuardObject::SendToPrison() {
 	BehaviourAction* SendToPrison = new BehaviourAction("Send to Prison", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
-			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == true) {
-				mPlayer->GetTransform().SetPosition(Vector3(mPlayer->GetTransform().GetPosition().x, 100, mPlayer->GetTransform().GetPosition().z));
+			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasItems == false) {
+				Vector3 prisonLocation = Vector3(mPlayer->GetTransform().GetPosition().x, 100, mPlayer->GetTransform().GetPosition().z);
+				mPlayer->GetTransform().SetPosition(prisonLocation);
 				return Success;
 			}
 			else {

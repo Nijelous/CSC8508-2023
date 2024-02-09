@@ -33,7 +33,7 @@ namespace NCL {
         private:
             bool mCanSeePlayer;
             bool mHasCaughtPlayer;
-            bool mHasConfiscatedItems;
+            bool mHasItems;
 
             void BehaviourTree();
             void ExecuteBT();
