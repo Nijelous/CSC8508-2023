@@ -4,15 +4,13 @@
 #include <random>
 #include "Vector3.h"
 #include "GameObject.h"
-#include "../InventoryBuffSystem/InventoryBuffSystem.h"
 
 using namespace NCL;
 using namespace CSC8503;
-using namespace InventoryBuffSystem;
-
 
 namespace InventoryBuffSystem
 {
+	const int MAX_PLAYERS = 4;
 	const int MAX_INVENTORY_SLOTS = 2;
 	class PlayerInventory
 	{
