@@ -31,6 +31,8 @@ set(Suspicion_System
     "SuspicionSystem/LocalSuspicionMetre.cpp"
     "SuspicionSystem/SuspicionMetre.h"
     "SuspicionSystem/SuspicionMetre.cpp"
+    "SuspicionSystem/SuspicionSystem.h"
+    "SuspicionSystem/SuspicionSystem.cpp"
 )
 source_group("Suspicion System" FILES ${Suspicion_System})
 
