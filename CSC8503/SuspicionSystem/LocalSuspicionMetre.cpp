@@ -1,6 +1,8 @@
 #include "LocalSuspicionMetre.h"
 #include <algorithm>
 
+using namespace SuspicionSystem;
+
 void LocalSuspicionMetre::Init()
 {
     for (int i = 0; i < MAX_PLAYERS; i++)
