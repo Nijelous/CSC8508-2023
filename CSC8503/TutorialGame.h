@@ -99,6 +99,8 @@ namespace NCL {
 			Texture* mKeeperNormal = nullptr;
 			Texture* mFloorAlbedo = nullptr;
 			Texture* mFloorNormal = nullptr;
+
+			Texture* iconTest = nullptr;
 			Shader*		basicShader = nullptr;
 
 

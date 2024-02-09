@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
+#include "UI.h"
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -333,6 +334,29 @@ void GameTechRenderer::NewRenderLines() {
 	glBindVertexArray(lineVAO);
 	glDrawArrays(GL_LINES, 0, (GLsizei)frameLineCount);
 	glBindVertexArray(0);
+}
+
+void GameTechRenderer::RenderIcons(GLuint iconTex) {
+	const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
+	if (icons.empty()) {
+		return;
+	}
+
+	BindShader(*debugShader);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, iconTex);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, iconTex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	for (const auto& i : icons) {
+		OGLTexture* t = (OGLTexture*)i.texture;
+		BindTextureToShader(*t, "mainTex", 0);
+	}
 }
 
 void GameTechRenderer::NewRenderText() {

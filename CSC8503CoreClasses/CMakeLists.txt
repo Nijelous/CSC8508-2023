@@ -123,6 +123,7 @@ set(Header_Files
     "Transform.h"
     "AnimationObject.h"
     "AnimationSystem.h"
+    "UI.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -135,6 +136,7 @@ set(Source_Files
     "Transform.cpp"
     "AnimationObject.cpp"
     "AnimationSystem.cpp"
+    "UI.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 

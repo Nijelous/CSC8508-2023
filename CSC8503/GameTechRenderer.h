@@ -15,6 +15,7 @@
 
 
 
+
 namespace NCL {
 	class Maths::Vector3;
 	class Maths::Vector4;
@@ -38,6 +39,8 @@ namespace NCL {
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
+
+			void RenderIcons(GLuint iconTex);
 			
 
 			void RenderFrame()	override;

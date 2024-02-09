@@ -74,6 +74,8 @@ void TutorialGame::InitialiseAssets() {
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 
+	iconTest = renderer->LoadTexture("GoatBrown.png");
+
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
@@ -110,6 +112,8 @@ TutorialGame::~TutorialGame()	{
 	delete renderer;
 	delete world;
 	delete mAnimation;
+
+	delete iconTest;
 }
 
 void TutorialGame::UpdateGame(float dt) {
