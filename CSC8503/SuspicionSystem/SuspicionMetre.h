@@ -1,17 +1,20 @@
 #pragma once
 #include <map>
 
-class SuspicionMetre
+namespace SuspicionSystem
 {
-public:
-	enum SusBreakpoint
+	class SuspicionMetre
 	{
-		low, mid, high
-	};
+	public:
+		enum SusBreakpoint
+		{
+			low, mid, high
+		};
 
-	SusBreakpoint GetSusBreakpoint(float inSusMetre);
-private:
-	std::map<float, SusBreakpoint> mSusBreakpointMap = { { 66 , high} ,
-														{ 33 , mid} ,
-														{ 0 , low} };
-};
+		SusBreakpoint GetSusBreakpoint(float inSusMetre);
+	private:
+		std::map<float, SusBreakpoint> mSusBreakpointMap = { { 66 , high} ,
+															{ 33 , mid} ,
+															{ 0 , low} };
+	};
+}
