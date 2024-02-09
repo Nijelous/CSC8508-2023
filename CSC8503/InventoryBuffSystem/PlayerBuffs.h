@@ -13,7 +13,7 @@ namespace InventoryBuffSystem {
 	public:
 		enum buff
 		{
-			disguise, slow, buff2
+			disguise, slow, buff2, everyoneElseSlowsDown, everyoneElseMakesASound
 		};
 
 		void Init();
@@ -25,19 +25,19 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			disguise, buff2
+			disguise, everyoneElseSlowsDown
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguise,10},{buff2,4},{slow,4}
+			{disguise,10},{buff2,4},{slow,4},{everyoneElseSlowsDown,0},{ever}
 		};
 
 		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap =
 		{
 			{disguise, [](int playerNo)
 				{
-					SuspicionSystem::mLocalSuspicionMetre->AddActiveLocalSusCause(disguise,playerNo);
+					SuspicionSystem::mLocalSuspicionMetre->AddActiveLocalSusCause(LocalSuspicionMetre::disguiseBuff,playerNo);
 				}
 			},
 			{slow, [](int playerNo)
@@ -45,6 +45,25 @@ namespace InventoryBuffSystem {
 					//Lower PlayerNo's movement speed
 				}
 			},
+			{everyoneElseSlowsDown, [this](int playerNo)
+				{
+					for(int i=0;i<MAX_PLAYERS;i++)
+						if (i != playerNo)
+						{
+							ApplyBuffToPlayer(slow, i);
+						}
+				}
+			},
+			{everyoneElseMakesASound, [](int playerNo)
+				{
+					for (int i = 0; i < MAX_PLAYERS; i++)
+						if (i != playerNo)
+						{
+							mLocalSuspicionMetre->AddInstantLocalSusCause(LocalSuspicionMetre::soundEmitted,i);
+							//Play sound at player i's location
+						}
+				}
+			}
 		};
 
 		std::map < buff, std::function<void(int playerNo,float dt)>> mOnBuffTickFunctionMap =
@@ -65,7 +84,7 @@ namespace InventoryBuffSystem {
 		{
 			{disguise, [](int playerNo)
 				{
-					SuspicionSystem::mLocalSuspicionMetre->RemoveActiveLocalSusCause(disguise,playerNo);
+					SuspicionSystem::mLocalSuspicionMetre->RemoveActiveLocalSusCause(LocalSuspicionMetre::disguiseBuff,playerNo);
 				}
 			},
 			{slow, [](int playerNo)
