@@ -40,7 +40,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	//Set up the light properties
 	Vector4 lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	float lightRadius = 60.0f;
+	float lightRadius = 50.0f;
 	Vector3 lightPosition = Vector3(0.0f, 5.0f, -5.0f);
 	PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
 	AddLight(pointL);
@@ -54,8 +54,10 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	//set up a quad
 	mQuad = new OGLMesh();
-	mQuad->SetVertexPositions({ Vector3(-1, 1,0), Vector3(-1,-1,0) , Vector3(1,-1,0) , Vector3(1,1,0) });
-	mQuad->SetVertexIndices({ 0,1,2,2,3,0 });
+	mQuad->SetPrimitiveType(GeometryPrimitive::TriangleStrip);
+	mQuad->SetVertexPositions({ Vector3(-1, 1,0), Vector3(-1,-1,0) , Vector3(1,1,0) , Vector3(1,-1,0) });
+	mQuad->SetVertexTextureCoords({ Vector2(0.0f, 1.0f), Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f), Vector2(1.0f, 0.0f) });
+	
 	mQuad->UploadToGPU();
 
 	LoadSkybox();
@@ -149,8 +151,9 @@ void GameTechRenderer::RenderFrame() {
 	BuildObjectList();
 	SortObjectList();
 	//RenderShadowMap();
+	RenderSkybox();
 	RenderCamera();
-	//RenderSkybox();	
+	
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
