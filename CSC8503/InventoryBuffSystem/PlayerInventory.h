@@ -13,7 +13,6 @@ using namespace InventoryBuffSystem;
 
 namespace InventoryBuffSystem
 {
-	const int MAX_PLAYERS = 4;
 	const int MAX_INVENTORY_SLOTS = 2;
 	class PlayerInventory
 	{
@@ -22,6 +21,7 @@ namespace InventoryBuffSystem
 		{
 			disguise, item2,none,flag
 		};
+
 		PlayerInventory()
 		{
 			Init();
