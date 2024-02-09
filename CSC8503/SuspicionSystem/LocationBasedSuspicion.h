@@ -11,6 +11,7 @@ namespace SuspicionSystem
     class LocationBasedSuspicion :
         public SuspicionMetre
     {
+    public:
         const enum instantLocationSusCause
         {
             singleSoundEmitted
@@ -34,12 +35,12 @@ namespace SuspicionSystem
 
         SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(float locationX, float locationZ)
         {
-            return SuspicionMetre::getSusBreakpoint(GetLocationSusAmount(locationX, locationZ));
+            return SuspicionMetre::GetSusBreakpoint(GetLocationSusAmount(locationX, locationZ));
         }
 
     private:
 
-        std::map<instantLocationSusCause, float>  instantLocationSusCauseSeverityMap =
+        std::map<instantLocationSusCause, float>  mInstantLocationSusCauseSeverityMap =
         {
             {singleSoundEmitted, 2}
         };
