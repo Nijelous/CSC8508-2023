@@ -16,7 +16,11 @@ void PlayerBuffs::Init()
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo)
 {
 	mOnBuffAppliedFunctionMap[inBuff](playerNo);
-	mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
+
+	if (mBuffInitDurationMap[inBuff] != 0)
+	{
+		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
+	}
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo)

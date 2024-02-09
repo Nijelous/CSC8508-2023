@@ -1,30 +1,31 @@
 #pragma once
+#include "LevelEnums.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
 		class Light;
-		enum RoomType {
-			Medium,
-			INVALID
-		};
+
 		class Room {
 		public:
-			Room(){}
+			Room() { mType = INVALID; }
 			Room(int type);
 			Room(std::string roomPath);
-			~Room() {}
+			~Room();
 			RoomType GetType() const { return mType; }
-			std::vector<Vector3> GetCCTVPositions() { return mCCTVPositions; }
-			std::vector<Vector3> GetCCTVRotations() { return mCCTVRotations; }
+			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
+			std::vector<Light*> GetLights() const { return mLights; }
+			std::vector<Matrix4> GetCCTVTransforms() const { return mCCTVTransforms; }
+			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
+			friend class JsonParser;
 		protected:
+			std::string mRoomName;
 			RoomType mType;
-			std::map<Vector3, GameObject*> mTileMap;
+			std::map<Vector3, TileType> mTileMap;
 			//NavMesh
 			std::vector<Light*> mLights;
-			std::vector<Vector3> mCCTVPositions;
-			std::vector<Vector3> mCCTVRotations;
+			std::vector<Matrix4> mCCTVTransforms;
 			std::vector<Vector3> mItemPositions;
 		};
 	}

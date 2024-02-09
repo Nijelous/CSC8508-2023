@@ -140,7 +140,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsActive() && !(o->GetIsPlayer())) {
 			const RenderObject* rendObj = o->GetRenderObject();
 			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
 				if (rendObj && isInFrustum) {
@@ -394,6 +394,16 @@ Texture* GameTechRenderer::LoadTexture(const std::string& name) {
 
 Shader* GameTechRenderer::LoadShader(const std::string& vertex, const std::string& fragment) {
 	return new OGLShader(vertex, fragment);
+}
+
+MeshAnimation* NCL::CSC8503::GameTechRenderer::LoadAnimation(const std::string& name)
+{
+	return new MeshAnimation(name);
+}
+
+MeshMaterial* NCL::CSC8503::GameTechRenderer::LoadMaterial(const std::string& name)
+{
+	return new MeshMaterial(name);
 }
 
 void GameTechRenderer::SetDebugStringBufferSizes(size_t newVertCount) {

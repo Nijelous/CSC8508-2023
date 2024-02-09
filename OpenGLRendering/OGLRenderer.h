@@ -11,6 +11,7 @@ License: MIT (see LICENSE file at the top of the source tree)
 #ifdef _WIN32
 #include "windows.h"
 #endif
+#include "glad/gl.h"
 
 #ifdef _DEBUG
 #define OPENGL_DEBUGGING
@@ -37,6 +38,8 @@ namespace NCL {
 			friend class OGLRenderer;
 			OGLRenderer(Window& w);
 			~OGLRenderer();
+
+			void SetTextureRepeating(GLuint target, bool repeating);
 
 			void OnWindowResize(int w, int h)	override;
 			bool HasInitialised()				const override {
