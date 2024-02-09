@@ -10,6 +10,11 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 
+#include "MeshAnimation.h"
+#include "MeshMaterial.h"
+
+
+
 namespace NCL {
 	class Maths::Vector3;
 	class Maths::Vector4;
@@ -24,6 +29,9 @@ namespace NCL {
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
+			MeshAnimation* LoadAnimation(const std::string& name);
+			MeshMaterial* LoadMaterial(const std::string& name);
+			
 
 			void AddLight(Light* light);
 
@@ -52,6 +60,7 @@ namespace NCL {
 			void CombineBuffers();
 			
 			void LoadSkybox();
+
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);

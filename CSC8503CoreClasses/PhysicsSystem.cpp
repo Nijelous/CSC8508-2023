@@ -12,19 +12,19 @@
 using namespace NCL;
 using namespace CSC8503;
 
-PhysicsSystem::PhysicsSystem(GameWorld& g) : gameWorld(g)	{
-	applyGravity	= false;
-	useBroadPhase	= false;	
-	dTOffset		= 0.0f;
-	globalDamping	= 0.995f;
+PhysicsSystem::PhysicsSystem(GameWorld& g) : mGameWorld(g) {
+	mApplyGravity = false;
+	mUseBroadPhase = false;
+	mDTOffset = 0.0f;
+	mGlobalDamping = 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
 }
 
-PhysicsSystem::~PhysicsSystem()	{
+PhysicsSystem::~PhysicsSystem() {
 }
 
 void PhysicsSystem::SetGravity(const Vector3& g) {
-	gravity = g;
+	mGravity = g;
 }
 
 /*
@@ -38,7 +38,7 @@ any collisions they are in.
 
 */
 void PhysicsSystem::Clear() {
-	allCollisions.clear();
+	mAllCollisions.clear();
 }
 
 /*
@@ -57,17 +57,17 @@ const float idealDT = 1.0f / idealHZ;
 
 /*
 This is the fixed update we actually have...
-If physics takes too long it starts to kill the framerate, it'll drop the 
+If physics takes too long it starts to kill the framerate, it'll drop the
 iteration count down until the FPS stabilises, even if that ends up
-being at a low rate. 
+being at a low rate.
 */
-int realHZ		= idealHZ;
-float realDT	= idealDT;
+int realHZ = idealHZ;
+float realDT = idealDT;
 
-void PhysicsSystem::Update(float dt) {	
+void PhysicsSystem::Update(float dt) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::B)) {
-		useBroadPhase = !useBroadPhase;
-		std::cout << "Setting broadphase to " << useBroadPhase << std::endl;
+		mUseBroadPhase = !mUseBroadPhase;
+		std::cout << "Setting broadphase to " << mUseBroadPhase << std::endl;
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::N)) {
 		useSimpleContainer = !useSimpleContainer;
@@ -82,18 +82,18 @@ void PhysicsSystem::Update(float dt) {
 		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
 	}
 
-	dTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
+	mDTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
 	GameTimer t;
 	t.GetTimeDeltaSeconds();
 
-	if (useBroadPhase) {
+	if (mUseBroadPhase) {
 		UpdateObjectAABBs();
 	}
 	int iteratorCount = 0;
-	while(dTOffset > realDT) {
+	while (mDTOffset > realDT) {
 		IntegrateAccel(realDT); //Update accelerations from external forces
-		if (useBroadPhase) {
+		if (mUseBroadPhase) {
 			BroadPhase();
 			NarrowPhase();
 		}
@@ -104,13 +104,13 @@ void PhysicsSystem::Update(float dt) {
 		//This is our simple iterative solver - 
 		//we just run things multiple times, slowly moving things forward
 		//and then rechecking that the constraints have been met		
-		float constraintDt = realDT /  (float)constraintIterationCount;
+		float constraintDt = realDT / (float)constraintIterationCount;
 		for (int i = 0; i < constraintIterationCount; ++i) {
-			UpdateConstraints(constraintDt);	
+			UpdateConstraints(constraintDt);
 		}
 		IntegrateVelocity(realDT); //update positions from new velocity changes
 
-		dTOffset -= realDT;
+		mDTOffset -= realDT;
 		iteratorCount++;
 	}
 
@@ -127,7 +127,7 @@ void PhysicsSystem::Update(float dt) {
 		realDT *= 2;
 		std::cout << "Dropping iteration count due to long physics time...(now " << realHZ << ")\n";
 	}
-	else if(dt*2 < realDT) { //we have plenty of room to increase iteration count!
+	else if (dt * 2 < realDT) { //we have plenty of room to increase iteration count!
 		int temp = realHZ;
 		realHZ *= 2;
 		realDT /= 2;
@@ -150,12 +150,12 @@ The first time they are added, we tell the objects they are colliding.
 The frame they are to be removed, we tell them they're no longer colliding.
 
 From this simple mechanism, we we build up gameplay interactions inside the
-OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a 
+OnCollisionBegin / OnCollisionEnd functions (removing health when hit by a
 rocket launcher, gaining a point when the player hits the gold coin, and so on).
 */
 void PhysicsSystem::UpdateCollisionList() {
-	for (std::set<CollisionDetection::CollisionInfo>::iterator i = allCollisions.begin(); i != allCollisions.end(); ) {
-		if ((*i).framesLeft == numCollisionFrames) {
+	for (std::set<CollisionDetection::CollisionInfo>::iterator i = mAllCollisions.begin(); i != mAllCollisions.end(); ) {
+		if ((*i).framesLeft == mNumCollisionFrames) {
 			i->a->OnCollisionBegin(i->b);
 			i->b->OnCollisionBegin(i->a);
 		}
@@ -166,7 +166,7 @@ void PhysicsSystem::UpdateCollisionList() {
 		if ((*i).framesLeft < 0) {
 			i->a->OnCollisionEnd(i->b);
 			i->b->OnCollisionEnd(i->a);
-			i = allCollisions.erase(i);
+			i = mAllCollisions.erase(i);
 		}
 		else {
 			++i;
@@ -175,7 +175,7 @@ void PhysicsSystem::UpdateCollisionList() {
 }
 
 void PhysicsSystem::UpdateObjectAABBs() {
-	gameWorld.OperateOnContents(
+	mGameWorld.OperateOnContents(
 		[](GameObject* g) {
 			g->UpdateBroadphaseAABB();
 		}
@@ -185,7 +185,7 @@ void PhysicsSystem::UpdateObjectAABBs() {
 /*
 
 This is how we'll be doing collision detection in tutorial 4.
-We step thorugh every pair of objects once (the inner for loop offset 
+We step thorugh every pair of objects once (the inner for loop offset
 ensures this), and determine whether they collide, and if so, add them
 to the collision set for later processing. The set will guarantee that
 a particular pair will only be added once, so objects colliding for
@@ -194,21 +194,22 @@ multiple frames won't flood the set with duplicates.
 void PhysicsSystem::BasicCollisionDetection() {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
+	mGameWorld.GetObjectIterators(first, last);
 
 	for (auto i = first; i != last; i++) {
 		if ((*i)->GetPhysicsObject() == nullptr)
 			continue;
-		for (auto j = i+1; j != last; j++) {
+		for (auto j = i + 1; j != last; j++) {
 			if ((*j)->GetPhysicsObject() == nullptr)
 				continue;
 			CollisionDetection::CollisionInfo info;
 			if (CollisionDetection::ObjectIntersection(*i, *j, info)) {
 				if (!((*i)->GetBoundingVolume()->applyPhysics && (*j)->GetBoundingVolume()->applyPhysics))
 					continue;
-				ImpulseResolveCollision(*info.a, *info.b, info.point);
-				info.framesLeft = numCollisionFrames;
-				allCollisions.insert(info);
+				float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
+				FrictionImpulse(*info.a, *info.b, info.point, j);
+				info.framesLeft = mNumCollisionFrames;
+				mAllCollisions.insert(info);
 			}
 		}
 	}
@@ -217,54 +218,143 @@ void PhysicsSystem::BasicCollisionDetection() {
 /*
 
 In tutorial 5, we start determining the correct response to a collision,
-so that objects separate back out. 
+so that objects separate back out.
 
 */
-void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
+float PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p) const {
 	PhysicsObject* physA = a.GetPhysicsObject();
 	PhysicsObject* physB = b.GetPhysicsObject();
-
-	Transform& transformA = a.GetTransform();
-	Transform& transformB = b.GetTransform();
 
 	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
 
 	// both objects are static
 	if (totalMass == 0)
-		return;
+		return 0;
 
-	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (physA->GetInverseMass() / totalMass)));
-	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (physB->GetInverseMass() / totalMass)));
+	SeperateObjects(a, b, p, totalMass);
 
+	// local collision points
 	Vector3 relativeA = p.localA;
 	Vector3 relativeB = p.localB;
 
-	Vector3 angVelocityA = Vector3::Cross(physA->GetAngularVelocity(), relativeA);
-	Vector3 angVelocityB = Vector3::Cross(physB->GetAngularVelocity(), relativeB);
-
-	Vector3 fullVelocityA = physA->GetLinearVelocity() + angVelocityA;
-	Vector3 fullVelocityB = physB->GetLinearVelocity() + angVelocityB;
-
-	Vector3 contactVelocity = fullVelocityB - fullVelocityA;
+	Vector3 contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB);
 
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
-
-	// calculate inertia
-	Vector3 inertiaA = Vector3::Cross(physA->GetInertiaTensor() * Vector3::Cross(relativeA, p.normal), relativeA);
-	Vector3 inertiaB = Vector3::Cross(physB->GetInertiaTensor() * Vector3::Cross(relativeB, p.normal), relativeB);
-	float angularEffect = Vector3::Dot(inertiaA + inertiaB, p.normal);
+	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, p.normal);
 
 	float cRestitution = 0.66f; // loss of kinetic energy
 
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
-
-	Vector3 fullImpulse = p.normal * j;
+	Vector3 fullImpulse = p.normal * j * physA->GetElasticity();
 
 	// apply impulse in opposite directions for collision responce
 	physA->ApplyLinearImpulse(-fullImpulse);
 	physB->ApplyLinearImpulse(fullImpulse);
 	physA->ApplyAngularImpulse(Vector3::Cross(relativeA, -fullImpulse));
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
+
+	return j;
+}
+
+void PhysicsSystem::FrictionImpulse(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float j) const {
+	PhysicsObject* physA = a.GetPhysicsObject();
+	PhysicsObject* physB = b.GetPhysicsObject();
+	float totalMass = physA->GetInverseMass() + physB->GetInverseMass();
+	if (!CheckFrictionShuldBeApplied(physA->GetLinearVelocity().Length(), physB->GetLinearVelocity().Length(), totalMass))
+		return;
+	Vector3 relativeA = p.localA;
+	Vector3 relativeB = p.localB;
+
+	Vector3 contactVelocity = CalculateCollisionVelocity(relativeA, relativeB, physA, physB);
+
+	Vector3 tangent = CalculateFrictionDirection(contactVelocity, p.normal);
+	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, tangent);
+
+	float impulseForce = Vector3::Dot(contactVelocity, tangent);
+
+	j = abs(j);
+
+	float friction = CalculateFriction(physA, physB);
+
+	Vector3 fullFrictionImpulse = CalculateFrictionImpulse(tangent, j, friction);
+
+	// apply impulse opposite direction incoming force
+	physA->ApplyLinearImpulse(fullFrictionImpulse);
+	physB->ApplyLinearImpulse(-fullFrictionImpulse);
+	if (!(GetIsCapsule(a)))
+		physA->ApplyAngularImpulse(Vector3::Cross(relativeA, fullFrictionImpulse));
+	if (!(GetIsCapsule(b)))
+		physB->ApplyAngularImpulse(Vector3::Cross(relativeB, -fullFrictionImpulse));
+}
+
+bool PhysicsSystem::GetIsCapsule(GameObject& obj) const {
+	if (obj.GetBoundingVolume()->type == VolumeType::Capsule)
+		return true;
+	return false;
+}
+
+void PhysicsSystem::SeperateObjects(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float totalMass) const {
+	Transform& transformA = a.GetTransform();
+	Transform& transformB = b.GetTransform();
+
+	transformA.SetPosition(transformA.GetPosition() - (p.normal * p.penetration * (a.GetPhysicsObject()->GetInverseMass() / totalMass)));
+	transformB.SetPosition(transformB.GetPosition() + (p.normal * p.penetration * (b.GetPhysicsObject()->GetInverseMass() / totalMass)));
+}
+
+bool PhysicsSystem::CheckFrictionShuldBeApplied(float aVelocity, float bVelocity, float totalMass) const {
+	if (aVelocity < 1 && bVelocity < 1)
+		return false;
+	if (totalMass <= 0)
+		return false;
+	return true;
+}
+
+Vector3 PhysicsSystem::CalculateCollisionVelocity(Vector3 contactPointA, Vector3 contactPointB, PhysicsObject* physA, PhysicsObject* physB) const {
+	Vector3 angVelocityA = Vector3::Cross(physA->GetAngularVelocity(), contactPointA);
+	Vector3 angVelocityB = Vector3::Cross(physB->GetAngularVelocity(), contactPointB);
+
+	Vector3 fullVelocityA = physA->GetLinearVelocity() + angVelocityA;
+	Vector3 fullVelocityB = physB->GetLinearVelocity() + angVelocityB;
+
+	return fullVelocityB - fullVelocityA;
+}
+
+Vector3 PhysicsSystem::CalculateFrictionDirection(Vector3 contactVelocity, Vector3 collisionNormal) const {
+	// get direction of friction
+	float impulseForce = Vector3::Dot(contactVelocity, collisionNormal);
+	Vector3 tangent = contactVelocity - (collisionNormal * impulseForce);
+	tangent.Normalise();
+	return tangent;
+}
+
+float PhysicsSystem::CalculateInertia(PhysicsObject* physA, PhysicsObject* physB, Vector3 contactPointA, Vector3 contactPointB, Vector3 angle) const {
+	Vector3 inertiaA = Vector3::Cross(physA->GetInertiaTensor() * Vector3::Cross(contactPointA, angle), contactPointA);
+	Vector3 inertiaB = Vector3::Cross(physB->GetInertiaTensor() * Vector3::Cross(contactPointB, angle), contactPointB);
+	return Vector3::Dot(inertiaA + inertiaB, angle);
+}
+
+float PhysicsSystem::CalculateFriction(PhysicsObject* physA, PhysicsObject* physB) const {
+	float frictionA;
+	float frictionB;
+
+	if (physA->GetForce() == Vector3(0, 0, 0) && physA->GetInverseMass() > 0)
+		frictionA = physA->GetStaticFriction();
+	else
+		frictionA = physA->GetDynamicFriction();
+
+	if (physB->GetForce() == Vector3(0, 0, 0) && physB->GetInverseMass() > 0)
+		frictionB = physB->GetStaticFriction();
+	else
+		frictionB = physB->GetDynamicFriction();
+	return (frictionA + frictionB) / 2;
+}
+
+Vector3 PhysicsSystem::CalculateFrictionImpulse(Vector3 tangent, float j, float friction) const {
+	Vector3 fullFrictionImpulse;
+
+	fullFrictionImpulse = tangent * j * friction;
+
+	return fullFrictionImpulse;
 }
 
 /*
@@ -272,18 +362,18 @@ void PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Collis
 Later, we replace the BasicCollisionDetection method with a broadphase
 and a narrowphase collision detection method. In the broad phase, we
 split the world up using an acceleration structure, so that we can only
-compare the collisions that we absolutely need to. 
+compare the collisions that we absolutely need to.
 
 */
 void PhysicsSystem::BroadPhase() {
 	// clear last frames collisions
-	broadphaseCollisions.clear();
+	mBroadphaseCollisions.clear();
 
 	// create quadtree to store all objects
-	QuadTree<GameObject*> tree(Vector2(1024, 1024), 7, 6);   
+	QuadTree<GameObject*> tree(Vector2(1024, 1024), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last; 
-	gameWorld.GetObjectIterators(first, last);
+	std::vector<GameObject*>::const_iterator last;
+	mGameWorld.GetObjectIterators(first, last);
 	// add all objects to tree
 	for (auto i = first; i != last; i++) {
 		Vector3 halfSizes;
@@ -300,10 +390,10 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-				broadphaseCollisions.insert(info);
+				mBroadphaseCollisions.insert(info);
 			}
 		}
-	});
+		});
 
 
 }
@@ -315,12 +405,12 @@ and work out if they are truly colliding, and if so, add them into the main coll
 */
 void PhysicsSystem::NarrowPhase() {
 	// iteratr through all collisions added and if collision then call impulse resolve collision
-	for (std::set<CollisionDetection::CollisionInfo>::iterator i = broadphaseCollisions.begin(); i != broadphaseCollisions.end(); i++) {
-	CollisionDetection::CollisionInfo info = *i;
-		if (CollisionDetection::ObjectIntersection(info.a,info.b,info)) {
-			info.framesLeft = numCollisionFrames;
+	for (std::set<CollisionDetection::CollisionInfo>::iterator i = mBroadphaseCollisions.begin(); i != mBroadphaseCollisions.end(); i++) {
+		CollisionDetection::CollisionInfo info = *i;
+		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
+			info.framesLeft = mNumCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
-			allCollisions.insert(info);
+			mAllCollisions.insert(info);
 		}
 	}
 }
@@ -328,7 +418,7 @@ void PhysicsSystem::NarrowPhase() {
 /*
 Integration of acceleration and velocity is split up, so that we can
 move objects multiple times during the course of a PhysicsUpdate,
-without worrying about repeated forces accumulating etc. 
+without worrying about repeated forces accumulating etc.
 
 This function will update both linear and angular acceleration,
 based on any forces that have been accumulated in the objects during
@@ -337,7 +427,7 @@ the course of the previous game frame.
 void PhysicsSystem::IntegrateAccel(float dt) {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first,last);
+	mGameWorld.GetObjectIterators(first, last);
 
 	for (auto i = first; i != last; i++) {
 		PhysicsObject* object = (*i)->GetPhysicsObject();
@@ -350,8 +440,8 @@ void PhysicsSystem::IntegrateAccel(float dt) {
 		Vector3 force = object->GetForce();
 		Vector3 accel = force * inverseMass;
 
-		if (applyGravity && inverseMass > 0)
-			accel += gravity;
+		if (mApplyGravity && inverseMass > 0)
+			accel += mGravity;
 
 		linearVel += accel * dt;
 		object->SetLinearVelocity(linearVel);
@@ -380,7 +470,7 @@ the world, looking for collisions.
 void PhysicsSystem::IntegrateVelocity(float dt) {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
-	gameWorld.GetObjectIterators(first, last);
+	mGameWorld.GetObjectIterators(first, last);
 	float frameLinearDampening = 1.0f - (0.4f * dt);
 
 	for (auto i = first; i != last; i++) {
@@ -417,7 +507,7 @@ clear out any accumulated forces, ready to receive new
 ones in the next 'game' frame.
 */
 void PhysicsSystem::ClearForces() {
-	gameWorld.OperateOnContents(
+	mGameWorld.OperateOnContents(
 		[](GameObject* o) {
 			o->GetPhysicsObject()->ClearForces();
 		}
@@ -429,13 +519,13 @@ void PhysicsSystem::ClearForces() {
 
 As part of the final physics tutorials, we add in the ability
 to constrain objects based on some extra calculation, allowing
-us to model springs and ropes etc. 
+us to model springs and ropes etc.
 
 */
 void PhysicsSystem::UpdateConstraints(float dt) {
 	std::vector<Constraint*>::const_iterator first;
 	std::vector<Constraint*>::const_iterator last;
-	gameWorld.GetConstraintIterators(first, last);
+	mGameWorld.GetConstraintIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
 		(*i)->UpdateConstraint(dt);

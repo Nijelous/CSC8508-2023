@@ -6,12 +6,29 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "NetworkObject.h"
+#include "NetworkPlayer.h"
+#include "NetworkObject.h"
+#include "PhysicsObject.h"
+#include "RenderObject.h"
 
 namespace{
     constexpr int MAX_PLAYER = 4;
+    
+    constexpr const char* PLAYER_PREFIX = "Player";
+
+    //TODO(erendgrmnc): remove after level data is usable.
+    std::vector<Vector3> PLAYER_START_POSITIONS =
+    {
+        Vector3(100,-17,100),
+        Vector3(100,-17,85),
+        Vector3(60,-17,100),
+        Vector3(40,-17,100),
+        
+    };
+    
 }
 
-DebugNetworkedGame::DebugNetworkedGame(){
+DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(){
     mThisServer = nullptr;
     mThisClient = nullptr;
 
@@ -43,8 +60,9 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(Player_Connected, this);
     mThisClient->RegisterPacketHandler(Player_Disconnected, this);
     mThisClient->RegisterPacketHandler(String_Message, this);
-    mThisClient->RegisterPacketHandler(GameState, this);
+    mThisClient->RegisterPacketHandler(GameStartState, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
@@ -63,6 +81,19 @@ void DebugNetworkedGame::UpdateGame(float dt){
         }
     }
     if (isGameStarted){
+        //TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
+        if (mIsGameFinished){
+            Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
+            renderer->Render();
+            return;
+        }
+        
+        //DEBUG END GAME
+        if (mThisServer){
+            if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)){
+                SetIsGameFinished(true);
+            }
+        }
         TutorialGame::UpdateGame(dt);
     }
     else{
@@ -88,10 +119,17 @@ void DebugNetworkedGame::UpdateGame(float dt){
 void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
     this->isGameStarted = isGameStarted;
     if (mThisServer){
-        SendGameStatusPacket();
+        SendStartGameStatusPacket();
     }
     if (isGameStarted){
         StartLevel();
+    }
+}
+
+void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
+    mIsGameFinished = isGameFinished;
+    if (mThisServer){
+        SendFinishGameStatusPacket();
     }
 }
 
@@ -115,8 +153,8 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         int a = 0;
         break;
     }
-    case BasicNetworkMessages::GameState: {
-        GameStatePacket* packet = (GameStatePacket*)payload;
+    case BasicNetworkMessages::GameStartState: {
+        GameStartStatePacket* packet = (GameStartStatePacket*)payload;
         SetIsGameStarted(packet->isGameStarted);
         break;
     }
@@ -125,7 +163,18 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         HandleFullPacket(packet);
         break;
     }
+    case BasicNetworkMessages::GameEndState:{
+        GameEndStatePacket* packet = (GameEndStatePacket*)payload;
+        SetIsGameFinished(packet->isGameEnded);
+        break;
+    }
+    case BasicNetworkMessages::SyncPlayers:{
+        SyncPlayerListPacket* packet = (SyncPlayerListPacket*)payload;
+        packet->SyncPlayerList(mPlayerList);
+        break;
+    }
     default:
+        std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
         break;
     }
 }
@@ -220,13 +269,26 @@ int DebugNetworkedGame::GetPlayerPeerID(int peerId){
     return -1;
 }
 
-void DebugNetworkedGame::SendGameStatusPacket(){
-    GameStatePacket state(isGameStarted);
+void DebugNetworkedGame::SendStartGameStatusPacket(){
+    GameStartStatePacket state(isGameStarted);
     mThisServer->SendGlobalPacket(state);
 }
 
+void DebugNetworkedGame::SendFinishGameStatusPacket(){
+    GameEndStatePacket packet(mIsGameFinished);
+    mThisServer->SendGlobalPacket(packet);
+}
+
 void DebugNetworkedGame::InitWorld(){
-    TutorialGame::InitWorld();
+    world->ClearAndErase();
+    physics->Clear();
+    testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+
+    AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
+    InitDefaultFloor();
+
+    SpawnPlayers();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID){
@@ -234,10 +296,63 @@ void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* player
 }
 
 void DebugNetworkedGame::SpawnPlayers(){
+    
+    for (int i = 0; i < 4; i++)		{
+        if (mPlayerList[i] != -1) {
+            auto* netPlayer = AddPlayerObject(PLAYER_START_POSITIONS[i], i);
+            mServerPlayers.emplace(i, netPlayer);
+        }
+        else
+        {
+            mServerPlayers.emplace(i, nullptr);
+        }
+    }
+    if (mThisServer) {
+        mLocalPlayer = mServerPlayers[0];
+    }
+    else
+    {
+        mLocalPlayer = mServerPlayers[GetPlayerPeerID()];
+    }
+    tempPlayer = (PlayerObject*)mLocalPlayer;
+    //localPlayer->GetRenderObject()->SetVisibility(false);
+    LockCameraToObject(mLocalPlayer);
 }
 
 NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum){
-    return nullptr;
+
+    //Set Player Obj Name
+    char buffer[256]; // Adjust the size according to your needs
+    strcpy_s(buffer, sizeof(buffer), _strdup(PLAYER_PREFIX));
+    strcat_s(buffer, sizeof(buffer), std::to_string(playerNum).c_str());
+    
+    auto* netPlayer = new NetworkPlayer(this, playerNum, buffer);
+    CreatePlayerObjectComponents(*netPlayer, position);
+
+    auto* networkComponet = new NetworkObject(*netPlayer, playerNum);
+    netPlayer->SetNetworkObject(networkComponet);
+    mNetworkObjects.push_back(netPlayer->GetNetworkObject());
+    world->AddGameObject(netPlayer);
+
+    Vector4 colour;
+    switch (playerNum)
+    {
+    case 0:
+        colour = Vector4(1, 0, 0, 1); // RED
+        break;
+    case 1:
+        colour = Vector4(0, 1, 0, 1); //Green
+        break;
+    case 2:
+        colour = Vector4(0, 0, 1, 1); //Blue
+        case 3:
+            colour = Vector4(1, 1, 0, 1); //Yellow
+        default:
+            break;
+    }
+
+    netPlayer->GetRenderObject()->SetColour(colour);
+    return netPlayer;
 }
 
 void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
@@ -265,4 +380,7 @@ void DebugNetworkedGame::SyncPlayerList(){
 
     SyncPlayerListPacket packet(mPlayerList);
     mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SetItemsLeftToZero(){
 }

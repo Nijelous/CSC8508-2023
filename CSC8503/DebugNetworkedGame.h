@@ -1,7 +1,8 @@
 ﻿#pragma once
-#include <map>
+#include <functional>
 #include "NetworkBase.h"
 #include "TutorialGame.h"
+#include "NetworkedGame.h"
 
 namespace NCL{
     namespace CSC8503{
@@ -13,7 +14,7 @@ namespace NCL{
         struct ClientPlayerInputPacket;
         struct AddPlayerScorePacket;
 
-        class DebugNetworkedGame : public TutorialGame, public PacketReceiver{
+        class DebugNetworkedGame : public NetworkedGame{
         public:
             DebugNetworkedGame();
             ~DebugNetworkedGame();
@@ -24,6 +25,7 @@ namespace NCL{
             void UpdateGame(float dt) override;
 
             void SetIsGameStarted(bool isGameStarted);
+            void SetIsGameFinished(bool isGameFinished);
             void StartLevel();
 
             void AddEventOnGameStarts(std::function<void()> event);
@@ -36,6 +38,7 @@ namespace NCL{
         protected:
             bool isClientConnectedToServer = false;
             bool isGameStarted = false;
+            bool mIsGameFinished = false;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);
@@ -44,7 +47,8 @@ namespace NCL{
             void UpdateMinimumState();
             int GetPlayerPeerID(int peerId = -2);
 
-            void SendGameStatusPacket();
+            void SendStartGameStatusPacket();
+            void SendFinishGameStatusPacket();
             void InitWorld() override;
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
@@ -57,21 +61,10 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
+            void SetItemsLeftToZero() override;
 
-            std::vector<std::function<void()>> mOnGameStarts;
 
-            std::map<int, int> mStateIDs;
-
-            GameServer* mThisServer;
-            GameClient* mThisClient;
-            float mTimeToNextPacket;
-            int mPacketsToSnapshot;
-
-            std::vector<NetworkObject*> mNetworkObjects;
-
-            std::vector<int> mPlayerList;
-            std::map<int, NetworkPlayer*> mServerPlayers;
-            GameObject* mLocalPlayer;
+            std::vector<function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 
