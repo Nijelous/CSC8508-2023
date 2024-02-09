@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+
 namespace SuspicionSystem
 {
 	class SuspicionMetre
