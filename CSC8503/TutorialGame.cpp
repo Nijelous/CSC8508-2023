@@ -10,6 +10,7 @@
 #include "StateGameObject.h"
 #include "PlayerObject.h"
 #include "LevelManager.h"
+#include "RecastBuilder.h"
 
 #include <irrKlang.h>
 using namespace NCL;
@@ -35,6 +36,7 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	mAnimation   = new AnimationSystem(*world);
 
 	mLevelManager = new LevelManager();
+	mBuilder = new RecastBuilder();
 
 	forceMagnitude	= 10.0f;
 	useGravity		= true;
@@ -375,6 +377,8 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 	floor->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
 	world->AddGameObject(floor);
+
+	//mBuilder->BuildNavMesh(floor);
 
 	return floor;
 }
