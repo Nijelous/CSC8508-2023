@@ -13,6 +13,27 @@ set(Header_Files
 )
 source_group("Header Files" FILES ${Header_Files})
 
+set(Inventory_Buff_System
+    "InventoryBuffSystem/InventoryBuffSystem.h"
+    "InventoryBuffSystem/PlayerInventory.h"
+    "InventoryBuffSystem/PlayerInventory.cpp"
+    "InventoryBuffSystem/PlayerBuffs.h"
+    "InventoryBuffSystem/PlayerBuffs.cpp"
+)
+source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
+
+set(Suspicion_System
+    "SuspicionSystem/GlobalSuspicionMetre.h"
+    "SuspicionSystem/GlobalSuspicionMetre.cpp"
+    "SuspicionSystem/LocationBasedSuspicion.h"
+    "SuspicionSystem/LocationBasedSuspicion.cpp"
+    "SuspicionSystem/LocalSuspicionMetre.h"
+    "SuspicionSystem/LocalSuspicionMetre.cpp"
+    "SuspicionSystem/SuspicionMetre.h"
+    "SuspicionSystem/SuspicionMetre.cpp"
+)
+source_group("Suspicion System" FILES ${Suspicion_System})
+
 set(Source_Files
     "GameTechRenderer.cpp"
     "Main.cpp"
@@ -38,6 +59,8 @@ source_group("Source Files" FILES ${Source_Files})
 set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
+    ${Inventory_Buff_System}
+    ${Suspicion_System}
 )
 
 if(USE_VULKAN)
