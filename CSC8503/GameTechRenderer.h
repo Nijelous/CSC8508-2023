@@ -54,6 +54,7 @@ namespace NCL {
 			void SetUpFBOs();
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
+			void MakeAndAttachStencil(GLuint& fbo, GLuint& stencil);
 			void LoadDefRendShaders();
 			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);

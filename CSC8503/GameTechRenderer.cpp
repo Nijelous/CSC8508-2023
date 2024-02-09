@@ -266,7 +266,11 @@ void GameTechRenderer::RenderCamera() {
 
 void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glBindFramebuffer(GL_FRAMEBUFFER, mGBufferFBO);
-	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	glEnable(GL_STENCIL_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilMask(0xFF);
 
 	OGLShader* activeShader = nullptr;
 	int projLocation = 0;
@@ -431,10 +435,11 @@ void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	GLuint format = depth ? GL_DEPTH_COMPONENT24 : GL_RGBA8;
-	GLuint type = depth ? GL_DEPTH_COMPONENT : GL_RGBA;
+	GLuint internalFormat = depth ? GL_DEPTH24_STENCIL8 : GL_RGBA8;
+	GLuint format = depth ? GL_DEPTH_STENCIL : GL_RGBA;
+	GLuint type = depth ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE;
 
-	glTexImage2D(GL_TEXTURE_2D, 0, format, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, type, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, format, type, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -445,7 +450,7 @@ void GameTechRenderer::BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colour0,
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colour0, 0);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, colour1, 0);
 	if (depthTex) {
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, *depthTex, 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, *depthTex, 0);
 	}
 	glDrawBuffers(2, buffers);
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) return;
