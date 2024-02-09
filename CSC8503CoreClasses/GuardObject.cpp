@@ -70,7 +70,7 @@ void GuardObject::BehaviourTree() {
 	FirstSelect->AddChild(Patrol());
 	FirstSelect->AddChild(ChasePlayerSetup());
 	FirstSelect->AddChild(CaughtPlayerSequence);
-	CaughtPlayerSequence->AddChild(ConfiscateItems(5));
+	CaughtPlayerSequence->AddChild(ConfiscateItems());
 	CaughtPlayerSequence->AddChild(SendToPrison());
 
 }
@@ -130,20 +130,20 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 	return ChasePlayer;
 }
 
-BehaviourAction* GuardObject::ConfiscateItems(float timer) {
+BehaviourAction* GuardObject::ConfiscateItems() {
 	BehaviourAction* ConfiscateItems = new BehaviourAction("Confiscate Items", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
-			timer = 5;
+			mTimer = 60;
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mHasConfiscatedItems == false) {
 				std::cout << "Gotem\n";
-				std::cout << timer;
-				timer - dt;
+				std::cout << mTimer;
+				mTimer -= dt;
 				Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
 				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
-				if (timer == 0) {
+				if (mTimer == 0) {
 					mHasConfiscatedItems = true;
 					return Success;
 				}
