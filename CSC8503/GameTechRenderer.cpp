@@ -41,15 +41,22 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	//Set up the light properties
 	Vector4 lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
 	float lightRadius = 35.0f;
+	Vector3 dir = Vector3(0, -1, 0);
 	for (int i = 0; i < 5; i++) {
 		for (int j = 0; j < 5; j++) {
 			Vector3 lightPosition = Vector3(-30 + 30.0f * i, -5.0f, -30 + 60.0f * j);
-			PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
-			AddLight(pointL);
-		}
-		
+			if (j % 2 == 0)
+			{
+				PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
+				AddLight(pointL);
+			}
+			else
+			{				
+				SpotLight* spotL = new SpotLight(dir, lightPosition, lightColour, lightRadius, 40, 2);
+				AddLight(spotL);
+			}			
+		}		
 	}
-	
 
 	//Skybox!
 	skyboxShader = new OGLShader("skybox.vert", "skybox.frag");
@@ -661,8 +668,7 @@ void GameTechRenderer::BindSpecificLightDataToShader(Light* l)
 		}
 		else if (type == Light::Direction) {
 			SendDirLightDataToShader((OGLShader*)mDirLightShader, (DirectionLight*) l);
-		}
-	
+		}	
 }
 
 void GameTechRenderer::SendPointLightDataToShader(OGLShader* shader, PointLight* l) {
@@ -684,7 +690,26 @@ void GameTechRenderer::SendDirLightDataToShader(OGLShader* shader, DirectionLigh
 }
 
 void GameTechRenderer::SendSpotLightDataToShader(OGLShader* shader, SpotLight* l) {
+	BindShader(*shader);
+	int lightPosLocation = 0;
+	int lightColourLocation = 0;
+	int lightRadiusLocation = 0;
+	int spotLightDirLocation = 0;
+	int minDotProdLocation = 0;
+	int dimDotProdLocation = 0;
 
+	lightPosLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
+	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
+	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
+	spotLightDirLocation = glGetUniformLocation(shader->GetProgramID(), "spotlightDir");
+	minDotProdLocation = glGetUniformLocation(shader->GetProgramID(), "minDotProd");
+	dimDotProdLocation = glGetUniformLocation(shader->GetProgramID(), "dimDotProd");
+	glUniform3fv(lightPosLocation, 1, l->GetPositionAddress());
+	glUniform4fv(lightColourLocation, 1, l->GetColourAddress());
+	glUniform1f(lightRadiusLocation, l->GetRadius());
+	glUniform3fv(spotLightDirLocation, 1, l->GetDirectionAddress());
+	glUniform1f(minDotProdLocation, l->GetDotProdMin());
+	glUniform1f(dimDotProdLocation, l->GetDimProdMin());
 }
 
 
