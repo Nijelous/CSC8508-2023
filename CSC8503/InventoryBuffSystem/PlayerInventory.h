@@ -4,12 +4,9 @@
 #include <random>
 #include "Vector3.h"
 #include "GameObject.h"
-#include "../InventoryBuffSystem/InventoryBuffSystem.h"
 
 using namespace NCL;
 using namespace CSC8503;
-using namespace InventoryBuffSystem;
-
 
 namespace InventoryBuffSystem
 {
@@ -22,6 +19,7 @@ namespace InventoryBuffSystem
 		{
 			disguise, item2,none,flag
 		};
+
 		PlayerInventory()
 		{
 			Init();
