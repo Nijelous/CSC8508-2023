@@ -5,8 +5,8 @@
 
 namespace SuspicionSystem
 {
-    float MAX_NEARBY_DISTANCE = 5;
-    float DT_UNTIL_LOCATION_RECOVERY = 5;
+    const float MAX_NEARBY_DISTANCE = 5;
+    const float DT_UNTIL_LOCATION_RECOVERY = 5;
 
     class LocationBasedSuspicion :
         public SuspicionMetre

@@ -1,10 +1,12 @@
 	#include "PlayerInventory.h"
+	#include "Level.h"
 
 	using namespace InventoryBuffSystem;
+	using namespace NCL::CSC8503;
 
 	void PlayerInventory::Init()
 	{
-		for (int playerNo = 0; playerNo < MAX_PLAYERS; playerNo++)
+		for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 		{
 			for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 			{

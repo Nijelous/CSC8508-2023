@@ -10,14 +10,10 @@ using namespace CSC8503;
 
 namespace InventoryBuffSystem
 {
-	
+	constexpr int MAX_INVENTORY_SLOTS = 2;
 	class PlayerInventory
 	{
 	public:
-
-		const int MAX_PLAYERS = 4;
-		const int MAX_INVENTORY_SLOTS = 2;
-
 		enum item
 		{
 			disguise, item2,none,flag
