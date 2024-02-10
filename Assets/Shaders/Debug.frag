@@ -23,6 +23,7 @@ void main(void)
 			discard;
 		}
 		
-		fragColor = IN.colour * vec4(1,1,1,alpha);
+		//fragColor = IN.colour * vec4(1,1,1,alpha);
+		fragColor = texture(mainTex, IN.texCoord);
 	}
 }

@@ -10,6 +10,7 @@
 #include "StateGameObject.h"
 #include "PlayerObject.h"
 
+#include "UI.h"
 #include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
@@ -144,6 +145,8 @@ void TutorialGame::UpdateGame(float dt) {
 	UpdateKeys();
 	if (useGravity) {
 		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
+		UI::CreateInevntorySlot(Vector2(5, 5), 1, iconTest);
+		
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
