@@ -5,19 +5,19 @@
 
 namespace InventoryBuffSystem
 {
-    InventoryBuffSystem::PlayerBuffs* mPlayerBuffsPtr;
-    //InventoryBuffSystem::PlayerInventory* mPlayerInventoryPtr;
+    PlayerBuffs* mPlayerBuffsPtr;
+    PlayerInventory* mPlayerInventoryPtr;
 
     void Init() 
     {
         mPlayerBuffsPtr = new PlayerBuffs();
-        //mPlayerInventoryPtr = new PlayerInventory();
+        mPlayerInventoryPtr = new PlayerInventory();
     };
 
     void Reset()
     {
         mPlayerBuffsPtr->Init();
-        //mPlayerInventoryPtr->Init();
+        mPlayerInventoryPtr->Init();
     };
 }
 
