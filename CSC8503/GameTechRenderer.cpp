@@ -97,7 +97,9 @@ GameTechRenderer::~GameTechRenderer()	{
 	glDeleteTextures(1, &mLightAlbedoTex);
 	glDeleteTextures(1, &mLightSpecularTex);
 
-	delete mLightShader;
+	delete mPointLightShader;
+	delete mSpotLightShader;
+	delete mDirLightShader;
 	delete mCombineShader;
 }
 
@@ -142,7 +144,9 @@ void GameTechRenderer::LoadSkybox() {
 }
 
 void GameTechRenderer::LoadDefRendShaders() {
-	mLightShader = LoadShader("light.vert", "light.frag");
+	mPointLightShader = LoadShader("light.vert", "pointlight.frag");
+	mSpotLightShader = LoadShader("light.vert", "spotlight.frag");
+	mDirLightShader = LoadShader("light.vert", "dirlight.frag");
 	mCombineShader = LoadShader("combine.vert", "combine.frag");
 }
 
@@ -349,19 +353,36 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 void GameTechRenderer::DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
-	OGLShader* shader = (OGLShader*)mLightShader;
-	BindShader(*shader);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
+	BindCommonLightDataToShader((OGLShader*)mPointLightShader, viewMatrix, projMatrix);		
+	BindCommonLightDataToShader((OGLShader*)mSpotLightShader, viewMatrix, projMatrix);
+	BindCommonLightDataToShader((OGLShader*)mDirLightShader, viewMatrix, projMatrix);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_ALWAYS);
 	glDepthMask(GL_FALSE);
+	
+	for (int i = 0; i < mLights.size(); i++) {
+		BindSpecificLightDataToShader(mLights[i]);
+		BindMesh(*mSphereMesh);
+		DrawBoundMesh();
+	}
 
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "normTex"),0);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glCullFace(GL_BACK);
+	glDepthFunc(GL_LEQUAL);
+	glDepthMask(GL_TRUE);
+	glClearColor(0.2f, 0.2f, 0.2f, 1);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);	
+}
+
+void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix) {
+	BindShader(*shader);
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "normTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, mGBufferNormalTex);
-	
+
 	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "depthTex"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
@@ -374,22 +395,6 @@ void GameTechRenderer::DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "inverseProjView"), 1, false, (float*)&invProjView);
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "projMatrix"), 1, false, (float*)&projMatrix);
 	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "viewMatrix"), 1, false, (float*)&viewMatrix);
-	for (int i = 0; i < mLights.size(); i++) {
-		SendLightDataToShader(mLights[i],shader);
-		BindMesh(*mSphereMesh);
-		DrawBoundMesh();
-	}
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glCullFace(GL_BACK);
-	glDepthFunc(GL_LEQUAL);
-
-	glDepthMask(GL_TRUE);
-
-	glClearColor(0.2f, 0.2f, 0.2f, 1);
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
 }
 
 void GameTechRenderer::CombineBuffers() {
@@ -645,22 +650,23 @@ void GameTechRenderer::AddLight(Light* lightPtr) {
 	mLights.push_back(lightPtr);
 }
 
-void GameTechRenderer::SendLightDataToShader(Light* l, OGLShader* shader)
+void GameTechRenderer::BindSpecificLightDataToShader(Light* l)
 {
 		Light::Type type = l->GetType();
 		if (type == Light::Point) {
-			SendPointLightDataToShader(shader, (PointLight*) l);
+			SendPointLightDataToShader((OGLShader*)mPointLightShader, (PointLight*)l);
 		}
 		else if (type == Light::Spot) {
-			SendSpotLightDataToShader(shader, (SpotLight*) l);
+			SendSpotLightDataToShader((OGLShader*)mSpotLightShader, (SpotLight*) l);
 		}
 		else if (type == Light::Direction) {
-			SendDirLightDataToShader(shader, (DirectionLight*) l);
+			SendDirLightDataToShader((OGLShader*)mDirLightShader, (DirectionLight*) l);
 		}
 	
 }
 
 void GameTechRenderer::SendPointLightDataToShader(OGLShader* shader, PointLight* l) {
+	BindShader(*shader);
 	int lightPosLocation = 0;
 	int lightColourLocation = 0;
 	int lightRadiusLocation = 0;

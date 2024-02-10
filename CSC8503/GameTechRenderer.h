@@ -54,7 +54,6 @@ namespace NCL {
 			void SetUpFBOs();
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
-			void MakeAndAttachStencil(GLuint& fbo, GLuint& stencil);
 			void LoadDefRendShaders();
 			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
@@ -66,7 +65,8 @@ namespace NCL {
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
-			void SendLightDataToShader(Light* l, OGLShader* shader);
+			void BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix);
+			void BindSpecificLightDataToShader(Light* l);			
 			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
@@ -95,7 +95,9 @@ namespace NCL {
 			GLuint mLightFBO;
 			GLuint mLightAlbedoTex;
 			GLuint mLightSpecularTex;
-			Shader* mLightShader;
+			Shader* mPointLightShader;
+			Shader* mSpotLightShader;
+			Shader* mDirLightShader;
 			Shader* mCombineShader;
 			const OGLMesh* mSphereMesh;
 			OGLMesh* mQuad;
