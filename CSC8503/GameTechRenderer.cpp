@@ -557,7 +557,7 @@ void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 		glVertexAttribBinding(1, 1);
 		glBindVertexBuffer(1, textColourVBO, 0, sizeof(Vector4));*/
 
-		glVertexAttribFormat(2, 2, GL_FLOAT, false, 0);
+		glVertexAttribFormat(1, 2, GL_FLOAT, false, 0);
 		glVertexAttribBinding(1, 1);
 		glBindVertexBuffer(1, iconTexVBO, 0, sizeof(Vector2));
 
