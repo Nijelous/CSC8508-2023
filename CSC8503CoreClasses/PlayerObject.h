@@ -18,7 +18,7 @@ namespace NCL {
 			PlayerObject(GameWorld* world, const std::string& objName = "", int walkSpeed = 35, int sprintSpeed = 50, int crouchSpeed = 25, Vector3 offset = Vector3(0,0,0));
 			~PlayerObject();
 
-			void	UpdateObject(float dt);
+			virtual void UpdateObject(float dt);
 
 		protected:
 			bool mIsCrouched;
@@ -36,7 +36,7 @@ namespace NCL {
             
 			void AttachCameraToPlayer(GameWorld* world);
 			
-			void MatchCameraRotation();
+			virtual void MatchCameraRotation(float yawValue);
 
 			void StopSliding();
 

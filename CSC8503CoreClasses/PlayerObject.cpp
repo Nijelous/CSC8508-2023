@@ -33,7 +33,9 @@ void PlayerObject::UpdateObject(float dt)
 {
 	MovePlayer(dt);
 	AttachCameraToPlayer(mGameWorld);
-	MatchCameraRotation();
+	
+	float yawValue = mGameWorld->GetMainCamera().GetYaw();
+	MatchCameraRotation(yawValue);
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
@@ -118,8 +120,8 @@ void PlayerObject::StartCrouching() {
 	}
 }
 
-void PlayerObject::MatchCameraRotation() {
-	Matrix4 yawRotation = Matrix4::Rotation(mGameWorld->GetMainCamera().GetYaw(), Vector3(0, 1, 0));
+void PlayerObject::MatchCameraRotation(float yawValue) {
+	Matrix4 yawRotation = Matrix4::Rotation(yawValue, Vector3(0, 1, 0));
 	GetTransform().SetOrientation(yawRotation);
 }
 
