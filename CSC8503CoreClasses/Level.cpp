@@ -5,7 +5,6 @@
 
 using namespace NCL::CSC8503;
 
-constexpr int MAX_PLAYERS = 4;
 
 Level::Level(std::string levelPath) {
 	mLevelName = levelPath.substr(24, levelPath.size()-29);
