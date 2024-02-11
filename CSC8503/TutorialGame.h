@@ -101,6 +101,7 @@ namespace NCL {
 			Texture* mFloorNormal = nullptr;
 
 			Texture* iconTest = nullptr;
+			Texture* iconTest2 = nullptr;
 			Shader*		basicShader = nullptr;
 
 

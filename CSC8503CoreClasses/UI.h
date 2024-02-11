@@ -12,18 +12,20 @@ namespace NCL {
 
 			struct Icon {
 				Vector2 position;
-				int size;
+				int length;
+				int height;
 				Texture* texture;
+				bool isAppear;
 			};
-			static void CreateInevntorySlot(Vector2 newPos, int sideLength, Texture* tex);
+			static void CreateInevntorySlot(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
 
 			static const std::vector<Icon>& GetInventorySlot();
 
-			void CreatePowerupIndicator();
+			static void SetIconPosition(Vector2 newPos, Icon icon);
 
-			void CreateSuspicionBar();
+			static void SwitchTransparency(bool isShown, Icon icon);
 
-			static void BuildVerticesForIcon(const int& iconNum, const Vector2& iconPos, int size, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
+			static void BuildVerticesForIcon(const int& iconNum, const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
 			/*enum PowerUP{
 				SilentRun, SlowDowm, LightOff, IndicateHeist, SwapPosition, Stun, MakeNoise
 			};*/

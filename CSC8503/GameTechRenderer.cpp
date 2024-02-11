@@ -351,40 +351,69 @@ void GameTechRenderer::RenderIcons() {
 	BindShader(*iconShader);
 
 	int iconVertCount = 0;
+
+	UIiconPos.clear();
+	UIiconUVs.clear();
+
 	for (const auto& i : icons) {
 		OGLTexture* t = (OGLTexture*)i.texture;
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+		//glActiveTexture(GL_TEXTURE0);
+		//glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+		BindTextureToShader(*t, "iconTex", t->GetObjectID());
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		BindTextureToShader(*t, "mainTex", 0);
+		//glBindTexture(GL_TEXTURE_2D, 0);
+
 		iconVertCount += 6;
-		UI::BuildVerticesForIcon(icons.size(), i.position, i.size, UIiconPos, UIiconUVs);
+		UI::BuildVerticesForIcon(icons.size(), i.position, i.length, i.height, UIiconPos, UIiconUVs);
+
+		bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
+		glUniform1i(texSlot, i.isAppear);
+
+		Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
+		//0.02, 0, 0, 0
+		//0, 0.02, 0, 0
+		//0, 0, -1, 0;
+		//-1, 1, 0, 1
+
+		int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
+		glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
+
+		SetUIiconBufferSizes(iconVertCount);
+
+		glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector3), UIiconPos.data());
+		glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector2), UIiconUVs.data());
+
+		glEnable(GL_BLEND);
+
+		glBindVertexArray(iconVAO);
+		glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
+		glBindVertexArray(0);
 	}
 
-	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	/*float a[16] = { 1 };
-	proj = Matrix4(a);*/
+	//Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
+	////0.02, 0, 0, 0
+	////0, 0.02, 0, 0
+	////0, 0, -1, 0;
+	////-1, 1, 0, 1
 
-	int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
-	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
+	//int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
+	//glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
 
-	GLuint texSlot = glGetUniformLocation(iconShader->GetProgramID(), "useTexture");
-	glUniform1i(texSlot, 1);
+	//SetUIiconBufferSizes(iconVertCount);
 
-	SetUIiconBufferSizes(iconVertCount);
+	//glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector3), UIiconPos.data());
+	//glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector2), UIiconUVs.data());
 
-	glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(Vector3), UIiconPos.data());
-	/*glBindBuffer(GL_ARRAY_BUFFER, textColourVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 4 * sizeof(Vector4), debugTextColours.data());*/
-	glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(Vector2), UIiconUVs.data());
+	//glEnable(GL_BLEND);
 
-	glBindVertexArray(iconVAO);
-	glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
-	glBindVertexArray(0);
+	//glBindVertexArray(iconVAO);
+	//glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
+	//glBindVertexArray(0);
 }
 
 void GameTechRenderer::NewRenderText() {
@@ -406,11 +435,6 @@ void GameTechRenderer::NewRenderText() {
 		BindTextureToShader(*t, "mainTex", 0);
 	}
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	//0.02, 0, 0, 0
-	//0, 0.02, 0, 0
-	//0, 0, -1, 0;
-	//-1, 1, 0, 1
-
 
 	int matSlot = glGetUniformLocation(debugShader->GetProgramID(), "viewProjMatrix");
 	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);

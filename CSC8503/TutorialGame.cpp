@@ -75,7 +75,8 @@ void TutorialGame::InitialiseAssets() {
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 
-	iconTest = renderer->LoadTexture("GoatBrown.png");
+	iconTest = renderer->LoadTexture("Default.png");
+	iconTest2 = renderer->LoadTexture("GoatBeige.png");
 
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
@@ -115,6 +116,7 @@ TutorialGame::~TutorialGame()	{
 	delete mAnimation;
 
 	delete iconTest;
+	delete iconTest2;
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -144,9 +146,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	UpdateKeys();
 	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
-		UI::CreateInevntorySlot(Vector2(5, 5), 1, iconTest);
-		
+		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);		
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
@@ -342,6 +342,10 @@ void TutorialGame::InitWorld() {
 
 	AddPlayerToWorld(Vector3(100,-17,100), "Player");
 	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
+
+	UI::CreateInevntorySlot(Vector2(90, 90), 3, 5, iconTest, false);
+	UI::CreateInevntorySlot(Vector2(85, 90), 3, 5, iconTest2);
+	UI::CreateInevntorySlot(Vector2(90, 80), 3, 5, iconTest, false);
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 

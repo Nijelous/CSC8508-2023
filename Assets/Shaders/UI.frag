@@ -1,6 +1,7 @@
 #version 400 core
 
 uniform sampler2D iconTex;
+uniform bool isOn;
 
 in Vertex
 {
@@ -11,5 +12,10 @@ out vec4 fragColor;
 
 void main(void)
 { 
-     fragColor = texture(iconTex, IN.texCoord);
+     if(isOn){
+          fragColor = texture(iconTex, IN.texCoord);
+     }
+     else{
+          fragColor = texture(iconTex, IN.texCoord) * vec4(0.4, 0.4, 0.4, 0.3);
+     }
 }
