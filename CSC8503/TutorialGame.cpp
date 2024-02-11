@@ -397,7 +397,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, nullptr, basicShader,radius));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, mFloorAlbedo, mFloorNormal, basicShader,radius));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -461,7 +461,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);

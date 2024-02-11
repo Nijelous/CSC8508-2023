@@ -89,6 +89,8 @@ BehaviourAction* GuardObject::Patrol() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
+				//std::cout << "Lost em";
+  
 				return Success;
 			}
 			else if (mCanSeePlayer == true) {

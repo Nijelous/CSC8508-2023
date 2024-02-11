@@ -14,10 +14,9 @@ public:
 	SpotLight(const Vector3& dir, const Vector3& pos, const Vector4& colour, float radius, float angle, float degreesDimming)
 		:PointLight(pos, colour, radius)	{
 		mAngle = angle;
-		mDirection = dir;
+		mDirection = dir.Normalised();
 		mDotProdMin = cosf((angle / 2) * (PI / 180));
 		mDimProdMin = cosf(((angle - degreesDimming) / 2) * (PI / 180));
-		mDirection = Vector3(0, 0, -1);
 		mType = Spot;
 	}
 	~SpotLight() {};
@@ -39,6 +38,11 @@ public:
 	}
 	float GetDimProdMin() const { 
 		return mDimProdMin; 
+	}
+
+	const float* GetDirectionAddress() const {
+		const float* address = &mDirection.x;
+		return address;
 	}
 
 protected:

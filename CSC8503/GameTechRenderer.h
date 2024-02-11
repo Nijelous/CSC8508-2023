@@ -51,14 +51,22 @@ namespace NCL {
 			void RenderShadowMap();
 			void RenderCamera(); 
 			void RenderSkybox();
-
+			void SetUpFBOs();
+			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
+			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
+			void LoadDefRendShaders();
+			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void CombineBuffers();
+			
 			void LoadSkybox();
 
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
-			void SendLightDataToShader(OGLShader* shader);
+			void BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix);
+			void BindSpecificLightDataToShader(Light* l);			
 			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
@@ -78,6 +86,21 @@ namespace NCL {
 
 			//Debug data storage things
 			vector<Vector3> debugLineData;
+
+			//Deferred rendering stuff
+			GLuint mGBufferFBO;
+			GLuint mGBufferColourTex;
+			GLuint mGBufferNormalTex;
+			GLuint mGBufferDepthTex;
+			GLuint mLightFBO;
+			GLuint mLightAlbedoTex;
+			GLuint mLightSpecularTex;
+			Shader* mPointLightShader;
+			Shader* mSpotLightShader;
+			Shader* mDirLightShader;
+			Shader* mCombineShader;
+			const OGLMesh* mSphereMesh;
+			OGLMesh* mQuad;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;
