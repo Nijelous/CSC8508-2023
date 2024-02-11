@@ -51,6 +51,15 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	this->playerInputs.movementButtons[1] = playerInputs.movementButtons[1];
 	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[3];
 	this->playerInputs.movementButtons[3] = playerInputs.movementButtons[3];
+
+	this->playerInputs.fwdAxis.x = playerInputs.fwdAxis.x;
+	this->playerInputs.fwdAxis.y = playerInputs.fwdAxis.y;
+	this->playerInputs.fwdAxis.z = playerInputs.fwdAxis.z;
+
+	this->playerInputs.rightAxis.x = playerInputs.rightAxis.x;
+	this->playerInputs.rightAxis.y = playerInputs.rightAxis.y;
+	this->playerInputs.rightAxis.z = playerInputs.rightAxis.z;
+	this->playerInputs.cameraYaw = playerInputs.cameraYaw;
 	
 	this-> lastId = lastId;
 	this->mouseXLook = mouseXLook;
