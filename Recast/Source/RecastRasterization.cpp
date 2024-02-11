@@ -17,6 +17,7 @@
 //
 
 #include <math.h>
+#include <iostream>
 #include "Recast.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
@@ -476,12 +477,12 @@ bool rcRasterizeTriangle(rcContext* context,
 
 bool rcRasterizeTriangles(rcContext* context,
                           const float* verts, const int /*nv*/,
-                          const int* tris, const unsigned char* triAreaIDs, const int numTris,
+                          const unsigned int* tris, const unsigned char* triAreaIDs, const int numTris,
                           rcHeightfield& heightfield, const int flagMergeThreshold)
 {
-	rcAssert(context != NULL);
+	//rcAssert(context != NULL);
 
-	rcScopedTimer timer(context, RC_TIMER_RASTERIZE_TRIANGLES);
+	//rcScopedTimer timer(context, RC_TIMER_RASTERIZE_TRIANGLES);
 	
 	// Rasterize the triangles.
 	const float inverseCellSize = 1.0f / heightfield.cs;
@@ -493,7 +494,8 @@ bool rcRasterizeTriangles(rcContext* context,
 		const float* v2 = &verts[tris[triIndex * 3 + 2] * 3];
 		if (!rasterizeTri(v0, v1, v2, triAreaIDs[triIndex], heightfield, heightfield.bmin, heightfield.bmax, heightfield.cs, inverseCellSize, inverseCellHeight, flagMergeThreshold))
 		{
-			context->log(RC_LOG_ERROR, "rcRasterizeTriangles: Out of memory.");
+			//context->log(RC_LOG_ERROR, "rcRasterizeTriangles: Out of memory.");
+			std::cout << "Recast Error: rcRasterizeTriangles Out of memory.\n";
 			return false;
 		}
 	}

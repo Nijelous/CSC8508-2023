@@ -28,9 +28,9 @@ namespace
 
 void rcFilterLowHangingWalkableObstacles(rcContext* context, const int walkableClimb, rcHeightfield& heightfield)
 {
-	rcAssert(context);
+	//rcAssert(context);
 
-	rcScopedTimer timer(context, RC_TIMER_FILTER_LOW_OBSTACLES);
+	//rcScopedTimer timer(context, RC_TIMER_FILTER_LOW_OBSTACLES);
 
 	const int xSize = heightfield.width;
 	const int zSize = heightfield.height;
@@ -66,9 +66,9 @@ void rcFilterLowHangingWalkableObstacles(rcContext* context, const int walkableC
 
 void rcFilterLedgeSpans(rcContext* context, const int walkableHeight, const int walkableClimb, rcHeightfield& heightfield)
 {
-	rcAssert(context);
+	//rcAssert(context);
 	
-	rcScopedTimer timer(context, RC_TIMER_FILTER_BORDER);
+	//rcScopedTimer timer(context, RC_TIMER_FILTER_BORDER);
 
 	const int xSize = heightfield.width;
 	const int zSize = heightfield.height;
@@ -175,8 +175,8 @@ void rcFilterLedgeSpans(rcContext* context, const int walkableHeight, const int 
 
 void rcFilterWalkableLowHeightSpans(rcContext* context, const int walkableHeight, rcHeightfield& heightfield)
 {
-	rcAssert(context);
-	rcScopedTimer timer(context, RC_TIMER_FILTER_WALKABLE);
+	//rcAssert(context);
+	//rcScopedTimer timer(context, RC_TIMER_FILTER_WALKABLE);
 
 	const int xSize = heightfield.width;
 	const int zSize = heightfield.height;

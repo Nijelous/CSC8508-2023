@@ -19,6 +19,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
+#include <iostream>
 #include "Recast.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
@@ -602,7 +603,8 @@ static bool canRemoveVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned sho
 	rcScopedDelete<int> edges((int*)rcAlloc(sizeof(int)*maxEdges*3, RC_ALLOC_TEMP));
 	if (!edges)
 	{
-		ctx->log(RC_LOG_WARNING, "canRemoveVertex: Out of memory 'edges' (%d).", maxEdges*3);
+		//ctx->log(RC_LOG_WARNING, "canRemoveVertex: Out of memory 'edges' (%d).", maxEdges*3);
+		std::cout << "Recast Warning: canRemoveVertex: Out of memory 'edges'\n";
 		return false;
 	}
 		
@@ -682,7 +684,8 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	rcScopedDelete<int> edges((int*)rcAlloc(sizeof(int)*numRemovedVerts*nvp*4, RC_ALLOC_TEMP));
 	if (!edges)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'edges' (%d).", numRemovedVerts*nvp*4);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'edges' (%d).", numRemovedVerts*nvp*4);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'edges'\n";
 		return false;
 	}
 
@@ -690,7 +693,8 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	rcScopedDelete<int> hole((int*)rcAlloc(sizeof(int)*numRemovedVerts*nvp, RC_ALLOC_TEMP));
 	if (!hole)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'hole' (%d).", numRemovedVerts*nvp);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'hole' (%d).", numRemovedVerts*nvp);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'hole'\n";
 		return false;
 	}
 
@@ -698,7 +702,8 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	rcScopedDelete<int> hreg((int*)rcAlloc(sizeof(int)*numRemovedVerts*nvp, RC_ALLOC_TEMP));
 	if (!hreg)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'hreg' (%d).", numRemovedVerts*nvp);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'hreg' (%d).", numRemovedVerts*nvp);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'hreg'\n";
 		return false;
 	}
 
@@ -706,7 +711,8 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	rcScopedDelete<int> harea((int*)rcAlloc(sizeof(int)*numRemovedVerts*nvp, RC_ALLOC_TEMP));
 	if (!harea)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'harea' (%d).", numRemovedVerts*nvp);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'harea' (%d).", numRemovedVerts*nvp);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'harea'\n";
 		return false;
 	}
 	
@@ -823,21 +829,24 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	rcScopedDelete<int> tris((int*)rcAlloc(sizeof(int)*nhole*3, RC_ALLOC_TEMP));
 	if (!tris)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'tris' (%d).", nhole*3);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'tris' (%d).", nhole*3);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'tris'\n";
 		return false;
 	}
 
 	rcScopedDelete<int> tverts((int*)rcAlloc(sizeof(int)*nhole*4, RC_ALLOC_TEMP));
 	if (!tverts)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'tverts' (%d).", nhole*4);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'tverts' (%d).", nhole*4);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'tverts'\n";
 		return false;
 	}
 
 	rcScopedDelete<int> thole((int*)rcAlloc(sizeof(int)*nhole, RC_ALLOC_TEMP));
 	if (!thole)
 	{
-		ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'thole' (%d).", nhole);
+		//ctx->log(RC_LOG_WARNING, "removeVertex: Out of memory 'thole' (%d).", nhole);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'thole'\n";
 		return false;
 	}
 
@@ -857,26 +866,30 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 	if (ntris < 0)
 	{
 		ntris = -ntris;
-		ctx->log(RC_LOG_WARNING, "removeVertex: triangulate() returned bad results.");
+		//ctx->log(RC_LOG_WARNING, "removeVertex: triangulate() returned bad results.");
+		std::cout << "Recast Warning: removeVertex: triangulate() returned bad results\n";
 	}
 	
 	// Merge the hole triangles back to polygons.
 	rcScopedDelete<unsigned short> polys((unsigned short*)rcAlloc(sizeof(unsigned short)*(ntris+1)*nvp, RC_ALLOC_TEMP));
 	if (!polys)
 	{
-		ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'polys' (%d).", (ntris+1)*nvp);
+		//ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'polys' (%d).", (ntris+1)*nvp);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'polys'\n";
 		return false;
 	}
 	rcScopedDelete<unsigned short> pregs((unsigned short*)rcAlloc(sizeof(unsigned short)*ntris, RC_ALLOC_TEMP));
 	if (!pregs)
 	{
-		ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'pregs' (%d).", ntris);
+		//ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'pregs' (%d).", ntris);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'pregs'\n";
 		return false;
 	}
 	rcScopedDelete<unsigned char> pareas((unsigned char*)rcAlloc(sizeof(unsigned char)*ntris, RC_ALLOC_TEMP));
 	if (!pareas)
 	{
-		ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'pareas' (%d).", ntris);
+		//ctx->log(RC_LOG_ERROR, "removeVertex: Out of memory 'pareas' (%d).", ntris);
+		std::cout << "Recast Warning: removeVertex: Out of memory 'pareas'\n";
 		return false;
 	}
 	
@@ -973,7 +986,8 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 		mesh.npolys++;
 		if (mesh.npolys > maxTris)
 		{
-			ctx->log(RC_LOG_ERROR, "removeVertex: Too many polygons %d (max:%d).", mesh.npolys, maxTris);
+			//ctx->log(RC_LOG_ERROR, "removeVertex: Too many polygons %d (max:%d).", mesh.npolys, maxTris);
+			std::cout << "Recast Warning: removeVertex: Too many polygons\n";
 			return false;
 		}
 	}
@@ -989,9 +1003,9 @@ static bool removeVertex(rcContext* ctx, rcPolyMesh& mesh, const unsigned short 
 /// @see rcAllocPolyMesh, rcContourSet, rcPolyMesh, rcConfig
 bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rcPolyMesh& mesh)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
-	rcScopedTimer timer(ctx, RC_TIMER_BUILD_POLYMESH);
+	//rcScopedTimer timer(ctx, RC_TIMER_BUILD_POLYMESH);
 
 	rcVcopy(mesh.bmin, cset.bmin);
 	rcVcopy(mesh.bmax, cset.bmax);
@@ -1014,14 +1028,16 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	
 	if (maxVertices >= 0xfffe)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Too many vertices %d.", maxVertices);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Too many vertices %d.", maxVertices);
+		std::cout << "Recast Error: Build PolyMesh: Too many vertices\n";
 		return false;
 	}
 		
 	rcScopedDelete<unsigned char> vflags((unsigned char*)rcAlloc(sizeof(unsigned char)*maxVertices, RC_ALLOC_TEMP));
 	if (!vflags)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'vflags' (%d).", maxVertices);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'vflags' (%d).", maxVertices);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'vflags'\n";
 		return false;
 	}
 	memset(vflags, 0, maxVertices);
@@ -1029,25 +1045,29 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	mesh.verts = (unsigned short*)rcAlloc(sizeof(unsigned short)*maxVertices*3, RC_ALLOC_PERM);
 	if (!mesh.verts)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.verts' (%d).", maxVertices);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.verts' (%d).", maxVertices);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'mesh.verts'\n";
 		return false;
 	}
 	mesh.polys = (unsigned short*)rcAlloc(sizeof(unsigned short)*maxTris*nvp*2, RC_ALLOC_PERM);
 	if (!mesh.polys)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.polys' (%d).", maxTris*nvp*2);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.polys' (%d).", maxTris*nvp*2);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'mesh.polys'\n";
 		return false;
 	}
 	mesh.regs = (unsigned short*)rcAlloc(sizeof(unsigned short)*maxTris, RC_ALLOC_PERM);
 	if (!mesh.regs)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.regs' (%d).", maxTris);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.regs' (%d).", maxTris);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'mesh.regs'\n";
 		return false;
 	}
 	mesh.areas = (unsigned char*)rcAlloc(sizeof(unsigned char)*maxTris, RC_ALLOC_PERM);
 	if (!mesh.areas)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.areas' (%d).", maxTris);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.areas' (%d).", maxTris);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'mesh.areas'\n";
 		return false;
 	}
 	
@@ -1064,7 +1084,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	rcScopedDelete<int> nextVert((int*)rcAlloc(sizeof(int)*maxVertices, RC_ALLOC_TEMP));
 	if (!nextVert)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'nextVert' (%d).", maxVertices);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'nextVert' (%d).", maxVertices);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'nextVert'\n";
 		return false;
 	}
 	memset(nextVert, 0, sizeof(int)*maxVertices);
@@ -1072,7 +1093,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	rcScopedDelete<int> firstVert((int*)rcAlloc(sizeof(int)*VERTEX_BUCKET_COUNT, RC_ALLOC_TEMP));
 	if (!firstVert)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'firstVert' (%d).", VERTEX_BUCKET_COUNT);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'firstVert' (%d).", VERTEX_BUCKET_COUNT);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'firstVert'\n";
 		return false;
 	}
 	for (int i = 0; i < VERTEX_BUCKET_COUNT; ++i)
@@ -1081,19 +1103,22 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	rcScopedDelete<int> indices((int*)rcAlloc(sizeof(int)*maxVertsPerCont, RC_ALLOC_TEMP));
 	if (!indices)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'indices' (%d).", maxVertsPerCont);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'indices' (%d).", maxVertsPerCont);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'indices'\n";
 		return false;
 	}
 	rcScopedDelete<int> tris((int*)rcAlloc(sizeof(int)*maxVertsPerCont*3, RC_ALLOC_TEMP));
 	if (!tris)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'tris' (%d).", maxVertsPerCont*3);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'tris' (%d).", maxVertsPerCont*3);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'tris'\n";
 		return false;
 	}
 	rcScopedDelete<unsigned short> polys((unsigned short*)rcAlloc(sizeof(unsigned short)*(maxVertsPerCont+1)*nvp, RC_ALLOC_TEMP));
 	if (!polys)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'polys' (%d).", maxVertsPerCont*nvp);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'polys' (%d).", maxVertsPerCont*nvp);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'polys'\n";
 		return false;
 	}
 	unsigned short* tmpPoly = &polys[maxVertsPerCont*nvp];
@@ -1124,7 +1149,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 				printf("\t\t%d,%d,%d,%d,\n", v[0], v[1], v[2], v[3]);
 			}
 			printf("\t};\n\tconst int nverts = sizeof(verts)/(sizeof(int)*4);\n");*/
-			ctx->log(RC_LOG_WARNING, "rcBuildPolyMesh: Bad triangulation Contour %d.", i);
+			//ctx->log(RC_LOG_WARNING, "rcBuildPolyMesh: Bad triangulation Contour %d.", i);
+			std::cout << "Recast Error: Build PolyMesh: Bad triangulation Contour\n";
 			ntris = -ntris;
 		}
 				
@@ -1217,7 +1243,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 			mesh.npolys++;
 			if (mesh.npolys > maxTris)
 			{
-				ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Too many polygons %d (max:%d).", mesh.npolys, maxTris);
+				//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Too many polygons %d (max:%d).", mesh.npolys, maxTris);
+				std::cout << "Recast Error: Build PolyMesh: Too many polygons\n";
 				return false;
 			}
 		}
@@ -1234,7 +1261,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 			if (!removeVertex(ctx, mesh, (unsigned short)i, maxTris))
 			{
 				// Failed to remove vertex
-				ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Failed to remove edge vertex %d.", i);
+				//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Failed to remove edge vertex %d.", i);
+				std::cout << "Recast Error: Build PolyMesh: Failed to remove edge vertex\n";
 				return false;
 			}
 			// Remove vertex
@@ -1249,7 +1277,8 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	// Calculate adjacency.
 	if (!buildMeshAdjacency(mesh.polys, mesh.npolys, mesh.nverts, nvp))
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Adjacency failed.");
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Adjacency failed.");
+		std::cout << "Recast Error: Build PolyMesh: Adjacency failed\n";
 		return false;
 	}
 	
@@ -1288,18 +1317,21 @@ bool rcBuildPolyMesh(rcContext* ctx, const rcContourSet& cset, const int nvp, rc
 	mesh.flags = (unsigned short*)rcAlloc(sizeof(unsigned short)*mesh.npolys, RC_ALLOC_PERM);
 	if (!mesh.flags)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.flags' (%d).", mesh.npolys);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: Out of memory 'mesh.flags' (%d).", mesh.npolys);
+		std::cout << "Recast Error: Build PolyMesh: Out of memory 'mesh.flags'\n";
 		return false;
 	}
 	memset(mesh.flags, 0, sizeof(unsigned short) * mesh.npolys);
 	
 	if (mesh.nverts > 0xffff)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: The resulting mesh has too many vertices %d (max %d). Data can be corrupted.", mesh.nverts, 0xffff);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: The resulting mesh has too many vertices %d (max %d). Data can be corrupted.", mesh.nverts, 0xffff);
+		std::cout << "Recast Error: Build PolyMesh: The resulting mesh has too many vertices. Data can be corrupted\n";
 	}
 	if (mesh.npolys > 0xffff)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: The resulting mesh has too many polygons %d (max %d). Data can be corrupted.", mesh.npolys, 0xffff);
+		//ctx->log(RC_LOG_ERROR, "rcBuildPolyMesh: The resulting mesh has too many polygons %d (max %d). Data can be corrupted.", mesh.npolys, 0xffff);
+		std::cout << "Recast Error: Build PolyMesh: The resulting mesh has too many polygons. Data can be corrupted\n";
 	}
 	
 	return true;

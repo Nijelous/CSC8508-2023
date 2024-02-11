@@ -21,6 +21,7 @@
 #include "RecastAssert.h"
 
 #include <string.h> // for memcpy and memset
+#include <iostream>
 
 /// Sorts the given data in-place using insertion sort.
 ///
@@ -74,19 +75,20 @@ static bool pointInPoly(int numVerts, const float* verts, const float* point)
 
 bool rcErodeWalkableArea(rcContext* context, const int erosionRadius, rcCompactHeightfield& compactHeightfield)
 {
-	rcAssert(context != NULL);
+	//rcAssert(context != NULL);
 
 	const int xSize = compactHeightfield.width;
 	const int zSize = compactHeightfield.height;
 	const int& zStride = xSize; // For readability
 
-	rcScopedTimer timer(context, RC_TIMER_ERODE_AREA);
+	//rcScopedTimer timer(context, RC_TIMER_ERODE_AREA);
 
 	unsigned char* distanceToBoundary = (unsigned char*)rcAlloc(sizeof(unsigned char) * compactHeightfield.spanCount,
 	                                                            RC_ALLOC_TEMP);
 	if (!distanceToBoundary)
 	{
-		context->log(RC_LOG_ERROR, "erodeWalkableArea: Out of memory 'dist' (%d).", compactHeightfield.spanCount);
+		//context->log(RC_LOG_ERROR, "erodeWalkableArea: Out of memory 'dist' (%d).", compactHeightfield.spanCount);
+		std::cout << "Recast Error: Erode: Out of memory 'dist'\n";
 		return false;
 	}
 	memset(distanceToBoundary, 0xff, sizeof(unsigned char) * compactHeightfield.spanCount);

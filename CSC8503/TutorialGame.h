@@ -15,7 +15,6 @@ namespace NCL {
 	namespace CSC8503 {
 		class PlayerObject;
 		class LevelManager;
-		class RecastBuilder;
 		class TutorialGame		{
 		public:
 			TutorialGame();
@@ -81,7 +80,6 @@ namespace NCL {
 			
 
 			LevelManager* mLevelManager;
-			RecastBuilder* mBuilder;
 
 			KeyboardMouseController controller;
 

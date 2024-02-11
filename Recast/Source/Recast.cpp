@@ -20,6 +20,7 @@
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
 
+#include <iostream>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -335,7 +336,7 @@ static void calcTriNormal(const float* v0, const float* v1, const float* v2, flo
 
 void rcMarkWalkableTriangles(rcContext* context, const float walkableSlopeAngle,
                              const float* verts, const int numVerts,
-                             const int* tris, const int numTris,
+                             const unsigned int* tris, const int numTris,
                              unsigned char* triAreaIDs)
 {
 	rcIgnoreUnused(context);
@@ -347,7 +348,7 @@ void rcMarkWalkableTriangles(rcContext* context, const float walkableSlopeAngle,
 
 	for (int i = 0; i < numTris; ++i)
 	{
-		const int* tri = &tris[i * 3];
+		const unsigned int* tri = &tris[i * 3];
 		calcTriNormal(&verts[tri[0] * 3], &verts[tri[1] * 3], &verts[tri[2] * 3], norm);
 		// Check if the face is walkable.
 		if (norm[1] > walkableThr)
@@ -403,9 +404,9 @@ int rcGetHeightFieldSpanCount(rcContext* context, const rcHeightfield& heightfie
 bool rcBuildCompactHeightfield(rcContext* context, const int walkableHeight, const int walkableClimb,
                                const rcHeightfield& heightfield, rcCompactHeightfield& compactHeightfield)
 {
-	rcAssert(context);
+	//rcAssert(context);
 
-	rcScopedTimer timer(context, RC_TIMER_BUILD_COMPACTHEIGHTFIELD);
+	//rcScopedTimer timer(context, RC_TIMER_BUILD_COMPACTHEIGHTFIELD);
 
 	const int xSize = heightfield.width;
 	const int zSize = heightfield.height;
@@ -426,21 +427,24 @@ bool rcBuildCompactHeightfield(rcContext* context, const int walkableHeight, con
 	compactHeightfield.cells = (rcCompactCell*)rcAlloc(sizeof(rcCompactCell) * xSize * zSize, RC_ALLOC_PERM);
 	if (!compactHeightfield.cells)
 	{
-		context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.cells' (%d)", xSize * zSize);
+		std::cout << "Recast Error: Compact Heightfield: Out of memory 'compHF.cells'\n";
+		//context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.cells' (%d)", xSize * zSize);
 		return false;
 	}
 	memset(compactHeightfield.cells, 0, sizeof(rcCompactCell) * xSize * zSize);
 	compactHeightfield.spans = (rcCompactSpan*)rcAlloc(sizeof(rcCompactSpan) * spanCount, RC_ALLOC_PERM);
 	if (!compactHeightfield.spans)
 	{
-		context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.spans' (%d)", spanCount);
+		std::cout << "Recast Error: Compact Heightfield: Out of memory 'compHF.spans'\n";
+		//context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.spans' (%d)", spanCount);
 		return false;
 	}
 	memset(compactHeightfield.spans, 0, sizeof(rcCompactSpan) * spanCount);
 	compactHeightfield.areas = (unsigned char*)rcAlloc(sizeof(unsigned char) * spanCount, RC_ALLOC_PERM);
 	if (!compactHeightfield.areas)
 	{
-		context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.areas' (%d)", spanCount);
+		std::cout << "Recast Error: Compact Heightfield: Out of memory 'compHF.areas'\n";
+		//context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Out of memory 'chf.areas' (%d)", spanCount);
 		return false;
 	}
 	memset(compactHeightfield.areas, RC_NULL_AREA, sizeof(unsigned char) * spanCount);
@@ -534,8 +538,9 @@ bool rcBuildCompactHeightfield(rcContext* context, const int walkableHeight, con
 
 	if (maxLayerIndex > MAX_LAYERS)
 	{
-		context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Heightfield has too many layers %d (max: %d)",
-		         maxLayerIndex, MAX_LAYERS);
+		std::cout << "Recast Error: Compact Heightfield: Heightfield has too many layers\n";
+		//context->log(RC_LOG_ERROR, "rcBuildCompactHeightfield: Heightfield has too many layers %d (max: %d)",
+		//         maxLayerIndex, MAX_LAYERS);
 	}
 
 	return true;

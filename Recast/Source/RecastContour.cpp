@@ -20,6 +20,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include "Recast.h"
 #include "RecastAlloc.h"
 #include "RecastAssert.h"
@@ -733,7 +734,8 @@ static void mergeRegionHoles(rcContext* ctx, rcContourRegion& region)
 	rcScopedDelete<rcPotentialDiagonal> diags((rcPotentialDiagonal*)rcAlloc(sizeof(rcPotentialDiagonal)*maxVerts, RC_ALLOC_TEMP));
 	if (!diags)
 	{
-		ctx->log(RC_LOG_WARNING, "mergeRegionHoles: Failed to allocated diags %d.", maxVerts);
+		//ctx->log(RC_LOG_WARNING, "mergeRegionHoles: Failed to allocated diags %d.", maxVerts);
+		std::cout << "Recast Warning: mergeRegionHoles: Failed to allocate diags\n";
 		return;
 	}
 	
@@ -795,12 +797,14 @@ static void mergeRegionHoles(rcContext* ctx, rcContourRegion& region)
 		
 		if (index == -1)
 		{
-			ctx->log(RC_LOG_WARNING, "mergeHoles: Failed to find merge points for %p and %p.", region.outline, hole);
+			//ctx->log(RC_LOG_WARNING, "mergeHoles: Failed to find merge points for %p and %p.", region.outline, hole);
+			std::cout << "Recast Warning: mergeHoles: Failed to find merge points\n";
 			continue;
 		}
 		if (!mergeContours(*region.outline, *hole, index, bestVertex))
 		{
-			ctx->log(RC_LOG_WARNING, "mergeHoles: Failed to merge contours %p and %p.", region.outline, hole);
+			//ctx->log(RC_LOG_WARNING, "mergeHoles: Failed to merge contours %p and %p.", region.outline, hole);
+			std::cout << "Recast Warning: mergeHoles: Failed to find merge contours\n";
 			continue;
 		}
 	}
@@ -824,13 +828,13 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 					 const float maxError, const int maxEdgeLen,
 					 rcContourSet& cset, const int buildFlags)
 {
-	rcAssert(ctx);
+	//rcAssert(ctx);
 	
 	const int w = chf.width;
 	const int h = chf.height;
 	const int borderSize = chf.borderSize;
 	
-	rcScopedTimer timer(ctx, RC_TIMER_BUILD_CONTOURS);
+	//rcScopedTimer timer(ctx, RC_TIMER_BUILD_CONTOURS);
 	
 	rcVcopy(cset.bmin, chf.bmin);
 	rcVcopy(cset.bmax, chf.bmax);
@@ -859,11 +863,12 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 	rcScopedDelete<unsigned char> flags((unsigned char*)rcAlloc(sizeof(unsigned char)*chf.spanCount, RC_ALLOC_TEMP));
 	if (!flags)
 	{
-		ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'flags' (%d).", chf.spanCount);
+		//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'flags' (%d).", chf.spanCount);
+		std::cout << "Recast Error: Build Contour: Out of memory 'flags'\n";
 		return false;
 	}
 	
-	ctx->startTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
+	//ctx->startTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
 	
 	// Mark boundaries.
 	for (int y = 0; y < h; ++y)
@@ -898,7 +903,7 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 		}
 	}
 	
-	ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
+	//ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
 	
 	rcIntArray verts(256);
 	rcIntArray simplified(64);
@@ -923,14 +928,14 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 				verts.clear();
 				simplified.clear();
 				
-				ctx->startTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
+				//ctx->startTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
 				walkContour(x, y, i, chf, flags, verts);
-				ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
+				//ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_TRACE);
 				
-				ctx->startTimer(RC_TIMER_BUILD_CONTOURS_SIMPLIFY);
+				//ctx->startTimer(RC_TIMER_BUILD_CONTOURS_SIMPLIFY);
 				simplifyContour(verts, simplified, maxError, maxEdgeLen, buildFlags);
 				removeDegenerateSegments(simplified);
-				ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_SIMPLIFY);
+				//ctx->stopTimer(RC_TIMER_BUILD_CONTOURS_SIMPLIFY);
 				
 				
 				// Store region->contour remap info.
@@ -954,7 +959,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 						rcFree(cset.conts);
 						cset.conts = newConts;
 						
-						ctx->log(RC_LOG_WARNING, "rcBuildContours: Expanding max contours from %d to %d.", oldMax, maxContours);
+						//ctx->log(RC_LOG_WARNING, "rcBuildContours: Expanding max contours from %d to %d.", oldMax, maxContours);
+						std::cout << "Recast Warning: Build Contours: Expanding max contours\n";
 					}
 					
 					rcContour* cont = &cset.conts[cset.nconts++];
@@ -963,7 +969,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 					cont->verts = (int*)rcAlloc(sizeof(int)*cont->nverts*4, RC_ALLOC_PERM);
 					if (!cont->verts)
 					{
-						ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'verts' (%d).", cont->nverts);
+						//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'verts' (%d).", cont->nverts);
+						std::cout << "Recast Error: Build PolyMesh: Out of memory 'verts'\n";
 						return false;
 					}
 					memcpy(cont->verts, &simplified[0], sizeof(int)*cont->nverts*4);
@@ -982,7 +989,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 					cont->rverts = (int*)rcAlloc(sizeof(int)*cont->nrverts*4, RC_ALLOC_PERM);
 					if (!cont->rverts)
 					{
-						ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'rverts' (%d).", cont->nrverts);
+						//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'rverts' (%d).", cont->nrverts);
+						std::cout << "Recast Error: Build PolyMesh: Out of memory 'rverts'\n";
 						return false;
 					}
 					memcpy(cont->rverts, &verts[0], sizeof(int)*cont->nrverts*4);
@@ -1011,7 +1019,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 		rcScopedDelete<signed char> winding((signed char*)rcAlloc(sizeof(signed char)*cset.nconts, RC_ALLOC_TEMP));
 		if (!winding)
 		{
-			ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'hole' (%d).", cset.nconts);
+			//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'hole' (%d).", cset.nconts);
+			std::cout << "Recast Error: Build PolyMesh: Out of memory 'hole'\n";
 			return false;
 		}
 		int nholes = 0;
@@ -1032,7 +1041,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 			rcScopedDelete<rcContourRegion> regions((rcContourRegion*)rcAlloc(sizeof(rcContourRegion)*nregions, RC_ALLOC_TEMP));
 			if (!regions)
 			{
-				ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'regions' (%d).", nregions);
+				//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'regions' (%d).", nregions);
+				std::cout << "Recast Error: Build PolyMesh: Out of memory 'regions'\n";
 				return false;
 			}
 			memset(regions, 0, sizeof(rcContourRegion)*nregions);
@@ -1040,7 +1050,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 			rcScopedDelete<rcContourHole> holes((rcContourHole*)rcAlloc(sizeof(rcContourHole)*cset.nconts, RC_ALLOC_TEMP));
 			if (!holes)
 			{
-				ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'holes' (%d).", cset.nconts);
+				//ctx->log(RC_LOG_ERROR, "rcBuildContours: Out of memory 'holes' (%d).", cset.nconts);
+				std::cout << "Recast Error: Build PolyMesh: Out of memory 'holes'\n";
 				return false;
 			}
 			memset(holes, 0, sizeof(rcContourHole)*cset.nconts);
@@ -1051,8 +1062,10 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 				// Positively would contours are outlines, negative holes.
 				if (winding[i] > 0)
 				{
-					if (regions[cont.reg].outline)
-						ctx->log(RC_LOG_ERROR, "rcBuildContours: Multiple outlines for region %d.", cont.reg);
+					if (regions[cont.reg].outline) {
+						//ctx->log(RC_LOG_ERROR, "rcBuildContours: Multiple outlines for region %d.", cont.reg);
+						std::cout << "Recast Error: Build PolyMesh: Multiple outlines for region\n";
+					}
 					regions[cont.reg].outline = &cont;
 				}
 				else
@@ -1093,7 +1106,8 @@ bool rcBuildContours(rcContext* ctx, const rcCompactHeightfield& chf,
 					// The region does not have an outline.
 					// This can happen if the contour becaomes selfoverlapping because of
 					// too aggressive simplification settings.
-					ctx->log(RC_LOG_ERROR, "rcBuildContours: Bad outline for region %d, contour simplification is likely too aggressive.", i);
+					//ctx->log(RC_LOG_ERROR, "rcBuildContours: Bad outline for region %d, contour simplification is likely too aggressive.", i);
+					std::cout << "Recast Error: Build PolyMesh: Bad outline for region, contour simplification is likely too aggressive\n";
 				}
 			}
 		}

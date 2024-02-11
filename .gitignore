@@ -59,8 +59,11 @@ Detour/Debug
 Detour/Detour.dir
 Recast/Debug
 Recast/Recast.dir
+DetourTileCache/Debug
+DetourTileCache/DetourTileCache.dir
 
 DebugUtils/DebugUtils.vcxproj.filters
 Detour/Detour.vcxproj.filters
 INSTALL.vcxproj.filters
 Recast/Recast.vcxproj.filters
+DetourTileCache/DetourTileCache.vcxproj.filters
