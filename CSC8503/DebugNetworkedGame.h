@@ -19,6 +19,8 @@ namespace NCL{
         public:
             DebugNetworkedGame();
             ~DebugNetworkedGame();
+            
+            bool GetIsServer() const;
 
             void StartAsServer();
             void StartAsClient(char a, char b, char c, char d);
@@ -37,9 +39,9 @@ namespace NCL{
             GameServer* GetServer() const;
 
         protected:
-            bool isClientConnectedToServer = false;
-            bool isGameStarted = false;
+            bool mIsGameStarted = false;
             bool mIsGameFinished = false;
+            bool mIsServer = false;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);
@@ -64,6 +66,8 @@ namespace NCL{
             void HandleFullPacket(FullPacket* fullPacket);
 
             void HandleDeltaPacket(DeltaPacket* deltaPacket);
+
+            void HandleClientPlayerInputPacket(ClientPlayerInputPacket* clientPlayerInputPacket, int playerPeerId);
 
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
