@@ -2,9 +2,11 @@
 #include <functional>
 #include <random>
 #include <map>
+#include "Level.h"
+
+using namespace NCL::CSC8503;
 
 namespace InventoryBuffSystem {
-		const int MAX_PLAYERS = 4;
 	class PlayerBuffs
 	{
 	public:
@@ -72,7 +74,7 @@ namespace InventoryBuffSystem {
 			},
 		};
 
-		std::map<buff, float> mActiveBuffDurationMap[MAX_PLAYERS];
+		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
 
 
 	};

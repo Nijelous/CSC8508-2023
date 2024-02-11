@@ -2,10 +2,11 @@
 #include "SuspicionMetre.h"
 #include <vector>
 
-const int DT_UNTIL_GlOBAL_RECOVERY = 8;
 
 namespace SuspicionSystem
 {
+    const int DT_UNTIL_GlOBAL_RECOVERY = 8;
+
     class GlobalSuspicionMetre :
         public SuspicionMetre
     {

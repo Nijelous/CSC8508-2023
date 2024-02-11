@@ -1,10 +1,12 @@
 #include "PlayerBuffs.h"
+#include "Level.h"
 
 using namespace InventoryBuffSystem;
+using namespace NCL::CSC8503;
 
 void PlayerBuffs::Init()
 {
-	for (int playerNo = 0; playerNo < MAX_PLAYERS; playerNo++)
+	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 		mActiveBuffDurationMap[playerNo].clear();
 
 	mBuffsInRandomPool =
@@ -43,7 +45,7 @@ PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed)
 
 void PlayerBuffs::Update(float dt)
 {
-	for (int playerNo = 0; playerNo < MAX_PLAYERS; playerNo++)
+	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 	{
 		for (auto entry = mActiveBuffDurationMap[playerNo].begin();
 			entry != mActiveBuffDurationMap[playerNo].end(); ++entry)

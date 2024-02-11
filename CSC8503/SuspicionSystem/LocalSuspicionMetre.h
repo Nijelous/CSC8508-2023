@@ -2,12 +2,13 @@
 #include "SuspicionMetre.h"
 #include "GlobalSuspicionMetre.h"
 #include <vector>
+#include "Level.h"
 
-const int MAX_PLAYERS = 4;
-const float DT_UNTIL_LOCAL_RECOVERY = 5;
+using namespace NCL::CSC8503;
 
 namespace SuspicionSystem
 {
+    const float DT_UNTIL_LOCAL_RECOVERY = 5;
     class LocalSuspicionMetre :
         public SuspicionMetre
     {
@@ -55,11 +56,11 @@ namespace SuspicionSystem
             {guardsLOS, 3}, {cameraLOS, 3}
         };
 
-        float mPlayerMeters[MAX_PLAYERS];
-        float mRecoveryCooldowns[MAX_PLAYERS];
+        float mPlayerMeters[NCL::CSC8503::MAX_PLAYERS];
+        float mRecoveryCooldowns[NCL::CSC8503::MAX_PLAYERS];
         GlobalSuspicionMetre* mGlobalSusMeterPTR = nullptr;
 
-        std::vector<activeLocalSusCause> mActiveLocalSusCauseVector[MAX_PLAYERS];
+        std::vector<activeLocalSusCause> mActiveLocalSusCauseVector[NCL::CSC8503::MAX_PLAYERS];
 
         void ChangePlayerLocalSusMetre(int playerNo, float ammount);
     };
