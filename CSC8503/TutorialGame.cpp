@@ -478,7 +478,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
-
+	tempPlayer->SetActive();
 	return tempPlayer;
 }
 
