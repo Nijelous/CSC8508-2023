@@ -9,6 +9,7 @@
 #include "OrientationConstraint.h"
 #include "StateGameObject.h"
 #include "PlayerObject.h"
+#include "LevelManager.h"
 
 #include <irrKlang.h>
 using namespace NCL;
@@ -339,7 +340,12 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
+	//mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
+
+	//AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
+
 	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+  
 	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);

@@ -114,7 +114,7 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case RoomList:
-		level->mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = Room((int)keyValuePairs[1]["type"]);
+		level->mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = new Room((int)keyValuePairs[1]["type"]);
 		break;
 
 	case GuardCount:

@@ -1,16 +1,24 @@
 #include "GlobalSuspicionMetre.h"
 #include <algorithm>
 
+using namespace SuspicionSystem;
+
+void SuspicionSystem::GlobalSuspicionMetre::Init()
+{
+    mGlobalSusMeter = 0;
+    mGlobalRecoveryCooldown = 0;
+}
+
 void GlobalSuspicionMetre::AddInstantGlobalSusCause(instantGlobalSusCause inCause)
 {
     ChangePlayerGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
 }
 
-bool GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause)
+void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause)
 {
-    auto* foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
+    auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
-    if (*foundCause == mContinuousGlobalSusCauseVector.end())
+    if (foundCause == mContinuousGlobalSusCauseVector.end())
     {
         mContinuousGlobalSusCauseVector.push_back(inCause);
     }
@@ -18,9 +26,9 @@ bool GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause 
 
 void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause)
 {
-    auto* foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
+    auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
-    if (*foundCause != mContinuousGlobalSusCauseVector.end())
+    if (foundCause != mContinuousGlobalSusCauseVector.end())
     {
         mContinuousGlobalSusCauseVector.erase(foundCause);
     }
