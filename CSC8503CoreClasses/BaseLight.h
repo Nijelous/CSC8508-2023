@@ -34,6 +34,5 @@ public:
 
 protected:
 	Vector4 mColour;
-	Vector4 mIntensity;
 	Type mType;
 };

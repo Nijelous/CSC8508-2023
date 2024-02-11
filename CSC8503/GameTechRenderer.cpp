@@ -58,6 +58,9 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 		}		
 	}
 
+	DirectionLight* dLight = new DirectionLight({0.2,-0.7,0.3}, {0.1,0.1,0.1,1}, 200, {0,50,0});
+	AddLight(dLight);
+
 	//Skybox!
 	skyboxShader = new OGLShader("skybox.vert", "skybox.frag");
 	skyboxMesh = new OGLMesh();
@@ -167,7 +170,7 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
-	//RenderShadowMap();
+	RenderShadowMap();
 	RenderCamera();
 	RenderSkybox();
 	
@@ -370,7 +373,7 @@ void GameTechRenderer::DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix
 	
 	for (int i = 0; i < mLights.size(); i++) {
 		BindSpecificLightDataToShader(mLights[i]);
-		BindMesh(*mSphereMesh);
+		 BindMesh(*mSphereMesh);
 		DrawBoundMesh();
 	}
 
@@ -686,7 +689,20 @@ void GameTechRenderer::SendPointLightDataToShader(OGLShader* shader, PointLight*
 }
 
 void GameTechRenderer::SendDirLightDataToShader(OGLShader* shader, DirectionLight* l) {
+	BindShader(*shader);
+	int lightColourLocation = 0;
+	int dirLightDirectionLocation = 0;
+	int lightRadiusLocation = 0;
+	int dirCentreLocation = 0;
 
+	dirCentreLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
+	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
+	dirLightDirectionLocation = glGetUniformLocation(shader->GetProgramID(), "lightDirection");
+	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
+	glUniform3fv(dirLightDirectionLocation, 1, l->GetDirectionAddress());
+	glUniform4fv(lightColourLocation, 1, l->GetColourAddress());
+	glUniform1f(lightRadiusLocation, l->GetRadius());
+	glUniform3fv(dirCentreLocation, 1, l->GetCentreAddress());
 }
 
 void GameTechRenderer::SendSpotLightDataToShader(OGLShader* shader, SpotLight* l) {
