@@ -9,15 +9,15 @@
 #include "AnimationSystem.h"
 
 #include "StateGameObject.h"
-#include "GuardObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
 		class PlayerObject;
+		class GuardObject;
 		class LevelManager;
 		class TutorialGame		{
 		public:
-			TutorialGame();
+			TutorialGame(bool isInitingAssets = true);
 			~TutorialGame();
 
 			virtual void UpdateGame(float dt);
@@ -26,6 +26,7 @@ namespace NCL {
 		
 		protected:
 			virtual void InitialiseAssets();
+			virtual void LoadAssetFiles();
 
 			void InitCamera();
 			void UpdateKeys();

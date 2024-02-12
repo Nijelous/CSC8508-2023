@@ -1,4 +1,7 @@
 #include "GameClient.h"
+
+#include "NetworkObject.h"
+#include "../CSC8503/NetworkPlayer.h"
 #include "./enet/enet.h"
 using namespace NCL;
 using namespace CSC8503;
@@ -57,6 +60,11 @@ bool GameClient::UpdateClient() {
 		return false;
 	}
 	return true;
+}
+
+void GameClient::WriteAndSendClientInputPacket(int lastId, const PlayerInputs& playerInputs){
+	ClientPlayerInputPacket packet(lastId, playerInputs);
+	this->SendPacket(packet);
 }
 
 void GameClient::SendPacket(GamePacket&  payload) {
