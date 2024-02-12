@@ -49,12 +49,12 @@ void RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
 			verts[vCount++] = (vertsVector[j].x * objects[i]->GetTransform().GetScale().x) + objects[i]->GetTransform().GetPosition().x;
 			verts[vCount++] = (vertsVector[j].y * objects[i]->GetTransform().GetScale().y) + objects[i]->GetTransform().GetPosition().y;
 			verts[vCount++] = (vertsVector[j].z * objects[i]->GetTransform().GetScale().z) + objects[i]->GetTransform().GetPosition().z;
-			bmin[0] = std::min(bmin[0], verts[vCount - 3]);
-			bmin[1] = std::min(bmin[1], verts[vCount - 2]);
-			bmin[2] = std::min(bmin[2], verts[vCount - 1]);
-			bmax[0] = std::max(bmax[0], verts[vCount - 3]);
-			bmax[1] = std::max(bmax[1], verts[vCount - 2]);
-			bmax[2] = std::max(bmax[2], verts[vCount - 1]);
+			bmin[0] = std::min(bmin[x], verts[vCount + (x-3)]);
+			bmin[1] = std::min(bmin[y], verts[vCount + (y-3)]);
+			bmin[2] = std::min(bmin[z], verts[vCount + (z-3)]);
+			bmax[0] = std::max(bmax[x], verts[vCount + (x-3)]);
+			bmax[1] = std::max(bmax[y], verts[vCount + (y-3)]);
+			bmax[2] = std::max(bmax[z], verts[vCount + (z-3)]);
 		}
 
 		std::vector<unsigned int> trisVector = objects[i]->GetRenderObject()->GetMesh()->GetIndexData();
@@ -80,16 +80,16 @@ bool RecastBuilder::InitialiseConfig(const float* bmin, const float* bmax) {
 	mConfig.cs = mCellSize;
 	mConfig.ch = mCellHeight;
 	mConfig.walkableSlopeAngle = mGuardMaxSlope;
-	mConfig.walkableHeight = (int)ceilf(mGuardHeight / mConfig.ch);
-	mConfig.walkableClimb = (int)floorf(mGuardMaxClimb / mConfig.ch);
-	mConfig.walkableRadius = (int)ceilf(mGuardRadius / mConfig.cs);
-	mConfig.maxEdgeLen = (int)(mMaxEdgeLength / mCellSize);
+	mConfig.walkableHeight = mConfig.ch != 0 ? (int)ceilf(mGuardHeight / mConfig.ch) : 0;
+	mConfig.walkableClimb = mConfig.ch != 0 ? (int)floorf(mGuardMaxClimb / mConfig.ch) : 0;
+	mConfig.walkableRadius = mConfig.cs != 0 ? (int)ceilf(mGuardRadius / mConfig.cs) : 0;
+	mConfig.maxEdgeLen = mConfig.cs != 0 ? (int)(mMaxEdgeLength / mConfig.cs) : 0;
 	mConfig.maxSimplificationError = mMaxEdgeError;
 	mConfig.minRegionArea = (int)rcSqr(mMinRegionSize);		// Note: area = size*size
 	mConfig.mergeRegionArea = (int)rcSqr(mMergedRegionSize);	// Note: area = size*size
 	mConfig.maxVertsPerPoly = mVertsPerPoly;
-	mConfig.detailSampleDist = mSampleDistance < 0.9f ? 0 : mCellSize * mSampleDistance;
-	mConfig.detailSampleMaxError = mCellHeight * mMaxSampleError;
+	mConfig.detailSampleDist = mSampleDistance < 0.9f ? 0 : mConfig.cs * mSampleDistance;
+	mConfig.detailSampleMaxError = mConfig.ch * mMaxSampleError;
 
 	rcVcopy(mConfig.bmin, bmin);
 	rcVcopy(mConfig.bmax, bmax);

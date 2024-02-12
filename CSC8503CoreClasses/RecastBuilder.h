@@ -24,6 +24,9 @@ namespace NCL {
 			SAMPLE_POLYFLAGS_DISABLED = 0x10,	// Disabled polygon
 			SAMPLE_POLYFLAGS_ALL = 0xffff		// All abilities.
 		};
+		constexpr int x = 0;
+		constexpr int y = 1;
+		constexpr int z = 2;
 		class RecastBuilder {
 		public:
 			RecastBuilder();

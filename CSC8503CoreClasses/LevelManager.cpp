@@ -31,6 +31,10 @@ LevelManager::~LevelManager() {
 		delete(mLevelList[i]);
 	}
 	mLevelList.clear();
+	for (int i = 0; i < mLevelLayout.size(); i++) {
+		delete(mLevelLayout[i]);
+	}
+	mLevelLayout.clear();
 }
 
 void LevelManager::LoadLevel(int id, GameWorld* world, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader) {
