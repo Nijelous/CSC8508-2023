@@ -67,7 +67,7 @@ void GameManager::UpdateGame(float dt) {
 		DisplayVictory();
 
 	if (mGameState == DefeatScreenState)
-		DisplayVictory();
+		DisplayDefeat();
 
 	if ((mUpdatableObjects.size() > 0) && mGameState == LevelState) {
 		for (GameObject* obj : mUpdatableObjects) {
