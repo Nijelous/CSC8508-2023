@@ -1,0 +1,7 @@
+﻿  Building Custom Rule C:/Users/c3012795/TeamProject/CSC8508-2023/DebugUtils/CMakeLists.txt
+  DebugDraw.cpp
+  DetourDebugDraw.cpp
+  RecastDebugDraw.cpp
+  RecastDump.cpp
+  Generating Code...
+  DebugUtils.vcxproj -> C:\Users\c3012795\TeamProject\CSC8508-2023\DebugUtils\Debug\DebugUtils-d.lib

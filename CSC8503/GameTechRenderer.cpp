@@ -136,7 +136,10 @@ void GameTechRenderer::RenderFrame() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	NewRenderLines();
 	NewRenderText();
-	RenderIcons();
+	const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
+	for (const auto& i : icons) {
+		RenderIcons(i);
+	}
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -342,56 +345,67 @@ void GameTechRenderer::NewRenderLines() {
 	glBindVertexArray(0);
 }
 
-void GameTechRenderer::RenderIcons() {
-	const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
+void GameTechRenderer::RenderIcons(UI::Icon i) {
+	/*const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
 	if (icons.empty()) {
 		return;
-	}
+	}*/
 
 	BindShader(*iconShader);
 
-	int iconVertCount = 0;
+	int iconVertCount = 6;
 
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	for (const auto& i : icons) {
-		OGLTexture* t = (OGLTexture*)i.texture;
-		//glActiveTexture(GL_TEXTURE0);
-		//glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-		BindTextureToShader(*t, "iconTex", t->GetObjectID());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		//glBindTexture(GL_TEXTURE_2D, 0);
+	//for (const auto& i : icons) {
+	//	OGLTexture* t = (OGLTexture*)i.texture;
+	//	//glActiveTexture(GL_TEXTURE0);
+	//	//glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
+	//	BindTextureToShader(*t, "iconTex", t->GetObjectID());
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	//	//glBindTexture(GL_TEXTURE_2D, 0);
 
-		iconVertCount += 6;
-		UI::BuildVerticesForIcon(icons.size(), i.position, i.length, i.height, UIiconPos, UIiconUVs);
+	//	iconVertCount += 6;
+	//	UI::BuildVerticesForIcon(icons.size(), i.position, i.length, i.height, UIiconPos, UIiconUVs);
 
-		bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
-		glUniform1i(texSlot, i.isAppear);
+	//	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
+	//	glUniform1i(texSlot, i.isAppear);
 
-		Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-		//0.02, 0, 0, 0
-		//0, 0.02, 0, 0
-		//0, 0, -1, 0;
-		//-1, 1, 0, 1
+	//}
 
-		int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
-		glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
+	OGLTexture* t = (OGLTexture*)i.texture;
+	BindTextureToShader(*t, "iconTex", t->GetObjectID());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-		SetUIiconBufferSizes(iconVertCount);
+	UI::BuildVerticesForIcon(1, i.position, i.length, i.height, UIiconPos, UIiconUVs);
 
-		glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector3), UIiconPos.data());
-		glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector2), UIiconUVs.data());
+	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
+	glUniform1i(texSlot, i.isAppear);
 
-		glEnable(GL_BLEND);
+	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
+	//0.02, 0, 0, 0
+	//0, 0.02, 0, 0
+	//0, 0, -1, 0;
+	//-1, 1, 0, 1
 
-		glBindVertexArray(iconVAO);
-		glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
-		glBindVertexArray(0);
-	}
+	int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
+	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
+
+	SetUIiconBufferSizes(iconVertCount);
+
+	glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector3), UIiconPos.data());
+	glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector2), UIiconUVs.data());
+
+	glEnable(GL_BLEND);
+
+	glBindVertexArray(iconVAO);
+	glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
+	glBindVertexArray(0);
 
 	//Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	////0.02, 0, 0, 0

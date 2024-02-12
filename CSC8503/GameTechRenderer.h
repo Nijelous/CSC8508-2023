@@ -13,6 +13,8 @@
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 
+#include "UI.h"
+
 
 
 
@@ -40,7 +42,7 @@ namespace NCL {
 			void NewRenderLines();
 			void NewRenderText();
 
-			void RenderIcons();
+			void RenderIcons(UI::Icon icon);
 			
 
 			void RenderFrame()	override;

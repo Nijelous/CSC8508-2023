@@ -343,10 +343,10 @@ void TutorialGame::InitWorld() {
 	AddPlayerToWorld(Vector3(100,-17,100), "Player");
 	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
-	UI::CreateInevntorySlot(Vector2(90, 90), 3, 5, iconTest, false);
-	UI::CreateInevntorySlot(Vector2(85, 90), 3, 5, iconTest2);
-	UI::CreateInevntorySlot(Vector2(90, 80), 3, 5, iconTest, false);
-
+	UI::Icon icon1 = UI::AddIcon(Vector2(90, 90), 3, 5, iconTest, false);
+	UI::Icon icon2 = UI::AddIcon(Vector2(85, 90), 3, 5, iconTest2);
+	UI::Icon icon3 = UI::AddIcon(Vector2(90, 80), 3, 5, iconTest);
+	UI::DeleteIcon(icon2);
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
