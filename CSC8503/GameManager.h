@@ -35,8 +35,9 @@ namespace NCL {
 			void SetVictory() { mGameState = VictoryScreenState; }
 			void SetDefeat() { mGameState = DefeatScreenState; }
 
+			// to be repalced by actual game logic
 			bool PlayerWonGame() { return false; }
-			bool PLayerLostGame() { return true; }
+			bool PLayerLostGame() { return false; }
 
 			void CreateLevel();
 

@@ -129,23 +129,25 @@ void GameManager::CreateLevel() {
 }
 
 void GameManager::DisplayMainMenu() {
+	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	Debug::Print("WELCOME TO MY GAME", Vector2(35, 50), Debug::BLACK);
-	Debug::Print("PRESS SPACE TO PLAY SINGLEPLAYER", Vector2(20, 55), Debug::BLACK);
-	Debug::Print("PRESS BACKSPACE TO PLAY MULTIPLAYER", Vector2(17, 60), Debug::BLACK);
+	std::cout << "WELCOME" << std::endl;
+	std::cout << "PRESS SPACE TO PLAY" << std::endl;
 }
 
 void GameManager::DisplayVictory() {
+	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	Debug::Print("VICTORY!!!!!!!", Vector2(35, 50), Debug::BLACK);
+	std::cout << "VICTORY!!!!!!!" << std::endl;
 }
 
 void GameManager::DisplayDefeat() {
+	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	Debug::Print("defeat :(((((((", Vector2(35, 50), Debug::BLACK);
+	std::cout << "defeat :(((((((" << std::endl;
 }
 
 PlayerObject* GameManager::AddPlayerToWorld(const Vector3 position, const std::string& playerName) {
