@@ -89,7 +89,7 @@ namespace NCL {
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
 			MeshMaterial* mMaterial;
-			vector<GLuint>  mMatTextures;
+			vector<GLuint*>  mMatTextures;
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;

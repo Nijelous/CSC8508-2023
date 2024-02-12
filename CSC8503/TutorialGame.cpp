@@ -74,17 +74,24 @@ void TutorialGame::InitialiseAssets() {
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 
+	//renderer->LoadTexture("MB_BodyNone_Guard_Albedo.TGA");
+
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
+	mAnimationShader = renderer->LoadShader("animationScene.vert", "animationScene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = renderer->LoadShader("animationScene.vert", "scene.frag");
 
+
+	mGuardMesh = renderer->LoadMesh("Male_Guard.msh");
+	mGuardAnimation = renderer->LoadAnimation("Idle1.anm");
+	mGuardMaterial = renderer->LoadMaterial("Male_Guard.mat");
 
 
 	InitCamera();
 	InitWorld();
+	mAnimation->PreloadMatTextures();
 }
 
 TutorialGame::~TutorialGame()	{
@@ -94,10 +101,15 @@ TutorialGame::~TutorialGame()	{
 	delete charMesh;
 	delete enemyMesh;
 	delete bonusMesh;
+
+	delete mAnimationShader;
 	delete mSoldierAnimation;
 	delete mSoldierMaterial;
 	delete mSoldierMesh;
-	delete mSoldierShader;
+	
+	delete mGuardAnimation;
+	delete mGuardMaterial;
+	delete mGuardMesh;
 
 	delete basicTex;
 	delete basicShader;
@@ -340,7 +352,7 @@ void TutorialGame::InitWorld() {
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
-
+	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 	InitDefaultFloor();
 	AddAnimationTest(Vector3(50, 0, 50), "test");
 }
@@ -508,7 +520,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, mSoldierShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, mAnimationShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -532,10 +544,10 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, nullptr, mSoldierShader, meshSize));
+	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
 	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
 	
-	animTest->SetAnimationObject(new AnimationObject(mSoldierAnimation, mSoldierMaterial));
+	animTest->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
 	
 
 	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);

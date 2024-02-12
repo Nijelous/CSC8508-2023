@@ -18,6 +18,10 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mAnimation = nullptr;
 	mMaterial = nullptr;
 	mCurrentFrame = 0;
+	
+	vector<GLuint>  mMatTextures = {};
+	
+	
 }
 
 RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedoTex, Texture* normalTex, Shader* shader, Vector4 colour, float cullSphereRadius) {
@@ -33,6 +37,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mAnimation = nullptr;
 	mMaterial = nullptr;
 	mCurrentFrame = 0;
+	vector<GLuint*>  mMatTextures = {};
 }
 
 RenderObject::~RenderObject() {

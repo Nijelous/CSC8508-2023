@@ -23,6 +23,8 @@ namespace NCL::Rendering {
 
 		static UniqueOGLTexture TextureFromFile(const std::string&name);
 
+		static GLuint LoadOGLTexture(const std::string& name);
+
 		static UniqueOGLTexture LoadCubemap(
 			const std::string& xPosFile,
 			const std::string& xNegFile,

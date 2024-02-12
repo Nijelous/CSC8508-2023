@@ -2,7 +2,9 @@
 #include "GameWorld.h"
 #include "MeshAnimation.h"
 #include "RenderObject.h"
-
+#include "OGLRenderer.h"
+#include "OGLTexture.h"
+#include "../CSC8503/GameTechRenderer.h"
 
 
 namespace NCL {
@@ -26,14 +28,14 @@ namespace NCL {
 
 			void UpdateAnimations();
 
-			void PreloadAnimations();
+			void PreloadMatTextures();
 
 		protected:
 
 
 			GameWorld& gameWorld;
 			vector<AnimationObject*> animationList;
-			
+			vector<GLuint>  mMatTextures;
 		};
 	}
 }

@@ -4,6 +4,7 @@
 #include "Mesh.h"
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
+#include <glad/gl.h>
 
 namespace NCL {
 	using namespace NCL::Rendering;
@@ -95,6 +96,14 @@ namespace NCL {
 				return mCurrentFrame;
 			}
 
+			void SetMatTextures(vector<GLuint> matTextures) {
+				mMatTextures = matTextures;
+			}
+
+			vector<GLuint>  GetMatTextures() const{
+				return mMatTextures;
+			}
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
@@ -104,6 +113,8 @@ namespace NCL {
 			MeshAnimation* mAnimation;
 			MeshMaterial* mMaterial;
 			Vector4		mColour;
+			vector<GLuint>  mMatTextures;
+			
 			
 			float	mCullSphereRadius;
 			float	mSqDistToCam;

@@ -4,8 +4,6 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "AnimationObject.h"
-#include "AnimationSystem.h"
 #include "Mesh.h"
 using namespace NCL;
 using namespace Rendering;
@@ -246,14 +244,16 @@ void GameTechRenderer::RenderCamera() {
 	for (const auto&i : activeObjects) {
 		OGLShader* shader = (OGLShader*)(*i).GetShader();
 		BindShader(*shader);
-
+		
 		if ((*i).GetAlbedoTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
+			
 		}
 		
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
+		
 		if (activeShader != shader) {
 			projLocation	= glGetUniformLocation(shader->GetProgramID(), "projMatrix");
 			viewLocation	= glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
@@ -262,9 +262,8 @@ void GameTechRenderer::RenderCamera() {
 			colourLocation  = glGetUniformLocation(shader->GetProgramID(), "objectColour");
 			hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
 			hasTexLocation  = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
-
 			cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
-
+			
 			Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
 			glUniform3fv(cameraLocation, 1, &camPos.x);
 	
@@ -276,7 +275,7 @@ void GameTechRenderer::RenderCamera() {
 
 			activeShader = shader;
 		}
-
+		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);			
 		
@@ -289,12 +288,14 @@ void GameTechRenderer::RenderCamera() {
 		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
 
 		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1:0);
+		
 
 		//Animation basic draw
 
 		
 		if ((*i).GetAnimation()) {
-			vector<Matrix4> frameMatrices;
+			BindMesh((OGLMesh&)*(*i).GetMesh());
+			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "diffuseTex"), 3);
 				
 			mMesh = (*i).GetMesh();
 			mAnim = (*i).GetAnimation();
@@ -306,32 +307,56 @@ void GameTechRenderer::RenderCamera() {
 			const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 			const Matrix4* frameData = mAnim->GetJointData(currentFrame);
 			
+			vector<Matrix4> frameMatrices;
 			
-			for (unsigned int i = 0; i < mMesh->GetJointCount(); ++i) {
-				frameMatrices.emplace_back(frameData[i] * invBindPose[i]);
-			}
 
 			int j = glGetUniformLocation(shader->GetProgramID(), "joints");
-			glUniformMatrix4fv(j, frameMatrices.size(), false, (float*)frameMatrices.data());
+			
 
-			frameMatrices.clear();
-			BindMesh((OGLMesh&)*(*i).GetMesh());
-			size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
-			for (size_t i = 0; i < layerCount; ++i) {
-				DrawBoundMesh((uint32_t)i);
+			size_t layerCount = mMesh->GetSubMeshCount();
+
+			for (size_t b = 0; b < layerCount; ++b) {
+				
+				glActiveTexture(GL_TEXTURE3);
+				GLuint textureID = (*i).GetMatTextures()[b];
+				std::cout << textureID << std::endl;
+				glBindTexture(GL_TEXTURE_2D, textureID);
+				std::cout << textureID << std::endl;
+				std::cout <<"" << std::endl;
+
+
+				for (unsigned int a = 0; a < mMesh->GetJointCount(); ++a) {
+					frameMatrices.emplace_back(frameData[a] * invBindPose[a]);
+				}
+				glUniformMatrix4fv(j, frameMatrices.size(), false, (float*)frameMatrices.data());
+
+			
+			
+				
+				
+				DrawBoundMesh((uint32_t)b);
+
+				
+				
 			}
 			
 
 		}
-		else {
-
+		else
+		{
 			BindMesh((OGLMesh&)*(*i).GetMesh());
 			size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
-			for (size_t i = 0; i < layerCount; ++i) {
-				DrawBoundMesh((uint32_t)i);
+			for (size_t b = 0; b < layerCount; ++b) {
+
+				DrawBoundMesh((uint32_t)b);
 			}
-		
+
 		}
+		
+
+		
+		
+		
 
 	}
 }

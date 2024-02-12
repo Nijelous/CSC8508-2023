@@ -3,8 +3,15 @@
 #include "AnimationObject.h"
 
 
+#define SHADERDIR	"../Assets/Shaders/"
+#define MESHDIR		"../Assets/Meshes/"
+#define TEXTUREDIR  "../Assets/Textures/"
+#define SOUNDSDIR	"../Assets/Sounds/"
+
 AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g)
 {
+	
+	
 	
 }
 
@@ -21,6 +28,7 @@ void AnimationSystem::Update(float dt)
 {
 	
 	GetAllAnimationObjects();
+	UpdateMaterials();
 	UpdateCurrentFrames(dt);
 
 
@@ -53,6 +61,12 @@ void AnimationSystem::UpdateCurrentFrames(float dt)
 	}
 }
 
+void AnimationSystem::UpdateMaterials()
+{
+	
+	
+}
+
 void AnimationSystem::UpdateAnimations()
 {
 	
@@ -76,6 +90,43 @@ void AnimationSystem::UpdateAnimations()
 	
 }
 
-void AnimationSystem::PreloadAnimations()
+void AnimationSystem::PreloadMatTextures()
 {
+	gameWorld.OperateOnContents(
+		[&](GameObject* o) {
+
+			if (o->GetAnimationObject()) {
+				for (int i = 0; i < o->GetRenderObject()->GetMesh()->GetSubMeshCount(); ++i) {
+					const MeshMaterialEntry* matEntry = o->GetAnimationObject()->GetMaterial()->GetMaterialForLayer(i);
+					const string* filename = nullptr;
+					matEntry->GetEntry("Diffuse", &filename);
+					GLuint texID = 0;
+
+					if (filename) {
+						string path = *filename;  
+						std::cout << path << std::endl;
+						texID = NCL::Rendering::OGLTexture::LoadOGLTexture(path);
+						std::cout << "++++++++++++++++" << std::endl;
+						/*glBindTexture(GL_TEXTURE_2D, texID);*/
+						std::cout << "---------------------" << std::endl;
+						/*NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);*/
+						std::cout << "==============================" << std::endl;
+
+						
+					}
+					
+					mMatTextures.emplace_back(texID);
+					if (mMatTextures.size() ==4) {
+						o->GetRenderObject()->SetMatTextures(mMatTextures);	
+					}
+				
+					
+				}
+				
+				
+			}
+			//std::cout << o->GetRenderObject()->GetMatTextures().size() << std::endl;
+
+		}
+	);
 }
