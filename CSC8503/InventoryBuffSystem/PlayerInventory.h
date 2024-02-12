@@ -10,7 +10,7 @@ using namespace CSC8503;
 
 namespace InventoryBuffSystem
 {
-	constexpr enum InventoryEvent
+	const enum InventoryEvent
 	{
 		flagDropped
 	};

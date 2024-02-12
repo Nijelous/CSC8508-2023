@@ -71,18 +71,18 @@ void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot)
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer)
 {
-	mObserverList.push_back(observer);
+	mInventoryObserverList.push_back(observer);
 }
 
 void InventoryBuffSystem::PlayerInventory::Detach(PlayerInventoryObserver* observer)
 {
-	mObserverList.remove(observer);
+	mInventoryObserverList.remove(observer);
 }
 
 void InventoryBuffSystem::PlayerInventory::Notify(const InventoryEvent invEvent,int playerNo)
 {
-	std::list<PlayerInventoryObserver*>::iterator iterator = mObserverList.begin();
-	while (iterator != mObserverList.end()) {
+	std::list<PlayerInventoryObserver*>::iterator iterator = mInventoryObserverList.begin();
+	while (iterator != mInventoryObserverList.end()) {
 		(*iterator)->UpdateInventoryObserver(invEvent,playerNo);
 		++iterator;
 	}
