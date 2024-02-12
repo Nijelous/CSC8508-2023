@@ -47,7 +47,7 @@ int main(){
 
     TutorialGame* g = nullptr;
     //erendgrmnc: make the bool below true for network test.
-    bool isNetworkTestActive = false;
+    bool isNetworkTestActive = true;
     
     if (isNetworkTestActive){
         g = new DebugNetworkedGame();
