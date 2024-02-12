@@ -7,8 +7,6 @@ namespace NCL {
 		constexpr int MAX_PLAYERS = 4;
 
 		class Vent;
-		class Light;
-		class Room;
 
 		class Level {
 		public:

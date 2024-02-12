@@ -1,11 +1,11 @@
 #pragma once
 #include "LevelEnums.h"
+#include "BaseLight.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
-		class Light;
 
 		class Room {
 		public:
