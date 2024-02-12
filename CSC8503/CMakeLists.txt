@@ -10,8 +10,35 @@ set(Header_Files
     "StateGameObject.h"
     "TutorialGame.h"
     "DebugNetworkedGame.h"
+    "GameSceneManager.h"
+    "PushdownStates.h"
 )
 source_group("Header Files" FILES ${Header_Files})
+
+set(Inventory_Buff_System
+    "InventoryBuffSystem/InventoryBuffSystem.h"
+    "InventoryBuffSystem/PlayerInventory.h"
+    "InventoryBuffSystem/PlayerInventory.cpp"
+    "InventoryBuffSystem/PlayerBuffs.h"
+    "InventoryBuffSystem/PlayerBuffs.cpp"
+    "InventoryBuffSystem/PickupGameObject.h"
+    "InventoryBuffSystem/PickupGameObject.cpp"
+)
+source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
+
+set(Suspicion_System
+    "SuspicionSystem/GlobalSuspicionMetre.h"
+    "SuspicionSystem/GlobalSuspicionMetre.cpp"
+    "SuspicionSystem/LocationBasedSuspicion.h"
+    "SuspicionSystem/LocationBasedSuspicion.cpp"
+    "SuspicionSystem/LocalSuspicionMetre.h"
+    "SuspicionSystem/LocalSuspicionMetre.cpp"
+    "SuspicionSystem/SuspicionMetre.h"
+    "SuspicionSystem/SuspicionMetre.cpp"
+    "SuspicionSystem/SuspicionSystem.h"
+    "SuspicionSystem/SuspicionSystem.cpp"
+)
+source_group("Suspicion System" FILES ${Suspicion_System})
 
 set(Source_Files
     "GameTechRenderer.cpp"
@@ -21,6 +48,7 @@ set(Source_Files
     "StateGameObject.cpp"
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
+    "GameSceneManager.cpp"
 )
 
 if(USE_VULKAN)
@@ -38,6 +66,8 @@ source_group("Source Files" FILES ${Source_Files})
 set(ALL_FILES
     ${Header_Files}
     ${Source_Files}
+    ${Inventory_Buff_System}
+    ${Suspicion_System}
 )
 
 if(USE_VULKAN)
@@ -206,11 +236,19 @@ endif()
 include_directories("../OpenGLRendering/")
 include_directories("../NCLCoreClasses/")
 include_directories("../CSC8503CoreClasses/")
+include_directories("../Recast")
+include_directories("../Detour")
+include_directories("../DebugUtils")
+include_directories("../DetourTileCache")
 include_directories("../Audio/includes")
 
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Recast)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Detour)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DebugUtils)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DetourTileCache)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../Audio/libs/irrKlang")
 
 file(GLOB DLLS "../Audio/dlls/*.dll")

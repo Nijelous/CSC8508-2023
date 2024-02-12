@@ -4,11 +4,13 @@
 #include "RenderObject.h"
 #include "AnimationObject.h"
 #include "TextureLoader.h"
+#include "GuardObject.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
 #include "StateGameObject.h"
 #include "PlayerObject.h"
+#include "LevelManager.h"
 
 #include "UI.h"
 #include <irrKlang.h>
@@ -21,7 +23,7 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
+TutorialGame::TutorialGame(bool isInitingAssets) : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
 #ifdef USEVULKAN
 	renderer	= new GameTechVulkanRenderer(*world);
@@ -50,7 +52,9 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	controller.MapAxis(3, "XLook");
 	controller.MapAxis(4, "YLook");
 
-	InitialiseAssets();
+	if (isInitingAssets){
+		InitialiseAssets();
+	}
 }
 
 /*
@@ -61,6 +65,13 @@ for this module, even in the coursework, but you can add it if you like!
 
 */
 void TutorialGame::InitialiseAssets() {
+
+	LoadAssetFiles();
+	InitCamera();
+	InitWorld();
+}
+
+void TutorialGame::LoadAssetFiles(){
 	cubeMesh	= renderer->LoadMesh("cube.msh");
 	sphereMesh	= renderer->LoadMesh("sphere.msh");
 	capsuleMesh = renderer->LoadMesh("Capsule.msh");
@@ -75,20 +86,12 @@ void TutorialGame::InitialiseAssets() {
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 
-	iconTest = renderer->LoadTexture("Default.png");
-	iconTest2 = renderer->LoadTexture("GoatBeige.png");
-
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
 	mSoldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
-
-
-
-	InitCamera();
-	InitWorld();
 }
 
 TutorialGame::~TutorialGame()	{
@@ -114,14 +117,11 @@ TutorialGame::~TutorialGame()	{
 	delete renderer;
 	delete world;
 	delete mAnimation;
-
-	delete iconTest;
-	delete iconTest2;
 }
 
 void TutorialGame::UpdateGame(float dt) {
 	if (testSphere != nullptr){
-		testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
@@ -340,13 +340,14 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
+	//mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
+
+	//AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
+
 	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+  
 	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
-	UI::Icon icon1 = UI::AddIcon(Vector2(90, 90), 3, 5, iconTest, false);
-	UI::Icon icon2 = UI::AddIcon(Vector2(85, 90), 3, 5, iconTest2);
-	UI::Icon icon3 = UI::AddIcon(Vector2(90, 80), 3, 5, iconTest);
-	UI::DeleteIcon(icon2);
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
@@ -402,7 +403,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, nullptr, basicShader,radius));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, mFloorAlbedo, mFloorNormal, basicShader,radius));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -466,7 +467,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -483,7 +484,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
-
+	tempPlayer->SetActive();
 	return tempPlayer;
 }
 

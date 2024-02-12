@@ -1,9 +1,11 @@
 #include "LocalSuspicionMetre.h"
 #include <algorithm>
 
+using namespace SuspicionSystem;
+
 void LocalSuspicionMetre::Init()
 {
-    for (int i = 0; i < MAX_PLAYERS; i++)
+    for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++)
     {
         mPlayerMeters[i] = 0;
         mRecoveryCooldowns[i] = 0;
@@ -46,7 +48,7 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
 
 void LocalSuspicionMetre::Update(float dt)
 {
-    for (int playerNo = 0; playerNo < MAX_PLAYERS; playerNo++)
+    for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
     {
         for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
         {

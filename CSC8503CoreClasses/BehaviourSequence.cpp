@@ -1,4 +1,4 @@
-//#include "BehaviourSequence.h"
+#include "BehaviourSequence.h"
 //#include <iostream>
 //BehaviourState BehaviourSequence::Execute(float dt) {
 //	//std::cout << "Executing sequence " << name << "\n";
@@ -16,3 +16,4 @@
 //	}
 //	return Success;
 //}
+

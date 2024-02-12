@@ -38,6 +38,8 @@ namespace NCL {
             void BehaviourTree();
             void ExecuteBT();
 
+            float mTimer;
+
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();
             BehaviourAction* ConfiscateItems();

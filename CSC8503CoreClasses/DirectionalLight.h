@@ -1,5 +1,6 @@
 #pragma once
 #include "BaseLight.h"
+#include <Transform.h>
 
 using namespace NCL;
 using namespace Maths;
@@ -7,10 +8,11 @@ using namespace Maths;
 class DirectionLight : public Light
 {
 public:
-	DirectionLight(Vector3 direction, const Vector4& colour) {
-		direction.Normalise();
-		this->mDirection = direction;
+	DirectionLight(const Vector3& direction, const Vector4& colour, float radius, const Vector3& centre) {
+		this->mDirection = direction.Normalised();
 		this->mColour = colour;
+		mRadius = radius;
+		mCentre = centre;
 		mType = Direction;
 	}
 
@@ -22,6 +24,22 @@ public:
 		mDirection = val; 
 	}
 
+	float GetRadius() {
+		return mRadius;
+	}
+
+	const float* GetDirectionAddress() const {
+		const float* address = &mDirection.x;
+		return address;
+	}
+
+	const float* GetCentreAddress() const {
+		const float* address = &mCentre.x;
+		return address;
+	}
+
 protected:
 	Vector3 mDirection;
+	float mRadius;
+	Vector3 mCentre;
 };
