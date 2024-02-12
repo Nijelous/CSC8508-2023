@@ -21,7 +21,7 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
+TutorialGame::TutorialGame(bool isInitingAssets) : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
 #ifdef USEVULKAN
 	renderer	= new GameTechVulkanRenderer(*world);
@@ -50,7 +50,9 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	controller.MapAxis(3, "XLook");
 	controller.MapAxis(4, "YLook");
 
-	InitialiseAssets();
+	if (isInitingAssets){
+		InitialiseAssets();
+	}
 }
 
 /*
@@ -61,6 +63,13 @@ for this module, even in the coursework, but you can add it if you like!
 
 */
 void TutorialGame::InitialiseAssets() {
+
+	LoadAssetFiles();
+	InitCamera();
+	InitWorld();
+}
+
+void TutorialGame::LoadAssetFiles(){
 	cubeMesh	= renderer->LoadMesh("cube.msh");
 	sphereMesh	= renderer->LoadMesh("sphere.msh");
 	capsuleMesh = renderer->LoadMesh("Capsule.msh");
@@ -81,11 +90,6 @@ void TutorialGame::InitialiseAssets() {
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
 	mSoldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
-
-
-
-	InitCamera();
-	InitWorld();
 }
 
 TutorialGame::~TutorialGame()	{
@@ -115,7 +119,7 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 	if (testSphere != nullptr){
-		testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
@@ -478,7 +482,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
-
+	tempPlayer->SetActive();
 	return tempPlayer;
 }
 

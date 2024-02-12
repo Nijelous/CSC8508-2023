@@ -16,7 +16,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-NetworkedGame::NetworkedGame() {
+NetworkedGame::NetworkedGame(bool isInitingAssets) : TutorialGame(false){
 	mThisServer = nullptr;
 	mThisClient = nullptr;
 

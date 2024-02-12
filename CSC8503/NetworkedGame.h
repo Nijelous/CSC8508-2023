@@ -33,7 +33,7 @@ namespace NCL {
 
 		class NetworkedGame : public TutorialGame, public PacketReceiver {
 		public:
-			NetworkedGame();
+			NetworkedGame(bool isInitingAssets = true);
 			virtual ~NetworkedGame();
 
 			void StartAsServer();
@@ -60,8 +60,8 @@ namespace NCL {
 
             std::map<int, int> mStateIDs;
 
-            GameServer* mThisServer;
-            GameClient* mThisClient;
+            GameServer* mThisServer = nullptr;
+            GameClient* mThisClient = nullptr;
             float mTimeToNextPacket;
             int mPacketsToSnapshot;
 
