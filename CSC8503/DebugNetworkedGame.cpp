@@ -94,7 +94,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
                 SetIsGameFinished(true);
             }
         }
-        GameManager::UpdateGame(dt);
+        GameSceneManager::UpdateGame(dt);
     }
     else{
         if (mThisServer){

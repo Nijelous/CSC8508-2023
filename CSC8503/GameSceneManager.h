@@ -21,10 +21,10 @@ namespace NCL {
 			DefeatScreenState
 		};
 
-		class GameManager {
+		class GameSceneManager {
 		public:
-			GameManager();
-			~GameManager();
+			GameSceneManager();
+			~GameSceneManager();
 
 			virtual void UpdateGame(float dt);
 

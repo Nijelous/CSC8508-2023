@@ -12,7 +12,7 @@ using namespace CSC8503;
 
 class Defeat : public PushdownState {
 public:
-	Defeat(GameManager* g) {
+	Defeat(GameSceneManager* g) {
 		this->game = g;
 	}
 private:
@@ -27,12 +27,12 @@ private:
 		game->SetDefeat();
 	}
 
-	GameManager* game;
+	GameSceneManager* game;
 };
 
 class Victory : public PushdownState {
 public:
-	Victory(GameManager* g) {
+	Victory(GameSceneManager* g) {
 		this->game = g;
 	}
 private:
@@ -47,12 +47,12 @@ private:
 		game->SetVictory();
 	}
 
-	GameManager* game;
+	GameSceneManager* game;
 };
 
 class PlayingLevel : public PushdownState {
 public:
-	PlayingLevel(GameManager* g) {
+	PlayingLevel(GameSceneManager* g) {
 		this->game = g;
 	}
 private:
@@ -73,12 +73,12 @@ private:
 		game->CreateLevel();
 	}
 
-	GameManager* game;
+	GameSceneManager* game;
 };
 
 class MainMenu : public PushdownState {
 public:
-	MainMenu(GameManager* g) {
+	MainMenu(GameSceneManager* g) {
 		this->game = g;
 	}
 
@@ -95,5 +95,5 @@ private:
 		game->SetMainMenu();
 	}
 
-	GameManager* game;
+	GameSceneManager* game;
 };

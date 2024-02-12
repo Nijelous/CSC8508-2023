@@ -69,7 +69,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		std::cout << "Start As Client!" << std::endl;
 	}
 
-	GameManager::UpdateGame(dt);
+	GameSceneManager::UpdateGame(dt);
 }
 
 void NetworkedGame::UpdateAsServer(float dt) {

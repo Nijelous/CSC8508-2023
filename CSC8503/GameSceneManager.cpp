@@ -19,7 +19,7 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-GameManager::GameManager() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
+GameSceneManager::GameSceneManager() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	mWorld = new GameWorld();
 	mRenderer = new GameTechRenderer(*mWorld);
 	mPhysics = new PhysicsSystem(*mWorld);
@@ -37,7 +37,7 @@ GameManager::GameManager() : mController(*Window::GetWindow()->GetKeyboard(), *W
 	InitialiseAssets();
 }
 
-GameManager::~GameManager() {
+GameSceneManager::~GameSceneManager() {
 	delete mCubeMesh;
 	delete mSphereMesh;
 	delete mCapsuleMesh;
@@ -62,7 +62,7 @@ GameManager::~GameManager() {
 	delete mAnimation;
 }
 
-void GameManager::UpdateGame(float dt) {
+void GameSceneManager::UpdateGame(float dt) {
 	mWorld->GetMainCamera().UpdateCamera(dt);
 
 	if (mGameState == MainMenuState)
@@ -88,7 +88,7 @@ void GameManager::UpdateGame(float dt) {
 	Debug::UpdateRenderables(dt);
 }
 
-void GameManager::InitialiseAssets() {
+void GameSceneManager::InitialiseAssets() {
 	mCubeMesh = mRenderer->LoadMesh("cube.msh");
 	mSphereMesh = mRenderer->LoadMesh("sphere.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("Capsule.msh");
@@ -116,7 +116,7 @@ void GameManager::InitialiseAssets() {
 	CreateLevel();
 }
 
-void GameManager::InitCamera() {
+void GameSceneManager::InitCamera() {
 	mWorld->GetMainCamera().SetNearPlane(0.1f);
 	mWorld->GetMainCamera().SetFarPlane(500.0f);
 	mWorld->GetMainCamera().SetPitch(-15.0f);
@@ -124,11 +124,11 @@ void GameManager::InitCamera() {
 	mWorld->GetMainCamera().SetPosition(Vector3(-60, 40, 60));
 }
 
-void GameManager::CreateLevel() {
+void GameSceneManager::CreateLevel() {
 	mLevelManager->LoadLevel(0, mWorld, mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader);
 }
 
-void GameManager::DisplayMainMenu() {
+void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
@@ -136,25 +136,25 @@ void GameManager::DisplayMainMenu() {
 	std::cout << "PRESS SPACE TO PLAY" << std::endl;
 }
 
-void GameManager::DisplayVictory() {
+void GameSceneManager::DisplayVictory() {
 	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
 	std::cout << "VICTORY!!!!!!!" << std::endl;
 }
 
-void GameManager::DisplayDefeat() {
+void GameSceneManager::DisplayDefeat() {
 	// to be replaced by proper UI
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
 	std::cout << "defeat :(((((((" << std::endl;
 }
 
-PlayerObject* GameManager::AddPlayerToWorld(const Vector3 position, const std::string& playerName) {
+PlayerObject* GameSceneManager::AddPlayerToWorld(const Vector3 position, const std::string& playerName) {
 	return nullptr;
 }
 
-void GameManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
+void GameSceneManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
 	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
@@ -171,14 +171,14 @@ void GameManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 }
 
-GuardObject* GameManager::AddGuardToWorld(const Vector3 position, const std::string& guardName) {
+GuardObject* GameSceneManager::AddGuardToWorld(const Vector3 position, const std::string& guardName) {
 	return nullptr;
 }
 
-void GameManager::CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
+void GameSceneManager::CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
 }
 
-GameObject* GameManager::AddFloorToWorld(const Vector3& position, const std::string& objectName) {
+GameObject* GameSceneManager::AddFloorToWorld(const Vector3& position, const std::string& objectName) {
 	GameObject* floor = new GameObject(objectName);
 
 	Vector3 floorSize = Vector3(120, 2, 120);

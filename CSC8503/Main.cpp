@@ -43,7 +43,7 @@ int main() {
     w->ShowOSPointer(false);
     w->LockMouseToWindow(true);
 
-    GameManager* gm = nullptr;
+    GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
     bool isServer = false;
@@ -58,7 +58,7 @@ int main() {
         }
     }
     else{
-        gm = new GameManager();
+        gm = new GameSceneManager();
     }
     PushdownMachine pushdownMachine(new MainMenu(gm));
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!

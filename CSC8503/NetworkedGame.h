@@ -31,7 +31,7 @@ namespace NCL {
 			Vector3 cameraPosition;
 		};
 
-		class NetworkedGame : public GameManager, public PacketReceiver {
+		class NetworkedGame : public GameSceneManager, public PacketReceiver {
 		public:
 			NetworkedGame();
 			virtual ~NetworkedGame();
