@@ -12,7 +12,7 @@
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
 
-#include "GameManager.h"
+#include "GameSceneManager.h"
 
 #include "NetworkedGame.h"
 

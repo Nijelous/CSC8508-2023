@@ -1,4 +1,4 @@
-#include "GameManager.h"
+#include "GameSceneManager.h"
 #include "GameWorld.h"
 #include "TextureLoader.h"
 

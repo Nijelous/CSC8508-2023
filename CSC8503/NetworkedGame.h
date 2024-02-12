@@ -1,5 +1,5 @@
 #pragma once
-#include "GameManager.h"
+#include "GameSceneManager.h"
 #include "NetworkBase.h"
 
 namespace NCL {

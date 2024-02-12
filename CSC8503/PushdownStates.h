@@ -2,7 +2,7 @@
 
 #include "PushdownMachine.h"
 #include "PushdownState.h"
-#include "GameManager.h"
+#include "GameSceneManager.h"
 
 #include <chrono>
 #include <thread>

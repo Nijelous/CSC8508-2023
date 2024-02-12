@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <functional>
 #include "NetworkBase.h"
-#include "GameManager.h"
+#include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
 namespace NCL{
