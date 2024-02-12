@@ -339,21 +339,21 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	mLevelManager->LoadLevel(0, world, renderer, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
+	//mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
 
-	AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
+	//AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
 
-	//AddPlayerToWorld(Vector3(100,-17,100), "Player");
+	AddPlayerToWorld(Vector3(100,-17,100), "Player");
   
-	//AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
+	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
-	//testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
+	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
-	//AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
 
-	//AddGuardToWorld(Vector3(30, -17, 5), "Guard Object");
+	AddGuardToWorld(Vector3(30, -17, 5), "Guard Object");
 
-	//InitDefaultFloor();
+	InitDefaultFloor();
 }
 
 /*
