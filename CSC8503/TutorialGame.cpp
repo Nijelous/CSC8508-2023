@@ -182,9 +182,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	if (mGameObjects.size() > 0) {
 		for (int i = 0; i < mGameObjects.size(); i++) {
-			if (mGameObjects[i] != nullptr){
-				mGameObjects[i]->UpdateObject(dt);
-			}
+			mGameObjects[i]->UpdateObject(dt);
 		}
 	}
 
