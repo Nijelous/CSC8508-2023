@@ -19,7 +19,7 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-GameSceneManager::GameSceneManager() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
+GameSceneManager::GameSceneManager(bool isInitingAssets) : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	mWorld = new GameWorld();
 	mRenderer = new GameTechRenderer(*mWorld);
 	mPhysics = new PhysicsSystem(*mWorld);
@@ -34,7 +34,9 @@ GameSceneManager::GameSceneManager() : mController(*Window::GetWindow()->GetKeyb
 	mController.MapAxis(3, "XLook");
 	mController.MapAxis(4, "YLook");
 
-	InitialiseAssets();
+	if (isInitingAssets) {
+		InitialiseAssets();
+	}
 }
 
 GameSceneManager::~GameSceneManager() {
@@ -113,7 +115,7 @@ void GameSceneManager::InitialiseAssets() {
 
 
 	InitCamera();
-	CreateLevel();
+	//CreateLevel();
 }
 
 void GameSceneManager::InitCamera() {

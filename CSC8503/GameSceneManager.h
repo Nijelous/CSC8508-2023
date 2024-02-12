@@ -23,7 +23,7 @@ namespace NCL {
 
 		class GameSceneManager {
 		public:
-			GameSceneManager();
+			GameSceneManager(bool isInitingAssets = true);
 			~GameSceneManager();
 
 			virtual void UpdateGame(float dt);
@@ -45,7 +45,8 @@ namespace NCL {
 			void CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
 		protected:
-			void InitialiseAssets();
+			virtual void InitialiseAssets();
+			virtual void InitWorld() {}
 
 			void InitCamera();
 

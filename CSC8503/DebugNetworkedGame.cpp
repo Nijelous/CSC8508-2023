@@ -306,20 +306,16 @@ void DebugNetworkedGame::SendFinishGameStatusPacket(){
     GameEndStatePacket packet(mIsGameFinished);
     mThisServer->SendGlobalPacket(packet);
 }
-void DebugNetworkedGame::InitialiseAssets(){
-    LoadAssetFiles();
+
+void DebugNetworkedGame::InitialiseAssets() {
+    GameSceneManager::InitialiseAssets();
 
     InitCamera();
 }
 
 void DebugNetworkedGame::InitWorld(){
-    world->ClearAndErase();
-    physics->Clear();
-    testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
-
-    AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
-
-    InitDefaultFloor();
+    mWorld->ClearAndErase();
+    mPhysics->Clear();
 
     SpawnPlayers();
 }

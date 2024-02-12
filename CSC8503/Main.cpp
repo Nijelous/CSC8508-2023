@@ -52,14 +52,14 @@ int main(){
     bool isNetworkTestActive = false;
     
     if (isNetworkTestActive){
-        g = new DebugNetworkedGame();
+        gm = new DebugNetworkedGame();
 
         int choice = 0;
         std::cout << "--------Network Test ----------" << std::endl;
         std::cout <<"Enter '1' to start as server or '2' to start as client: ";
         std::cin >> choice;
         
-        auto* networkedGame = (DebugNetworkedGame*)g;
+        auto* networkedGame = (DebugNetworkedGame*)gm;
         if (choice == SERVER_CHOICE){
             networkedGame->StartAsServer();
         }
