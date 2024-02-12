@@ -1,95 +1,96 @@
-	#include "PlayerInventory.h"
-	#include "Level.h"
+#include "PlayerInventory.h"
+#include "Level.h"
 
-	using namespace InventoryBuffSystem;
-	using namespace NCL::CSC8503;
+using namespace InventoryBuffSystem;
+using namespace NCL::CSC8503;
 
-	void PlayerInventory::Init()
-	{
-		for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
-		{
-			for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
-			{
-				mPlayerInventory[playerNo][invSlot] = none;
-			}
-		}
-
-	}
-
-	void PlayerInventory::AddItemToPlayer(item inItem, int playerNo)
+void PlayerInventory::Init()
+{
+	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 	{
 		for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 		{
-			if (mPlayerInventory[playerNo][invSlot] == none)
+			mPlayerInventory[playerNo][invSlot] = none;
+		}
+	}
+	
+}
+
+void PlayerInventory::AddItemToPlayer(item inItem, int playerNo)
+{
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+	{
+		if (mPlayerInventory[playerNo][invSlot] == none)
+		{
+			mPlayerInventory[playerNo][invSlot] = inItem;
+
+			if (mOnItemAddedInventoryEventMap.find(inItem) != mOnItemAddedInventoryEventMap.end())
 			{
-				mPlayerInventory[playerNo][invSlot] = inItem;
-
-				if (mOnItemAddedFunctionMap.find(inItem) != mOnItemAddedFunctionMap.end())
-				{
-					mOnItemAddedFunctionMap[inItem](playerNo);
-				}
-				return;
+				Notify(mOnItemAddedInventoryEventMap[inItem], playerNo);
 			}
+			return;
 		}
 	}
+}
 
-	void PlayerInventory::DropItemFromPlayer(item inItem, int playerNo)
+void PlayerInventory::DropItemFromPlayer(item inItem, int playerNo)
+{
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
-		for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+		if (mPlayerInventory[playerNo][invSlot] == inItem)
 		{
-			if (mPlayerInventory[playerNo][invSlot] == inItem)
+			if (mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
 			{
-				CreateItemPickup(inItem, (mPlayerGameObjectsPTR + playerNo)->GetTransform().GetPosition());
-
-				if (mOnItemDroppedFunctionMap.find(inItem) != mOnItemDroppedFunctionMap.end())
-				{
-					mOnItemDroppedFunctionMap[inItem](playerNo);
-				}
-
-				mPlayerInventory[playerNo][invSlot] = none;
+				Notify(mOnItemDroppedInventoryEventMap[inItem],playerNo);
 			}
+
+			mPlayerInventory[playerNo][invSlot] = none;
 		}
 	}
+}
 
-	void PlayerInventory::DropItemFromPlayer(int playerNo, int invSlot)
+void PlayerInventory::DropItemFromPlayer(int playerNo, int invSlot)
+{
+	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
 	{
-		CreateItemPickup(mPlayerInventory[playerNo][invSlot],
-			(mPlayerGameObjectsPTR + playerNo)->GetTransform().GetPosition());
-
-		if (mOnItemDroppedFunctionMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedFunctionMap.end())
-		{
-			mOnItemDroppedFunctionMap[mPlayerInventory[playerNo][invSlot]](playerNo);
-		}
-
-		mPlayerInventory[playerNo][invSlot] = none;
+		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]],playerNo);
 	}
 
+	mPlayerInventory[playerNo][invSlot] = none;
+}
 
-	void PlayerInventory::DropFlagFromPlayer(int playerNo)
+void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot)
+{
+	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end())
 	{
-		for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
-		{
-			if (mPlayerInventory[playerNo][invSlot] == flag)
-			{
-				CreateItemPickup(flag, *mFlagLocationPTR);
-				mPlayerInventory[playerNo][invSlot] = none;
-			}
-		}
+		Notify(mOnItemUsedInventoryEventMap[mPlayerInventory[playerNo][invSlot]],(playerNo));
 	}
 
-	void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot)
-	{
-		if (mOnItemUsedFunctionMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedFunctionMap.end())
-		{
-			mOnItemUsedFunctionMap[mPlayerInventory[playerNo][invSlot]](playerNo);
-		}
+	mPlayerInventory[playerNo][invSlot] = none;
+}
 
-		mPlayerInventory[playerNo][invSlot] = none;
-	}
+void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer)
+{
+	mObserverList.push_back(observer);
+}
 
-	PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed)
-	{
-		std::mt19937 rng(seed);
-		std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), rng);
-		return mItemsInRandomPool[0];
+void InventoryBuffSystem::PlayerInventory::Detach(PlayerInventoryObserver* observer)
+{
+	mObserverList.remove(observer);
+}
+
+void InventoryBuffSystem::PlayerInventory::Notify(const InventoryEvent invEvent,int playerNo)
+{
+	std::list<PlayerInventoryObserver*>::iterator iterator = mObserverList.begin();
+	while (iterator != mObserverList.end()) {
+		(*iterator)->UpdateInventoryObserver(invEvent,playerNo);
+		++iterator;
 	}
+}
+
+PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed)
+{
+	std::mt19937 rng(seed);
+	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), rng);
+	return mItemsInRandomPool[0];
+}

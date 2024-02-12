@@ -3,20 +3,31 @@
 #include <map>
 #include <random>
 #include "Vector3.h"
-#include "GameObject.h"
+#include "PlayerBuffs.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 namespace InventoryBuffSystem
 {
-	constexpr int MAX_INVENTORY_SLOTS = 2;
+	constexpr enum InventoryEvent
+	{
+		flagDropped
+	};
+
+	class PlayerInventoryObserver
+	{
+	public:
+		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) = 0;
+	};
+
 	class PlayerInventory
 	{
 	public:
+
 		enum item
 		{
-			disguise, item2,none,flag
+			disguise, item2, none, flag, slowEveryoneElse, soundEmitter
 		};
 
 		PlayerInventory()
@@ -25,65 +36,45 @@ namespace InventoryBuffSystem
 		}
 
 		void Init();
-		void AddItemToPlayer(item inItem, int playerNo); 
+		void AddItemToPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(int playerNo, int invSlot);
 		void DropFlagFromPlayer(int playerNo);
 		void UseItemInPlayerSlot(int itemSlot, int playerNo);
 
+		void Attach(PlayerInventoryObserver* observer);
+		void Detach(PlayerInventoryObserver* observer);
+		void Notify(InventoryEvent invEvent,int playerNo);
+
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 	private:
 
-		std::vector<item> mItemsInRandomPool=
+		std::vector<item> mItemsInRandomPool =
 		{
-			item2
+			disguise, slowEveryoneElse
 		};
 
-		std::map<item, std::function<void(int playerNo)>> mOnItemAddedFunctionMap =
+		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =
 		{
-			{disguise, [](int playerNo)
-				{
 
-				}
-			},
-			{item2, [](int playerNo)
-				{
-
-				}
-			},
 		};
 
-		std::map<item, std::function<void(int playerNo)>> mOnItemDroppedFunctionMap =
+		std::map<item, InventoryEvent > mOnItemDroppedInventoryEventMap =
 		{
-			{disguise, [](int playerNo)
-				{
-
-				}
-			},
-			{item2, [](int playerNo)
-				{
-
-				}
-			},
+			{flag,flagDropped}
 		};
 
-		std::map<item, std::function<void(int playerNo)>> mOnItemUsedFunctionMap =
+		std::map<item, InventoryEvent > mOnItemUsedInventoryEventMap =
 		{
-			{disguise, [](int playerNo)
-				{
 
-				}
-			},
-			{item2, [](int playerNo)
-				{
-
-				}
-			},
 		};
 
+		int MAX_INVENTORY_SLOTS = 2;
 		item mPlayerInventory[4][2];
-		GameObject* mPlayerGameObjectsPTR;
-		Vector3* mFlagLocationPTR;
+		PlayerBuffs* mPlayerBuffsPtr;
+		std::list<PlayerInventoryObserver*> mObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};
+
+
 }

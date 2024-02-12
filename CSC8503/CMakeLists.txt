@@ -22,7 +22,9 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/PlayerBuffs.h"
     "InventoryBuffSystem/PlayerBuffs.cpp"
     "InventoryBuffSystem/PickupGameObject.h"
-    "InventoryBuffSystem/PickupGameObject.cpp"
+    "InventoryBuffSystem/PickupGameObject.cpp"    
+    "InventoryBuffSystem/FlagGameObject.h"
+    "InventoryBuffSystem/FlagGameObject.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
