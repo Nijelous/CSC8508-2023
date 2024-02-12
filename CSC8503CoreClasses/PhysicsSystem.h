@@ -22,6 +22,9 @@ namespace NCL {
 
 			void SetGravity(const Vector3& g);
 		protected:
+			bool AreBothCollidersStatic(const CollisionDetection::CollisionInfo info);
+			bool IsEitherColliderNoCollide(const CollisionDetection::CollisionInfo& info);
+			
 			void BasicCollisionDetection();
 			void BroadPhase();
 			void NarrowPhase();
@@ -58,6 +61,8 @@ namespace NCL {
 
 			GameWorld& mGameWorld;
 
+			const char STATIC_COLLISION_LAYERS = StaticObj | Collectable | Zone;
+			const char NO_COLLISION_RESOLUTION = Collectable | Zone;
 			bool	mApplyGravity;
 			Vector3 mGravity;
 			float	mDTOffset;
