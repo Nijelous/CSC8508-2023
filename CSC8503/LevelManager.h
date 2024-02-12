@@ -42,7 +42,7 @@ namespace NCL {
 
 			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
 
-			//void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
+			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);

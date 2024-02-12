@@ -87,13 +87,14 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 	}
 	mLevelLayout.clear();
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
-	//LoadLights((*mLevelList[id]).GetLights(), Vector3(0, 0, 0)); TO-DO (nijelous): ADD LIGHTS
+	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	for (auto const& [key, val] : (*mLevelList[levelID]).GetRooms()) {
 		switch ((*val).GetType()) {
 		case Medium:
 			for (Room* room : mRoomList) {
 				if (room->GetType() == Medium) {
 					LoadMap(room->GetTileMap(), key);
+					LoadLights(room->GetLights(), key);
 					break;
 				}
 			}
@@ -156,14 +157,28 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 	}
 }
 
-/*void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) { (TO DO (nijelous): ADD LIGHTS
+void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
 	for (int i = 0; i < lights.size(); i++) {
+		auto* pl = dynamic_cast<PointLight*>(lights[i]);
+		if (pl) {
+			pl->SetPosition((pl->GetPosition() + centre) * 10);
+			pl->SetRadius(pl->GetRadius() * 10);
+			mRenderer->AddLight(pl);
+			continue;
+		}
+		auto* sl = dynamic_cast<SpotLight*>(lights[i]);
+		if (sl) {
+			sl->SetPosition((pl->GetPosition() + centre) * 10);
+			sl->SetRadius(sl->GetRadius() * 10);
+			mRenderer->AddLight(sl);
+			continue;
+		}
 		mRenderer->AddLight(lights[i]);
 	}
-}*/
+}
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
-	GameObject* wall = new GameObject("Wall");
+	GameObject* wall = new GameObject(StaticObj, "Wall");
 
 	Vector3 wallSize = Vector3(5, 5, 5);
 	AABBVolume* volume = new AABBVolume(wallSize);
@@ -188,7 +203,7 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 }
 
 GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
-	GameObject* floor = new GameObject("Floor");
+	GameObject* floor = new GameObject(StaticObj, "Floor");
 
 	Vector3 wallSize = Vector3(5, 0.5f, 5);
 	AABBVolume* volume = new AABBVolume(wallSize);
@@ -237,6 +252,8 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
+
+	playerObject.SetCollisionLayer(Player);
 }
 
 GuardObject* LevelManager::AddGuardToWorld(const Vector3 position, const std::string& guardName) {
@@ -258,6 +275,7 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3 position, const std::st
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 
+	guard->SetCollisionLayer(Npc);
 
 	guard->SetPlayer(mTempPlayer);
 	guard->SetGameWorld(mWorld);
