@@ -7,7 +7,7 @@
 
 using namespace NCL::CSC8503;
 
-GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectName)	{
+GameObject::GameObject(const std::string& objectName, CollisionLayer collisionLayer)	{
 
 	mName			= objectName;
 	mWorldID			= -1;
