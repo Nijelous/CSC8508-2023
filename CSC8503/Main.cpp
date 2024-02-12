@@ -33,24 +33,34 @@ using namespace CSC8503;
 #include <sstream>
 #include "DebugNetworkedGame.h"
 
-int main() {
+namespace{
+    constexpr int SERVER_CHOICE = 1;
+}
+
+int main(){
     Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 
     if (!w->HasInitialised()) {
         return -1;
     }
 
-    w->ShowOSPointer(false);
-    w->LockMouseToWindow(true);
+    w->ShowOSPointer(true);
+    w->LockMouseToWindow(false);
 
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
-    bool isServer = false;
+    
     if (isNetworkTestActive){
-        gm = new DebugNetworkedGame();
-        auto* networkedGame = (DebugNetworkedGame*)gm;
-        if (isServer){
+        g = new DebugNetworkedGame();
+
+        int choice = 0;
+        std::cout << "--------Network Test ----------" << std::endl;
+        std::cout <<"Enter '1' to start as server or '2' to start as client: ";
+        std::cin >> choice;
+        
+        auto* networkedGame = (DebugNetworkedGame*)g;
+        if (choice == SERVER_CHOICE){
             networkedGame->StartAsServer();
         }
         else{

@@ -2,6 +2,7 @@
 #include "GameWorld.h"
 #include "RenderObject.h"
 #include "PhysicsObject.h"
+#include "RecastBuilder.h"
 #include <filesystem>
 
 using namespace NCL::CSC8503;
@@ -18,6 +19,7 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
+	mBuilder = new RecastBuilder();
 }
 
 LevelManager::~LevelManager() {
@@ -29,6 +31,10 @@ LevelManager::~LevelManager() {
 		delete(mLevelList[i]);
 	}
 	mLevelList.clear();
+	for (int i = 0; i < mLevelLayout.size(); i++) {
+		delete(mLevelLayout[i]);
+	}
+	mLevelLayout.clear();
 }
 
 void LevelManager::LoadLevel(int id, GameWorld* world, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader) {
@@ -46,6 +52,7 @@ void LevelManager::LoadLevel(int id, GameWorld* world, Mesh* mesh, Texture* albe
 			break;
 		}
 	}
+	mBuilder->BuildNavMesh(mLevelLayout);
 	mActiveLevel = id;
 }
 
@@ -83,6 +90,8 @@ GameObject* LevelManager::AddWallToWorld(GameWorld* world, const Vector3& positi
 
 	world->AddGameObject(wall);
 
+	mLevelLayout.push_back(wall);
+
 	return wall;
 }
 
@@ -105,6 +114,8 @@ GameObject* LevelManager::AddFloorToWorld(GameWorld* world, const Vector3& posit
 	floor->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
 	world->AddGameObject(floor);
+
+	mLevelLayout.push_back(floor);
 
 	return floor;
 }

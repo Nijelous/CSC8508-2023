@@ -8,6 +8,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
 		class GameObject;
+		class RecastBuilder;
 		class LevelManager {
 		public:
 			LevelManager();
@@ -17,14 +18,18 @@ namespace NCL {
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
 			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[player]).GetPlayerStartPosition(player)*10; }
 			void LoadLevel(int id, GameWorld* world, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader);
+			void Update();
 		protected:
 			void LoadMap(GameWorld* world, const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition, 
 				Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader);
 
 			GameObject* AddWallToWorld(GameWorld* world, const Vector3& position, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader);
 			GameObject* AddFloorToWorld(GameWorld* world, const Vector3& position, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader);
+
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
+			std::vector<GameObject*> mLevelLayout;
+			RecastBuilder* mBuilder;
 			int mActiveLevel;
 		};
 	}

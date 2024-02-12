@@ -18,7 +18,8 @@ enum BasicNetworkMessages {
 	VariableUpdate,
 	SyncPlayers,
 	GameStartState,
-	GameEndState
+	GameEndState,
+	ClientPlayerInputState
 };
 
 struct GamePacket {

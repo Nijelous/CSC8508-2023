@@ -18,39 +18,38 @@ namespace NCL {
 			PlayerObject(GameWorld* world, const std::string& objName = "", int walkSpeed = 35, int sprintSpeed = 50, int crouchSpeed = 25, Vector3 offset = Vector3(0,0,0));
 			~PlayerObject();
 
-			void	UpdateObject(float dt);
+			virtual void UpdateObject(float dt);
 
 		protected:
+			bool mIsCrouched;
+			
+			int mMovementSpeed;
+			int mWalkSpeed;
+			int mSprintSpeed;
+			int mCrouchSpeed;
 
+			PlayerState mPlayerState;
+
+			GameWorld* mGameWorld;
+			
             virtual void MovePlayer(float dt);
+            
+			void AttachCameraToPlayer(GameWorld* world);
+			
+			virtual void MatchCameraRotation(float yawValue);
 
-		private:
+			void StopSliding();
 
-			void	AttachCameraToPlayer(GameWorld* world);
+			void	ToggleCrouch(bool isCrouching);
 
-			void	ToggleCrouch();
-
-			void	ActivateSprint();	
+			void	ActivateSprint(bool isSprinting);	
 
 			void	StartWalking();
 
 			void	StartSprinting();
 
 			void	StartCrouching();
-			void	MatchCameraRotation();
-
-			void StopSliding();
-
-			int mMovementSpeed;
-			int mWalkSpeed;
-			int mSprintSpeed;
-			int mCrouchSpeed;
-
-			GameWorld* mGameWorld;
-
-			PlayerState mPlayerState;
-
-			bool mIsCrouched;
+		private:
 		};
 	}
 }
