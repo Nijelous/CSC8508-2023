@@ -45,7 +45,7 @@ int main(){
     }
 
     w->ShowOSPointer(true);
-    w->LockMouseToWindow(false);
+    w->LockMouseToWindow(true);
 
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.

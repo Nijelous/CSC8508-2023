@@ -15,7 +15,7 @@ namespace NCL {
 
 		class PlayerObject : public GameObject {
 		public:
-			PlayerObject(GameWorld* world, const std::string& objName = "", int walkSpeed = 35, int sprintSpeed = 50, int crouchSpeed = 25, Vector3 offset = Vector3(0,0,0));
+			PlayerObject(GameWorld* world, const std::string& objName = "", int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed =35, Vector3 offset = Vector3(0,0,0));
 			~PlayerObject();
 
 			virtual void UpdateObject(float dt);
@@ -49,6 +49,10 @@ namespace NCL {
 			void	StartSprinting();
 
 			void	StartCrouching();
+
+			void	ChangeCharacterSize(float newSize);
+
+			void	EnforceMaxSpeeds();
 		private:
 		};
 	}
