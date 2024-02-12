@@ -14,6 +14,11 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace irrklang;
 
+namespace {
+	constexpr float PLAYER_MESH_SIZE = 3.0f;
+	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+}
+
 GameManager::GameManager() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	mWorld = new GameWorld();
 	mRenderer = new GameTechRenderer(*mWorld);
@@ -147,14 +152,28 @@ PlayerObject* GameManager::AddPlayerToWorld(const Vector3 position, const std::s
 	return nullptr;
 }
 
-void GameManager::CreatePlayerComponents(PlayerObject& playerObject, const Vector3& position) const {
+void GameManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
+	CapsuleVolume* volume  = new CapsuleVolume(1.4f, 1.0f);
+
+	playerObject.SetBoundingVolume((CollisionVolume*)volume);
+
+	playerObject.GetTransform()
+		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
+		.SetPosition(position);
+
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, PLAYER_MESH_SIZE));
+	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+
+
+	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
+	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 }
 
 GuardObject* GameManager::AddGuardToWorld(const Vector3 position, const std::string& guardName) {
 	return nullptr;
 }
 
-void GameManager::CreateGuardComponents(PlayerObject& playerObject, const Vector3& position) const {
+void GameManager::CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const {
 }
 
 GameObject* GameManager::AddFloorToWorld(const Vector3& position, const std::string& objectName) {

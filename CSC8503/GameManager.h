@@ -26,7 +26,9 @@ namespace NCL {
 			GameManager();
 			~GameManager();
 
-			void UpdateGame(float dt);
+			virtual void UpdateGame(float dt);
+
+			GameWorld* GetGameWorld() { return mWorld; }
 
 			void SetMainMenu() { mGameState = MainMenuState; }
 			void SetLevel() { mGameState = LevelState; }
@@ -38,6 +40,9 @@ namespace NCL {
 
 			void CreateLevel();
 
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
+			void CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
+
 		protected:
 			void InitialiseAssets();
 
@@ -48,14 +53,11 @@ namespace NCL {
 			void DisplayDefeat();
 
 			PlayerObject* AddPlayerToWorld(const Vector3 position, const std::string& playerName);
-			void CreatePlayerComponents(PlayerObject& playerObject, const Vector3& position) const;
 
 			GuardObject* AddGuardToWorld(const Vector3 position, const std::string& guardName);
-			void CreateGuardComponents(PlayerObject& playerObject, const Vector3& position) const;
 
 			GameObject* AddFloorToWorld(const Vector3& position, const std::string& objectName);
 
-		private:
 			// world creation
 			GameTechRenderer* mRenderer;
 			PhysicsSystem* mPhysics;
@@ -93,6 +95,11 @@ namespace NCL {
 			vector<GameObject*> mUpdatableObjects;
 
 			GameStates mGameState;
+
+			PlayerObject* mTempPlayer;
+
+		private:
+			
 		};
 	}
 }
