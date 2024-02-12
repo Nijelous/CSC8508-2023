@@ -73,8 +73,6 @@ source_group("Lights" FILES ${Lights})
 set(Level_Creation
     "JsonParser.h"
     "JsonParser.cpp"
-    "LevelManager.h"
-    "LevelManager.cpp"
     "Level.h"
     "Level.cpp"
     "LevelEnums.h"

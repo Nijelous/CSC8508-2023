@@ -5,6 +5,7 @@ set(PROJECT_NAME CSC8503)
 ################################################################################
 set(Header_Files
     "GameTechRenderer.h"
+    "LevelManager.h"
     "NetworkedGame.h"
     "NetworkPlayer.h"
     "StateGameObject.h"
@@ -40,6 +41,7 @@ source_group("Suspicion System" FILES ${Suspicion_System})
 
 set(Source_Files
     "GameTechRenderer.cpp"
+    "LevelManager.cpp"
     "Main.cpp"
     "NetworkedGame.cpp"
     "NetworkPlayer.cpp"
