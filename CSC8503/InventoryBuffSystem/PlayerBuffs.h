@@ -7,7 +7,7 @@
 using namespace NCL::CSC8503;
 
 namespace InventoryBuffSystem {
-	constexpr enum BuffEvent
+	const enum BuffEvent
 	{
 		
 	};
