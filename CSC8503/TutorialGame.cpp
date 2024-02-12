@@ -4,6 +4,7 @@
 #include "RenderObject.h"
 #include "AnimationObject.h"
 #include "TextureLoader.h"
+#include "GuardObject.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"

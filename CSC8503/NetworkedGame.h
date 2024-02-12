@@ -1,5 +1,5 @@
 #pragma once
-#include "TutorialGame.h"
+#include "GameSceneManager.h"
 #include "NetworkBase.h"
 
 namespace NCL {
@@ -31,7 +31,7 @@ namespace NCL {
 			Vector3 cameraPosition;
 		};
 
-		class NetworkedGame : public TutorialGame, public PacketReceiver {
+		class NetworkedGame : public GameSceneManager, public PacketReceiver {
 		public:
 			NetworkedGame(bool isInitingAssets = true);
 			virtual ~NetworkedGame();
@@ -70,7 +70,6 @@ namespace NCL {
             std::vector<int> mPlayerList;
             std::map<int, NetworkPlayer*> mServerPlayers;
             GameObject* mLocalPlayer;
-
 		};
 	}
 }

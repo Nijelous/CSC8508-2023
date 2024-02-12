@@ -9,11 +9,11 @@
 #include "AnimationSystem.h"
 
 #include "StateGameObject.h"
-#include "GuardObject.h"
 
 namespace NCL {
 	namespace CSC8503 {
 		class PlayerObject;
+		class GuardObject;
 		class LevelManager;
 		class TutorialGame		{
 		public:

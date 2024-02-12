@@ -92,7 +92,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
         //TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
         if (mIsGameFinished){
             Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
-            renderer->Render();
+            mRenderer->Render();
             return;
         }
         
@@ -113,8 +113,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
             }
         }
         
-        TutorialGame::UpdateGame(dt);
-        
+        GameSceneManager::UpdateGame(dt);
     }
     else{
         if (mThisServer){
@@ -126,7 +125,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
         else{
             Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
         }
-        renderer->Render();
+        mRenderer->Render();
     }
 
     if (mThisServer){
@@ -156,8 +155,6 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
 
 void DebugNetworkedGame::StartLevel(){
     Debug::Print("Game Started", Vector2(10, 5));
-    
-    InitWorld();
 
     for (auto& event : mOnGameStarts){
         event();
@@ -243,7 +240,7 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame){
     std::vector<GameObject*>::const_iterator first;
     std::vector<GameObject*>::const_iterator last;
 
-    world->GetObjectIterators(first, last);
+    mWorld->GetObjectIterators(first, last);
 
     for (auto i = first; i != last; ++i){
         NetworkObject* o = (*i)->GetNetworkObject();
@@ -277,7 +274,7 @@ void DebugNetworkedGame::UpdateMinimumState(){
     //so we can get rid of any old states!
     std::vector<GameObject*>::const_iterator first;
     std::vector<GameObject*>::const_iterator last;
-    world->GetObjectIterators(first, last);
+    mWorld->GetObjectIterators(first, last);
 
     for (auto i = first; i != last; ++i){
         NetworkObject* o = (*i)->GetNetworkObject();
@@ -310,20 +307,15 @@ void DebugNetworkedGame::SendFinishGameStatusPacket(){
     mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::InitialiseAssets(){
-    LoadAssetFiles();
+void DebugNetworkedGame::InitialiseAssets() {
+    GameSceneManager::InitialiseAssets();
 
     InitCamera();
 }
 
 void DebugNetworkedGame::InitWorld(){
-    world->ClearAndErase();
-    physics->Clear();
-    testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
-
-    AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
-
-    InitDefaultFloor();
+    mWorld->ClearAndErase();
+    mPhysics->Clear();
 
     SpawnPlayers();
 }
@@ -354,7 +346,7 @@ void DebugNetworkedGame::SpawnPlayers(){
         mLocalPlayer = mServerPlayers[playerPeerId];
     }
       mServerPlayers[playerPeerId]->SetIsLocalPlayer(true);
-    tempPlayer = (PlayerObject*)mLocalPlayer;
+    mTempPlayer = (PlayerObject*)mLocalPlayer;
     mLocalPlayer->SetActive();
 }
 
@@ -371,8 +363,7 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
     auto* networkComponet = new NetworkObject(*netPlayer, playerNum);
     netPlayer->SetNetworkObject(networkComponet);
     mNetworkObjects.push_back(netPlayer->GetNetworkObject());
-    world->AddGameObject(netPlayer);
-    
+    mWorld->AddGameObject(netPlayer);
     Vector4 colour;
     switch (playerNum)
     {

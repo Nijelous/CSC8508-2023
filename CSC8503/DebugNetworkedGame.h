@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <functional>
 #include "NetworkBase.h"
-#include "TutorialGame.h"
+#include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
 namespace NCL{
@@ -56,7 +56,6 @@ namespace NCL{
             void InitialiseAssets() override;
             
             void InitWorld() override;
-            
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
@@ -75,7 +74,7 @@ namespace NCL{
             void SetItemsLeftToZero() override;
 
 
-            std::vector<function<void()>> mOnGameStarts;
+            std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 
