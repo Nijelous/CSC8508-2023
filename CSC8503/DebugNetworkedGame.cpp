@@ -136,8 +136,6 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
 void DebugNetworkedGame::StartLevel(){
     Debug::Print("Game Started", Vector2(10, 5));
 
-    // InitWorld();
-
     for (auto& event : mOnGameStarts){
         event();
     }

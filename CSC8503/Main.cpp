@@ -47,7 +47,7 @@ int main() {
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
     bool isServer = false;
-    /*if (isNetworkTestActive){
+    if (isNetworkTestActive){
         gm = new DebugNetworkedGame();
         auto* networkedGame = (DebugNetworkedGame*)gm;
         if (isServer){
@@ -57,10 +57,10 @@ int main() {
             networkedGame->StartAsClient(127, 0, 0, 1);
         }
     }
-    else{*/
-    gm = new GameManager();
+    else{
+        gm = new GameManager();
+    }
     PushdownMachine pushdownMachine(new MainMenu(gm));
-    //}
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
     while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
