@@ -58,6 +58,7 @@ void NetworkPlayer::ResetPlayerInput(){
 
 void NetworkPlayer::UpdateObject(float dt){
     MovePlayer(dt);
+    std::cout << mMovementSpeed << std::endl;
     if (mIsLocalPlayer){
         AttachCameraToPlayer(game->GetGameWorld());
         mCameraYaw = game->GetGameWorld()->GetMainCamera().GetYaw();
@@ -91,7 +92,7 @@ void NetworkPlayer::MovePlayer(float dt){
         if (Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT))
             mPlayerInputs.isSprinting = true;
         
-        if (Window::GetKeyboard()->KeyDown(KeyCodes::CONTROL))
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL))
             mPlayerInputs.isCrouching = true;
             
         mPlayerInputs.cameraYaw = game->GetGameWorld()->GetMainCamera().GetYaw();

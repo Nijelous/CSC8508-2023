@@ -60,7 +60,7 @@ void PlayerObject::MovePlayer(float dt) {
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 
-	bool isSprinting = Window::GetKeyboard()->KeyPressed(KeyCodes::SHIFT);
+	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
 	ActivateSprint(isSprinting);
 	ToggleCrouch(isCrouching);
@@ -89,7 +89,7 @@ void PlayerObject::StartWalking() {
 		std::cout << "Walking" << std::endl;
 		mPlayerState = Walk;
 		mIsCrouched = false;
-		mMovementSpeed = mWalkSpeed * 2;
+		mMovementSpeed = mWalkSpeed;
 
 		dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(1.4f);
 	}
