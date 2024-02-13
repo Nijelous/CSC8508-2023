@@ -70,22 +70,6 @@ UniqueOGLTexture OGLTexture::TextureFromFile(const std::string&name) {
 	return glTex;
 }
 
-GLuint NCL::Rendering::OGLTexture::LoadOGLTexture(const std::string& name)
-{
-	char* texData = nullptr;
-	int width = 0;
-	int height = 0;
-	int channels = 0;
-	int flags = 0;
-	TextureLoader::LoadTexture(name, texData, width, height, channels, flags);
-
-	UniqueOGLTexture glTex = TextureFromData(texData, width, height, channels);
-	
-	free(texData);
-	glGenTextures(1, &glTex->texID);
-	
-	return glTex->texID;
-}
 
 UniqueOGLTexture OGLTexture::LoadCubemap(
 	const std::string& xPosFile, 
