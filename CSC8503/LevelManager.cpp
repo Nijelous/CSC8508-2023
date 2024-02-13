@@ -78,7 +78,7 @@ LevelManager::~LevelManager() {
 	delete mAnimation;
 }
 
-void LevelManager::LoadLevel(int levelID, int playerID) {
+void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
@@ -102,7 +102,11 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 		}
 	}
 	mBuilder->BuildNavMesh(mLevelLayout);
-	AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartPosition(playerID) * 10, "Player");
+
+	if (!isMultiplayer){
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartPosition(playerID) * 10, "Player");
+	}
+	
 	mActiveLevel = levelID;
 }
 
@@ -254,6 +258,10 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 
 	playerObject.SetCollisionLayer(Player);
+}
+
+void LevelManager::AddUpdateableGameObject(GameObject& object){
+	mUpdatableObjects.push_back(&object);
 }
 
 GuardObject* LevelManager::AddGuardToWorld(const Vector3 position, const std::string& guardName) {
