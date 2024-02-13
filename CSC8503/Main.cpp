@@ -20,14 +20,17 @@
 #include "BehaviourSelector.h"
 #include "BehaviourSequence.h"
 #include "BehaviourAction.h"
-
+#include "DebugNetworkedGame.h"
+#include "PushdownMachine.h"
+#include "SceneManager.h"
 using namespace NCL;
 using namespace CSC8503;
 
 #include <chrono>
 #include <thread>
 #include <sstream>
-#include "DebugNetworkedGame.h"
+
+
 
 namespace{
     constexpr int SERVER_CHOICE = 1;
@@ -39,7 +42,10 @@ int main(){
     if (!w->HasInitialised()) {
         return -1;
     }
-  
+
+
+    auto* sceneManager = SceneManager::GetSceneManager();
+    
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
@@ -68,7 +74,7 @@ int main(){
     }
     
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
-    while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)) {
+    while (w->UpdateWindow() && !sceneManager->GetIsForceQuit()) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
         if (dt > 0.1f) {
             std::cout << "Skipping large time delta" << std::endl;
@@ -86,7 +92,16 @@ int main(){
         }
 
         w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-        gm->UpdateGame(dt);
+        //gm->UpdateGame(dt);
+
+        if (sceneManager->GetScenePushdownMachine() != nullptr)
+        {
+            sceneManager->GetScenePushdownMachine()->Update(dt);
+        }
+        if (sceneManager->GetCurrentScene() != nullptr)
+        {
+            sceneManager->GetCurrentScene()->UpdateGame(dt);
+        }
     }
     Window::DestroyGameWindow();
 }

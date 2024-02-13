@@ -123,9 +123,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer){
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
-	}
 
-	LoadGuards((*mLevelList[levelID]).GetGuardCount());
+		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
+		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+	}
+	
 	LoadItems(itemPositions);
 }
 
