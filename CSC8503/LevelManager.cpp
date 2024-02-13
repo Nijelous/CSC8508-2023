@@ -312,6 +312,32 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 
 }
 
+PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr)
+{
+	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	pickup->SetBoundingVolume((CollisionVolume*)volume);
+	pickup->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
+
+	pickup->SetCollisionLayer(Collectable);
+
+	pickup->GetPhysicsObject()->SetInverseMass(0);
+	pickup->GetPhysicsObject()->InitSphereInertia(false);
+
+	pickup->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+
+	mWorld->AddGameObject(pickup);
+
+	return pickup;
+}
+
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
 	mTempPlayer = new PlayerObject(mWorld, playerName);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);

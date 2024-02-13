@@ -17,6 +17,7 @@ namespace NCL {
 		class RecastBuilder;
 		class Helipad;
 		class FlagGameObject;
+		class PickupGameObject;
 		class LevelManager {
 		public:
 			LevelManager();
@@ -59,6 +60,8 @@ namespace NCL {
 			Helipad* AddHelipadToWorld(const Vector3& position);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+
+			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
