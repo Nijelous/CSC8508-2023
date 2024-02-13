@@ -72,7 +72,7 @@ namespace InventoryBuffSystem
 		int MAX_INVENTORY_SLOTS = 2;
 		item mPlayerInventory[4][2];
 		PlayerBuffs* mPlayerBuffsPtr;
-		std::list<PlayerInventoryObserver*> mObserverList;
+		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};
 
