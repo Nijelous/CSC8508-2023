@@ -528,10 +528,6 @@ void GameTechRenderer::NewRenderLines() {
 }
 
 void GameTechRenderer::RenderIcons(UI::Icon i) {
-	/*const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
-	if (icons.empty()) {
-		return;
-	}*/
 
 	BindShader(*iconShader);
 
@@ -539,23 +535,6 @@ void GameTechRenderer::RenderIcons(UI::Icon i) {
 
 	UIiconPos.clear();
 	UIiconUVs.clear();
-
-	//for (const auto& i : icons) {
-	//	OGLTexture* t = (OGLTexture*)i.texture;
-	//	//glActiveTexture(GL_TEXTURE0);
-	//	//glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-	//	BindTextureToShader(*t, "iconTex", t->GetObjectID());
-	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	//	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	//	//glBindTexture(GL_TEXTURE_2D, 0);
-
-	//	iconVertCount += 6;
-	//	UI::BuildVerticesForIcon(icons.size(), i.position, i.length, i.height, UIiconPos, UIiconUVs);
-
-	//	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
-	//	glUniform1i(texSlot, i.isAppear);
-
-	//}
 
 	OGLTexture* t = (OGLTexture*)i.texture;
 	BindTextureToShader(*t, "iconTex", t->GetObjectID());
@@ -588,28 +567,6 @@ void GameTechRenderer::RenderIcons(UI::Icon i) {
 	glBindVertexArray(iconVAO);
 	glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
 	glBindVertexArray(0);
-
-	//Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	////0.02, 0, 0, 0
-	////0, 0.02, 0, 0
-	////0, 0, -1, 0;
-	////-1, 1, 0, 1
-
-	//int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
-	//glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
-
-	//SetUIiconBufferSizes(iconVertCount);
-
-	//glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector3), UIiconPos.data());
-	//glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
-	//glBufferSubData(GL_ARRAY_BUFFER, 0, iconVertCount * sizeof(Vector2), UIiconUVs.data());
-
-	//glEnable(GL_BLEND);
-
-	//glBindVertexArray(iconVAO);
-	//glDrawArrays(GL_TRIANGLES, 0, iconVertCount);
-	//glBindVertexArray(0);
 }
 
 void GameTechRenderer::NewRenderText() {
@@ -752,19 +709,14 @@ void GameTechRenderer::SetDebugLineBufferSizes(size_t newVertCount) {
 
 void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 	if (newVertCount > 0) {
-		//textCount = newVertCount;
 
 		glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
 		glBufferData(GL_ARRAY_BUFFER, newVertCount * sizeof(Vector3), nullptr, GL_DYNAMIC_DRAW);
-
-		/*glBindBuffer(GL_ARRAY_BUFFER, textColourVBO);
-		glBufferData(GL_ARRAY_BUFFER, newVertCount * sizeof(Vector4), nullptr, GL_DYNAMIC_DRAW);*/
 
 		glBindBuffer(GL_ARRAY_BUFFER, iconTexVBO);
 		glBufferData(GL_ARRAY_BUFFER, newVertCount * sizeof(Vector2), nullptr, GL_DYNAMIC_DRAW);
 
 		UIiconPos.reserve(newVertCount);
-		//debugTextColours.reserve(newVertCount);
 		UIiconUVs.reserve(newVertCount);
 
 		glBindVertexArray(iconVAO);
@@ -773,17 +725,12 @@ void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 		glVertexAttribBinding(0, 0);
 		glBindVertexBuffer(0, iconVertVBO, 0, sizeof(Vector3));
 
-		/*glVertexAttribFormat(1, 4, GL_FLOAT, false, 0);
-		glVertexAttribBinding(1, 1);
-		glBindVertexBuffer(1, textColourVBO, 0, sizeof(Vector4));*/
-
 		glVertexAttribFormat(1, 2, GL_FLOAT, false, 0);
 		glVertexAttribBinding(1, 1);
 		glBindVertexBuffer(1, iconTexVBO, 0, sizeof(Vector2));
 
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
-		//glEnableVertexAttribArray(2);
 
 		glBindVertexArray(0);
 	}
