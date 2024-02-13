@@ -58,7 +58,6 @@ void NetworkPlayer::ResetPlayerInput(){
 
 void NetworkPlayer::UpdateObject(float dt){
     MovePlayer(dt);
-    std::cout << mMovementSpeed << std::endl;
     if (mIsLocalPlayer){
         AttachCameraToPlayer(game->GetLevelManager()->GetGameWorld());
         mCameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
