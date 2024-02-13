@@ -1,8 +1,7 @@
-﻿#include "../NCLCoreClasses/KeyboardMouseController.h"
-
+﻿
 #pragma once
 #include <memory>
-
+#include "../NCLCoreClasses/KeyboardMouseController.h"
 namespace NCL{
     namespace CSC8503{
         class LevelManager;

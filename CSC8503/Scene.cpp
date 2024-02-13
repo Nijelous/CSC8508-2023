@@ -11,8 +11,6 @@ NCL::CSC8503::Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), 
     mController.MapAxis(2, "Forward");
     mController.MapAxis(3, "XLook");
     mController.MapAxis(4, "YLook");
-
-    InitCamera();
 }
 
 Scene::~Scene(){
