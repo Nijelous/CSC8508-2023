@@ -9,6 +9,9 @@
 #include "PlayerObject.h"
 #include "GuardObject.h"
 #include "Helipad.h"
+#include "InventoryBuffSystem/FlagGameObject.h"
+#include "InventoryBuffSystem/PickupGameObject.h"
+#include "InventoryBuffSystem/InventoryBuffSystem.h"
 
 #include <filesystem>
 
@@ -199,7 +202,10 @@ void LevelManager::LoadGuards(int guardCount) {
 }
 
 void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
-	//TO-DO (nijelous): Load Items in
+	for (int i = 0; i < itemPositions.size(); i++) {
+		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		return;
+	}
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
@@ -212,7 +218,8 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
 	wall->GetPhysicsObject()->SetInverseMass(0);
@@ -237,7 +244,8 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -262,7 +270,8 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
 	helipad->GetPhysicsObject()->SetInverseMass(0);
@@ -275,6 +284,58 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	mLevelLayout.push_back(helipad);
 
 	return helipad;
+}
+
+FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
+	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	flag->SetBoundingVolume((CollisionVolume*)volume);
+	flag->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
+
+	flag->SetCollisionLayer(Collectable);
+
+	flag->GetPhysicsObject()->SetInverseMass(0);
+	flag->GetPhysicsObject()->InitSphereInertia(false);
+
+	flag->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+
+	mWorld->AddGameObject(flag);
+
+	return flag;
+
+}
+
+PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr)
+{
+	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	pickup->SetBoundingVolume((CollisionVolume*)volume);
+	pickup->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
+
+	pickup->SetCollisionLayer(Collectable);
+
+	pickup->GetPhysicsObject()->SetInverseMass(0);
+	pickup->GetPhysicsObject()->InitSphereInertia(false);
+
+	pickup->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+
+	mWorld->AddGameObject(pickup);
+
+	return pickup;
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
