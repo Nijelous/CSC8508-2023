@@ -61,6 +61,10 @@ namespace NCL {
 				return mSqDistToCam;
 			}
 
+			void SetSqDistToCam(const Vector3& camPos) {
+				mSqDistToCam = (camPos - mTransform->GetPosition()).LengthSquared();
+			}
+
 			void SetSqDistToCam(float sqDist) {
 				mSqDistToCam = sqDist;
 			}
