@@ -43,7 +43,7 @@ int main(){
     if (!w->HasInitialised()) {
         return -1;
     }
-
+  
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;

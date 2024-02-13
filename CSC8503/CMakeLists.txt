@@ -13,6 +13,7 @@ set(Header_Files
     "DebugNetworkedGame.h"
     "GameSceneManager.h"
     "PushdownStates.h"
+    "Scene.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -23,7 +24,9 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/PlayerBuffs.h"
     "InventoryBuffSystem/PlayerBuffs.cpp"
     "InventoryBuffSystem/PickupGameObject.h"
-    "InventoryBuffSystem/PickupGameObject.cpp"
+    "InventoryBuffSystem/PickupGameObject.cpp"    
+    "InventoryBuffSystem/FlagGameObject.h"
+    "InventoryBuffSystem/FlagGameObject.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
@@ -51,6 +54,7 @@ set(Source_Files
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
     "GameSceneManager.cpp"
+    "Scene.cpp"
 )
 
 if(USE_VULKAN)

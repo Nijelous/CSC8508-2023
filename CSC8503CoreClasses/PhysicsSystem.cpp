@@ -408,7 +408,8 @@ void PhysicsSystem::NarrowPhase() {
 		}
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = mNumCollisionFrames;
-			ImpulseResolveCollision(*info.a, *info.b, info.point);
+			float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
+			FrictionImpulse(*info.a, *info.b, info.point, j);
 			mAllCollisions.insert(info);
 		}
 	}
