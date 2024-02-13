@@ -5,19 +5,27 @@
 
 namespace InventoryBuffSystem
 {
-    PlayerBuffs* mPlayerBuffsPtr;
-    PlayerInventory* mPlayerInventoryPtr;
-
-    void Init() 
+    class InventoryBuffSystemClass
     {
-        mPlayerBuffsPtr = new PlayerBuffs();
-        mPlayerInventoryPtr = new PlayerInventory();
-    };
+    public:
 
-    void Reset()
-    {
-        mPlayerBuffsPtr->Init();
-        mPlayerInventoryPtr->Init();
+        InventoryBuffSystemClass()
+        {
+            mPlayerBuffsPtr = new PlayerBuffs();
+            mPlayerInventoryPtr = new PlayerInventory();
+        };
+
+        void Reset()
+        {
+            mPlayerBuffsPtr->Init();
+            mPlayerInventoryPtr->Init();
+        };
+
+        PlayerBuffs* GetPlayerBuffsPtr() { return mPlayerBuffsPtr; };
+        PlayerInventory* GetPlayerInventoryPtr() { return mPlayerInventoryPtr; };
+    private:
+        PlayerBuffs* mPlayerBuffsPtr;
+        PlayerInventory* mPlayerInventoryPtr;
     };
 }
 

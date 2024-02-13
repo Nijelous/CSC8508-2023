@@ -15,6 +15,7 @@ namespace NCL {
         public:
             PickupGameObject() {};
             PickupGameObject(std::map<GameObject*, int>* playerObjectToPlayerNoMap,
+                InventoryBuffSystemClass* mInventoryBuffSystemClassPtr,
                 float initCooldown = 5.0f);
             ~PickupGameObject();
 
@@ -37,6 +38,7 @@ namespace NCL {
 
             unsigned int* mRandomSeed;
             bool mIsBuff;
+            InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
             PlayerInventory::item mCurrentItem;
             PlayerBuffs::buff mCurrentBuff;
         };

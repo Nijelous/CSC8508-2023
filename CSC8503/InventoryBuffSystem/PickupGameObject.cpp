@@ -11,9 +11,11 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
-PickupGameObject::PickupGameObject(std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap, float initCooldown) {
+PickupGameObject::PickupGameObject(std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap,
+	InventoryBuffSystemClass* inventoryBuffSystemClassPtr, float initCooldown) {
 	mCooldown = 0.0f;
 	mInitCooldown = initCooldown;
+	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = mPlayerObjectToPlayerNoMap;
 
 	mStateMachine = new StateMachine();
@@ -86,17 +88,17 @@ void PickupGameObject::ChangeToRandomPickup()
 	std::bernoulli_distribution bool_distribution(0.5);
 	mIsBuff = bool_distribution(rng);
 	if (mIsBuff)
-		mCurrentBuff = InventoryBuffSystem::mPlayerBuffsPtr->GetRandomBuffFromPool(*mRandomSeed);
+		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(*mRandomSeed);
 	else
-		mCurrentItem = InventoryBuffSystem::mPlayerInventoryPtr->GetRandomItemFromPool(*mRandomSeed);
+		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(*mRandomSeed);
 }
 
 void PickupGameObject::ActivatePickup(int playerNo)
 {
 	if (mIsBuff)
-		InventoryBuffSystem::mPlayerBuffsPtr->ApplyBuffToPlayer(mCurrentBuff, playerNo);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 	else
-		InventoryBuffSystem::mPlayerInventoryPtr->AddItemToPlayer(mCurrentItem, playerNo);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(mCurrentItem, playerNo);
 
 	mCooldown = INT_MAX;
 }
