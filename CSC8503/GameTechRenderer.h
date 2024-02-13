@@ -58,7 +58,7 @@ namespace NCL {
 			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void CombineBuffers();
-			
+			void DrawOutlinedObjects(RenderObject& ro);
 			void LoadSkybox();
 
 

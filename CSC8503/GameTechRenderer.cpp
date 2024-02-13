@@ -170,7 +170,7 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
-	if(!mLights.empty()) RenderShadowMap();
+	
 	RenderCamera();
 	RenderSkybox();
 	
@@ -178,6 +178,7 @@ void GameTechRenderer::RenderFrame() {
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//DrawOutlinedObjects();
 	NewRenderLines();
 	NewRenderText();
 	glDisable(GL_BLEND);
@@ -423,6 +424,13 @@ void GameTechRenderer::CombineBuffers() {
 	glBindTexture(GL_TEXTURE_2D, mLightSpecularTex);
 	BindMesh(*mQuad);
 	DrawBoundMesh();
+}
+
+void GameTechRenderer::DrawOutlinedObjects(RenderObject& ro) {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	OGLShader* shader = (OGLShader*)ro.GetShader();
+	BindShader(*shader);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 

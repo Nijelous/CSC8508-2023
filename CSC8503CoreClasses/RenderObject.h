@@ -69,6 +69,14 @@ namespace NCL {
 				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
 			}
 
+			void SetOutlined(bool outlined) {
+				mOutlined = outlined;
+			}
+
+			bool GetOutlined() const {
+				return mOutlined;
+			}
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
@@ -78,6 +86,7 @@ namespace NCL {
 			Vector4		mColour;
 			float		mCullSphereRadius;
 			float mSqDistToCam;
+			bool mOutlined = false;
 		};
 	}
 }
