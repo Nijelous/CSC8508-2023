@@ -15,7 +15,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped
+		flagDropped,disguiseItemUsed,soundEmitterUsed
 	};
 
 	class PlayerInventoryObserver
@@ -32,7 +32,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			disguise, item2, none, flag, slowEveryoneElse, soundEmitter
+			disguise, soundEmitter, flag,  none
 		};
 
 		PlayerInventory()
@@ -57,7 +57,7 @@ namespace InventoryBuffSystem
 
 		std::vector<item> mItemsInRandomPool =
 		{
-			disguise, slowEveryoneElse
+			disguise, soundEmitter
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =
@@ -72,7 +72,7 @@ namespace InventoryBuffSystem
 
 		std::map<item, InventoryEvent > mOnItemUsedInventoryEventMap =
 		{
-
+			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}
 		};
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
