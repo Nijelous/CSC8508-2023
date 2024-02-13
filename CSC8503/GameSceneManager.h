@@ -50,6 +50,8 @@ namespace NCL {
 
 			void InitCamera();
 
+			void InitIcons();
+
 			void DisplayMainMenu();
 			void DisplayVictory();
 			void DisplayDefeat();
@@ -85,8 +87,18 @@ namespace NCL {
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
 
-			Texture* mIconTest;
-			Texture* mIconTest2;
+			Texture* mInventorySlotTex;
+
+			Texture* mHighlightAwardTex;
+			Texture* mLightOffTex;
+			Texture* mMakingNoiseTex;
+			Texture* mSilentRunTex;
+			Texture* mSlowDownTex;
+			Texture* mStunTex;
+			Texture* mSwapPositionTex;
+
+			Texture* mSuspensionBarTex;
+			Texture* mSuspensionIndicatorTex;
 
 			// shaders
 			Shader* mBasicShader;

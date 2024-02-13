@@ -16,6 +16,6 @@ void main(void)
           fragColor = texture(iconTex, IN.texCoord);
      }
      else{
-          fragColor = texture(iconTex, IN.texCoord) * vec4(0.4, 0.4, 0.4, 0.3);
+          fragColor = texture(iconTex, IN.texCoord) * vec4(0.06, 0.06, 0.06, 0.2);
      }
 }

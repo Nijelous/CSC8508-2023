@@ -7,6 +7,7 @@
 #include "RenderObject.h"
 #include "AnimationObject.h"
 #include "LevelManager.h"
+#include "UI.h"
 
 #include <irrKlang.h>
 
@@ -63,15 +64,24 @@ GameSceneManager::~GameSceneManager() {
 	delete mWorld;
 	delete mAnimation;
 
-	delete mIconTest;
-	delete mIconTest2;
+	delete mInventorySlotTex;
+	delete mHighlightAwardTex;
+	delete mLightOffTex;
+	delete mMakingNoiseTex;
+	delete mSilentRunTex;
+	delete mSlowDownTex;
+	delete mStunTex;
+	delete mSwapPositionTex;
+
+	delete mSuspensionBarTex;
+	delete mSuspensionIndicatorTex;
 }
 
 void GameSceneManager::UpdateGame(float dt) {
 	mWorld->GetMainCamera().UpdateCamera(dt);
-	UI::Icon icon1 = UI::AddIcon(Vector2(90, 90), 3, 5, mIconTest, false);
-	UI::Icon icon2 = UI::AddIcon(Vector2(85, 90), 3, 5, mIconTest2);
-	UI::Icon icon3 = UI::AddIcon(Vector2(90, 80), 3, 5, mIconTest);
+
+	InitIcons();
+
 	if (mGameState == MainMenuState)
 		DisplayMainMenu();
 
@@ -117,8 +127,18 @@ void GameSceneManager::InitialiseAssets() {
 	mSoldierMaterial = mRenderer->LoadMaterial("Role_T.mat");
 	mSoldierShader = mRenderer->LoadShader("SkinningVertex.glsl", "scene.frag");
 
-	mIconTest = mRenderer->LoadTexture("Default.png");
-	mIconTest2 = mRenderer->LoadTexture("GoatBeige.png");
+	//icons
+	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
+	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
+	mLightOffTex = mRenderer->LoadTexture("LightOff.png");
+	mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
+	mSilentRunTex = mRenderer->LoadTexture("SilentRun.png");
+	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
+	mStunTex = mRenderer->LoadTexture("Stun.png");
+	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
+	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
+	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionPointer.png");
 
 
 	InitCamera();
@@ -131,6 +151,22 @@ void GameSceneManager::InitCamera() {
 	mWorld->GetMainCamera().SetPitch(-15.0f);
 	mWorld->GetMainCamera().SetYaw(315.0f);
 	mWorld->GetMainCamera().SetPosition(Vector3(-60, 40, 60));
+}
+
+void GameSceneManager::InitIcons() {
+	UI::Icon mInventoryIcon1 = UI::AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon2 = UI::AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+
+	UI::Icon mHighlightAwardIcon = UI::AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
+	UI::Icon mLightOffIcon = UI::AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UI::Icon mMakingNoiseIcon = UI::AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UI::Icon mSilentRunIcon = UI::AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UI::Icon mSlowDownIcon = UI::AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UI::Icon mStunIcon = UI::AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
+	UI::Icon mSwapPositionIcon = UI::AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+
+	UI::Icon mSuspensionBarIcon = UI::AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UI::Icon mSuspensionIndicatorIcon = UI::AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
 }
 
 void GameSceneManager::CreateLevel() {
