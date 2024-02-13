@@ -39,6 +39,7 @@ LevelManager::LevelManager() {
 	mActiveLevel = -1;
 
 	InitialiseAssets();
+	InitialiseIcons();
 }
 
 LevelManager::~LevelManager() {
