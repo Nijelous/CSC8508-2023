@@ -6,7 +6,7 @@
 
 using namespace NCL::CSC8503;
 
-constexpr ParserVariables LEVEL_VARIABLES[13] = {
+constexpr ParserVariables LEVEL_VARIABLES[14] = {
 	TileMap,
 	RoomList,
 	GuardCount,
@@ -14,12 +14,13 @@ constexpr ParserVariables LEVEL_VARIABLES[13] = {
 	GuardPaths,
 	CCTVTransforms,
 	PrisonPosition,
-	PlayerStartPositions,
+	PlayerStartTransforms,
 	DirectionalLight,
 	Pointlight,
 	Spotlight,
 	ItemPositions,
-	Vents
+	Vents,
+	Helipad
 };
 
 constexpr ParserVariables ROOM_VARIABLES[6] = {
@@ -33,6 +34,7 @@ constexpr ParserVariables ROOM_VARIABLES[6] = {
 
 void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	if ((!level && !room) || (level && room)) return;
+	mPlayerCount = 0;
 	std::string output = "";
 	std::string currentKey = "";
 
@@ -83,7 +85,8 @@ void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	WriteVariable(keyValuePairs, level, room);
 }
 
-void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents) {
+void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, 
+	std::string key, std::string* value, int indents, int maxIndents) {
 	if (writingValue) {
 		if (keyValuePairs->size() <= maxIndents || indents < maxIndents) {
 			(*keyValuePairs)[indents - 1][key] = std::atof(value->c_str());
@@ -112,6 +115,7 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case RoomList:
+		if (keyValuePairs.size() == 1) return;
 		level->mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = new Room((int)keyValuePairs[1]["type"]);
 		break;
 
@@ -124,6 +128,7 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case GuardPaths:
+		if (keyValuePairs.size() == 1) return;
 		level->mGuardPaths.push_back(std::vector<Vector3>());
 		for (int i = 2; i < keyValuePairs.size(); i++) {
 			level->mGuardPaths[level->mGuardPaths.size() - 1].push_back(Vector3(keyValuePairs[i]["x"], keyValuePairs[i]["y"], -keyValuePairs[i]["z"]));
@@ -131,9 +136,11 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case CCTVTransforms:
+		if (keyValuePairs.size() == 1) return;
 	{
-		Matrix4 newTransform = Matrix4::Rotation(keyValuePairs[3]["y"], Vector3(0, 1, 0)) *
-			Matrix4::Translation(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])) * Matrix4::Scale(Vector3(1, 1, 1)) * Matrix4();
+		Transform newTransform = Transform();
+		newTransform.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+			.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, keyValuePairs[3]["y"]-180, 0));
 		if (level) level->mCCTVTransforms.push_back(newTransform);
 		else room->mCCTVTransforms.push_back(newTransform);
 	}
@@ -143,12 +150,13 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		level->mPrisonPosition = Vector3(keyValuePairs[1]["x"], keyValuePairs[1]["y"], -keyValuePairs[1]["z"]);
 		break;
 
-	case PlayerStartPositions:
-		for (int i = 0; i < MAX_PLAYERS; i++) {
-			if (!level->mPlayerStartPositions[i].x) {
-				level->mPlayerStartPositions[i] = Vector3(keyValuePairs[1]["x"], keyValuePairs[1]["y"], -keyValuePairs[1]["z"]);
-				break;
-			}
+	case PlayerStartTransforms:
+		if (mPlayerCount < MAX_PLAYERS) {
+			Transform newTransform = Transform();
+			newTransform.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+				.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"]-180, keyValuePairs[3]["z"]));
+			level->mPlayerStartTransforms[mPlayerCount] = newTransform;
+			mPlayerCount++;
 		}
 		break;
 
@@ -161,6 +169,7 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;*/
 
 	case Pointlight:
+		if (keyValuePairs.size() == 1) return;
 	{
 		Light* newLight = (Light*)new PointLight(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]),
 			Vector4(keyValuePairs[3]["x"], keyValuePairs[3]["y"], keyValuePairs[3]["z"], keyValuePairs[3]["w"]), keyValuePairs[1]["radius"]);
@@ -170,8 +179,9 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case Spotlight:
+		if (keyValuePairs.size() == 1) return;
 	{
-		Light* newLight = (Light*)new SpotLight(Vector3(keyValuePairs[4]["x"], keyValuePairs[4]["y"], -keyValuePairs[4]["z"]),
+		Light* newLight = (Light*)new SpotLight(Vector3(keyValuePairs[4]["x"], keyValuePairs[4]["y"]-180, -keyValuePairs[4]["z"]),
 			Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]),
 			Vector4(keyValuePairs[3]["x"], keyValuePairs[3]["y"], keyValuePairs[3]["z"], keyValuePairs[3]["w"]),
 			keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
@@ -189,11 +199,17 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 		break;
 
 	case Vents:
+		if (keyValuePairs.size() == 1) return;
+	{
 		Vent* vent = new Vent();
 		vent->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
-			.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"], -keyValuePairs[3]["z"]));
+			.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"]-180, -keyValuePairs[3]["z"]));
 		level->mVents.push_back(vent);
 		level->mVentConnections.push_back(keyValuePairs[1]["connectedVentID"]);
+	}
+		break;
+	case Helipad:
+		level->mHelipadPosition = Vector3(keyValuePairs[1]["x"], keyValuePairs[1]["y"], -keyValuePairs[1]["z"]);
 		break;
 	}
 }

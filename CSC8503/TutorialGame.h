@@ -104,10 +104,19 @@ namespace NCL {
 
 
 			//Animation Thing
+			Shader* mAnimationShader = nullptr;
+
 			Mesh* mSoldierMesh = nullptr;
 			MeshAnimation* mSoldierAnimation = nullptr;
 			MeshMaterial* mSoldierMaterial = nullptr;
-			Shader* mSoldierShader = nullptr;
+			
+
+			Mesh* mGuardMesh = nullptr;
+			MeshAnimation* mGuardAnimation = nullptr;
+			MeshMaterial* mGuardMaterial = nullptr;
+			
+			
+			
 			AnimationSystem* mAnimation;
 
 

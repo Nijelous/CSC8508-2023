@@ -19,6 +19,7 @@ using namespace Rendering;
 using namespace Maths;
 
 bool MshLoader::LoadMesh(const std::string& filename, Mesh& destinationMesh) {
+	
 	std::ifstream file(Assets::MESHDIR + filename);
 
 	std::string filetype;
@@ -115,7 +116,7 @@ bool MshLoader::LoadMesh(const std::string& filename, Mesh& destinationMesh) {
 		case GeometryChunkTypes::BindPoseInv: {
 			vector<Matrix4> inverseBindPose;
 			ReadRigPose(file, inverseBindPose);
-			destinationMesh.SetBindPose(inverseBindPose);
+			destinationMesh.SetInverseBindPose(inverseBindPose);
 		}break;
 		case GeometryChunkTypes::SubMeshes: {
 			vector<SubMesh> subMeshes;
@@ -130,7 +131,7 @@ bool MshLoader::LoadMesh(const std::string& filename, Mesh& destinationMesh) {
 		}break;
 		}
 	}
-
+	
 	destinationMesh.SetPrimitiveType(GeometryPrimitive::Triangles);
 
 	return true;
