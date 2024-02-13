@@ -31,8 +31,6 @@ constexpr ParserVariables ROOM_VARIABLES[6] = {
 	ItemPositions,
 };
 
-constexpr int MAX_PLAYERS = 4;
-
 void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	if ((!level && !room) || (level && room)) return;
 	std::string output = "";

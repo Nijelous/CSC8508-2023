@@ -54,12 +54,16 @@ x64/Debug/
 x64/Release/
 CSC8503.sln
 DebugUtils/Debug
+DebugUtils/Release
 DebugUtils/DebugUtils.dir
 Detour/Debug
+Detour/Release
 Detour/Detour.dir
 Recast/Debug
+Recast/Release
 Recast/Recast.dir
 DetourTileCache/Debug
+DetourTileCache/Release
 DetourTileCache/DetourTileCache.dir
 
 DebugUtils/DebugUtils.vcxproj.filters

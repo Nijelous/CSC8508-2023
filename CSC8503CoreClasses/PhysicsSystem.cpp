@@ -1,11 +1,10 @@
 #include "PhysicsSystem.h"
 #include "PhysicsObject.h"
 #include "GameObject.h"
-#include "CollisionDetection.h"
 #include "Quaternion.h"
 
 #include "Constraint.h"
-
+#include "CollisionDetection.h"
 #include "Debug.h"
 #include "Window.h"
 #include <functional>
@@ -14,7 +13,6 @@ using namespace CSC8503;
 
 PhysicsSystem::PhysicsSystem(GameWorld& g) : mGameWorld(g) {
 	mApplyGravity = false;
-	mUseBroadPhase = false;
 	mDTOffset = 0.0f;
 	mGlobalDamping = 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
@@ -65,23 +63,6 @@ int realHZ = idealHZ;
 float realDT = idealDT;
 
 void PhysicsSystem::Update(float dt) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::B)) {
-		mUseBroadPhase = !mUseBroadPhase;
-		std::cout << "Setting broadphase to " << mUseBroadPhase << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::N)) {
-		useSimpleContainer = !useSimpleContainer;
-		std::cout << "Setting broad container to " << useSimpleContainer << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::I)) {
-		constraintIterationCount--;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::O)) {
-		constraintIterationCount++;
-		std::cout << "Setting constraint iterations to " << constraintIterationCount << std::endl;
-	}
-
 	mDTOffset += dt; //We accumulate time delta here - there might be remainders from previous frame!
 
 	GameTimer t;
@@ -367,10 +348,10 @@ compare the collisions that we absolutely need to.
 */
 void PhysicsSystem::BroadPhase() {
 	// clear last frames collisions
-	mBroadphaseCollisions.clear();
+ 	mBroadphaseCollisions.clear();
 
 	// create quadtree to store all objects
-	QuadTree<GameObject*> tree(Vector2(1024, 1024), 7, 6);
+	QuadTree<GameObject*> tree(Vector2(256, 256), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	mGameWorld.GetObjectIterators(first, last);
@@ -390,13 +371,21 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
+				if (info.a->GetCollisionLayer() & Player || info.b->GetCollisionLayer() & Player) {
+					int test = 12;
+				}
+				if (info.a->GetCollisionLayer() & NoCollide || info.b->GetCollisionLayer() & NoCollide) {
+					continue;
+				}
+				if (info.a->GetCollisionLayer() & STATIC_COLLISION_LAYERS && info.b->GetCollisionLayer() & STATIC_COLLISION_LAYERS) {
+					continue;
+				}				
 				mBroadphaseCollisions.insert(info);
 			}
 		}
-		});
-
-
+	});
 }
+
 
 /*
 
@@ -407,6 +396,9 @@ void PhysicsSystem::NarrowPhase() {
 	// iteratr through all collisions added and if collision then call impulse resolve collision
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = mBroadphaseCollisions.begin(); i != mBroadphaseCollisions.end(); i++) {
 		CollisionDetection::CollisionInfo info = *i;
+		if (info.a->GetCollisionLayer() & NO_COLLISION_RESOLUTION || info.b->GetCollisionLayer() & NO_COLLISION_RESOLUTION) {
+			continue;
+		}
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = mNumCollisionFrames;
 			ImpulseResolveCollision(*info.a, *info.b, info.point);
