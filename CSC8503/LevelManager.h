@@ -44,6 +44,8 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
+			bool CheckGameWon();
+
 		protected:
 			virtual void InitialiseAssets();
 
@@ -102,6 +104,8 @@ namespace NCL {
 			Mesh* mSoldierMesh;
 			MeshAnimation* mSoldierAnimation;
 			MeshMaterial* mSoldierMaterial;
+
+			Helipad* mHelipad;
 
 			PlayerObject* mTempPlayer;
 
