@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
+#include "Transform.h"
 
 namespace NCL {
 	using namespace NCL::Rendering;

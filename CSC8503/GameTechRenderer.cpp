@@ -170,7 +170,6 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
-	if(!mLights.empty()) RenderShadowMap();
 	RenderCamera();
 	RenderSkybox();
 	
