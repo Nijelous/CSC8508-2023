@@ -51,6 +51,8 @@ namespace InventoryBuffSystem
 		void Notify(InventoryEvent invEvent,int playerNo);
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
+
+		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 	private:
 
 		std::vector<item> mItemsInRandomPool =

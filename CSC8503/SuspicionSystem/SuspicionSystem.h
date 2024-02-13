@@ -1,25 +1,34 @@
 #pragma once
 #include "LocalSuspicionMetre.h"
 #include "GlobalSuspicionMetre.h"
-#include "LocationBasedSuspicion.h"
+#include "LocationBasedSuspicion.h"mLocationBasedSuspicionPtr
 #include "SuspicionMetre.h"
 
 namespace SuspicionSystem 
 {
-	LocalSuspicionMetre* mLocalSuspicionMetre;
-	GlobalSuspicionMetre* mGlobalSuspicionMetre;
-	LocationBasedSuspicion* mLocationBasedSuspicion;
-	void Init()
+	class SuspicionSystemClass
 	{
-		mGlobalSuspicionMetre = new GlobalSuspicionMetre();
-		mLocalSuspicionMetre = new LocalSuspicionMetre(mGlobalSuspicionMetre);
-		mLocationBasedSuspicion = new LocationBasedSuspicion();
-	}
+	public:
+		void Init()
+		{
+			mGlobalSuspicionMetrePtr = new GlobalSuspicionMetre();
+			mLocalSuspicionMetrePtr = new LocalSuspicionMetre(mGlobalSuspicionMetrePtr);
+			mLocationBasedSuspicionPtr = new LocationBasedSuspicion();
+		}
 
-	void Reset()
-	{
-		mGlobalSuspicionMetre->Init();
-		mLocalSuspicionMetre->Init();
-		mLocationBasedSuspicion->Init();
-	}
+		void Reset()
+		{
+			mGlobalSuspicionMetrePtr->Init();
+			mLocalSuspicionMetrePtr->Init();
+			mLocationBasedSuspicionPtr->Init();
+		}
+
+		LocalSuspicionMetre* GetLocalSuspicionMetre() { return mLocalSuspicionMetrePtr; };
+		GlobalSuspicionMetre* GetGlobalSuspicionMetre() { return mGlobalSuspicionMetrePtr; };
+		LocationBasedSuspicion* GetLocationBasedSuspicion() { return mLocationBasedSuspicionPtr; };
+	private:
+		LocalSuspicionMetre* mLocalSuspicionMetrePtr;
+		GlobalSuspicionMetre* mGlobalSuspicionMetrePtr;
+		LocationBasedSuspicion* mLocationBasedSuspicionPtr;
+	};
 };
