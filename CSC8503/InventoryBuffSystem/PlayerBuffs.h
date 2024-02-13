@@ -3,13 +3,14 @@
 #include <random>
 #include <map>
 #include "Level.h"
+#include "PlayerInventory.h"
 
 using namespace NCL::CSC8503;
 
 namespace InventoryBuffSystem {
 	const enum BuffEvent
 	{
-		
+		disguiseBuffApplied, disguiseBuffRemoved
 	};
 
 	class PlayerBuffsObserver
@@ -17,12 +18,12 @@ namespace InventoryBuffSystem {
 	public:
 		virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) = 0;
 	};
-	class PlayerBuffs
+	class PlayerBuffs : public PlayerInventoryObserver
 	{
 	public:
 		enum buff
 		{
-			disguise, buff2
+			disguiseBuff, buff2
 		};
 
 		void Init();
@@ -31,6 +32,8 @@ namespace InventoryBuffSystem {
 		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
 		void Update(float dt);
 
+		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+
 		void Attach(PlayerBuffsObserver* observer);
 		void Detach(PlayerBuffsObserver* observer);
 		void Notify(BuffEvent buffEvent, int playerNo);
@@ -38,17 +41,17 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			disguise, buff2
+			disguiseBuff, buff2
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguise,10},{buff2,4}
+			{disguiseBuff,10},{buff2,4}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
-
+			{disguiseBuff, disguiseBuffApplied}
 		};
 
 		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
@@ -58,11 +61,10 @@ namespace InventoryBuffSystem {
 
 		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
-
+			{disguiseBuff, disguiseBuffRemoved}
 		};
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
 		std::list<PlayerBuffsObserver*> mBuffsObserverList;
 	};
-
 }

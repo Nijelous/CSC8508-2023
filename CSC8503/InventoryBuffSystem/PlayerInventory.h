@@ -3,7 +3,6 @@
 #include <map>
 #include <random>
 #include "Vector3.h"
-#include "PlayerBuffs.h"
 #include "Level.h"
 
 using namespace NCL::CSC8503;
@@ -44,7 +43,6 @@ namespace InventoryBuffSystem
 		void AddItemToPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(int playerNo, int invSlot);
-		void DropFlagFromPlayer(int playerNo);
 		void UseItemInPlayerSlot(int itemSlot, int playerNo);
 		bool ItemInPlayerInventory(item inItem, int playerNo);
 
@@ -76,7 +74,6 @@ namespace InventoryBuffSystem
 		};
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
-		PlayerBuffs* mPlayerBuffsPtr;
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};

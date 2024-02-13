@@ -8,11 +8,6 @@ void PlayerBuffs::Init()
 {
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 		mActiveBuffDurationMap[playerNo].clear();
-
-	mBuffsInRandomPool =
-	{
-		disguise, buff2
-	};
 }
 
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo)
@@ -61,6 +56,17 @@ void PlayerBuffs::Update(float dt)
 				RemoveBuffFromPlayer(entry->first, playerNo);
 			}
 		}
+	}
+}
+
+void InventoryBuffSystem::PlayerBuffs::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo)
+{
+	switch (invEvent)
+	{
+	case disguiseItemUsed:
+		ApplyBuffToPlayer(PlayerBuffs::disguiseBuff, playerNo);
+	default:
+		break;
 	}
 }
 

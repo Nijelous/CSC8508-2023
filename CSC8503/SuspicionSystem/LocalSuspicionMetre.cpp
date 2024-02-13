@@ -46,6 +46,21 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
     return false;
 }
 
+void LocalSuspicionMetre::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo)
+{
+    switch (buffEvent)
+    {
+    case disguiseBuffApplied:
+        AddActiveLocalSusCause(disguiseBuff, playerNo);
+        break;
+    case disguiseBuffRemoved:
+        RemoveActiveLocalSusCause(disguiseBuff, playerNo);
+        break;
+    default:
+        break;
+    }
+}
+
 void LocalSuspicionMetre::Update(float dt)
 {
     for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
