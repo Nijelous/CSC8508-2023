@@ -194,7 +194,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i][i+1], "Guard");
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
 	}
 }
 
@@ -327,7 +327,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::string& guardName) {
+GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName) {
 	GuardObject* guard = new GuardObject(guardName);
 
 	float meshSize = PLAYER_MESH_SIZE;
@@ -338,7 +338,7 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::s
 
 	guard->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
+		.SetPosition(nodes[1]);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
@@ -350,6 +350,8 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::s
 
 	guard->SetPlayer(mTempPlayer);
 	guard->SetGameWorld(mWorld);
+	guard->SetPrisonPosition(prisonPosition);
+	guard->SetPatrolNodes(nodes);
 
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);

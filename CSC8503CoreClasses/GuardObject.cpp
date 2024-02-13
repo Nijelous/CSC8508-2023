@@ -32,7 +32,7 @@ void GuardObject::UpdateObject(float dt) {
 void GuardObject::RaycastToPlayer() {
 	mPlayer = dynamic_cast<PlayerObject*>(mPlayer);
 	Vector3 dir = (mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
-	float ang = Vector3::Dot(dir, AngleOfSight());
+	float ang = Vector3::Dot(dir, GuardForwardVector());
 	if (ang > 2) {
 		RayCollision closestCollision;
 		Ray r = Ray(this->GetTransform().GetPosition(), dir);
@@ -56,65 +56,14 @@ void GuardObject::RaycastToPlayer() {
 	}
 }
 
-Vector3 GuardObject::AngleOfSight() {
+Vector3 GuardObject::GuardForwardVector() {
 	Vector3 rightAxis = this->mTransform.GetMatrix().GetColumn(0);
 	Vector3 fwdAxis = Vector3::Cross(Vector3(0, 1, 0), rightAxis);
 	return fwdAxis;
 }
 
-Quaternion GuardObject::VectorToQuaternion(Vector3 directionVector) {
-	directionVector.Normalise();
-	directionVector.y = 0;
-	Vector3 xAxis = Vector3::Cross(directionVector, Vector3(0, 1, 0));
-	xAxis.Normalise();
-	Vector3 yAxis = Vector3::Cross(directionVector, xAxis);
-	yAxis.Normalise();
+void GuardObject::SetFocus() {
 
-	Matrix3 m = Matrix3();
-	Vector3 column1 = Vector3(xAxis.x, yAxis.x, directionVector.x);
-	Vector3 column2 = Vector3(xAxis.y, yAxis.y, directionVector.y);
-	Vector3 column3 = Vector3(xAxis.z, yAxis.z, directionVector.z);
-	m.SetColumn(0, column1);
-	m.SetColumn(1, column2);
-	m.SetColumn(2, column3);
-
-	return Matrix3ToQuaternion(m);
-}
-
-Quaternion GuardObject::Matrix3ToQuaternion(Matrix3 m) {
-	Quaternion rotation = Quaternion();
-	float trace = m.GetColumn(0)[0] + m.GetColumn(1)[1] + m.GetColumn(2)[2];
-	if (trace > 0) {
-		float s = 0.5f / sqrtf(trace + 1.0f);
-		rotation.w = 0.25f / s;
-		rotation.x = (m.GetColumn(2)[1] - m.GetColumn(1)[2]) * s;
-		rotation.y = (m.GetColumn(0)[2] - m.GetColumn(2)[0]) * s;
-		rotation.z = (m.GetColumn(1)[0] - m.GetColumn(0)[1]) * s;
-	}
-	else {
-		if (m.GetColumn(0)[0] > m.GetColumn(1)[1] && m.GetColumn(0)[0] > m.GetColumn(2)[2]) {
-			float s = 2.0f * sqrtf(1.0f + m.GetColumn(0)[0] - m.GetColumn(1)[1] - m.GetColumn(2)[2]);
-			rotation.w = (m.GetColumn(2)[1] - m.GetColumn(1)[2]) / s;
-			rotation.x = 0.25f * s;
-			rotation.y = (m.GetColumn(0)[1] + m.GetColumn(1)[0]) / s;
-			rotation.z = (m.GetColumn(0)[2] + m.GetColumn(2)[0]) / s;
-		}
-		else if (m.GetColumn(1)[1] > m.GetColumn(2)[2]) {
-			float s = 2.0f * sqrtf(1.0f + m.GetColumn(1)[1] - m.GetColumn(0)[0] - m.GetColumn(2)[2]);
-			rotation.w = (m.GetColumn(0)[2] - m.GetColumn(2)[0]) / s;
-			rotation.x = (m.GetColumn(0)[1] + m.GetColumn(1)[0]) / s;
-			rotation.y = 0.25f * s;
-			rotation.z = (m.GetColumn(1)[2] + m.GetColumn(2)[1]) / s;
-		}
-		else {
-			float s = 2.0f * sqrtf(1.0f + m.GetColumn(2)[2] - m.GetColumn(0)[0] - m.GetColumn(1)[1]);
-			rotation.w = (m.GetColumn(1)[0] - m.GetColumn(0)[1]) / s;
-			rotation.x = (m.GetColumn(0)[2] + m.GetColumn(2)[0]) / s;
-			rotation.y = (m.GetColumn(1)[2] + m.GetColumn(2)[1]) / s;
-			rotation.z = 0.25f * s;
-		}
-	}
-	return rotation;
 }
 
 void GuardObject::BehaviourTree() {
@@ -145,8 +94,7 @@ BehaviourAction* GuardObject::Patrol() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
-				//std::cout << "Lost em";
-  
+				
 				return Success;
 			}
 			else if (mCanSeePlayer == true) {
@@ -167,17 +115,28 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		else if (state == Ongoing){
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 				int GuardCatchingDistanceSquared = 25;
-				int GuardSpeedMultiplyer = 30;
+				int GuardSpeedMultiplyer = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 				Vector3 dirNorm = direction.Normalised();
-				this->GetTransform().SetOrientation(VectorToQuaternion(direction) * Quaternion(1.0f, 0.0f,0.0f,0.0f));
+				Vector3 upVector = this->GetTransform().GetOrientation() * Vector3(0,1,0);
+				Vector3 perpendicularVector = Vector3::Cross(GuardForwardVector(), upVector);
+				float angleOfPlayer = Vector3::Dot(dirNorm, perpendicularVector.Normalised());
 
-				this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * GuardSpeedMultiplyer);
+				if (angleOfPlayer <= 0.1) {
+					this->GetPhysicsObject()->AddTorque(Vector3(0,10,0));
+				}
+				else if (angleOfPlayer >= -0.1) {
+					this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
+				}
 
 				float dist = direction.LengthSquared();
 				if (dist < GuardCatchingDistanceSquared) {
+					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
 					return Failure;
+				}
+				else {
+					this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * GuardSpeedMultiplyer);
 				}
 			}
 			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
@@ -202,7 +161,6 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == true) {
 				mConfiscateItemsTime -= dt;
-				std::cout << "Caught";
 				Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
 				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 				if (mConfiscateItemsTime == 0) {
@@ -233,8 +191,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 	BehaviourAction* SendToPrison = new BehaviourAction("Send to Prison", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
-				Vector3 prisonLocation = Vector3(mPlayer->GetTransform().GetPosition().x, 100, mPlayer->GetTransform().GetPosition().z);
-				mPlayer->GetTransform().SetPosition(prisonLocation);
+				mPlayer->GetTransform().SetPosition(mPrisonPosition);
 				mHasCaughtPlayer = false;
 				return Success;
 			}

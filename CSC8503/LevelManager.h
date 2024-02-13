@@ -57,7 +57,7 @@ namespace NCL {
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
-			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
 
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
