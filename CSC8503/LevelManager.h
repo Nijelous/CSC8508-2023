@@ -13,6 +13,7 @@ namespace NCL {
 		class PlayerObject;
 		class GuardObject;
 		class RecastBuilder;
+		class Helipad;
 		class LevelManager {
 		public:
 			LevelManager();
@@ -20,7 +21,7 @@ namespace NCL {
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
-			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[player]).GetPlayerStartPosition(player)*10; }
+			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
 			void LoadLevel(int levelID, int playerID);
 
 			PlayerObject* GetTempPlayer() { return mTempPlayer; }
@@ -37,6 +38,8 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
+
 		protected:
 			virtual void InitialiseAssets();
 
@@ -44,12 +47,17 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
+			void LoadGuards(int guardCount);
+
+			void LoadItems(const std::vector<Vector3> itemPositions);
+
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);
+			Helipad* AddHelipadToWorld(const Vector3& position);
 
-			PlayerObject* AddPlayerToWorld(const Vector3 position, const std::string& playerName);
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
-			GuardObject* AddGuardToWorld(const Vector3 position, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& guardName);
 
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
