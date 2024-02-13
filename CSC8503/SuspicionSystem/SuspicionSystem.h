@@ -1,7 +1,7 @@
 #pragma once
 #include "LocalSuspicionMetre.h"
 #include "GlobalSuspicionMetre.h"
-#include "LocationBasedSuspicion.h"mLocationBasedSuspicionPtr
+#include "LocationBasedSuspicion.h"
 #include "SuspicionMetre.h"
 
 namespace SuspicionSystem 
