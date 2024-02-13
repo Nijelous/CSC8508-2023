@@ -392,7 +392,7 @@ bool LevelManager::CheckGameWon() {
 	CollisionDetection::CollisionInfo x;
 	if (mTempPlayer && mHelipad) {
 		if (CollisionDetection::ObjectIntersection(mTempPlayer, mHelipad, x)) {
-			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][0] == PlayerInventory::flag)
+			if ((mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][0] == PlayerInventory::flag) || (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][1] == PlayerInventory::flag))
 				return true;
 		}
 	}
