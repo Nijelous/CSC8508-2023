@@ -46,6 +46,7 @@ namespace InventoryBuffSystem
 		void DropItemFromPlayer(int playerNo, int invSlot);
 		void DropFlagFromPlayer(int playerNo);
 		void UseItemInPlayerSlot(int itemSlot, int playerNo);
+		bool ItemInPlayerInventory(item inItem, int playerNo);
 
 		void Attach(PlayerInventoryObserver* observer);
 		void Detach(PlayerInventoryObserver* observer);

@@ -17,7 +17,7 @@ void PlayerBuffs::Init()
 
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo)
 {
-	mOnBuffAppliedFunctionMap[inBuff](playerNo);
+	Notify(mOnBuffAppliedBuffEventMap[inBuff],playerNo);
 
 	if (mBuffInitDurationMap[inBuff] != 0)
 	{
@@ -31,7 +31,7 @@ void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo)
 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
-		mOnBuffRemovedFunctionMap[inBuff](playerNo);
+		Notify(mOnBuffRemovedBuffEventMap[inBuff],playerNo);
 		mActiveBuffDurationMap[playerNo].erase(foundBuff);
 	}
 };
@@ -54,12 +54,31 @@ void PlayerBuffs::Update(float dt)
 
 			if (entry->second > 0)
 			{
-				mOnBuffTickFunctionMap[entry->first](playerNo, dt);
+				Notify(mOnBuffTickBuffEventMap[entry->first],playerNo);
 			}
 			else
 			{
 				RemoveBuffFromPlayer(entry->first, playerNo);
 			}
 		}
+	}
+}
+
+void InventoryBuffSystem::PlayerBuffs::Attach(PlayerBuffsObserver* observer)
+{
+	mBuffsObserverList.push_back(observer);
+}
+
+void InventoryBuffSystem::PlayerBuffs::Detach(PlayerBuffsObserver* observer)
+{
+	mBuffsObserverList.remove(observer);
+}
+
+void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo)
+{
+	std::list<PlayerBuffsObserver*>::iterator iterator = mBuffsObserverList.begin();
+	while (iterator != mBuffsObserverList.end()) {
+		(*iterator)->UpdateInventoryObserver(buffEvent, playerNo);
+		++iterator;
 	}
 }

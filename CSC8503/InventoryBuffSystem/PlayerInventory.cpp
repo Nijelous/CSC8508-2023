@@ -69,6 +69,19 @@ void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot)
 	mPlayerInventory[playerNo][invSlot] = none;
 }
 
+bool PlayerInventory::ItemInPlayerInventory(item inItem, int playerNo)
+{
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+	{
+		if (mPlayerInventory[playerNo][invSlot] == inItem)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer)
 {
 	mInventoryObserverList.push_back(observer);

@@ -25,6 +25,13 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 	mGravity = g;
 }
 
+void PhysicsSystem::SetNewBroadphaseSize(const Vector3& levelSize) {
+	int xz = 64;
+	while(levelSize.x > xz || levelSize.z > xz){
+		xz *= 2;
+	}
+}
+
 /*
 
 If the 'game' is ever reset, the PhysicsSystem must be
@@ -351,7 +358,7 @@ void PhysicsSystem::BroadPhase() {
  	mBroadphaseCollisions.clear();
 
 	// create quadtree to store all objects
-	QuadTree<GameObject*> tree(Vector2(256, 256), 7, 6);
+	QuadTree<GameObject*> tree(Vector2(mBroadphaseXZ, mBroadphaseXZ), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	mGameWorld.GetObjectIterators(first, last);
@@ -401,7 +408,8 @@ void PhysicsSystem::NarrowPhase() {
 		}
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = mNumCollisionFrames;
-			ImpulseResolveCollision(*info.a, *info.b, info.point);
+			float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
+			FrictionImpulse(*info.a, *info.b, info.point, j);
 			mAllCollisions.insert(info);
 		}
 	}

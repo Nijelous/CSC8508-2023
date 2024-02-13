@@ -12,12 +12,13 @@ namespace NCL {
 			GuardPaths,
 			CCTVTransforms,
 			PrisonPosition,
-			PlayerStartPositions,
+			PlayerStartTransforms,
 			DirectionalLight,
 			Pointlight,
 			Spotlight,
 			ItemPositions,
-			Vents
+			Vents,
+			Helipad
 		};
 		class JsonParser {
 		public:
@@ -26,6 +27,7 @@ namespace NCL {
 		protected:
 			void WriteVariable(std::vector<std::map<std::string, float>>& keyValuePairs, Level* level, Room* room);
 			void WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents);
+			int mPlayerCount = 0;
 		};
 	}
 }
