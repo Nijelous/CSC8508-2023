@@ -56,6 +56,9 @@ void LocalSuspicionMetre::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int pla
     case disguiseBuffRemoved:
         RemoveActiveLocalSusCause(disguiseBuff, playerNo);
         break;
+    case playerMakesSound:
+        AddInstantLocalSusCause(soundEmitted, playerNo);
+        break;
     default:
         break;
     }

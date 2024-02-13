@@ -10,7 +10,7 @@ using namespace NCL::CSC8503;
 namespace InventoryBuffSystem {
 	const enum BuffEvent
 	{
-		disguiseBuffApplied, disguiseBuffRemoved
+		Null, disguiseBuffApplied, disguiseBuffRemoved,slowApplied, slowRemoved, playerMakesSound
 	};
 
 	class PlayerBuffsObserver
@@ -23,7 +23,7 @@ namespace InventoryBuffSystem {
 	public:
 		enum buff
 		{
-			disguiseBuff, buff2
+			Null, disguiseBuff, slow, makeSound, slowEveryoneElse, everyoneMakesASound
 		};
 
 		void Init();
@@ -41,17 +41,17 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			disguiseBuff, buff2
+			slowEveryoneElse, everyoneMakesASound
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,10},{buff2,4}
+			{disguiseBuff,10}, {slowEveryoneElse,0}, {everyoneMakesASound,0}, {slow,4}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffApplied}
+			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied}, {makeSound, playerMakesSound}
 		};
 
 		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
@@ -61,7 +61,29 @@ namespace InventoryBuffSystem {
 
 		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffRemoved}
+			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved}
+		};
+
+		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap
+		{
+			{slowEveryoneElse,[this](int playerNo)
+				{
+					for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++){
+						if(i!=playerNo){
+							ApplyBuffToPlayer(slow,i);
+						}
+					}
+				}
+			},
+			{everyoneMakesASound,[this](int playerNo)
+				{
+					for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++) {
+						if (i != playerNo) {
+							ApplyBuffToPlayer(makeSound,i);
+						}
+					}
+				}
+			}
 		};
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];

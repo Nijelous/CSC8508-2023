@@ -22,6 +22,11 @@ namespace InventoryBuffSystem
             mPlayerInventoryPtr->Init();
         };
 
+        void Update(float dt)
+        {
+            mPlayerBuffsPtr->Update(dt);
+        };
+
         PlayerBuffs* GetPlayerBuffsPtr() { return mPlayerBuffsPtr; };
         PlayerInventory* GetPlayerInventoryPtr() { return mPlayerInventoryPtr; };
     private:

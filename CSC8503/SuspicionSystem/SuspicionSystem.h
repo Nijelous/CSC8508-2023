@@ -23,6 +23,13 @@ namespace SuspicionSystem
 			mLocationBasedSuspicionPtr->Init();
 		}
 
+		void Update(float dt)
+		{
+			mGlobalSuspicionMetrePtr->Update(dt);
+			mLocalSuspicionMetrePtr->Update(dt);
+			mLocationBasedSuspicionPtr->Update(dt);
+		}
+
 		LocalSuspicionMetre* GetLocalSuspicionMetre() { return mLocalSuspicionMetrePtr; };
 		GlobalSuspicionMetre* GetGlobalSuspicionMetre() { return mGlobalSuspicionMetrePtr; };
 		LocationBasedSuspicion* GetLocationBasedSuspicion() { return mLocationBasedSuspicionPtr; };

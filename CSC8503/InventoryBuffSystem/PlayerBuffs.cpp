@@ -12,8 +12,8 @@ void PlayerBuffs::Init()
 
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo)
 {
-	Notify(mOnBuffAppliedBuffEventMap[inBuff],playerNo);
-
+	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+	mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	if (mBuffInitDurationMap[inBuff] != 0)
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
