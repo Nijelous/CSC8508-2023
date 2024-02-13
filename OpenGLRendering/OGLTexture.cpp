@@ -39,8 +39,9 @@ UniqueOGLTexture OGLTexture::TextureFromData(char* data, int width, int height, 
 		case 3: sourceType = GL_RGB	; break;
 		case 4: sourceType = GL_RGBA; break;
 	}
-
+	
 	glBindTexture(GL_TEXTURE_2D, tex->texID);
+	
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, sourceType, GL_UNSIGNED_BYTE, data);
 
@@ -50,7 +51,7 @@ UniqueOGLTexture OGLTexture::TextureFromData(char* data, int width, int height, 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
-
+	
 	return tex;
 }
 
@@ -68,6 +69,7 @@ UniqueOGLTexture OGLTexture::TextureFromFile(const std::string&name) {
 
 	return glTex;
 }
+
 
 UniqueOGLTexture OGLTexture::LoadCubemap(
 	const std::string& xPosFile, 

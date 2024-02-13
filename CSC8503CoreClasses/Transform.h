@@ -29,11 +29,15 @@ namespace NCL {
 			}
 
 			Matrix4 GetMatrix() const {
-				return matrix;
+				return mMatrix;
+			}
+
+			void SetMatrix(Matrix4 matrix) {
+				mMatrix = matrix;
 			}
 			void UpdateMatrix();
 		protected:
-			Matrix4		matrix;
+			Matrix4		mMatrix;
 			Quaternion	orientation;
 			Vector3		position;
 

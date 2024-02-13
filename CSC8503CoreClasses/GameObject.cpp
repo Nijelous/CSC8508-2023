@@ -16,8 +16,10 @@ GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectN
 	mPhysicsObject	= nullptr;
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
+
   mAnimationObject = nullptr;
   mCollisionLayer = collisionLayer;
+
 
 	mIsPlayer = false;
 }
@@ -27,7 +29,9 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
-	 delete mAnimationObject;
+
+	delete mAnimationObject;
+
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {

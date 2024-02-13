@@ -2,7 +2,7 @@
 
 uniform vec4 		objectColour;
 uniform sampler2D 	mainTex;
-uniform sampler2D normTex;
+uniform sampler2D   normTex;
 uniform sampler2DShadow shadowTex;
 
 uniform vec3	lightPos;
@@ -39,5 +39,7 @@ void main(void)
 	
 	fragColor[0] = texture2D(mainTex,IN.texCoord);
 	fragColor[1] = vec4(bumpNormal.xyz * 0.5 + 0.5, 1.0);
+	fragColor[0].a = 1.0;
+	fragColor[1].a = 1.0;
 
 }
