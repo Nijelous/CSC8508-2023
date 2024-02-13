@@ -11,7 +11,7 @@ Transform::~Transform()	{
 }
 
 void Transform::UpdateMatrix() {
-	matrix =
+	mMatrix =
 		Matrix4::Translation(position) *
 		Matrix4(orientation) *
 		Matrix4::Scale(scale);

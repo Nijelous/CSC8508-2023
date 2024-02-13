@@ -110,7 +110,7 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
-	AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
+	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
 		itemPositions.push_back(itemPos);
 	}
@@ -339,7 +339,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetCollisionLayer(Collectable);
@@ -347,7 +347,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->GetPhysicsObject()->SetInverseMass(0);
 	flag->GetPhysicsObject()->InitSphereInertia(false);
 
-	flag->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
 
 	mWorld->AddGameObject(flag);
 
@@ -429,6 +429,16 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 
 	playerObject.SetCollisionLayer(Player);
+}
+
+bool LevelManager::CheckGameWon() {
+	if (mTempPlayer && mHelipad) {
+		if (mHelipad->GetCollidingWithPlayer()) {
+			if ((mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][0] == PlayerInventory::flag) || (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][1] == PlayerInventory::flag))
+				return true;
+		}
+	}
+	return false;
 }
 
 GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::string& guardName) {

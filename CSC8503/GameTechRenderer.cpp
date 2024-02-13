@@ -5,6 +5,8 @@
 #include "TextureLoader.h"
 #include "MshLoader.h"
 #include "UI.h"
+#include "Mesh.h"
+
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -176,6 +178,7 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
+
 	RenderCamera();
 	RenderSkybox();
 	
@@ -192,6 +195,7 @@ void GameTechRenderer::RenderFrame() {
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
 }
 
 void GameTechRenderer::BuildObjectList() {
@@ -318,13 +322,16 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	for (const auto& i : activeObjects) {
 		OGLShader* shader = (OGLShader*)(*i).GetShader();
 		BindShader(*shader);
-
 		if ((*i).GetAlbedoTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
+			
 		}
-
+		
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
+		}
+		if ((*i).GetAnimation()) {
+			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
 		}
 		if (activeShader != shader) {
 			projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
@@ -347,7 +354,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 			activeShader = shader;
 		}
-
+		
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);
 
@@ -359,12 +366,35 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
 
-		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1 : 0);
+		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1:0);
+		
 
-		BindMesh((OGLMesh&)*(*i).GetMesh());
-		size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
-		for (size_t i = 0; i < layerCount; ++i) {
-			DrawBoundMesh((uint32_t)i);
+		//Animation basic draw
+
+		
+		if ((*i).GetAnimation()) {
+			BindMesh((OGLMesh&)*(*i).GetMesh());
+			mMesh = (*i).GetMesh();
+			size_t layerCount = mMesh->GetSubMeshCount();
+			for (size_t b = 0; b < layerCount; ++b) {
+				glActiveTexture(GL_TEXTURE3);
+				GLuint textureID = (*i).GetMatTextures()[b];
+				glBindTexture(GL_TEXTURE_2D, textureID);
+				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatrices().size(), false, (float*)(*i).GetFrameMatrices().data());
+				DrawBoundMesh((uint32_t)b);
+			}
+			
+
+		}
+		else
+		{
+			BindMesh((OGLMesh&)*(*i).GetMesh());
+			size_t layerCount = (*i).GetMesh()->GetSubMeshCount();
+			for (size_t b = 0; b < layerCount; ++b) {
+
+				DrawBoundMesh((uint32_t)b);
+			}
+
 		}
 	}
 	glDisable(GL_STENCIL_TEST);

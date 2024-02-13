@@ -39,7 +39,7 @@ namespace NCL {
 			OGLRenderer(Window& w);
 			~OGLRenderer();
 
-			void SetTextureRepeating(GLuint target, bool repeating);
+			static void SetTextureRepeating(GLuint target, bool repeating);
 
 			void OnWindowResize(int w, int h)	override;
 			bool HasInitialised()				const override {
