@@ -48,6 +48,8 @@ void GameSceneManager::UpdateGame(float dt) {
 		DisplayDefeat();
 
 	mLevelManager->Update(dt, mGameState == LevelState);
+
+	PlayerWonGame();
 }
 
 void GameSceneManager::InitCamera() {
@@ -60,6 +62,12 @@ void GameSceneManager::InitCamera() {
 
 void GameSceneManager::CreateLevel() {
 	mLevelManager->LoadLevel(0, 0);
+}
+
+bool GameSceneManager::PlayerWonGame() {
+	if (mLevelManager->CheckGameWon())
+		return true;
+	return false;
 }
 
 void GameSceneManager::DisplayMainMenu() {
