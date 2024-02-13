@@ -32,7 +32,7 @@ namespace NCL {
 		protected:
 			UI();
 			~UI();
-			Vector2 pos;
+			Vector2 mPos;
 		};
 	}
 }
