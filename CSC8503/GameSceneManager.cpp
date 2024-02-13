@@ -38,7 +38,7 @@ GameSceneManager::~GameSceneManager() {
 void GameSceneManager::UpdateGame(float dt) {
 	mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
 
-	InitIcons();
+	//InitIcons();
 
 	if (mGameState == MainMenuState)
 		DisplayMainMenu();
