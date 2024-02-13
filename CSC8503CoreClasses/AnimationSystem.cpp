@@ -21,7 +21,7 @@ AnimationSystem::~AnimationSystem()
 
 void AnimationSystem::Clear()
 {
-	animationList.clear();
+	mAnimationList.clear();
 }
 
 void AnimationSystem::Update(float dt)
@@ -33,13 +33,14 @@ void AnimationSystem::Update(float dt)
 }
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt)
-{	animationList.clear();
+{
+	mAnimationList.clear();
 	
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->GetAnimationObject()) {
 				AnimationObject* animObj = o->GetAnimationObject();
-				animationList.emplace_back(animObj);
+				mAnimationList.emplace_back(animObj);
 				//TODO may it is not a good position to run
 				UpdateCurrentFrames(dt);
 
@@ -69,7 +70,7 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt)
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
-	for ( auto& a : animationList) {
+	for ( auto& a : mAnimationList) {
 		(*a).Update(dt);
 	}
 }
@@ -83,7 +84,7 @@ void AnimationSystem::UpdateMaterials()
 void AnimationSystem::UpdateAnimations()
 {
 	
-	for (auto& a : animationList) {
+	for (auto& a : mAnimationList) {
 		AnimationObject::mAnimationState state = (*a).GetAnimationState();
 		switch (state)
 		{

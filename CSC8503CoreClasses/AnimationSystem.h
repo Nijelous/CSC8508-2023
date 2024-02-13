@@ -34,7 +34,7 @@ namespace NCL {
 
 
 			GameWorld& gameWorld;
-			vector<AnimationObject*> animationList;
+			vector<AnimationObject*> mAnimationList;
 			vector<GLuint>  mMatTextures;
 			Shader* mShader;
 			Mesh* mMesh;
