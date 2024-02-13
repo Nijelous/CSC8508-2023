@@ -23,7 +23,7 @@ namespace NCL {
 
 		class GameSceneManager : public Scene{
 		public:
-			GameSceneManager();
+			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
 
 			virtual void UpdateGame(float dt);

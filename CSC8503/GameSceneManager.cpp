@@ -20,7 +20,10 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-GameSceneManager::GameSceneManager() {
+GameSceneManager::GameSceneManager(bool isNetworkGame) {
+	if (!isNetworkGame){
+		InitInGameMenuManager();
+	}
 	InitCamera();
 }
 
