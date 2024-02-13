@@ -26,7 +26,8 @@ namespace NCL {
 			void ParseJson(std::string JSON, Level* level, Room* room);
 		protected:
 			void WriteVariable(std::vector<std::map<std::string, float>>& keyValuePairs, Level* level, Room* room);
-			void WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents);
+			void WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, 
+				std::string key, std::string* value, int indents, int maxIndents);
 			int mPlayerCount = 0;
 		};
 	}
