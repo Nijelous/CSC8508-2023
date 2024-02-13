@@ -33,7 +33,6 @@ TutorialGame::TutorialGame(bool isInitingAssets) : controller(*Window::GetWindow
 #endif
 
 	physics		= new PhysicsSystem(*world);
-	mAnimation   = new AnimationSystem(*world);
 
 	mLevelManager = new LevelManager();
 
@@ -86,20 +85,12 @@ void TutorialGame::LoadAssetFiles(){
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
 	
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
-	mAnimationShader = renderer->LoadShader("animationScene.vert", "scene.frag");
-
-	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
-	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
-	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-
 	
-	mGuardMesh = renderer->LoadMesh("Male_Guard.msh");
-	mGuardAnimation = renderer->LoadAnimation("Idle1.anm");
-	mGuardMaterial = renderer->LoadMaterial("Male_Guard.mat");
+	
+
 
 	InitCamera();
 	InitWorld();
-	mAnimation->PreloadMatTextures(renderer);
 
 }
 
@@ -111,14 +102,7 @@ TutorialGame::~TutorialGame()	{
 	delete enemyMesh;
 	delete bonusMesh;
 
-	delete mAnimationShader;
-	delete mSoldierAnimation;
-	delete mSoldierMaterial;
-	delete mSoldierMesh;
-	
-	delete mGuardAnimation;
-	delete mGuardMaterial;
-	delete mGuardMesh;
+
 
 	delete basicTex;
 	delete basicShader;
@@ -130,7 +114,7 @@ TutorialGame::~TutorialGame()	{
 	delete physics;
 	delete renderer;
 	delete world;
-	delete mAnimation;
+	
 }
 
 void TutorialGame::UpdateGame(float dt) {
@@ -203,7 +187,7 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	world->UpdateWorld(dt);
-	mAnimation->Update(dt);
+	
 	renderer->Update(dt);
 	physics->Update(dt);
 	renderer->Render();
@@ -370,7 +354,6 @@ void TutorialGame::InitWorld() {
 
 
 	InitDefaultFloor();
-	AddAnimationTest(Vector3(50, 0, 50), "test");
 }
 
 /*
@@ -537,7 +520,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, mAnimationShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, basicShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -548,33 +531,33 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 	return apple;
 }
 
-GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::string& objectName)
-{
-	float meshSize = 1.0f;
-	float inverseMass = 0.5f;
-
-	GameObject* animTest = new GameObject();
-	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
-	animTest->SetBoundingVolume((CollisionVolume*)volume);
-
-	animTest->GetTransform()
-		.SetScale(Vector3(meshSize*2, meshSize * 2, meshSize * 2))
-		.SetPosition(position);
-
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
-	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
-	
-	animTest->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
-	
-
-	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);
-	animTest->GetPhysicsObject()->InitSphereInertia(false);
-
-	world->AddGameObject(animTest);
-
-	return animTest;
-
-}
+//GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::string& objectName)
+//{
+//	float meshSize = 1.0f;
+//	float inverseMass = 0.5f;
+//
+//	GameObject* animTest = new GameObject();
+//	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
+//	animTest->SetBoundingVolume((CollisionVolume*)volume);
+//
+//	animTest->GetTransform()
+//		.SetScale(Vector3(meshSize*2, meshSize * 2, meshSize * 2))
+//		.SetPosition(position);
+//
+//	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
+//	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
+//	
+//	animTest->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
+//	
+//
+//	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);
+//	animTest->GetPhysicsObject()->InitSphereInertia(false);
+//
+//	world->AddGameObject(animTest);
+//
+//	return animTest;
+//
+//}
 
 StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, const std::string& objectName) {
 	StateGameObject* apple = new StateGameObject(objectName);
@@ -635,7 +618,6 @@ void TutorialGame::InitGameExamples() {
 	AddEnemyToWorld(Vector3(5, 5, 0), "Enemy Object");
 	AddBonusToWorld(Vector3(10, 5, 0), "Bonus Object");
 	AddGuardToWorld(Vector3(10, 5, 5), "Guard Object");
-	AddAnimationTest(Vector3(15,15, 0), "Animation Object");
 }
 
 void TutorialGame::InitSphereGridWorld(int numRows, int numCols, float rowSpacing, float colSpacing, float radius) {

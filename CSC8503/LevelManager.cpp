@@ -66,10 +66,7 @@ LevelManager::~LevelManager() {
 	delete mCharMesh;
 	delete mEnemyMesh;
 	delete mBonusMesh;
-	delete mSoldierAnimation;
-	delete mSoldierMaterial;
-	delete mSoldierMesh;
-	delete mSoldierShader;
+
 
 	delete mBasicTex;
 	delete mBasicShader;
@@ -81,6 +78,15 @@ LevelManager::~LevelManager() {
 	delete mPhysics;
 	delete mRenderer;
 	delete mWorld;
+	delete mAnimation;
+
+	delete mAnimationShader;
+	delete mSoldierAnimation;
+	delete mSoldierMaterial;
+	delete mSoldierMesh;
+	delete mGuardAnimation;
+	delete mGuardMaterial;
+	delete mGuardMesh;
 	delete mAnimation;
 }
 
@@ -122,6 +128,7 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 	AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	LoadItems(itemPositions);
+	mAnimation->PreloadMatTextures(mRenderer);
 }
 
 void LevelManager::Update(float dt, bool isUpdatingObjects) {
@@ -155,11 +162,17 @@ void LevelManager::InitialiseAssets() {
 	mFloorNormal = mRenderer->LoadTexture("panel_normal.png");
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
+	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
 
 	mSoldierMesh = mRenderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = mRenderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = mRenderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = mRenderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+
+	mGuardMesh = mRenderer->LoadMesh("Male_Guard.msh");
+	mGuardAnimation = mRenderer->LoadAnimation("Idle1.anm");
+	mGuardMaterial = mRenderer->LoadMaterial("Male_Guard.mat");
+	
+	
 }
 
 void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition) {
@@ -411,11 +424,14 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::s
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(position);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, meshSize));
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
+	guard->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
+
+
 
 	guard->SetCollisionLayer(Npc);
 

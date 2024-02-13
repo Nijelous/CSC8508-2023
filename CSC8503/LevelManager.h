@@ -100,10 +100,16 @@ namespace NCL {
 			Shader* mBasicShader;
 			Shader* mSoldierShader;
 
-			// animated meshes
+			// animation 
 			Mesh* mSoldierMesh;
 			MeshAnimation* mSoldierAnimation;
 			MeshMaterial* mSoldierMaterial;
+			Mesh* mGuardMesh;
+			MeshAnimation* mGuardAnimation;
+			MeshMaterial* mGuardMaterial;
+			Shader* mAnimationShader;
+
+		
 
 			Helipad* mHelipad;
 
