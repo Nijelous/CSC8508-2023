@@ -5,7 +5,6 @@
 
 using namespace NCL::CSC8503;
 
-constexpr int MAX_PLAYERS = 4;
 
 Level::Level(std::string levelPath) {
 	mLevelName = levelPath.substr(24, levelPath.size()-29);
@@ -24,12 +23,16 @@ Level::Level(std::string levelPath) {
 }
 
 Level::~Level() {
+	for (auto const& [key, val] : mRoomList) {
+		delete(val);
+		mRoomList.erase(key);
+	}
 	for (int i = 0; i < mLights.size(); i++) {
 		delete(mLights[i]);
-		mLights[i] = NULL;
 	}
+	mLights.clear();
 	for (int i = 0; i < mVents.size(); i++) {
 		delete(mVents[i]);
-		mVents[i] = NULL;
 	}
+	mVents.clear();
 }

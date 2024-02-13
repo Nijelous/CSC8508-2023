@@ -9,6 +9,7 @@
 #include "OrientationConstraint.h"
 #include "StateGameObject.h"
 #include "PlayerObject.h"
+#include "LevelManager.h"
 
 #include <irrKlang.h>
 using namespace NCL;
@@ -73,25 +74,22 @@ void TutorialGame::InitialiseAssets() {
 	mKeeperNormal = renderer->LoadTexture("fleshy_normal.png");
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
-
-	//renderer->LoadTexture("MB_BodyNone_Guard_Albedo.TGA");
-
+	
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
-	mAnimationShader = renderer->LoadShader("animationScene.vert", "animationScene.frag");
+	mAnimationShader = renderer->LoadShader("animationScene.vert", "scene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-
-
+	
+	
 	mGuardMesh = renderer->LoadMesh("Male_Guard.msh");
 	mGuardAnimation = renderer->LoadAnimation("Idle1.anm");
 	mGuardMaterial = renderer->LoadMaterial("Male_Guard.mat");
 
-
 	InitCamera();
 	InitWorld();
-	mAnimation->PreloadMatTextures();
+	mAnimation->PreloadMatTextures(renderer);
 }
 
 TutorialGame::~TutorialGame()	{
@@ -126,7 +124,7 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 	if (testSphere != nullptr){
-		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+		testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
@@ -287,7 +285,7 @@ void TutorialGame::CreatePlayerObjectComponents(PlayerObject& playerObject,  con
 		.SetPosition(position);
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, PLAYER_MESH_SIZE));
-	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume()));
+	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -345,14 +343,21 @@ void TutorialGame::InitWorld() {
 	world->ClearAndErase();
 	physics->Clear();
 
-	//InitMixedGridWorld(5, 5, 3.5f, 3.5f);
+	//mLevelManager->LoadLevel(0, world, cubeMesh, mFloorAlbedo, mFloorNormal, basicShader);
+
+	//AddPlayerToWorld(mLevelManager->GetPlayerStartPosition(0), "Player");
 
 	AddPlayerToWorld(Vector3(100,-17,100), "Player");
+  
+	AddGuardToWorld(Vector3(90, -17, 90), "Enemy");
 
 	testSphere = AddSphereToWorld(Vector3(40,-17,40), 1.0f, true);
 
 	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
-	AddAABBCubeToWorld(Vector3(0,0,0), Vector3(10,20,10), 0.0f, "Wall");
+
+	AddGuardToWorld(Vector3(30, -17, 5), "Guard Object");
+
+
 	InitDefaultFloor();
 	AddAnimationTest(Vector3(50, 0, 50), "test");
 }
@@ -373,7 +378,7 @@ GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::st
 		.SetPosition(position);
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, 120));
-	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume()));
+	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 1, 2, 2));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
 	floor->GetPhysicsObject()->InitCubeInertia();
@@ -403,7 +408,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 		.SetScale(sphereSize)
 		.SetPosition(position);
 
-	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, basicTex, nullptr, basicShader,radius));
+	sphere->SetRenderObject(new RenderObject(&sphere->GetTransform(), sphereMesh, mFloorAlbedo, mFloorNormal, basicShader,radius));
 	sphere->SetPhysicsObject(new PhysicsObject(&sphere->GetTransform(), sphere->GetBoundingVolume()));
 
 	sphere->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -467,7 +472,7 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 		.SetPosition(position)
 		.SetScale(dimensions * 2);
 	float largestDim = std::max(dimensions.x, std::max(dimensions.y, dimensions.z));
-	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, basicTex, nullptr, basicShader, largestDim));
+	cube->SetRenderObject(new RenderObject(&cube->GetTransform(), cubeMesh, mFloorAlbedo, mFloorNormal, basicShader, largestDim));
 	cube->SetPhysicsObject(new PhysicsObject(&cube->GetTransform(), cube->GetBoundingVolume()));
 
 	cube->GetPhysicsObject()->SetInverseMass(inverseMass);
@@ -479,7 +484,8 @@ GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 di
 }
 
 GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::string& objectName) {
-	tempPlayer = new PlayerObject(world, objectName, 50);
+
+	tempPlayer = new PlayerObject(world, objectName);
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
@@ -541,7 +547,7 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 	animTest->SetBoundingVolume((CollisionVolume*)volume);
 
 	animTest->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetScale(Vector3(meshSize*2, meshSize * 2, meshSize * 2))
 		.SetPosition(position);
 
 	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
@@ -594,7 +600,7 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 		.SetPosition(position);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), enemyMesh, mKeeperAlbedo, mKeeperNormal, basicShader, meshSize));
-	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume()));
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
 
 	guard->GetPhysicsObject()->SetInverseMass(inverseMass);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
