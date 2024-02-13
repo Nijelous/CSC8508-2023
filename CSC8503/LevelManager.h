@@ -3,8 +3,10 @@
 #include "GameTechRenderer.h"
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
+#include "InventoryBuffSystem/InventoryBuffSystem.h"
 
 using namespace NCL::Maths;
+using namespace InventoryBuffSystem;
 
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
@@ -56,7 +58,7 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 
-			FlagGameObject* AddFlagToWorld(const Vector3& position);
+			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
@@ -99,6 +101,8 @@ namespace NCL {
 			MeshMaterial* mSoldierMaterial;
 
 			PlayerObject* mTempPlayer;
+
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 
 			int mActiveLevel;
 		};

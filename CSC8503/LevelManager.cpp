@@ -10,6 +10,8 @@
 #include "GuardObject.h"
 #include "Helipad.h"
 #include "InventoryBuffSystem/FlagGameObject.h"
+#include "InventoryBuffSystem/PickupGameObject.h"
+#include "InventoryBuffSystem/InventoryBuffSystem.h"
 
 #include <filesystem>
 
@@ -201,7 +203,7 @@ void LevelManager::LoadGuards(int guardCount) {
 
 void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		AddFlagToWorld(itemPositions[i]);
+		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
 		return;
 	}
 }
@@ -284,8 +286,8 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	return helipad;
 }
 
-FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position) {
-	FlagGameObject* flag = new FlagGameObject();
+FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
+	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);

@@ -46,6 +46,6 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject)
 	if (this->IsActive())
 	{
 		//GetFlag((*mPlayerObjectToPlayerNoMap)[otherObject]);
-		GetFlag(0);
+		GetFlag(1);
 	}
 }

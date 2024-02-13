@@ -112,7 +112,7 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject)
 		if (otherObject->GetIsPlayer())
 			return;
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
-		ActivatePickup(0);
+		ActivatePickup(1);
 	}
 }
 
