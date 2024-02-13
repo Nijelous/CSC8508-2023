@@ -378,7 +378,8 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-				if (info.a->GetCollisionLayer() & Player || info.b->GetCollisionLayer() & Player) {
+				if ((info.a->GetCollisionLayer() & Player && info.b->GetCollisionLayer() & Collectable) || 
+					(info.b->GetCollisionLayer() & Player && info.a->GetCollisionLayer() & Collectable)) {
 					int test = 12;
 				}
 				if (info.a->GetCollisionLayer() & NoCollide || info.b->GetCollisionLayer() & NoCollide) {
@@ -403,13 +404,13 @@ void PhysicsSystem::NarrowPhase() {
 	// iteratr through all collisions added and if collision then call impulse resolve collision
 	for (std::set<CollisionDetection::CollisionInfo>::iterator i = mBroadphaseCollisions.begin(); i != mBroadphaseCollisions.end(); i++) {
 		CollisionDetection::CollisionInfo info = *i;
-		if (info.a->GetCollisionLayer() & NO_COLLISION_RESOLUTION || info.b->GetCollisionLayer() & NO_COLLISION_RESOLUTION) {
-			continue;
-		}
+		
 		if (CollisionDetection::ObjectIntersection(info.a, info.b, info)) {
 			info.framesLeft = mNumCollisionFrames;
-			float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
-			FrictionImpulse(*info.a, *info.b, info.point, j);
+			if (!(info.a->GetCollisionLayer() & NO_COLLISION_RESOLUTION || info.b->GetCollisionLayer() & NO_COLLISION_RESOLUTION)) {
+				float j = ImpulseResolveCollision(*info.a, *info.b, info.point);
+				FrictionImpulse(*info.a, *info.b, info.point, j);
+			}
 			mAllCollisions.insert(info);
 		}
 	}
