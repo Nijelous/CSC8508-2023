@@ -49,6 +49,8 @@ namespace NCL {
 		protected:
 			virtual void InitialiseAssets();
 
+			void InitialiseIcons();
+
 			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
@@ -95,6 +97,20 @@ namespace NCL {
 			Texture* mKeeperNormal;
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
+
+			//icons
+			Texture* mInventorySlotTex;
+
+			Texture* mHighlightAwardTex;
+			Texture* mLightOffTex;
+			Texture* mMakingNoiseTex;
+			Texture* mSilentRunTex;
+			Texture* mSlowDownTex;
+			Texture* mStunTex;
+			Texture* mSwapPositionTex;
+
+			Texture* mSuspensionBarTex;
+			Texture* mSuspensionIndicatorTex;
 
 			// shaders
 			Shader* mBasicShader;

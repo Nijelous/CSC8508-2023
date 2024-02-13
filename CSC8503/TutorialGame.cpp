@@ -12,6 +12,7 @@
 #include "PlayerObject.h"
 #include "LevelManager.h"
 
+#include "UI.h"
 #include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
@@ -160,7 +161,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	UpdateKeys();
 	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
+		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);		
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
