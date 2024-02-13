@@ -1,11 +1,12 @@
 ﻿#pragma once
 #include <functional>
 #include "NetworkBase.h"
-#include "TutorialGame.h"
+#include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
 namespace NCL{
     namespace CSC8503{
+        struct DeltaPacket;
         class GameServer;
         class GameClient;
         class NetworkPlayer;
@@ -18,6 +19,8 @@ namespace NCL{
         public:
             DebugNetworkedGame();
             ~DebugNetworkedGame();
+            
+            bool GetIsServer() const;
 
             void StartAsServer();
             void StartAsClient(char a, char b, char c, char d);
@@ -36,9 +39,9 @@ namespace NCL{
             GameServer* GetServer() const;
 
         protected:
-            bool isClientConnectedToServer = false;
-            bool isGameStarted = false;
+            bool mIsGameStarted = false;
             bool mIsGameFinished = false;
+            bool mIsServer = false;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);
@@ -49,6 +52,7 @@ namespace NCL{
 
             void SendStartGameStatusPacket();
             void SendFinishGameStatusPacket();
+            
             void InitWorld() override;
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
@@ -58,13 +62,17 @@ namespace NCL{
 
             void HandleFullPacket(FullPacket* fullPacket);
 
+            void HandleDeltaPacket(DeltaPacket* deltaPacket);
+
+            void HandleClientPlayerInputPacket(ClientPlayerInputPacket* clientPlayerInputPacket, int playerPeerId);
+
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
             void SetItemsLeftToZero() override;
 
 
-            std::vector<function<void()>> mOnGameStarts;
+            std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 

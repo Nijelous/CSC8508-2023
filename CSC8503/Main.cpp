@@ -12,11 +12,13 @@
 #include "NavigationGrid.h"
 #include "NavigationMesh.h"
 
-#include "TutorialGame.h"
+#include "GameSceneManager.h"
+
 #include "NetworkedGame.h"
 
 #include "PushdownMachine.h"
 #include "PushdownState.h"
+#include "PushdownStates.h"
 
 #include "BehaviourNode.h"
 #include "BehaviourSelector.h"
@@ -31,24 +33,34 @@ using namespace CSC8503;
 #include <sstream>
 #include "DebugNetworkedGame.h"
 
+namespace{
+    constexpr int SERVER_CHOICE = 1;
+}
+
 int main(){
     Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
 
-    if (!w->HasInitialised()){
+    if (!w->HasInitialised()) {
         return -1;
     }
-
-    w->ShowOSPointer(false);
-    w->LockMouseToWindow(true);
-
-    TutorialGame* g = nullptr;
+  
+    GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
-    bool isServer = false;
+
+    w->ShowOSPointer(isNetworkTestActive);
+    w->LockMouseToWindow(!isNetworkTestActive);
+    
     if (isNetworkTestActive){
-        g = new DebugNetworkedGame();
-        auto* networkedGame = (DebugNetworkedGame*)g;
-        if (isServer){
+        gm = new DebugNetworkedGame();
+
+        int choice = 0;
+        std::cout << "--------Network Test ----------" << std::endl;
+        std::cout <<"Enter '1' to start as server or '2' to start as client: ";
+        std::cin >> choice;
+        
+        auto* networkedGame = (DebugNetworkedGame*)gm;
+        if (choice == SERVER_CHOICE){
             networkedGame->StartAsServer();
         }
         else{
@@ -56,28 +68,30 @@ int main(){
         }
     }
     else{
-        g = new TutorialGame();
+        gm = new GameSceneManager();
     }
+    PushdownMachine pushdownMachine(new MainMenu(gm));
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
-    while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)){
+    while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
-        if (dt > 0.1f){
+        if (dt > 0.1f) {
             std::cout << "Skipping large time delta" << std::endl;
             continue; //must have hit a breakpoint or something to have a 1 second frame time!
         }
-        if (Window::GetKeyboard()->KeyPressed(KeyCodes::PRIOR)){
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::PRIOR)) {
             w->ShowConsole(true);
         }
-        if (Window::GetKeyboard()->KeyPressed(KeyCodes::NEXT)){
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::NEXT)) {
             w->ShowConsole(false);
         }
 
-        if (Window::GetKeyboard()->KeyPressed(KeyCodes::T)){
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::T)) {
             w->SetWindowPosition(0, 0);
         }
 
         w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-        g->UpdateGame(dt);
+        pushdownMachine.Update(dt);
+        gm->UpdateGame(dt);
     }
     Window::DestroyGameWindow();
 }

@@ -70,21 +70,31 @@ set(Lights
 )
 source_group("Lights" FILES ${Lights})
 
-set(Level
+set(Level_Creation
     "JsonParser.h"
     "JsonParser.cpp"
-    "LevelManager.h"
-    "LevelManager.cpp"
     "Level.h"
     "Level.cpp"
     "LevelEnums.h"
     "LevelEnums.cpp"
     "Room.h"
     "Room.cpp"
+)
+source_group("Level\\Level Creation" FILES ${Level_Creation})
+
+set(NavMesh
+    "RecastBuilder.h"
+    "RecastBuilder.cpp"
+)
+source_group("Level\\NavMesh" FILES ${NavMesh})
+
+set(Level_Objects
+    "Helipad.h"
+    "Helipad.cpp"
     "Vent.h"
     "Vent.cpp"
 )
-source_group("Level" FILES ${Level})
+source_group("Level\\Level Objects" FILES ${Level_Objects})
 
 set(Networking
     "GameClient.h"  
@@ -168,7 +178,9 @@ set(ALL_FILES
     ${AI_State_Machine}
     ${AI_Pathfinding}
     ${Collision_Detection}
-    ${Level}
+    ${Level_Creation}
+    ${NavMesh}
+    ${Level_Objects}
     ${Networking}
     ${Physics}
     ${enet_Files}

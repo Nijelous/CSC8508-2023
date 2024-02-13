@@ -1,5 +1,5 @@
 #pragma once
-#include "TutorialGame.h"
+#include "GameSceneManager.h"
 #include "NetworkBase.h"
 
 namespace NCL {
@@ -31,9 +31,9 @@ namespace NCL {
 			Vector3 cameraPosition;
 		};
 
-		class NetworkedGame : public TutorialGame, public PacketReceiver {
+		class NetworkedGame : public GameSceneManager, public PacketReceiver {
 		public:
-			NetworkedGame();
+			NetworkedGame(bool isInitingAssets = true);
 			virtual ~NetworkedGame();
 
 			void StartAsServer();
@@ -60,8 +60,8 @@ namespace NCL {
 
             std::map<int, int> mStateIDs;
 
-            GameServer* mThisServer;
-            GameClient* mThisClient;
+            GameServer* mThisServer = nullptr;
+            GameClient* mThisClient = nullptr;
             float mTimeToNextPacket;
             int mPacketsToSnapshot;
 
@@ -70,7 +70,6 @@ namespace NCL {
             std::vector<int> mPlayerList;
             std::map<int, NetworkPlayer*> mServerPlayers;
             GameObject* mLocalPlayer;
-
 		};
 	}
 }

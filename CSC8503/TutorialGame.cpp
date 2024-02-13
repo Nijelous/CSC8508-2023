@@ -4,6 +4,7 @@
 #include "RenderObject.h"
 #include "AnimationObject.h"
 #include "TextureLoader.h"
+#include "GuardObject.h"
 
 #include "PositionConstraint.h"
 #include "OrientationConstraint.h"
@@ -21,7 +22,7 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
+TutorialGame::TutorialGame(bool isInitingAssets) : controller(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
 	world		= new GameWorld();
 #ifdef USEVULKAN
 	renderer	= new GameTechVulkanRenderer(*world);
@@ -50,7 +51,9 @@ TutorialGame::TutorialGame() : controller(*Window::GetWindow()->GetKeyboard(), *
 	controller.MapAxis(3, "XLook");
 	controller.MapAxis(4, "YLook");
 
-	InitialiseAssets();
+	if (isInitingAssets){
+		InitialiseAssets();
+	}
 }
 
 /*
@@ -61,6 +64,13 @@ for this module, even in the coursework, but you can add it if you like!
 
 */
 void TutorialGame::InitialiseAssets() {
+
+	LoadAssetFiles();
+	InitCamera();
+	InitWorld();
+}
+
+void TutorialGame::LoadAssetFiles(){
 	cubeMesh	= renderer->LoadMesh("cube.msh");
 	sphereMesh	= renderer->LoadMesh("sphere.msh");
 	capsuleMesh = renderer->LoadMesh("Capsule.msh");
@@ -81,7 +91,7 @@ void TutorialGame::InitialiseAssets() {
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-	
+
 	
 	mGuardMesh = renderer->LoadMesh("Male_Guard.msh");
 	mGuardAnimation = renderer->LoadAnimation("Idle1.anm");
@@ -90,6 +100,7 @@ void TutorialGame::InitialiseAssets() {
 	InitCamera();
 	InitWorld();
 	mAnimation->PreloadMatTextures(renderer);
+
 }
 
 TutorialGame::~TutorialGame()	{
@@ -124,7 +135,7 @@ TutorialGame::~TutorialGame()	{
 
 void TutorialGame::UpdateGame(float dt) {
 	if (testSphere != nullptr){
-		testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
+		//testSphere->GetPhysicsObject()->AddForce(Vector3(1,0,1));
 	}
 	if (!inSelectionMode) {
 		world->GetMainCamera().UpdateCamera(dt);
@@ -368,7 +379,7 @@ A single function to add a large immoveable cube to the bottom of our world
 
 */
 GameObject* TutorialGame::AddFloorToWorld(const Vector3& position, const std::string& objectName) {
-	GameObject* floor = new GameObject(objectName);
+	GameObject* floor = new GameObject(StaticObj, objectName);
 
 	Vector3 floorSize = Vector3(120, 2, 120);
 	AABBVolume* volume = new AABBVolume(floorSize);
@@ -398,7 +409,7 @@ physics worlds. You'll probably need another function for the creation of OBB cu
 
 */
 GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius, bool applyPhysics, float inverseMass, const std::string& objectName) {
-	GameObject* sphere = new GameObject(objectName);
+	GameObject* sphere = new GameObject();
 
 	Vector3 sphereSize = Vector3(radius, radius, radius);
 	SphereVolume* volume = new SphereVolume(radius, applyPhysics);
@@ -420,7 +431,7 @@ GameObject* TutorialGame::AddSphereToWorld(const Vector3& position, float radius
 }
 
 GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfHeight, float radius, float inverseMass, const std::string& objectName) {
-	GameObject* capsule = new GameObject(objectName);
+	GameObject* capsule = new GameObject();
 
 	Vector3 capsuleSize = Vector3(radius * 2, (halfHeight * 2), radius * 2);
 	CapsuleVolume* volume = new CapsuleVolume(halfHeight, radius);
@@ -442,7 +453,7 @@ GameObject* TutorialGame::AddCapsuleToWorld(const Vector3& position, float halfH
 }
 
 GameObject* TutorialGame::AddOBBCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass, const std::string& objectName) {
-	GameObject* cube = new GameObject(objectName);
+	GameObject* cube = new GameObject();
 
 	OBBVolume* volume = new OBBVolume(dimensions);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
@@ -463,7 +474,7 @@ GameObject* TutorialGame::AddOBBCubeToWorld(const Vector3& position, Vector3 dim
 }
 
 GameObject* TutorialGame::AddAABBCubeToWorld(const Vector3& position, Vector3 dimensions, float inverseMass, const std::string& objectName) {
-	GameObject* cube = new GameObject(objectName);
+	GameObject* cube = new GameObject();
 
 	AABBVolume* volume = new AABBVolume(dimensions);
 	cube->SetBoundingVolume((CollisionVolume*)volume);
@@ -489,7 +500,7 @@ GameObject* TutorialGame::AddPlayerToWorld(const Vector3& position, const std::s
 	CreatePlayerObjectComponents(*tempPlayer, position);
 
 	world->AddGameObject(tempPlayer);
-
+	tempPlayer->SetActive();
 	return tempPlayer;
 }
 
@@ -497,7 +508,7 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position, const std::st
 	float meshSize		= 3.0f;
 	float inverseMass	= 0.5f;
 
-	GameObject* character = new GameObject(objectName);
+	GameObject* character = new GameObject();
 
 	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
 	character->SetBoundingVolume((CollisionVolume*)volume);
@@ -518,7 +529,7 @@ GameObject* TutorialGame::AddEnemyToWorld(const Vector3& position, const std::st
 }
 
 GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::string& objectName) {
-	GameObject* apple = new GameObject(objectName);
+	GameObject* apple = new GameObject();
 
 	SphereVolume* volume = new SphereVolume(0.5f);
 	apple->SetBoundingVolume((CollisionVolume*)volume);
@@ -542,7 +553,7 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 	float meshSize = 1.0f;
 	float inverseMass = 0.5f;
 
-	GameObject* animTest = new GameObject(objectName);
+	GameObject* animTest = new GameObject();
 	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
 	animTest->SetBoundingVolume((CollisionVolume*)volume);
 

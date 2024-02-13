@@ -5,11 +5,15 @@ set(PROJECT_NAME CSC8503)
 ################################################################################
 set(Header_Files
     "GameTechRenderer.h"
+    "LevelManager.h"
     "NetworkedGame.h"
     "NetworkPlayer.h"
     "StateGameObject.h"
     "TutorialGame.h"
     "DebugNetworkedGame.h"
+    "GameSceneManager.h"
+    "PushdownStates.h"
+    "Scene.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -20,7 +24,9 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/PlayerBuffs.h"
     "InventoryBuffSystem/PlayerBuffs.cpp"
     "InventoryBuffSystem/PickupGameObject.h"
-    "InventoryBuffSystem/PickupGameObject.cpp"
+    "InventoryBuffSystem/PickupGameObject.cpp"    
+    "InventoryBuffSystem/FlagGameObject.h"
+    "InventoryBuffSystem/FlagGameObject.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
@@ -40,12 +46,15 @@ source_group("Suspicion System" FILES ${Suspicion_System})
 
 set(Source_Files
     "GameTechRenderer.cpp"
+    "LevelManager.cpp"
     "Main.cpp"
     "NetworkedGame.cpp"
     "NetworkPlayer.cpp"
     "StateGameObject.cpp"
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
+    "GameSceneManager.cpp"
+    "Scene.cpp"
 )
 
 if(USE_VULKAN)
@@ -233,11 +242,19 @@ endif()
 include_directories("../OpenGLRendering/")
 include_directories("../NCLCoreClasses/")
 include_directories("../CSC8503CoreClasses/")
+include_directories("../Recast")
+include_directories("../Detour")
+include_directories("../DebugUtils")
+include_directories("../DetourTileCache")
 include_directories("../Audio/includes")
 
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Recast)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Detour)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DebugUtils)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DetourTileCache)
 target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../Audio/libs/irrKlang")
 
 file(GLOB DLLS "../Audio/dlls/*.dll")

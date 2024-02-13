@@ -2,9 +2,13 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
+
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 #include <glad/gl.h>
+
+#include "Transform.h"
+
 
 namespace NCL {
 	using namespace NCL::Rendering;
@@ -62,6 +66,10 @@ namespace NCL {
 
 			float GetSqDistToCam() const {
 				return mSqDistToCam;
+			}
+
+			void SetSqDistToCam(const Vector3& camPos) {
+				mSqDistToCam = (camPos - mTransform->GetPosition()).LengthSquared();
 			}
 
 			void SetSqDistToCam(float sqDist) {

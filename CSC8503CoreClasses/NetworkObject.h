@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "NetworkBase.h"
 #include "NetworkState.h"
+#include "../CSC8503/NetworkPlayer.h"
 
 namespace NCL::CSC8503 {
 	class GameObject;
@@ -57,6 +58,13 @@ namespace NCL::CSC8503 {
 		GameEndStatePacket(bool val);
 	};
 
+	struct ClientPlayerInputPacket : public GamePacket{
+		int lastId;
+		PlayerInputs playerInputs;
+		float mouseXLook = 0.0f;
+		
+		ClientPlayerInputPacket(int lastId,  const PlayerInputs& playerInputs);
+	};
 
 	class NetworkObject	{
 	public:
