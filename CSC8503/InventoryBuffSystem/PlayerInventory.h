@@ -4,6 +4,9 @@
 #include <random>
 #include "Vector3.h"
 #include "PlayerBuffs.h"
+#include "Level.h"
+
+using namespace NCL::CSC8503;
 
 using namespace NCL;
 using namespace CSC8503;
@@ -20,6 +23,8 @@ namespace InventoryBuffSystem
 	public:
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) = 0;
 	};
+
+	const int MAX_INVENTORY_SLOTS = 2;
 
 	class PlayerInventory
 	{
@@ -69,8 +74,7 @@ namespace InventoryBuffSystem
 
 		};
 
-		int MAX_INVENTORY_SLOTS = 2;
-		item mPlayerInventory[4][2];
+		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		PlayerBuffs* mPlayerBuffsPtr;
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
