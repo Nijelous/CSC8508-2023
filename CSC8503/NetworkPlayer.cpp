@@ -16,13 +16,13 @@ namespace {
     constexpr int MOVE_RIGHT_INDEX = 3; 
 }
 
-NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : PlayerObject(game->GetGameWorld(), ""){
+NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : PlayerObject(game->GetLevelManager()->GetGameWorld(), ""){
     //this->game = game;
     playerNum = num;
 }
 
 NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(
-    game->GetGameWorld(), objName){
+    game->GetLevelManager()->GetGameWorld(), objName) {
     this->game = game;
     playerNum = num;
 }
@@ -60,8 +60,8 @@ void NetworkPlayer::UpdateObject(float dt){
     MovePlayer(dt);
     std::cout << mMovementSpeed << std::endl;
     if (mIsLocalPlayer){
-        AttachCameraToPlayer(game->GetGameWorld());
-        mCameraYaw = game->GetGameWorld()->GetMainCamera().GetYaw();
+        AttachCameraToPlayer(game->GetLevelManager()->GetGameWorld());
+        mCameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
     }
 
     if (mIsLocalPlayer || game->GetIsServer()){
@@ -95,7 +95,7 @@ void NetworkPlayer::MovePlayer(float dt){
         if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL))
             mPlayerInputs.isCrouching = true;
             
-        mPlayerInputs.cameraYaw = game->GetGameWorld()->GetMainCamera().GetYaw();
+        mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
     }
 
     if (isServer == false && mIsLocalPlayer){

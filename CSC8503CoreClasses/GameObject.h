@@ -10,9 +10,19 @@ namespace NCL::CSC8503 {
 	class PhysicsObject;
 	class AnimationObject;
 
+	enum CollisionLayer {
+		StaticObj = 1,
+		Collectable = 2,
+		Player = 4,
+		Npc = 8,
+		NoCollide = 16,
+		Zone = 32, 
+		NoSpecialFeatures = 64
+	};
+
 	class GameObject	{
 	public:
-		GameObject(const std::string& name = "");
+		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
 		~GameObject();
 
 		void SetBoundingVolume(CollisionVolume* vol) {
@@ -93,6 +103,14 @@ namespace NCL::CSC8503 {
 
 		bool GetIsPlayer() { return mIsPlayer; }
 
+		CollisionLayer GetCollisionLayer() {
+			return mCollisionLayer;
+		}
+
+		void SetCollisionLayer(CollisionLayer collisionLayer) {
+			mCollisionLayer = collisionLayer;
+		}
+
 	protected:
 		Transform			mTransform;
 
@@ -108,6 +126,7 @@ namespace NCL::CSC8503 {
 
 		Vector3 mBroadphaseAABB;
 
+		CollisionLayer mCollisionLayer;
 		bool mIsPlayer;
 	};
 }
