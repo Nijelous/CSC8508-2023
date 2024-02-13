@@ -3,8 +3,10 @@
 #include "GameTechRenderer.h"
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
+#include "InventoryBuffSystem/InventoryBuffSystem.h"
 
 using namespace NCL::Maths;
+using namespace InventoryBuffSystem;
 
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
@@ -13,6 +15,9 @@ namespace NCL {
 		class PlayerObject;
 		class GuardObject;
 		class RecastBuilder;
+		class Helipad;
+		class FlagGameObject;
+		class PickupGameObject;
 		class LevelManager {
 		public:
 			LevelManager();
@@ -20,7 +25,7 @@ namespace NCL {
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
-			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[player]).GetPlayerStartPosition(player)*10; }
+			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
 			void LoadLevel(int levelID, int playerID);
 
 			PlayerObject* GetTempPlayer() { return mTempPlayer; }
@@ -37,6 +42,8 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
+
 		protected:
 			virtual void InitialiseAssets();
 
@@ -44,12 +51,21 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
+			void LoadGuards(int guardCount);
+
+			void LoadItems(const std::vector<Vector3> itemPositions);
+
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);
+			Helipad* AddHelipadToWorld(const Vector3& position);
 
-			PlayerObject* AddPlayerToWorld(const Vector3 position, const std::string& playerName);
+			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			GuardObject* AddGuardToWorld(const Vector3 position, const std::string& guardName);
+			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
+
+			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& guardName);
 
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
@@ -88,6 +104,8 @@ namespace NCL {
 			MeshMaterial* mSoldierMaterial;
 
 			PlayerObject* mTempPlayer;
+
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 
 			int mActiveLevel;
 		};

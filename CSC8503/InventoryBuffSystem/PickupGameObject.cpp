@@ -11,10 +11,14 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
-PickupGameObject::PickupGameObject(std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap, float initCooldown) {
+PickupGameObject::PickupGameObject(
+	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
+	float initCooldown) {
 	mCooldown = 0.0f;
 	mInitCooldown = initCooldown;
-	mPlayerObjectToPlayerNoMap = mPlayerObjectToPlayerNoMap;
+	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
+	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
@@ -86,17 +90,17 @@ void PickupGameObject::ChangeToRandomPickup()
 	std::bernoulli_distribution bool_distribution(0.5);
 	mIsBuff = bool_distribution(rng);
 	if (mIsBuff)
-		mCurrentBuff = InventoryBuffSystem::mPlayerBuffsPtr->GetRandomBuffFromPool(*mRandomSeed);
+		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(*mRandomSeed);
 	else
-		mCurrentItem = InventoryBuffSystem::mPlayerInventoryPtr->GetRandomItemFromPool(*mRandomSeed);
+		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(*mRandomSeed);
 }
 
 void PickupGameObject::ActivatePickup(int playerNo)
 {
 	if (mIsBuff)
-		InventoryBuffSystem::mPlayerBuffsPtr->ApplyBuffToPlayer(mCurrentBuff, playerNo);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 	else
-		InventoryBuffSystem::mPlayerInventoryPtr->AddItemToPlayer(mCurrentItem, playerNo);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(mCurrentItem, playerNo);
 
 	mCooldown = INT_MAX;
 }
@@ -107,7 +111,8 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject)
 	{
 		if (otherObject->GetIsPlayer())
 			return;
-		ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		ActivatePickup(0);
 	}
 }
 

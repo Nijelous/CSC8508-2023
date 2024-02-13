@@ -21,6 +21,8 @@ namespace NCL {
 			}
 
 			void SetGravity(const Vector3& g);
+
+			void SetNewBroadphaseSize(const Vector3& levelSize);
 		protected:
 			bool AreBothCollidersStatic(const CollisionDetection::CollisionInfo info);
 			bool IsEitherColliderNoCollide(const CollisionDetection::CollisionInfo& info);
@@ -73,6 +75,7 @@ namespace NCL {
 			std::vector<CollisionDetection::CollisionInfo> mBroadphaseCollisionsVec;
 			bool mUseBroadPhase		= true;
 			int mNumCollisionFrames	= 5;
+			int mBroadphaseXZ = 256;
 		};
 	}
 }

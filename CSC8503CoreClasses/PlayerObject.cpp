@@ -103,7 +103,6 @@ void PlayerObject::StartWalking() {
 
 		mPlayerState = Walk;
 		mIsCrouched = false;
-
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
 	else
