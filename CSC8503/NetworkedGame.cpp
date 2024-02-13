@@ -16,7 +16,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-NetworkedGame::NetworkedGame(bool isInitingAssets) : GameSceneManager(false) {
+NetworkedGame::NetworkedGame(bool isInitingAssets) : GameSceneManager() {
 	mThisServer = nullptr;
 	mThisClient = nullptr;
 
@@ -114,7 +114,7 @@ void NetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 
-	mWorld->GetObjectIterators(first, last);
+	mLevelManager->GetGameWorld()->GetObjectIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
 		NetworkObject* o = (*i)->GetNetworkObject();
@@ -146,7 +146,7 @@ void NetworkedGame::UpdateMinimumState() {
 	//so we can get rid of any old states!
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
-	mWorld->GetObjectIterators(first, last);
+	mLevelManager->GetGameWorld()->GetObjectIterators(first, last);
 
 	for (auto i = first; i != last; ++i) {
 		NetworkObject* o = (*i)->GetNetworkObject();

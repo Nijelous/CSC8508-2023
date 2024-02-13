@@ -73,8 +73,6 @@ source_group("Lights" FILES ${Lights})
 set(Level_Creation
     "JsonParser.h"
     "JsonParser.cpp"
-    "LevelManager.h"
-    "LevelManager.cpp"
     "Level.h"
     "Level.cpp"
     "LevelEnums.h"
@@ -91,6 +89,8 @@ set(NavMesh
 source_group("Level\\NavMesh" FILES ${NavMesh})
 
 set(Level_Objects
+    "Helipad.h"
+    "Helipad.cpp"
     "Vent.h"
     "Vent.cpp"
 )

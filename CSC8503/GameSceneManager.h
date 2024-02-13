@@ -2,10 +2,7 @@
 
 #pragma once
 
-#include "GameTechRenderer.h"
-
-#include "PhysicsSystem.h"
-#include "AnimationSystem.h"
+#include "LevelManager.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -23,12 +20,12 @@ namespace NCL {
 
 		class GameSceneManager {
 		public:
-			GameSceneManager(bool isInitingAssets = true);
+			GameSceneManager();
 			~GameSceneManager();
 
 			virtual void UpdateGame(float dt);
 
-			GameWorld* GetGameWorld() { return mWorld; }
+			LevelManager* GetLevelManager() { return mLevelManager; }
 
 			void SetMainMenu() { mGameState = MainMenuState; }
 			void SetLevel() { mGameState = LevelState; }
@@ -41,11 +38,7 @@ namespace NCL {
 
 			void CreateLevel();
 
-			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
-			void CreateGuardObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
-
 		protected:
-			virtual void InitialiseAssets();
 			virtual void InitWorld() {}
 
 			void InitCamera();
@@ -56,64 +49,12 @@ namespace NCL {
 			void DisplayVictory();
 			void DisplayDefeat();
 
-			PlayerObject* AddPlayerToWorld(const Vector3 position, const std::string& playerName);
-
-			GuardObject* AddGuardToWorld(const Vector3 position, const std::string& guardName);
-
-			GameObject* AddFloorToWorld(const Vector3& position, const std::string& objectName);
-
 			// world creation
-			GameTechRenderer* mRenderer;
-			PhysicsSystem* mPhysics;
-			GameWorld* mWorld;
 			LevelManager* mLevelManager;
-
-			AnimationSystem* mAnimation;
 
 			KeyboardMouseController mController;
 
-			// meshes
-			Mesh* mCubeMesh;
-			Mesh* mSphereMesh;
-			Mesh* mCapsuleMesh;
-			Mesh* mCharMesh;
-			Mesh* mEnemyMesh;
-			Mesh* mBonusMesh;
-
-			// textures
-			Texture* mBasicTex;
-			Texture* mKeeperAlbedo;
-			Texture* mKeeperNormal;
-			Texture* mFloorAlbedo;
-			Texture* mFloorNormal;
-
-			Texture* mInventorySlotTex;
-
-			Texture* mHighlightAwardTex;
-			Texture* mLightOffTex;
-			Texture* mMakingNoiseTex;
-			Texture* mSilentRunTex;
-			Texture* mSlowDownTex;
-			Texture* mStunTex;
-			Texture* mSwapPositionTex;
-
-			Texture* mSuspensionBarTex;
-			Texture* mSuspensionIndicatorTex;
-
-			// shaders
-			Shader* mBasicShader;
-
-			// animated meshes
-			Mesh* mSoldierMesh;
-			MeshAnimation* mSoldierAnimation;
-			MeshMaterial* mSoldierMaterial;
-			Shader* mSoldierShader;
-
-			vector<GameObject*> mUpdatableObjects;
-
 			GameStates mGameState;
-
-			PlayerObject* mTempPlayer;
 
 		private:
 			
