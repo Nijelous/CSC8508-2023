@@ -4,9 +4,12 @@
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
+#include "InventoryBuffSystem/PlayerInventory.h"
+#include "SuspicionSystem/SuspicionSystem.h"
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
+using namespace SuspicionSystem;
 
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
@@ -18,7 +21,8 @@ namespace NCL {
 		class Helipad;
 		class FlagGameObject;
 		class PickupGameObject;
-		class LevelManager {
+		class SoundEmitter;
+		class LevelManager : PlayerInventoryObserver {
 		public:
 			LevelManager();
 			~LevelManager();
@@ -37,6 +41,8 @@ namespace NCL {
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
+
+			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
 
 			virtual void Update(float dt, bool isUpdatingObjects);
 
@@ -68,6 +74,8 @@ namespace NCL {
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
 			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& guardName);
+
+			SoundEmitter* AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR);
 
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
@@ -110,6 +118,7 @@ namespace NCL {
 			PlayerObject* mTempPlayer;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+			SuspicionSystemClass* mSuspicionSystemClassPtr = new SuspicionSystemClass();
 
 			int mActiveLevel;
 		};
