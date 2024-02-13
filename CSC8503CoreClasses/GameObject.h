@@ -22,7 +22,7 @@ namespace NCL::CSC8503 {
 
 	class GameObject	{
 	public:
-		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
+		GameObject(const std::string& name = "", CollisionLayer = NoSpecialFeatures);
 		~GameObject();
 
 		void SetBoundingVolume(CollisionVolume* vol) {
