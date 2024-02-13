@@ -32,6 +32,8 @@ DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(false){
     mThisServer = nullptr;
     mThisClient = nullptr;
 
+    mGameState = GameStates::MainMenuState;
+    
     NetworkBase::Initialise();
     mTimeToNextPacket = 0.0f;
     mPacketsToSnapshot = 0;
@@ -112,7 +114,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
             }
         }
         
-        GameSceneManager::UpdateGame(dt);
+        mLevelManager->Update(dt, mGameState == LevelState);
     }
     else{
         if (mThisServer){
@@ -141,6 +143,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
+        mGameState = GameStates::LevelState;
         StartLevel();
     }
 }
@@ -153,6 +156,7 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
 }
 
 void DebugNetworkedGame::StartLevel(){
+    InitWorld();
     Debug::Print("Game Started", Vector2(10, 5));
 
     for (auto& event : mOnGameStarts){
