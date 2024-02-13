@@ -1,7 +1,10 @@
 #pragma once
 #include "GameWorld.h"
 #include "MeshAnimation.h"
-
+#include "RenderObject.h"
+#include "OGLRenderer.h"
+#include "OGLTexture.h"
+#include "../CSC8503/GameTechRenderer.h"
 
 
 namespace NCL {
@@ -17,7 +20,7 @@ namespace NCL {
 
 			void Update(float dt);
 
-			void GetAllAnimationObjects();
+			void UpdateAllAnimationObjects(float dt);
 
 			void UpdateCurrentFrames(float dt);
 
@@ -25,14 +28,18 @@ namespace NCL {
 
 			void UpdateAnimations();
 
-			void PreloadAnimations();
+			void PreloadMatTextures(GameTechRenderer* renderer);
 
 		protected:
 
 
 			GameWorld& gameWorld;
-			vector<AnimationObject*> animationObjects;
-			
+			vector<AnimationObject*> mAnimationList;
+			vector<GLuint>  mMatTextures;
+			Shader* mShader;
+			Mesh* mMesh;
+			MeshAnimation* mAnim;
+			Texture* mAnimTexture = nullptr;	
 		};
 	}
 }
