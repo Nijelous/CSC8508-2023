@@ -14,8 +14,9 @@ namespace NCL {
         class PickupGameObject : public GameObject {
         public:
             PickupGameObject() {};
-            PickupGameObject(std::map<GameObject*, int>* playerObjectToPlayerNoMap,
-                InventoryBuffSystemClass* mInventoryBuffSystemClassPtr,
+            PickupGameObject(
+                InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+                std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
                 float initCooldown = 5.0f);
             ~PickupGameObject();
 

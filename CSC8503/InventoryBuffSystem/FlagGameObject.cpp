@@ -9,18 +9,12 @@
 using namespace NCL;
 using namespace CSC8503;
 
-FlagGameObject::FlagGameObject(std::map<GameObject*, int>* playerObjectToPlayerNoMap, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
-	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
+FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap) {
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
+	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 }
 
 FlagGameObject::~FlagGameObject() {
-}
-
-bool FlagGameObject::isServerPlayer(GameObject* otherObject)
-{
-	return (*mPlayerObjectToPlayerNoMap).find(otherObject) !=
-		(*mPlayerObjectToPlayerNoMap).end();
 }
 
 void FlagGameObject::GetFlag(int playerNo)
@@ -49,8 +43,9 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject)
 {
-	if (this->IsActive() && isServerPlayer(otherObject))
+	if (this->IsActive())
 	{
-		GetFlag((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		//GetFlag((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		GetFlag(0);
 	}
 }
