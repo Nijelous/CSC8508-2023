@@ -12,6 +12,7 @@ using namespace CSC8503;
 FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap) {
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 }
 
 FlagGameObject::~FlagGameObject() {
