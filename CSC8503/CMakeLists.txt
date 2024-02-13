@@ -5,6 +5,7 @@ set(PROJECT_NAME CSC8503)
 ################################################################################
 set(Header_Files
     "GameTechRenderer.h"
+    "LevelManager.h"
     "NetworkedGame.h"
     "NetworkPlayer.h"
     "StateGameObject.h"
@@ -12,6 +13,7 @@ set(Header_Files
     "DebugNetworkedGame.h"
     "GameSceneManager.h"
     "PushdownStates.h"
+    "Scene.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -44,6 +46,7 @@ source_group("Suspicion System" FILES ${Suspicion_System})
 
 set(Source_Files
     "GameTechRenderer.cpp"
+    "LevelManager.cpp"
     "Main.cpp"
     "NetworkedGame.cpp"
     "NetworkPlayer.cpp"
@@ -51,6 +54,7 @@ set(Source_Files
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
     "GameSceneManager.cpp"
+    "Scene.cpp"
 )
 
 if(USE_VULKAN)

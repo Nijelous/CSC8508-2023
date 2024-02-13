@@ -33,12 +33,14 @@ namespace NCL {
         private:
             bool mCanSeePlayer;
             bool mHasCaughtPlayer;
-            bool mHasConfiscatedItems;
+            bool mPlayerHasItems;
 
             void BehaviourTree();
             void ExecuteBT();
+            Quaternion VectorToQuaternion(Vector3 dir);
+            Quaternion Matrix3ToQuaternion(Matrix3 m);
 
-            float mTimer;
+            float mConfiscateItemsTime;
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();

@@ -7,7 +7,7 @@
 
 using namespace NCL::CSC8503;
 
-GameObject::GameObject(const std::string& objectName)	{
+GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectName)	{
 
 	mName			= objectName;
 	mWorldID			= -1;
@@ -17,6 +17,7 @@ GameObject::GameObject(const std::string& objectName)	{
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
   mAnimationObject = nullptr;
+  mCollisionLayer = collisionLayer;
 
 	mIsPlayer = false;
 }
@@ -26,7 +27,7 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
-  delete mAnimationObject;
+	 delete mAnimationObject;
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
@@ -53,6 +54,11 @@ void GameObject::UpdateBroadphaseAABB() {
 		mat = mat.Absolute();
 		Vector3 halfSizes = ((OBBVolume&)*mBoundingVolume).GetHalfDimensions();
 		mBroadphaseAABB = mat * halfSizes;
+	}
+	else if (mBoundingVolume->type == VolumeType::Capsule) {
+		mBroadphaseAABB = Vector3(((CapsuleVolume&)*mBoundingVolume).GetRadius(),
+			((CapsuleVolume&)*mBoundingVolume).GetHalfHeight(),
+			((CapsuleVolume&)*mBoundingVolume).GetRadius());
 	}
 }
 

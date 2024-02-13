@@ -52,8 +52,6 @@ namespace NCL{
 
             void SendStartGameStatusPacket();
             void SendFinishGameStatusPacket();
-
-            void InitialiseAssets() override;
             
             void InitWorld() override;
 

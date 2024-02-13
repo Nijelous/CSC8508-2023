@@ -48,18 +48,18 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 			if (j % 2 == 0)
 			{
 				PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
-				AddLight(pointL);
+				//AddLight(pointL);
 			}
 			else
 			{				
 				SpotLight* spotL = new SpotLight(dir, lightPosition, lightColour, lightRadius, 40, 2);
-				AddLight(spotL);
+				//AddLight(spotL);
 			}			
 		}		
 	}
 
 	DirectionLight* dLight = new DirectionLight({0.2,-0.7,0.3}, {0.1,0.1,0.1,1}, 200, {0,50,0});
-	AddLight(dLight);
+	//AddLight(dLight);
 
 	//Skybox!
 	skyboxShader = new OGLShader("skybox.vert", "skybox.frag");
@@ -170,7 +170,6 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
-	RenderShadowMap();
 	RenderCamera();
 	RenderSkybox();
 	
@@ -191,9 +190,10 @@ void GameTechRenderer::BuildObjectList() {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
 			if (o->IsActive()) {
-			const RenderObject* rendObj = o->GetRenderObject();
+			RenderObject* rendObj = o->GetRenderObject();
 			bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
 				if (rendObj && isInFrustum) {
+					rendObj->SetSqDistToCam(gameWorld.GetMainCamera().GetPosition());
 					activeObjects.emplace_back(rendObj);
 				}
 			}

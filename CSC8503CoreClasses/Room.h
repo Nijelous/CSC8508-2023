@@ -1,11 +1,12 @@
 #pragma once
 #include "LevelEnums.h"
+#include "BaseLight.h"
+#include "Transform.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
-		class Light;
 
 		class Room {
 		public:
@@ -16,7 +17,7 @@ namespace NCL {
 			RoomType GetType() const { return mType; }
 			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
 			std::vector<Light*> GetLights() const { return mLights; }
-			std::vector<Matrix4> GetCCTVTransforms() const { return mCCTVTransforms; }
+			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
 			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
 			friend class JsonParser;
 		protected:
@@ -25,7 +26,7 @@ namespace NCL {
 			std::map<Vector3, TileType> mTileMap;
 			//NavMesh
 			std::vector<Light*> mLights;
-			std::vector<Matrix4> mCCTVTransforms;
+			std::vector<Transform> mCCTVTransforms;
 			std::vector<Vector3> mItemPositions;
 		};
 	}
