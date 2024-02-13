@@ -31,7 +31,7 @@ namespace NCL {
 		public:
 			RecastBuilder();
 			~RecastBuilder();
-			void BuildNavMesh(std::vector<GameObject*> objects);
+			float* BuildNavMesh(std::vector<GameObject*> objects);
 			dtNavMeshQuery* GetNavMeshQuery() const { return mNavMeshQuery; }
 		protected:
 			bool InitialiseConfig(const float* bmin, const float* bmax);

@@ -44,12 +44,12 @@ int main(){
         return -1;
     }
 
-    w->ShowOSPointer(true);
-    w->LockMouseToWindow(false);
-
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
     bool isNetworkTestActive = false;
+
+    w->ShowOSPointer(isNetworkTestActive);
+    w->LockMouseToWindow(!isNetworkTestActive);
     
     if (isNetworkTestActive){
         gm = new DebugNetworkedGame();

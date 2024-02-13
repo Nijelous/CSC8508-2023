@@ -8,7 +8,7 @@ using namespace NCL::CSC8503;
 
 Level::Level(std::string levelPath) {
 	mLevelName = levelPath.substr(24, levelPath.size()-29);
-	mPlayerStartPositions = new Vector3[MAX_PLAYERS];
+	mPlayerStartTransforms = new Transform[MAX_PLAYERS];
 	std::ifstream levelFile(levelPath);
 	std::string line;
 	getline(levelFile, line);
