@@ -104,6 +104,13 @@ namespace NCL {
 				return mMatTextures;
 			}
 
+			void SetFrameMatrices(vector<Matrix4> frameMatrices) {
+				mFrameMatrices = frameMatrices;
+			}
+
+			vector<Matrix4>  GetFrameMatrices() const {
+				return mFrameMatrices;
+			}
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
@@ -114,7 +121,7 @@ namespace NCL {
 			MeshMaterial* mMaterial;
 			Vector4		mColour;
 			vector<GLuint>  mMatTextures;
-			
+			vector<Matrix4> mFrameMatrices;
 			
 			float	mCullSphereRadius;
 			float	mSqDistToCam;

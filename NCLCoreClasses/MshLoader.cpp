@@ -19,6 +19,7 @@ using namespace Rendering;
 using namespace Maths;
 
 bool MshLoader::LoadMesh(const std::string& filename, Mesh& destinationMesh) {
+	
 	std::ifstream file(Assets::MESHDIR + filename);
 
 	std::string filetype;
@@ -130,7 +131,7 @@ bool MshLoader::LoadMesh(const std::string& filename, Mesh& destinationMesh) {
 		}break;
 		}
 	}
-
+	
 	destinationMesh.SetPrimitiveType(GeometryPrimitive::Triangles);
 
 	return true;

@@ -20,7 +20,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mCurrentFrame = 0;
 	
 	vector<GLuint>  mMatTextures = {};
-	
+	vector<Matrix4> mFrameMatrices = {};
 	
 }
 
@@ -38,6 +38,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mMaterial = nullptr;
 	mCurrentFrame = 0;
 	vector<GLuint*>  mMatTextures = {};
+	vector<Matrix4> mFrameMatrices = {};
 }
 
 RenderObject::~RenderObject() {
@@ -48,5 +49,6 @@ RenderObject::~RenderObject() {
 	delete mShader;
 	delete mAnimation;
 	delete mMaterial;
+	
 
 }

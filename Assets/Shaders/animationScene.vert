@@ -61,14 +61,13 @@ void main(void)
 	}
 
 	
-
-
+	
 	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
 	OUT.shadowProj 	=  shadowMatrix * vec4 ( skelPos.xyz,1);
 	OUT.worldPos 	= ( modelMatrix * vec4 ( skelPos.xyz ,1)). xyz ;
 	OUT.tangent = wTangent;
 	OUT.binormal = cross(wTangent, wNormal) * tangent.w;
-	OUT.texCoord	= texCoord;
+	OUT.texCoord	= vec2(texCoord.x, 1- texCoord.y);
 	OUT.colour		= objectColour;
 	OUT.normal 		= skelNormal.xyz;
 	

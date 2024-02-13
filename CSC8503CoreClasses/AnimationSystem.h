@@ -20,7 +20,7 @@ namespace NCL {
 
 			void Update(float dt);
 
-			void GetAllAnimationObjects();
+			void UpdateAllAnimationObjects(float dt);
 
 			void UpdateCurrentFrames(float dt);
 
@@ -28,7 +28,7 @@ namespace NCL {
 
 			void UpdateAnimations();
 
-			void PreloadMatTextures();
+			void PreloadMatTextures(GameTechRenderer* renderer);
 
 		protected:
 
@@ -36,6 +36,10 @@ namespace NCL {
 			GameWorld& gameWorld;
 			vector<AnimationObject*> animationList;
 			vector<GLuint>  mMatTextures;
+			Shader* mShader;
+			Mesh* mMesh;
+			MeshAnimation* mAnim;
+			Texture* mAnimTexture = nullptr;	
 		};
 	}
 }

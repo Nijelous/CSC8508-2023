@@ -65,7 +65,7 @@ namespace NCL {
             MeshAnimation* mAnimation;
             MeshMaterial* mMaterial;
             mAnimationState mState;
-
+           
             int		mCurrentFrame;
             int		mNextFrame;
             float	mFrameTime;

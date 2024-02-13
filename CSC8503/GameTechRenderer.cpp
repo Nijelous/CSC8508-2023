@@ -171,7 +171,7 @@ void GameTechRenderer::RenderFrame() {
 	glClearColor(1, 1, 1, 1);	
 	BuildObjectList();
 	SortObjectList();
-	RenderShadowMap();
+	//RenderShadowMap();
 	RenderCamera();
 	RenderSkybox();
 	
@@ -310,7 +310,6 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	for (const auto& i : activeObjects) {
 		OGLShader* shader = (OGLShader*)(*i).GetShader();
 		BindShader(*shader);
-		
 		if ((*i).GetAlbedoTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
 			
@@ -319,7 +318,9 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
-		
+		if ((*i).GetAnimation()) {
+			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
+		}
 		if (activeShader != shader) {
 			projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
 			viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
@@ -361,49 +362,14 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 		
 		if ((*i).GetAnimation()) {
 			BindMesh((OGLMesh&)*(*i).GetMesh());
-			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "diffuseTex"), 3);
-				
 			mMesh = (*i).GetMesh();
-			mAnim = (*i).GetAnimation();
-			mShader = (*i).GetShader();
-			int currentFrame = (*i).GetCurrentFrame();
-			const Matrix4* bindPose = mMesh->GetBindPose().data();
-
-			
-			const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
-			const Matrix4* frameData = mAnim->GetJointData(currentFrame);
-			
-			vector<Matrix4> frameMatrices;
-			
-
-			int j = glGetUniformLocation(shader->GetProgramID(), "joints");
-			
-
 			size_t layerCount = mMesh->GetSubMeshCount();
-
 			for (size_t b = 0; b < layerCount; ++b) {
-				
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = (*i).GetMatTextures()[b];
-				std::cout << textureID << std::endl;
 				glBindTexture(GL_TEXTURE_2D, textureID);
-				std::cout << textureID << std::endl;
-				std::cout <<"" << std::endl;
-
-
-				for (unsigned int a = 0; a < mMesh->GetJointCount(); ++a) {
-					frameMatrices.emplace_back(frameData[a] * invBindPose[a]);
-				}
-				glUniformMatrix4fv(j, frameMatrices.size(), false, (float*)frameMatrices.data());
-
-			
-			
-				
-				
+				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatrices().size(), false, (float*)(*i).GetFrameMatrices().data());
 				DrawBoundMesh((uint32_t)b);
-
-				
-				
 			}
 			
 
