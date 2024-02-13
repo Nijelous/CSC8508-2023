@@ -1,9 +1,0 @@
-﻿  DetourAlloc.cpp
-  DetourAssert.cpp
-  DetourCommon.cpp
-  DetourNavMesh.cpp
-  DetourNavMeshBuilder.cpp
-  DetourNavMeshQuery.cpp
-  DetourNode.cpp
-  Generating Code...
-  Detour.vcxproj -> C:\Users\c3012795\TeamProject\CSC8508-2023\Detour\Debug\Detour-d.lib
