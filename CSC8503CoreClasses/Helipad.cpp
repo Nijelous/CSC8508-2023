@@ -1,5 +1,5 @@
 #include "Helipad.h"
-#include "PlayerObject.h"
+#include "../CSC8503/PlayerObject.h"
 #include "CollisionDetection.h"
 
 using namespace NCL::CSC8503;

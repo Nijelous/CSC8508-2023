@@ -1,5 +1,5 @@
 #include "GuardObject.h"
-#include "PlayerObject.h"
+#include "../CSC8503/PlayerObject.h"
 #include "Ray.h"
 #include "Debug.h"
 #include "PhysicsObject.h"
