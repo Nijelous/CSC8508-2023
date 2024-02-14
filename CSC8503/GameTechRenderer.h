@@ -64,7 +64,7 @@ namespace NCL {
 			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void CombineBuffers();
-			
+			void DrawOutlinedObjects();
 			void LoadSkybox();
 
 
@@ -78,11 +78,14 @@ namespace NCL {
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
 
-			vector<const RenderObject*> activeObjects;
-			
+			vector<const RenderObject*> mActiveObjects;
+			vector<const RenderObject*> mOutlinedObjects;
+
 			OGLShader*  debugShader;
 			OGLShader*  skyboxShader;
+			OGLShader* mOutlineShader;
 			OGLShader*  iconShader;
+
 			OGLMesh*	skyboxMesh;
 			GLuint		skyboxTex;
 
