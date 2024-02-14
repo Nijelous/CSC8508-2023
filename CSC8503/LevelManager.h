@@ -25,9 +25,9 @@ namespace NCL {
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
-			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
-			void LoadLevel(int levelID, int playerID);
 
+			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
+			void LoadLevel(int levelID, int playerID,  bool isMultiplayer = false);
 			PlayerObject* GetTempPlayer() { return mTempPlayer; }
 
 			void SetTempPlayer(PlayerObject* playerObject) { mTempPlayer = playerObject; }
@@ -42,12 +42,16 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
+			void AddUpdateableGameObject(GameObject& object);
+
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
 			bool CheckGameWon();
-
+		
 		protected:
 			virtual void InitialiseAssets();
+
+			void InitialiseIcons();
 
 			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
 
@@ -95,6 +99,20 @@ namespace NCL {
 			Texture* mKeeperNormal;
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
+
+			//icons
+			Texture* mInventorySlotTex;
+
+			Texture* mHighlightAwardTex;
+			Texture* mLightOffTex;
+			Texture* mMakingNoiseTex;
+			Texture* mSilentRunTex;
+			Texture* mSlowDownTex;
+			Texture* mStunTex;
+			Texture* mSwapPositionTex;
+
+			Texture* mSuspensionBarTex;
+			Texture* mSuspensionIndicatorTex;
 
 			// shaders
 			Shader* mBasicShader;
