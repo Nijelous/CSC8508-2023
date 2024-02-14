@@ -31,16 +31,22 @@ namespace NCL {
             void SetPatrolNodes(vector<Vector3> nodes) {
                 mNodes = nodes;
             }
+
+            void SetCurrentNode(int node) {
+                mCurrentNode = node;
+            }
         protected:
             void RaycastToPlayer();
             Vector3 GuardForwardVector();
-            void SetFocus();
+            float AngleFromFocalPoint(Vector3 direction);
 
             GameObject* mSightedObject;
             GameObject* mPlayer;
-            GameWorld* mWorld;
+            const GameWorld* mWorld;
             Vector3 mPrisonPosition;
             vector<Vector3> mNodes;
+            int mCurrentNode;
+            int mNextNode;
         private:
             bool mCanSeePlayer;
             bool mHasCaughtPlayer;
@@ -48,6 +54,9 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
+            void MoveTowardFocalPoint(Vector3 direction, int GuardSpeedMultiplier);
+            void LookTowardFocalPoint(Vector3 direction);
+            void GrabPlayer();
 
             float mConfiscateItemsTime;
 

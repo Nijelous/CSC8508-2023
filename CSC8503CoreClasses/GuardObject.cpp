@@ -62,8 +62,33 @@ Vector3 GuardObject::GuardForwardVector() {
 	return fwdAxis;
 }
 
-void GuardObject::SetFocus() {
+float GuardObject::AngleFromFocalPoint(Vector3 direction) {
+	Vector3 upVector = this->GetTransform().GetOrientation() * Vector3(0, 1, 0);
+	Vector3 perpendicularVector = Vector3::Cross(GuardForwardVector(), upVector);
+	float angle = Vector3::Dot(direction.Normalised(), perpendicularVector.Normalised());
+	return angle;
+}
 
+void GuardObject::MoveTowardFocalPoint(Vector3 direction, int GuardSpeedMultiplier) {
+	Vector3 dirNorm = direction.Normalised();
+	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * GuardSpeedMultiplier);
+
+}
+
+void GuardObject::LookTowardFocalPoint(Vector3 direction) {
+	float angleOfPlayer = AngleFromFocalPoint(direction);
+
+	if (angleOfPlayer < 0) {
+		this->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
+	}
+	else if (angleOfPlayer > 0) {
+		this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
+	}
+}
+
+void GuardObject::GrabPlayer() {
+	Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
+	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 }
 
 void GuardObject::BehaviourTree() {
@@ -91,11 +116,24 @@ BehaviourAction* GuardObject::Patrol() {
 	BehaviourAction* Patrol = new BehaviourAction("Patrol", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
+			mNextNode = mCurrentNode + 1;
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
-				
-				return Success;
+				int GuardSpeedMultiplier = 25;
+				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
+				LookTowardFocalPoint(direction);
+				MoveTowardFocalPoint(direction, GuardSpeedMultiplier);
+				float dist = direction.LengthSquared();
+				if (dist < 36) {
+					mCurrentNode += 1;
+					if (mCurrentNode == mNodes.size() - 1) {
+						mNextNode = 0;
+					}
+					else {
+						mNextNode = mCurrentNode + 1;
+					}
+				}
 			}
 			else if (mCanSeePlayer == true) {
 				return Failure;
@@ -112,22 +150,13 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		if (state == Initialise) {
 			state = Ongoing;
 		}
-		else if (state == Ongoing){
+		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 				int GuardCatchingDistanceSquared = 25;
-				int GuardSpeedMultiplyer = 40;
+				int GuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
-				Vector3 dirNorm = direction.Normalised();
-				Vector3 upVector = this->GetTransform().GetOrientation() * Vector3(0,1,0);
-				Vector3 perpendicularVector = Vector3::Cross(GuardForwardVector(), upVector);
-				float angleOfPlayer = Vector3::Dot(dirNorm, perpendicularVector.Normalised());
 
-				if (angleOfPlayer <= 0.1) {
-					this->GetPhysicsObject()->AddTorque(Vector3(0,10,0));
-				}
-				else if (angleOfPlayer >= -0.1) {
-					this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
-				}
+				LookTowardFocalPoint(direction);
 
 				float dist = direction.LengthSquared();
 				if (dist < GuardCatchingDistanceSquared) {
@@ -136,7 +165,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					return Failure;
 				}
 				else {
-					this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * GuardSpeedMultiplyer);
+					MoveTowardFocalPoint(direction, GuardSpeedMultiplier);
 				}
 			}
 			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
@@ -161,8 +190,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == true) {
 				mConfiscateItemsTime -= dt;
-				Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
-				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
 					mPlayerHasItems = false;
 					return Success;
@@ -170,8 +198,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 			}
 			else if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mConfiscateItemsTime -= dt;
-				Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
-				mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
 					mPlayerHasItems = false;
 					return Success;

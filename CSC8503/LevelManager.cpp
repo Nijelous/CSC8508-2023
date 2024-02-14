@@ -336,9 +336,10 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
 	guard->SetBoundingVolume((CollisionVolume*)volume);
 
+	int currentNode = 1;
 	guard->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(nodes[1]);
+		.SetPosition(nodes[currentNode]);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
@@ -352,6 +353,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetGameWorld(mWorld);
 	guard->SetPrisonPosition(prisonPosition);
 	guard->SetPatrolNodes(nodes);
+	guard->SetCurrentNode(currentNode);
 
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
