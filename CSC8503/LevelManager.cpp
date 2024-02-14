@@ -441,7 +441,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 bool LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
-			if ((mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][0] == PlayerInventory::flag) || (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->mPlayerInventory[0][1] == PlayerInventory::flag))
+			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
 				return true;
 		}
 	}
