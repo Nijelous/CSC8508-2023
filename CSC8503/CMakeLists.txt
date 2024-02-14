@@ -17,6 +17,7 @@ set(Header_Files
     "SceneManager.h"
     "SceneStates.h"
     "MainMenuScene.h"
+    "SoundManager.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -61,6 +62,7 @@ set(Source_Files
     "SceneManager.cpp"
     "SceneStates.cpp"
     "MainMenuScene.cpp"
+    "SoundManager.cpp"
 )
 
 if(USE_VULKAN)

@@ -13,7 +13,7 @@
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "UI.h"
-
+#include "SoundManager.h"
 #include <filesystem>
 
 using namespace NCL::CSC8503;
@@ -38,6 +38,8 @@ LevelManager::LevelManager() {
 	}
 	mActiveLevel = -1;
 
+	SoundManager* a = new SoundManager();
+	
 	InitialiseAssets();
 	InitialiseIcons();
 }
