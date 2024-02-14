@@ -54,11 +54,12 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
-            void MoveTowardFocalPoint(Vector3 direction, int GuardSpeedMultiplier);
+            void MoveTowardFocalPoint(Vector3 direction);
             void LookTowardFocalPoint(Vector3 direction);
             void GrabPlayer();
 
             float mConfiscateItemsTime;
+            int mGuardSpeedMultiplier;
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();

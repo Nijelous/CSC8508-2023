@@ -69,9 +69,9 @@ float GuardObject::AngleFromFocalPoint(Vector3 direction) {
 	return angle;
 }
 
-void GuardObject::MoveTowardFocalPoint(Vector3 direction, int GuardSpeedMultiplier) {
+void GuardObject::MoveTowardFocalPoint(Vector3 direction) {
 	Vector3 dirNorm = direction.Normalised();
-	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * GuardSpeedMultiplier);
+	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
 
 }
 
@@ -120,10 +120,10 @@ BehaviourAction* GuardObject::Patrol() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
-				int GuardSpeedMultiplier = 25;
+				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				LookTowardFocalPoint(direction);
-				MoveTowardFocalPoint(direction, GuardSpeedMultiplier);
+				MoveTowardFocalPoint(direction);
 				float dist = direction.LengthSquared();
 				if (dist < 36) {
 					mCurrentNode += 1;
@@ -153,7 +153,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 				int GuardCatchingDistanceSquared = 25;
-				int GuardSpeedMultiplier = 40;
+				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 
 				LookTowardFocalPoint(direction);
@@ -165,7 +165,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					return Failure;
 				}
 				else {
-					MoveTowardFocalPoint(direction, GuardSpeedMultiplier);
+					MoveTowardFocalPoint(direction);
 				}
 			}
 			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
