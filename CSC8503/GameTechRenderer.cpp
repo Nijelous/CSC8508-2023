@@ -174,12 +174,12 @@ void GameTechRenderer::RenderFrame() {
 
 	RenderCamera();
 	RenderSkybox();
-
+	DrawOutlinedObjects();
 	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	DrawOutlinedObjects();
+	
 	NewRenderLines();
 	NewRenderText();
 	glDisable(GL_BLEND);
@@ -434,7 +434,7 @@ void GameTechRenderer::CombineBuffers() {
 
 void GameTechRenderer::DrawOutlinedObjects() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDisable(GL_DEPTH_TEST);
+	glDepthFunc(GL_GEQUAL);
 	BindShader(*mOutlineShader);
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
@@ -451,7 +451,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 			DrawBoundMesh((uint32_t)i);
 		}
 	}
-	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
