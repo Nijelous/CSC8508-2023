@@ -98,7 +98,7 @@ LevelManager::~LevelManager() {
 	delete mSuspensionIndicatorTex;
 }
 
-void LevelManager::LoadLevel(int levelID, int playerID) {
+void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
@@ -131,9 +131,14 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 			break;
 		}
 	}
+
 	float* levelSize = mBuilder->BuildNavMesh(mLevelLayout);
 	if(levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
-	AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
+
+	if (!isMultiplayer){
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
+	}
+
 	LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	LoadItems(itemPositions);
 }
@@ -439,6 +444,10 @@ bool LevelManager::CheckGameWon() {
 		}
 	}
 	return false;
+}
+
+void LevelManager::AddUpdateableGameObject(GameObject& object){
+	mUpdatableObjects.push_back(&object);
 }
 
 GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::string& guardName) {

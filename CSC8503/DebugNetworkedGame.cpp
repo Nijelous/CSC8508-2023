@@ -13,25 +13,18 @@
 
 namespace{
     constexpr int MAX_PLAYER = 4;
+    constexpr int LEVEL_NUM = 0;
     
     constexpr const char* PLAYER_PREFIX = "Player";
-
-    //TODO(erendgrmnc): remove after level data is usable.
-    std::vector<Vector3> PLAYER_START_POSITIONS =
-    {
-        Vector3(100,-17,100),
-        Vector3(100,-17,85),
-        Vector3(60,-17,100),
-        Vector3(40,-17,100),
-        
-    };
     
 }
 
-DebugNetworkedGame::DebugNetworkedGame() : NetworkedGame(false){
+DebugNetworkedGame::DebugNetworkedGame() {
     mThisServer = nullptr;
     mThisClient = nullptr;
 
+    mGameState = GameStates::MainMenuState;
+    
     NetworkBase::Initialise();
     mTimeToNextPacket = 0.0f;
     mPacketsToSnapshot = 0;
@@ -105,14 +98,8 @@ void DebugNetworkedGame::UpdateGame(float dt){
         else{
             Debug::Print("CLIENT", Vector2(5, 10), Debug::MAGENTA);
         }
-
-        for (auto& networkPlayer : mServerPlayers){
-            if (networkPlayer.second != nullptr){
-                networkPlayer.second->UpdateObject(dt);
-            }
-        }
         
-        GameSceneManager::UpdateGame(dt);
+        mLevelManager->Update(dt, mGameState == LevelState);
     }
     else{
         if (mThisServer){
@@ -141,6 +128,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
+        mGameState = GameStates::LevelState;
         StartLevel();
     }
 }
@@ -153,6 +141,7 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished){
 }
 
 void DebugNetworkedGame::StartLevel(){
+    InitWorld();
     Debug::Print("Game Started", Vector2(10, 5));
 
     for (auto& event : mOnGameStarts){
@@ -310,6 +299,9 @@ void DebugNetworkedGame::InitWorld(){
     mLevelManager->GetGameWorld()->ClearAndErase();
     mLevelManager->GetPhysics()->Clear();
 
+    //TODO(erendgrmc): Second parameter is redundant remove it from func.
+    mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
+
     SpawnPlayers();
 }
 
@@ -321,7 +313,9 @@ void DebugNetworkedGame::SpawnPlayers(){
     
     for (int i = 0; i < 4; i++)		{
         if (mPlayerList[i] != -1) {
-            auto* netPlayer = AddPlayerObject(PLAYER_START_POSITIONS[i], i);
+
+            const Vector3& pos = mLevelManager->GetPlayerStartPosition(i);
+            auto* netPlayer = AddPlayerObject(pos, i);
             mServerPlayers.emplace(i, netPlayer);
         }
         else
@@ -338,7 +332,8 @@ void DebugNetworkedGame::SpawnPlayers(){
         playerPeerId = GetPlayerPeerID();
         mLocalPlayer = mServerPlayers[playerPeerId];
     }
-      mServerPlayers[playerPeerId]->SetIsLocalPlayer(true);
+    
+    mServerPlayers[playerPeerId]->SetIsLocalPlayer(true);
     mLevelManager->SetTempPlayer((PlayerObject*)mLocalPlayer);
     mLocalPlayer->SetActive();
 }
@@ -357,6 +352,7 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
     netPlayer->SetNetworkObject(networkComponet);
     mNetworkObjects.push_back(netPlayer->GetNetworkObject());
     mLevelManager->GetGameWorld()->AddGameObject(netPlayer);
+    mLevelManager->AddUpdateableGameObject(*netPlayer);
     Vector4 colour;
     switch (playerNum)
     {

@@ -25,9 +25,9 @@ namespace NCL {
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
-			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
-			void LoadLevel(int levelID, int playerID);
 
+			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
+			void LoadLevel(int levelID, int playerID,  bool isMultiplayer = false);
 			PlayerObject* GetTempPlayer() { return mTempPlayer; }
 
 			void SetTempPlayer(PlayerObject* playerObject) { mTempPlayer = playerObject; }
@@ -42,10 +42,12 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
+			void AddUpdateableGameObject(GameObject& object);
+
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
 			bool CheckGameWon();
-
+		
 		protected:
 			virtual void InitialiseAssets();
 

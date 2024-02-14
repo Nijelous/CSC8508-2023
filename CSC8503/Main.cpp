@@ -16,10 +16,6 @@
 
 #include "NetworkedGame.h"
 
-#include "PushdownMachine.h"
-#include "PushdownState.h"
-#include "PushdownStates.h"
-
 #include "BehaviourNode.h"
 #include "BehaviourSelector.h"
 #include "BehaviourSequence.h"
@@ -70,7 +66,7 @@ int main(){
     else{
         gm = new GameSceneManager();
     }
-    PushdownMachine pushdownMachine(new MainMenu(gm));
+    
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
     while (w->UpdateWindow() && !Window::GetKeyboard()->KeyDown(KeyCodes::ESCAPE)) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
@@ -90,7 +86,6 @@ int main(){
         }
 
         w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-        pushdownMachine.Update(dt);
         gm->UpdateGame(dt);
     }
     Window::DestroyGameWindow();
