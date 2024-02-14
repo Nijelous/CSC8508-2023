@@ -105,7 +105,7 @@ void PlayerObject::ControlInventory()
 						 ? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left))
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot,mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot( mPlayerID, mActiveItemSlot);
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
