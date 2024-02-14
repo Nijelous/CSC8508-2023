@@ -97,11 +97,11 @@ void PlayerObject::ControlInventory()
 		mActiveItemSlot = 1;
 
 	if (Window::GetMouse()->GetWheelMovement() > 0)
-		mActiveItemSlot = (mActiveItemSlot < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
+		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
 						 ? mActiveItemSlot + 1 : 0;
 
 	if (Window::GetMouse()->GetWheelMovement() < 0)
-		mActiveItemSlot = (mActiveItemSlot - 1 > 0)
+		mActiveItemSlot = (mActiveItemSlot > 0)
 						 ? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left))
