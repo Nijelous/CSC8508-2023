@@ -275,7 +275,9 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
 		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i][i+1], "Guard")->SetIsSensed(true);
+
 	}
 }
 
@@ -481,7 +483,6 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetCollisionLayer(Player);
 }
-
 bool LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
@@ -496,7 +497,7 @@ void LevelManager::AddUpdateableGameObject(GameObject& object){
 	mUpdatableObjects.push_back(&object);
 }
 
-GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::string& guardName) {
+GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName) {
 	GuardObject* guard = new GuardObject(guardName);
 
 	float meshSize = PLAYER_MESH_SIZE;
@@ -505,9 +506,10 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::s
 	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
 	guard->SetBoundingVolume((CollisionVolume*)volume);
 
+	int currentNode = 1;
 	guard->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(position);
+		.SetPosition(nodes[currentNode]);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
@@ -522,6 +524,9 @@ GuardObject* LevelManager::AddGuardToWorld(const Vector3& position, const std::s
 
 	guard->SetPlayer(mTempPlayer);
 	guard->SetGameWorld(mWorld);
+	guard->SetPrisonPosition(prisonPosition);
+	guard->SetPatrolNodes(nodes);
+	guard->SetCurrentNode(currentNode);
 
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
