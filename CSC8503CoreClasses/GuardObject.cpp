@@ -15,6 +15,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mHasCaughtPlayer = false;
 	mPlayerHasItems = true;
 	BehaviourTree();
+	mGuardState = Stand;
 }
 
 GuardObject::~GuardObject() {
@@ -146,7 +147,7 @@ BehaviourAction* GuardObject::Patrol() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
 				//std::cout << "Lost em";
-  
+				
 				return Success;
 			}
 			else if (mCanSeePlayer == true) {

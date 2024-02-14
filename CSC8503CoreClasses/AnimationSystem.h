@@ -18,7 +18,7 @@ namespace NCL {
 
 			void Clear();
 
-			void Update(float dt);
+			void Update(float dt, std::map<std::string, MeshAnimation*> preAnimationList);
 
 			void UpdateAllAnimationObjects(float dt);
 
@@ -26,7 +26,7 @@ namespace NCL {
 
 			void UpdateMaterials();
 
-			void UpdateAnimations();
+			void UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList);
 
 			void PreloadMatTextures(GameTechRenderer* renderer);
 

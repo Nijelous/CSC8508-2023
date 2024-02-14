@@ -39,7 +39,7 @@ void main(void)
 	
 	fragColor[0] = texture2D(mainTex,IN.texCoord);
 	fragColor[1] = vec4(bumpNormal.xyz * 0.5 + 0.5, 1.0);
-	fragColor[0].a = 1.0;
-	fragColor[1].a = 1.0;
+	fragColor[0].a = 1;
+	fragColor[1].a = 1;
 
 }

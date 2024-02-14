@@ -21,11 +21,11 @@ namespace NCL {
         {
         public:
             enum mAnimationState {
-                stand,
-                run,
-                jumpUp,
-                jumpDown
-            };
+                Stand,
+                Walk,
+                Sprint,
+                Happy
+             };
 
             AnimationObject(MeshAnimation* animation, MeshMaterial* material);
             ~AnimationObject();

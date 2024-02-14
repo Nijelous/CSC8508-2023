@@ -24,7 +24,7 @@ void AnimationSystem::Clear()
 	mAnimationList.clear();
 }
 
-void AnimationSystem::Update(float dt)
+void AnimationSystem::Update(float dt,std::map<std::string,MeshAnimation*> preAnimationList)
 {
 	
 	UpdateAllAnimationObjects(dt);
@@ -55,10 +55,11 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt)
 				vector<Matrix4> frameMatrices;
 
 				
+				
 				for (unsigned int a = 0; a < mMesh->GetJointCount(); ++a) {
 					frameMatrices.emplace_back(frameData[a] * invBindPose[a]);
 				}
-
+				
 				o->GetRenderObject()->SetAnimation(o->GetAnimationObject()->GetAnimation());
 				o->GetRenderObject()->SetMaterial(o->GetAnimationObject()->GetMaterial());
 				o->GetRenderObject()->SetCurrentFrame(o->GetAnimationObject()->GetCurrentFrame());
@@ -81,10 +82,10 @@ void AnimationSystem::UpdateMaterials()
 	
 }
 
-void AnimationSystem::UpdateAnimations()
+void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
 {
 	
-	for (auto& a : mAnimationList) {
+	/*for (auto& a : mAnimationList) {
 		AnimationObject::mAnimationState state = (*a).GetAnimationState();
 		switch (state)
 		{
@@ -100,6 +101,9 @@ void AnimationSystem::UpdateAnimations()
 		
 		
 		
+	}*/
+	for (auto& a : mAnimationList) {
+		//a->SetAnimation(mGuardAnimationHappy)
 	}
 	
 }

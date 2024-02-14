@@ -368,7 +368,6 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 			for (size_t b = 0; b < layerCount; ++b) {
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = (*i).GetMatTextures()[b];
-				std::cout << textureID << std::endl;
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatrices().size(), false, (float*)(*i).GetFrameMatrices().data());
 				DrawBoundMesh((uint32_t)b);

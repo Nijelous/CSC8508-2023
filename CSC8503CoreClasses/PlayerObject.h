@@ -8,8 +8,10 @@ namespace NCL {
 
 
 		enum PlayerState {
+			Stand,
 			Walk,
 			Sprint,
+			Happy,
 			Crouch
 		};
 

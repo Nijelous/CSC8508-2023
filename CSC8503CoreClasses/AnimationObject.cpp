@@ -6,7 +6,7 @@ AnimationObject::AnimationObject(MeshAnimation* animation, MeshMaterial* materia
 	this->mAnimation = animation;
 	this->mMaterial = material;
 
-	mState = stand;
+	mState = Stand;
 	mCurrentFrame = 0;
 	mNextFrame = 0;
 	mFrameTime = 0.0f;
@@ -19,7 +19,7 @@ AnimationObject::~AnimationObject() {
 }
 
 void AnimationObject::Update(float dt){
-	mFrameTime -= dt;
+	mFrameTime -= 2*dt;
 
 	while (mFrameTime < 0.0f) {
 		mCurrentFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();

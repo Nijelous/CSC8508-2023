@@ -105,11 +105,21 @@ namespace NCL {
 			MeshAnimation* mSoldierAnimation;
 			MeshMaterial* mSoldierMaterial;
 			Mesh* mGuardMesh;
-			MeshAnimation* mGuardAnimation;
 			MeshMaterial* mGuardMaterial;
 			Shader* mAnimationShader;
 
-		
+			//animation guard
+			std::map<std::string, MeshAnimation*> preAnimationList;
+			MeshAnimation* mGuardAnimationStop;
+			MeshAnimation* mGuardAnimationStepForward;
+			MeshAnimation* mGuardAnimationStepBack;
+			MeshAnimation* mGuardAnimationStepLeft;
+			MeshAnimation* mGuardAnimationStepRight;
+			MeshAnimation* mGuardAnimationTaunt;
+			MeshAnimation* mGuardAnimationFlinches;
+			MeshAnimation* mGuardAnimationHappy;
+			MeshAnimation* mGuardAnimationAngry;
+			
 
 			Helipad* mHelipad;
 

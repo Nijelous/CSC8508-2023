@@ -31,6 +31,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int wal
 	mMovementSpeed = walkSpeed;
 	mPlayerState = Walk;
 	mIsCrouched = false;
+	
 
 	mIsPlayer = true;
 }
