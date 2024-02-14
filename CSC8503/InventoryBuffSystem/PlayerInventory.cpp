@@ -14,6 +14,15 @@ void PlayerInventory::Init()
 		}
 	}
 	
+	mItemPreconditionsMet =
+	{
+		{
+			{none ,[](int playerno) { return false; }},
+			{disguise,[](int playerno) { return true; }},
+			{soundEmitter,[](int playerno) { return true; }},
+			{flag ,[](int playerno) { return false; }},
+		}
+	};
 }
 
 void PlayerInventory::AddItemToPlayer(item inItem, int playerNo)
@@ -61,12 +70,12 @@ void PlayerInventory::DropItemFromPlayer(int playerNo, int invSlot)
 
 void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot)
 {
-	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end())
+	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
+		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo))
 	{
 		Notify(mOnItemUsedInventoryEventMap[mPlayerInventory[playerNo][invSlot]],(playerNo));
+		mPlayerInventory[playerNo][invSlot] = none;
 	}
-
-	mPlayerInventory[playerNo][invSlot] = none;
 }
 
 bool PlayerInventory::ItemInPlayerInventory(item inItem, int playerNo)
@@ -103,7 +112,8 @@ void InventoryBuffSystem::PlayerInventory::Notify(const InventoryEvent invEvent,
 
 PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed)
 {
-	std::mt19937 rng(seed);
-	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), rng);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), gen);
 	return mItemsInRandomPool[0];
 }

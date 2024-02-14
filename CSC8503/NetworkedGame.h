@@ -33,7 +33,7 @@ namespace NCL {
 
 		class NetworkedGame : public GameSceneManager, public PacketReceiver {
 		public:
-			NetworkedGame(bool isInitingAssets = true);
+			NetworkedGame();
 			virtual ~NetworkedGame();
 
 			void StartAsServer();
