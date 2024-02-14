@@ -9,6 +9,8 @@
 
 #include <irrKlang.h>
 
+#include "PushdownStates.h"
+
 using namespace NCL;
 using namespace CSC8503;
 using namespace irrklang;
@@ -18,24 +20,22 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
-GameSceneManager::GameSceneManager() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()) {
-	mLevelManager = new LevelManager();
-
-	mLevelManager->GetGameWorld()->GetMainCamera().SetController(mController);
-	mController.MapAxis(0, "Sidestep");
-	mController.MapAxis(1, "UpDown");
-	mController.MapAxis(2, "Forward");
-	mController.MapAxis(3, "XLook");
-	mController.MapAxis(4, "YLook");
-
+GameSceneManager::GameSceneManager(bool isNetworkGame) {
+	if (!isNetworkGame){
+		InitInGameMenuManager();
+	}
 	InitCamera();
 }
 
 GameSceneManager::~GameSceneManager() {
-	delete mLevelManager;
 }
 
 void GameSceneManager::UpdateGame(float dt) {
+
+	if (mPushdownMachine != nullptr){
+		mPushdownMachine->Update(dt);
+	}
+
 	mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
 
 	if (mGameState == MainMenuState)
@@ -50,6 +50,11 @@ void GameSceneManager::UpdateGame(float dt) {
 	mLevelManager->Update(dt, mGameState == LevelState);
 
 	PlayerWonGame();
+}
+
+void GameSceneManager::InitInGameMenuManager(){
+	auto* mainMenu = new MainMenu(this);
+	mPushdownMachine = new PushdownMachine(mainMenu);
 }
 
 void GameSceneManager::InitCamera() {

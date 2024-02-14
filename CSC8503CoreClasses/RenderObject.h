@@ -80,6 +80,16 @@ namespace NCL {
 				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
 			}
 
+
+			void SetOutlined(bool outlined) {
+				mOutlined = outlined;
+			}
+
+			bool GetOutlined() const {
+				return mOutlined;
+			}
+
+
 			void SetAnimation(MeshAnimation* animation) {
 				mAnimation = animation;
 			}
@@ -119,6 +129,7 @@ namespace NCL {
 			vector<Matrix4>  GetFrameMatrices() const {
 				return mFrameMatrices;
 			}
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
@@ -128,11 +139,13 @@ namespace NCL {
 			MeshAnimation* mAnimation;
 			MeshMaterial* mMaterial;
 			Vector4		mColour;
+
+			float		mCullSphereRadius;
+			float mSqDistToCam;
+			bool mOutlined = false;
+
 			vector<GLuint>  mMatTextures;
 			vector<Matrix4> mFrameMatrices;
-			
-			float	mCullSphereRadius;
-			float	mSqDistToCam;
 
 
 			int		mCurrentFrame;
