@@ -33,7 +33,7 @@ namespace NCL {
 			void SetDefeat() { mGameState = DefeatScreenState; }
 
 			// to be repalced by actual game logic
-			bool PlayerWonGame() { return false; }
+			bool PlayerWonGame();
 			bool PLayerLostGame() { return false; }
 
 			void CreateLevel();
@@ -42,6 +42,8 @@ namespace NCL {
 			virtual void InitWorld() {}
 
 			void InitCamera();
+
+			void InitIcons();
 
 			void DisplayMainMenu();
 			void DisplayVictory();

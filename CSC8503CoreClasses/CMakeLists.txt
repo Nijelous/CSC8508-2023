@@ -133,6 +133,7 @@ set(Header_Files
     "Transform.h"
     "AnimationObject.h"
     "AnimationSystem.h"
+    "UI.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -145,6 +146,7 @@ set(Source_Files
     "Transform.cpp"
     "AnimationObject.cpp"
     "AnimationSystem.cpp"
+    "UI.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -250,10 +252,12 @@ target_precompile_headers(${PROJECT_NAME} PRIVATE
 set(ADDITIONAL_LIBRARY_DEPENDENCIES
     "NCLCoreClasses"
     "ws2_32.lib"
-)
-
+    )
 include_directories("../NCLCoreClasses/")
 include_directories("./")
+include_directories("../OpenGLRendering/")
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
+target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
 
 if(MSVC)
     target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")

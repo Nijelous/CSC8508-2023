@@ -128,7 +128,7 @@ namespace NCL::CSC8503 {
 		PhysicsObject*		mPhysicsObject;
 		RenderObject*		mRenderObject;
 		NetworkObject*		mNetworkObject;
-		AnimationObject* mAnimationObject;
+		AnimationObject*    mAnimationObject;
 
 		bool		mIsSensed;
 		bool		mIsActive;
