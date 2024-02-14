@@ -1,8 +1,11 @@
-#include "../NCLCoreClasses/KeyboardMouseController.h"
-
 #pragma once
 
 #include "LevelManager.h"
+#include "Scene.h"
+
+namespace NCL::CSC8503{
+	class PushdownMachine;
+}
 
 namespace NCL {
 	namespace CSC8503 {
@@ -18,14 +21,12 @@ namespace NCL {
 			DefeatScreenState
 		};
 
-		class GameSceneManager {
+		class GameSceneManager : public Scene{
 		public:
-			GameSceneManager();
+			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
 
 			virtual void UpdateGame(float dt);
-
-			LevelManager* GetLevelManager() { return mLevelManager; }
 
 			void SetMainMenu() { mGameState = MainMenuState; }
 			void SetLevel() { mGameState = LevelState; }
@@ -33,7 +34,7 @@ namespace NCL {
 			void SetDefeat() { mGameState = DefeatScreenState; }
 
 			// to be repalced by actual game logic
-			bool PlayerWonGame() { return false; }
+			bool PlayerWonGame();
 			bool PLayerLostGame() { return false; }
 
 			void CreateLevel();
@@ -41,18 +42,18 @@ namespace NCL {
 		protected:
 			virtual void InitWorld() {}
 
+			virtual void InitInGameMenuManager();
+
 			void InitCamera();
+
+			void InitIcons();
 
 			void DisplayMainMenu();
 			void DisplayVictory();
 			void DisplayDefeat();
-
-			// world creation
-			LevelManager* mLevelManager;
-
-			KeyboardMouseController mController;
-
+			
 			GameStates mGameState;
+			PushdownMachine* mPushdownMachine;
 
 		private:
 			

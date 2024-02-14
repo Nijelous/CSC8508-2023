@@ -20,7 +20,9 @@ std::map<std::string, TextureLoadFunction> TextureLoader::fileHandlers;
 
 bool TextureLoader::LoadTexture(const std::string& filename, char*& outData, int& width, int &height, int &channels, int&flags) {
 	if (filename.empty()) {
+		std::cout << "fail1"+filename << std::endl;
 		return false;
+		
 	}
 
 	std::filesystem::path path(filename);
@@ -36,6 +38,7 @@ bool TextureLoader::LoadTexture(const std::string& filename, char*& outData, int
 	if (it != fileHandlers.end()) {
 		//There's a custom handler function for this, just use that
 		return it->second(realPath, outData, width, height, channels, flags);
+		
 	}
 	//By default, attempt to use stb image to get this texture
 	stbi_uc *texData = stbi_load(realPath.c_str(), &width, &height, &channels, 4); //4 forces this to always be rgba!
@@ -44,9 +47,11 @@ bool TextureLoader::LoadTexture(const std::string& filename, char*& outData, int
 
 	if (texData) {
 		outData = (char*)texData;
+		std::cout << "success"+filename << std::endl;
 		return true;
+		
 	}
-
+	std::cout << "fail2"+ filename << std::endl;
 	return false;
 }
 

@@ -85,7 +85,8 @@ void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	WriteVariable(keyValuePairs, level, room);
 }
 
-void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, std::string key, std::string* value, int indents, int maxIndents) {
+void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, 
+	std::string key, std::string* value, int indents, int maxIndents) {
 	if (writingValue) {
 		if (keyValuePairs->size() <= maxIndents || indents < maxIndents) {
 			(*keyValuePairs)[indents - 1][key] = std::atof(value->c_str());

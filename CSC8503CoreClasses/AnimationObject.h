@@ -9,6 +9,7 @@
 
 
 
+
 namespace NCL {
     using namespace NCL::Rendering;
 
@@ -39,11 +40,11 @@ namespace NCL {
                 mMaterial = material;
             }
 
-            MeshAnimation* GetAnimation() const{
+            MeshAnimation* GetAnimation() {
                 return mAnimation;
             }
 
-            MeshMaterial* GetMaterial() const{
+            MeshMaterial* GetMaterial() {
                 return mMaterial;
             }
 
@@ -54,7 +55,7 @@ namespace NCL {
             void SetAnimationState(mAnimationState animationState) {
                 mState = animationState;
             }
-            
+
             mAnimationState GetAnimationState() {
                 return mState;
             }
@@ -64,11 +65,11 @@ namespace NCL {
             MeshAnimation* mAnimation;
             MeshMaterial* mMaterial;
             mAnimationState mState;
-
+           
             int		mCurrentFrame;
             int		mNextFrame;
             float	mFrameTime;
-            bool    mIsAnimation = false;
+           
         };
     }
 }
