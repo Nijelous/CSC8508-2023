@@ -9,6 +9,7 @@
 #include "PlayerObject.h"
 #include "GuardObject.h"
 #include "Helipad.h"
+#include "Vent.h"
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
@@ -109,6 +110,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mLevelLayout.clear();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
+	LoadVents((*mLevelList[levelID]).GetVents());
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -242,6 +244,12 @@ void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
 	}
 }
 
+void LevelManager::LoadVents(const std::vector<Vent*> vents) {
+	for (int i = 0; i < vents.size(); i++) {
+		AddVentToWorld(vents[i]);
+	}
+}
+
 void LevelManager::InitialiseIcons() {
 	UI::Icon mInventoryIcon1 = UI::AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 	UI::Icon mInventoryIcon2 = UI::AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
@@ -334,6 +342,30 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	mLevelLayout.push_back(helipad);
 
 	return helipad;
+}
+
+Vent* LevelManager::AddVentToWorld(Vent* vent) {
+	Vector3 size = Vector3(1.25f, 1.25f, 0.05f);
+	OBBVolume* volume = new OBBVolume(size);
+
+	vent->SetBoundingVolume((CollisionVolume*)volume);
+
+	vent->GetTransform()
+		.SetScale(size*2);
+
+	vent->SetRenderObject(new RenderObject(&vent->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
+		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
+	vent->SetPhysicsObject(new PhysicsObject(&vent->GetTransform(), vent->GetBoundingVolume(), 1, 1, 5));
+
+
+	vent->GetPhysicsObject()->SetInverseMass(0);
+	vent->GetPhysicsObject()->InitCubeInertia();
+
+	vent->SetCollisionLayer(StaticObj);
+
+	mWorld->AddGameObject(vent);
+
+	return vent;
 }
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
