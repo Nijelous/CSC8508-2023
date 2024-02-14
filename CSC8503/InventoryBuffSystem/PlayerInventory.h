@@ -31,7 +31,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			disguise, soundEmitter, flag,  none
+			none, disguise, soundEmitter, flag
 		};
 
 		PlayerInventory()
@@ -73,9 +73,10 @@ namespace InventoryBuffSystem
 		{
 			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}
 		};
+		
+		//std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
-		PlayerBuffs* mPlayerBuffsPtr;
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};

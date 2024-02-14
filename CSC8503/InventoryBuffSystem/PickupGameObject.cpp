@@ -13,12 +13,14 @@ using namespace InventoryBuffSystem;
 
 PickupGameObject::PickupGameObject(
 	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	unsigned int* randomSeed,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
 	float initCooldown) {
+	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
+	mRandomSeed = randomSeed;
 	mCooldown = 0.0f;
 	mInitCooldown = initCooldown;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
-	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
@@ -109,8 +111,6 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject)
 {
 	if (mCooldown == 0)
 	{
-		if (otherObject->GetIsPlayer())
-			return;
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
 		ActivatePickup(0);
 	}

@@ -16,6 +16,7 @@ namespace NCL {
             PickupGameObject() {};
             PickupGameObject(
                 InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+                unsigned int* randomSeed = 0,
                 std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
                 float initCooldown = 5.0f);
             ~PickupGameObject();
