@@ -13,8 +13,7 @@ AnimationObject::AnimationObject(MeshAnimation* animation, MeshMaterial* materia
 }
 
 AnimationObject::~AnimationObject() {
-	delete mAnimation;
-	delete mMaterial;
+	
 	
 }
 

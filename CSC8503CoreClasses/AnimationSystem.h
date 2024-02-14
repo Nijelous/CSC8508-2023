@@ -5,6 +5,7 @@
 #include "OGLRenderer.h"
 #include "OGLTexture.h"
 #include "../CSC8503/GameTechRenderer.h"
+#include "GuardObject.h"
 
 
 namespace NCL {
@@ -35,6 +36,7 @@ namespace NCL {
 
 			GameWorld& gameWorld;
 			vector<AnimationObject*> mAnimationList;
+			vector<GuardObject*> mGuardList;
 			vector<GLuint>  mMatTextures;
 			Shader* mShader;
 			Mesh* mMesh;

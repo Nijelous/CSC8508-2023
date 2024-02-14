@@ -131,13 +131,9 @@ namespace NCL {
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> preAnimationList;
-			MeshAnimation* mGuardAnimationStop;
-			MeshAnimation* mGuardAnimationStepForward;
-			MeshAnimation* mGuardAnimationStepBack;
-			MeshAnimation* mGuardAnimationStepLeft;
-			MeshAnimation* mGuardAnimationStepRight;
-			MeshAnimation* mGuardAnimationTaunt;
-			MeshAnimation* mGuardAnimationFlinches;
+			MeshAnimation* mGuardAnimationStand;
+			MeshAnimation* mGuardAnimationSprint;
+			MeshAnimation* mGuardAnimationWalk;
 			MeshAnimation* mGuardAnimationHappy;
 			MeshAnimation* mGuardAnimationAngry;
 			

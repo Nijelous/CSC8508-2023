@@ -26,7 +26,7 @@ void AnimationSystem::Clear()
 
 void AnimationSystem::Update(float dt,std::map<std::string,MeshAnimation*> preAnimationList)
 {
-	
+	UpdateAnimations(preAnimationList);
 	UpdateAllAnimationObjects(dt);
 	UpdateMaterials();
 	
@@ -35,9 +35,10 @@ void AnimationSystem::Update(float dt,std::map<std::string,MeshAnimation*> preAn
 void AnimationSystem::UpdateAllAnimationObjects(float dt)
 {
 	mAnimationList.clear();
-	
+	mGuardList.clear();
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
+			//Animation List
 			if (o->GetAnimationObject()) {
 				AnimationObject* animObj = o->GetAnimationObject();
 				mAnimationList.emplace_back(animObj);
@@ -64,9 +65,19 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt)
 				o->GetRenderObject()->SetMaterial(o->GetAnimationObject()->GetMaterial());
 				o->GetRenderObject()->SetCurrentFrame(o->GetAnimationObject()->GetCurrentFrame());
 				o->GetRenderObject()->SetFrameMatrices(frameMatrices);
+
+				if (o->GetName() == "Guard") {
+					mGuardList.emplace_back((GuardObject*)o);
+					std::cout << "find the guard find the guard" << std::endl;
+				}
 			}
+
+			//Guard list
+			
+			
 		}
 	);
+	
 }
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
@@ -85,25 +96,32 @@ void AnimationSystem::UpdateMaterials()
 void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
 {
 	
-	/*for (auto& a : mAnimationList) {
-		AnimationObject::mAnimationState state = (*a).GetAnimationState();
+	for (auto& a : mGuardList) {
+		GuardObject::GuardState state = (*a).GetGuardState();
+		
 		switch (state)
 		{
-		case AnimationObject::mAnimationState::stand:
+		case AnimationObject::mAnimationState::Stand:
+			std::cout << (*a).GetGuardState() << std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["Stand"]);
+			
 			break;
-		case AnimationObject::mAnimationState::run:
+		case AnimationObject::mAnimationState::Walk:
+			std::cout << (*a).GetGuardState() << std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["Walk"]);
 			break;
-		case AnimationObject::mAnimationState::jumpUp:
+		case AnimationObject::mAnimationState::Sprint:
+			std::cout << (*a).GetGuardState() << std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["Sprint"]);
 			break;
-		case AnimationObject::mAnimationState::jumpDown:
+		case AnimationObject::mAnimationState::Happy:
+			std::cout << (*a).GetGuardState() << std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["Happy"]);
 			break;
 		}
 		
 		
 		
-	}*/
-	for (auto& a : mAnimationList) {
-		//a->SetAnimation(mGuardAnimationHappy)
 	}
 	
 }

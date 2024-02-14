@@ -102,12 +102,10 @@ LevelManager::~LevelManager() {
 	delete mGuardMaterial;
 	delete mGuardMesh;
 	delete mAnimation;
-	delete mGuardAnimationStepForward;
-	delete mGuardAnimationStepBack;
-	delete mGuardAnimationStepLeft;
-	delete mGuardAnimationStepRight;
-	delete mGuardAnimationTaunt;
-	delete mGuardAnimationFlinches;
+
+	delete mGuardAnimationStand;
+	delete mGuardAnimationWalk;
+	delete mGuardAnimationSprint;
 	delete mGuardAnimationHappy;
 	delete mGuardAnimationAngry;
 }
@@ -198,24 +196,16 @@ void LevelManager::InitialiseAssets() {
 	mGuardMesh = mRenderer->LoadMesh("MaleGuard/Male_Guard.msh");	
 	mGuardMaterial = mRenderer->LoadMaterial("MaleGuard/Male_Guard.mat");
 	//Animations
-	mGuardAnimationStop = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
-	mGuardAnimationStepForward = mRenderer->LoadAnimation("MaleGuard/StepForward.anm");
-	mGuardAnimationStepBack = mRenderer->LoadAnimation("MaleGuard/StepBack1.anm");
-	mGuardAnimationStepLeft = mRenderer->LoadAnimation("MaleGuard/StepLeft.anm");
-	mGuardAnimationStepRight = mRenderer->LoadAnimation("MaleGuard/StepRight.anm");
-	mGuardAnimationTaunt = mRenderer->LoadAnimation("MaleGuard/Taunt.anm");
-	mGuardAnimationFlinches = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
+	mGuardAnimationStand = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
+	mGuardAnimationWalk = mRenderer->LoadAnimation("MaleGuard/StepForwardOneHand.anm");
+	mGuardAnimationSprint = mRenderer->LoadAnimation("MaleGuard/StepForward.anm");
 	mGuardAnimationHappy = mRenderer->LoadAnimation("MaleGuard/Happy.anm");
 	mGuardAnimationAngry = mRenderer->LoadAnimation("MaleGuard/Angry.anm");
 
 	
-	preAnimationList.insert(std::make_pair("stop", mGuardAnimationStop));
-	preAnimationList.insert(std::make_pair("StepForward", mGuardAnimationStepForward));
-	preAnimationList.insert(std::make_pair("StepBack", mGuardAnimationStepBack));
-	preAnimationList.insert(std::make_pair("StepLeft", mGuardAnimationStepLeft));
-	preAnimationList.insert(std::make_pair("StepRight", mGuardAnimationStepRight));
-	preAnimationList.insert(std::make_pair("Taunt", mGuardAnimationTaunt));
-	preAnimationList.insert(std::make_pair("Flinches", mGuardAnimationFlinches));
+	preAnimationList.insert(std::make_pair("Stand", mGuardAnimationStand));
+	preAnimationList.insert(std::make_pair("Walk", mGuardAnimationWalk));
+	preAnimationList.insert(std::make_pair("Sprint", mGuardAnimationSprint));
 	preAnimationList.insert(std::make_pair("Happy", mGuardAnimationHappy));
 	preAnimationList.insert(std::make_pair("Angry", mGuardAnimationAngry));
 	
@@ -277,8 +267,8 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i][i+1], "Guard")->SetIsSensed(true);
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
+		
 
 	}
 }
@@ -545,7 +535,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
-	guard->SetAnimationObject(new AnimationObject(mGuardAnimationStepForward, mGuardMaterial));
+	guard->SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
