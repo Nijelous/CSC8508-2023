@@ -13,7 +13,7 @@ using namespace InventoryBuffSystem;
 
 PickupGameObject::PickupGameObject(
 	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
-	unsigned int* randomSeed,
+	unsigned int randomSeed,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
 	float initCooldown) {
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
@@ -21,7 +21,8 @@ PickupGameObject::PickupGameObject(
 	mCooldown = 0.0f;
 	mInitCooldown = initCooldown;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
-
+	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
+	mRandomSeed = randomSeed;
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
 		{
@@ -75,26 +76,27 @@ PickupGameObject::PickupGameObject(
 			return this->mCooldown == 0;
 		}
 	));
-
+	ChangeToRandomPickup();
 }
 
 PickupGameObject::~PickupGameObject() {
 	delete mStateMachine;
 }
 
-void PickupGameObject::Update(float dt) {
+void PickupGameObject::UpdateObject(float dt) {
 	mStateMachine->Update(dt);
 }
 
 void PickupGameObject::ChangeToRandomPickup()
 {
-	std::mt19937 rng(*mRandomSeed);
-	std::bernoulli_distribution bool_distribution(0.5);
-	mIsBuff = bool_distribution(rng);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::bernoulli_distribution d(0.5);
+	mIsBuff = d(gen);
 	if (mIsBuff)
-		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(*mRandomSeed);
+		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(mRandomSeed);
 	else
-		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(*mRandomSeed);
+		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed);
 }
 
 void PickupGameObject::ActivatePickup(int playerNo)
@@ -126,6 +128,7 @@ void PickupGameObject::GoUnder(float dt) {
 	Vector3 UnderPos = GetTransform().GetPosition() + Vector3(0, -10, 0);
 	GetTransform().SetPosition(UnderPos);
 	mCooldown = mInitCooldown;
+	ChangeToRandomPickup();
 }
 
 void PickupGameObject::Waiting(float dt)

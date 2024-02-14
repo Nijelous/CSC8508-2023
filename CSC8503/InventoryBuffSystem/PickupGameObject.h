@@ -16,12 +16,12 @@ namespace NCL {
             PickupGameObject() {};
             PickupGameObject(
                 InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
-                unsigned int* randomSeed = 0,
+                unsigned int randomSeed = 10,
                 std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
-                float initCooldown = 5.0f);
+                float initCooldown = 2.0f);
             ~PickupGameObject();
 
-            virtual void Update(float dt);
+            virtual void UpdateObject(float dt);
 
             void ChangeToRandomPickup();
             void ActivatePickup(int playerNo);
@@ -38,7 +38,8 @@ namespace NCL {
             float mInitCooldown;
             std::map<GameObject* ,int>* mPlayerObjectToPlayerNoMap;
 
-            unsigned int* mRandomSeed;
+            unsigned int mRandomSeed;
+
             bool mIsBuff;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
             PlayerInventory::item mCurrentItem;

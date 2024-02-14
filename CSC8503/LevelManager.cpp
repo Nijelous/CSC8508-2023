@@ -204,7 +204,8 @@ void LevelManager::LoadGuards(int guardCount) {
 
 void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		//AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		return;
 	}
 }
@@ -335,6 +336,8 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	pickup->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
 
 	mWorld->AddGameObject(pickup);
+
+	mUpdatableObjects.push_back(pickup);
 
 	return pickup;
 }

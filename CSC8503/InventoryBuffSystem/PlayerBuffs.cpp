@@ -33,8 +33,9 @@ void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo)
 
 PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed)
 {
-	std::mt19937 rng(seed);
-	std::shuffle(mBuffsInRandomPool.begin(), mBuffsInRandomPool.end(), rng);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::shuffle(mBuffsInRandomPool.begin(), mBuffsInRandomPool.end(), gen);
 	return mBuffsInRandomPool[0];
 }
 

@@ -74,7 +74,7 @@ namespace InventoryBuffSystem
 			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}
 		};
 		
-		//std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
+		std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;

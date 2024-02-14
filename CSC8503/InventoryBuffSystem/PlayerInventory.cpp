@@ -112,7 +112,8 @@ void InventoryBuffSystem::PlayerInventory::Notify(const InventoryEvent invEvent,
 
 PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed)
 {
-	std::mt19937 rng(seed);
-	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), rng);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), gen);
 	return mItemsInRandomPool[0];
 }
