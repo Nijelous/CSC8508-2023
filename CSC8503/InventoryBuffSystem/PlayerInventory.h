@@ -54,7 +54,6 @@ namespace InventoryBuffSystem
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 
-		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 	private:
 
 		std::vector<item> mItemsInRandomPool =
@@ -77,6 +76,7 @@ namespace InventoryBuffSystem
 
 		};
 
+		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		PlayerBuffs* mPlayerBuffsPtr;
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}

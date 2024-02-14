@@ -14,6 +14,9 @@ set(Header_Files
     "GameSceneManager.h"
     "PushdownStates.h"
     "Scene.h"
+    "SceneManager.h"
+    "SceneStates.h"
+    "MainMenuScene.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -55,6 +58,9 @@ set(Source_Files
     "DebugNetworkedGame.cpp"
     "GameSceneManager.cpp"
     "Scene.cpp"
+    "SceneManager.cpp"
+    "SceneStates.cpp"
+    "MainMenuScene.cpp"
 )
 
 if(USE_VULKAN)

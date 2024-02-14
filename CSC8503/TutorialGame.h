@@ -99,8 +99,8 @@ namespace NCL {
 			Texture* mKeeperNormal = nullptr;
 			Texture* mFloorAlbedo = nullptr;
 			Texture* mFloorNormal = nullptr;
-			Shader*		basicShader = nullptr;
 
+			Shader*		basicShader = nullptr;
 
 			//Animation Thing
 			

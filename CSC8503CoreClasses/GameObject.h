@@ -1,6 +1,7 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
+#include "RenderObject.h"
 
 using std::vector;
 
@@ -56,6 +57,15 @@ namespace NCL::CSC8503 {
 		NetworkObject* GetNetworkObject() const {
 			return mNetworkObject;
 		}
+
+		void SetIsSensed(bool sensed) {
+			mRenderObject->SetOutlined(sensed);
+		}
+
+		bool GetIsSensed() {
+			return mRenderObject->GetOutlined();
+		}
+
     
     void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
     
@@ -120,6 +130,7 @@ namespace NCL::CSC8503 {
 		NetworkObject*		mNetworkObject;
 		AnimationObject*    mAnimationObject;
 
+		bool		mIsSensed;
 		bool		mIsActive;
 		int			mWorldID;
 		std::string	mName;

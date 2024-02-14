@@ -14,6 +14,9 @@
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 
+#include "UI.h"
+
+
 
 
 namespace NCL {
@@ -39,6 +42,8 @@ namespace NCL {
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
+
+			void RenderIcons(UI::Icon icon);
 			
 
 			void RenderFrame()	override;
@@ -59,23 +64,28 @@ namespace NCL {
 			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
 			void CombineBuffers();
-			
+			void DrawOutlinedObjects();
 			void LoadSkybox();
 
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
+			void SetUIiconBufferSizes(size_t newVertCount);
 			void BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix);
 			void BindSpecificLightDataToShader(Light* l);			
 			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
 			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
 
-			vector<const RenderObject*> activeObjects;
-			
+			vector<const RenderObject*> mActiveObjects;
+			vector<const RenderObject*> mOutlinedObjects;
+
 			OGLShader*  debugShader;
 			OGLShader*  skyboxShader;
+			OGLShader* mOutlineShader;
+			OGLShader*  iconShader;
+
 			OGLMesh*	skyboxMesh;
 			GLuint		skyboxTex;
 
@@ -107,12 +117,17 @@ namespace NCL {
 			vector<Vector4> debugTextColours;
 			vector<Vector2> debugTextUVs;
 
+
+			vector<Vector3> UIiconPos;
+			vector<Vector2> UIiconUVs;
+
 			//Animation things
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
 			MeshMaterial* mMaterial;
 			vector<GLuint*>  mMatTextures;
+
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;
@@ -123,6 +138,11 @@ namespace NCL {
 			GLuint textColourVBO;
 			GLuint textTexVBO;
 			size_t textCount;
+
+			GLuint iconVAO;
+			GLuint iconVertVBO;
+			GLuint iconTexVBO;
+
 			vector<Light*> mLights;
 
 			Frustum mFrameFrustum;

@@ -143,6 +143,7 @@ BehaviourAction* GuardObject::Patrol() {
 	BehaviourAction* Patrol = new BehaviourAction("Patrol", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
+			
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
