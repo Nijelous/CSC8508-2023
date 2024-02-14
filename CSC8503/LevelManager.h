@@ -61,9 +61,12 @@ namespace NCL {
 
 			void LoadItems(const std::vector<Vector3> itemPositions);
 
+			void LoadVents(const std::vector<Vent*> vents);
+
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);
 			Helipad* AddHelipadToWorld(const Vector3& position);
+			Vent* AddVentToWorld(Vent* vent);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
