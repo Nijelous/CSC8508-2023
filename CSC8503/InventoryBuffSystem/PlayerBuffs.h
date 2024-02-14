@@ -7,6 +7,16 @@
 using namespace NCL::CSC8503;
 
 namespace InventoryBuffSystem {
+	const enum BuffEvent
+	{
+		
+	};
+
+	class PlayerBuffsObserver
+	{
+	public:
+		virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) = 0;
+	};
 	class PlayerBuffs
 	{
 	public:
@@ -21,6 +31,10 @@ namespace InventoryBuffSystem {
 		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
 		void Update(float dt);
 
+		void Attach(PlayerBuffsObserver* observer);
+		void Detach(PlayerBuffsObserver* observer);
+		void Notify(BuffEvent buffEvent, int playerNo);
+
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
@@ -32,51 +46,23 @@ namespace InventoryBuffSystem {
 			{disguise,10},{buff2,4}
 		};
 
-		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap =
+		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
-			{disguise, [](int playerNo)
-				{
 
-				}
-			},
-			{buff2, [](int playerNo)
-				{
-
-				}
-			},
 		};
 
-		std::map < buff, std::function<void(int playerNo,float dt)>> mOnBuffTickFunctionMap =
+		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
 		{
-			{disguise, [](int playerNo,float dt)
-				{
 
-				}
-			},
-			{buff2, [](int playerNo,float dt)
-				{
-
-				}
-			},
 		};
 
-		std::map < buff, std::function<void(int playerNo)>> mOnBuffRemovedFunctionMap =
+		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
-			{disguise, [](int playerNo)
-				{
 
-				}
-			},
-			{buff2, [](int playerNo)
-				{
-
-				}
-			},
 		};
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
-
-
+		std::list<PlayerBuffsObserver*> mBuffsObserverList;
 	};
 
 }
