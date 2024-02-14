@@ -11,12 +11,14 @@ using namespace NCL;
 using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
-PickupGameObject::PickupGameObject(std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap,
-	InventoryBuffSystemClass* inventoryBuffSystemClassPtr, float initCooldown) {
+PickupGameObject::PickupGameObject(
+	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
+	float initCooldown) {
 	mCooldown = 0.0f;
 	mInitCooldown = initCooldown;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
-	mPlayerObjectToPlayerNoMap = mPlayerObjectToPlayerNoMap;
+	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
@@ -109,7 +111,8 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject)
 	{
 		if (otherObject->GetIsPlayer())
 			return;
-		ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
+		ActivatePickup(0);
 	}
 }
 

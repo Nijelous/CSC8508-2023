@@ -13,10 +13,10 @@ namespace NCL{
 
             virtual void UpdateGame(float dt);
 
-            std::unique_ptr<LevelManager> GetLevelManager();
+            LevelManager* GetLevelManager();
 
         protected:
-            std::unique_ptr<LevelManager> mLevelManager;
+            LevelManager* mLevelManager;
 
             virtual void InitCamera();
 

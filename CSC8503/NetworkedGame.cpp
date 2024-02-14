@@ -16,7 +16,7 @@ struct MessagePacket : public GamePacket {
 	}
 };
 
-NetworkedGame::NetworkedGame(bool isInitingAssets) : GameSceneManager() {
+NetworkedGame::NetworkedGame() : GameSceneManager(true) {
 	mThisServer = nullptr;
 	mThisClient = nullptr;
 

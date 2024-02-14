@@ -9,6 +9,10 @@
 #include "PlayerObject.h"
 #include "GuardObject.h"
 #include "Helipad.h"
+#include "InventoryBuffSystem/FlagGameObject.h"
+#include "InventoryBuffSystem/PickupGameObject.h"
+#include "InventoryBuffSystem/InventoryBuffSystem.h"
+#include "UI.h"
 
 #include <filesystem>
 
@@ -35,6 +39,7 @@ LevelManager::LevelManager() {
 	mActiveLevel = -1;
 
 	InitialiseAssets();
+	InitialiseIcons();
 }
 
 LevelManager::~LevelManager() {
@@ -79,9 +84,21 @@ LevelManager::~LevelManager() {
 	delete mRenderer;
 	delete mWorld;
 	delete mAnimation;
+
+	delete mInventorySlotTex;
+	delete mHighlightAwardTex;
+	delete mLightOffTex;
+	delete mMakingNoiseTex;
+	delete mSilentRunTex;
+	delete mSlowDownTex;
+	delete mStunTex;
+	delete mSwapPositionTex;
+
+	delete mSuspensionBarTex;
+	delete mSuspensionIndicatorTex;
 }
 
-void LevelManager::LoadLevel(int levelID, int playerID) {
+void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
@@ -93,7 +110,7 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
-	AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
+	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
 		itemPositions.push_back(itemPos);
 	}
@@ -114,10 +131,17 @@ void LevelManager::LoadLevel(int levelID, int playerID) {
 			break;
 		}
 	}
+
 	float* levelSize = mBuilder->BuildNavMesh(mLevelLayout);
 	if(levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
-	AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
-	LoadGuards((*mLevelList[levelID]).GetGuardCount());
+
+	if (!isMultiplayer){
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
+
+		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
+		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+	}
+	
 	LoadItems(itemPositions);
 }
 
@@ -157,6 +181,19 @@ void LevelManager::InitialiseAssets() {
 	mSoldierAnimation = mRenderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = mRenderer->LoadMaterial("Role_T.mat");
 	mSoldierShader = mRenderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+
+	//icons
+	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
+	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
+	mLightOffTex = mRenderer->LoadTexture("LightOff.png");
+	mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
+	mSilentRunTex = mRenderer->LoadTexture("SilentRun.png");
+	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
+	mStunTex = mRenderer->LoadTexture("Stun.png");
+	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
+	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
+	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionPointer.png");
 }
 
 void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition) {
@@ -195,11 +232,32 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
 		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i][i+1], "Guard")->SetIsSensed(true);
+
 	}
 }
 
 void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
-	//TO-DO (nijelous): Load Items in
+	for (int i = 0; i < itemPositions.size(); i++) {
+		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		return;
+	}
+}
+
+void LevelManager::InitialiseIcons() {
+	UI::Icon mInventoryIcon1 = UI::AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon2 = UI::AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+
+	UI::Icon mHighlightAwardIcon = UI::AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
+	UI::Icon mLightOffIcon = UI::AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UI::Icon mMakingNoiseIcon = UI::AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UI::Icon mSilentRunIcon = UI::AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UI::Icon mSlowDownIcon = UI::AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UI::Icon mStunIcon = UI::AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
+	UI::Icon mSwapPositionIcon = UI::AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+
+	UI::Icon mSuspensionBarIcon = UI::AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UI::Icon mSuspensionIndicatorIcon = UI::AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
@@ -212,7 +270,8 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
 	wall->GetPhysicsObject()->SetInverseMass(0);
@@ -237,7 +296,8 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -262,7 +322,8 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 1));
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
 	helipad->GetPhysicsObject()->SetInverseMass(0);
@@ -275,6 +336,58 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	mLevelLayout.push_back(helipad);
 
 	return helipad;
+}
+
+FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
+	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	flag->SetBoundingVolume((CollisionVolume*)volume);
+	flag->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
+	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
+
+	flag->SetCollisionLayer(Collectable);
+
+	flag->GetPhysicsObject()->SetInverseMass(0);
+	flag->GetPhysicsObject()->InitSphereInertia(false);
+
+	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
+
+	mWorld->AddGameObject(flag);
+
+	return flag;
+
+}
+
+PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr)
+{
+	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	pickup->SetBoundingVolume((CollisionVolume*)volume);
+	pickup->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
+
+	pickup->SetCollisionLayer(Collectable);
+
+	pickup->GetPhysicsObject()->SetInverseMass(0);
+	pickup->GetPhysicsObject()->InitSphereInertia(false);
+
+	pickup->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+
+	mWorld->AddGameObject(pickup);
+
+	return pickup;
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
@@ -325,6 +438,19 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 
 	playerObject.SetCollisionLayer(Player);
+}
+bool LevelManager::CheckGameWon() {
+	if (mTempPlayer && mHelipad) {
+		if (mHelipad->GetCollidingWithPlayer()) {
+			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
+				return true;
+		}
+	}
+	return false;
+}
+
+void LevelManager::AddUpdateableGameObject(GameObject& object){
+	mUpdatableObjects.push_back(&object);
 }
 
 GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName) {

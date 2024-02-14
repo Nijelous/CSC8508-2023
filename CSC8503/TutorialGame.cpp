@@ -12,6 +12,7 @@
 #include "PlayerObject.h"
 #include "LevelManager.h"
 
+#include "UI.h"
 #include <irrKlang.h>
 using namespace NCL;
 using namespace CSC8503;
@@ -84,13 +85,23 @@ void TutorialGame::LoadAssetFiles(){
 	mKeeperNormal = renderer->LoadTexture("fleshy_normal.png");
 	mFloorAlbedo = renderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = renderer->LoadTexture("panel_normal.png");
-
+	
 	basicShader = renderer->LoadShader("scene.vert", "scene.frag");
+	mAnimationShader = renderer->LoadShader("animationScene.vert", "scene.frag");
 
 	mSoldierMesh = renderer->LoadMesh("Role_T.msh");
 	mSoldierAnimation = renderer->LoadAnimation("Role_T.anm");
 	mSoldierMaterial = renderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = renderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+
+	
+	mGuardMesh = renderer->LoadMesh("Male_Guard.msh");
+	mGuardAnimation = renderer->LoadAnimation("Idle1.anm");
+	mGuardMaterial = renderer->LoadMaterial("Male_Guard.mat");
+
+	InitCamera();
+	InitWorld();
+	mAnimation->PreloadMatTextures(renderer);
+
 }
 
 TutorialGame::~TutorialGame()	{
@@ -100,10 +111,15 @@ TutorialGame::~TutorialGame()	{
 	delete charMesh;
 	delete enemyMesh;
 	delete bonusMesh;
+
+	delete mAnimationShader;
 	delete mSoldierAnimation;
 	delete mSoldierMaterial;
 	delete mSoldierMesh;
-	delete mSoldierShader;
+	
+	delete mGuardAnimation;
+	delete mGuardMaterial;
+	delete mGuardMesh;
 
 	delete basicTex;
 	delete basicShader;
@@ -145,7 +161,7 @@ void TutorialGame::UpdateGame(float dt) {
 
 	UpdateKeys();
 	if (useGravity) {
-		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
+		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);		
 	}
 	else {
 		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
@@ -188,9 +204,9 @@ void TutorialGame::UpdateGame(float dt) {
 	}
 
 	world->UpdateWorld(dt);
+	mAnimation->Update(dt);
 	renderer->Update(dt);
 	physics->Update(dt);
-	mAnimation->Update(dt);
 	renderer->Render();
 	Debug::UpdateRenderables(dt);
 }
@@ -353,7 +369,9 @@ void TutorialGame::InitWorld() {
 
 	AddGuardToWorld(Vector3(30, -17, 5), "Guard Object");
 
+
 	InitDefaultFloor();
+	AddAnimationTest(Vector3(50, 0, 50), "test");
 }
 
 /*
@@ -520,7 +538,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 		.SetScale(Vector3(2, 2, 2))
 		.SetPosition(position);
 
-	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, basicShader, 0.5f));
+	apple->SetRenderObject(new RenderObject(&apple->GetTransform(), bonusMesh, basicTex, nullptr, mAnimationShader, 0.5f));
 	apple->SetPhysicsObject(new PhysicsObject(&apple->GetTransform(), apple->GetBoundingVolume()));
 
 	apple->GetPhysicsObject()->SetInverseMass(1.0f);
@@ -541,13 +559,13 @@ GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::s
 	animTest->SetBoundingVolume((CollisionVolume*)volume);
 
 	animTest->GetTransform()
-		.SetScale(Vector3(meshSize, meshSize, meshSize))
+		.SetScale(Vector3(meshSize*2, meshSize * 2, meshSize * 2))
 		.SetPosition(position);
 
-	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mSoldierMesh, nullptr, nullptr, basicShader, meshSize));
+	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
 	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
 	
-	animTest->SetAnimationObject(new AnimationObject(mSoldierAnimation, mSoldierMaterial));
+	animTest->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
 	
 
 	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);

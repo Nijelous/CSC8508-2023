@@ -100,14 +100,23 @@ namespace NCL {
 			Texture* mKeeperNormal = nullptr;
 			Texture* mFloorAlbedo = nullptr;
 			Texture* mFloorNormal = nullptr;
+
 			Shader*		basicShader = nullptr;
 
-
 			//Animation Thing
+			Shader* mAnimationShader = nullptr;
+
 			Mesh* mSoldierMesh = nullptr;
 			MeshAnimation* mSoldierAnimation = nullptr;
 			MeshMaterial* mSoldierMaterial = nullptr;
-			Shader* mSoldierShader = nullptr;
+			
+
+			Mesh* mGuardMesh = nullptr;
+			MeshAnimation* mGuardAnimation = nullptr;
+			MeshMaterial* mGuardMaterial = nullptr;
+			
+			
+			
 			AnimationSystem* mAnimation;
 
 
