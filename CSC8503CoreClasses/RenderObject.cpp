@@ -37,18 +37,11 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mAnimation = nullptr;
 	mMaterial = nullptr;
 	mCurrentFrame = 0;
-	vector<GLuint*>  mMatTextures = {};
+	vector<GLuint>  mMatTextures = {};
 	vector<Matrix4> mFrameMatrices = {};
 }
 
 RenderObject::~RenderObject() {
-	delete mTransform;
-	delete mMesh;
-	delete mAlbedoTex;
-	delete mNormalTex;
-	delete mShader;
 	delete mAnimation;
 	delete mMaterial;
-	
-
 }
