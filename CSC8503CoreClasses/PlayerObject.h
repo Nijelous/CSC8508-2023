@@ -34,6 +34,8 @@ namespace NCL {
 
 			virtual void MovePlayer(float dt);
 
+			void RayCastFromPlayer(GameWorld* world);
+
 			void AttachCameraToPlayer(GameWorld* world);
 
 			virtual void MatchCameraRotation(float yawValue);

@@ -763,6 +763,33 @@ Ray CollisionDetection::BuildRayFromMouse(const PerspectiveCamera& cam) {
 	return Ray(cam.GetPosition(), c);
 }
 
+Ray CollisionDetection::BuidRayFromCenterOfTheCamera(const PerspectiveCamera& cam) {
+	Vector2i screenSize = Window::GetWindow()->GetScreenSize();
+
+	//We remove the y axis mouse position from height as OpenGL is 'upside down',
+	//and thinks the bottom left is the origin, instead of the top left!
+	Vector3 nearPos = Vector3((screenSize.x / 2.f),
+		(screenSize.y / 2.f),
+		-0.99999f
+	);
+
+	//We also don't use exactly 1.0 (the normalised 'end' of the far plane) as this
+	//causes the unproject function to go a bit weird. 
+	Vector3 farPos = Vector3((screenSize.x / 2.f),
+		(screenSize.y / 2.f),
+		0.99999f
+	);
+
+	Vector3 a = Unproject(nearPos, cam);
+	Vector3 b = Unproject(farPos, cam);
+	Vector3 c = b - a;
+
+	c.Normalise();
+
+	return Ray(cam.GetPosition(), c);
+
+}
+
 //http://bookofhook.com/mousepick.pdf
 Matrix4 CollisionDetection::GenerateInverseProjection(float aspect, float fov, float nearPlane, float farPlane) {
 	Matrix4 m;
