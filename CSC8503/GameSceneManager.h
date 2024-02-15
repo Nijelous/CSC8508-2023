@@ -39,6 +39,8 @@ namespace NCL {
 			void SetDefeat() { mGameState = DefeatScreenState; }
 			void SetPause() { mGameState = PauseScreenState; }
 
+			void ClearLevel();
+
 			// to be repalced by actual game logic
 			bool PlayerWonGame();
 			bool PLayerLostGame() { return false; }

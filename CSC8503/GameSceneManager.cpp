@@ -81,6 +81,11 @@ void GameSceneManager::CreateLevel() {
 	mLevelManager->LoadLevel(0, 0);
 }
 
+void GameSceneManager::ClearLevel() {
+	mLevelManager->GetGameWorld()->ClearAndErase();
+	mLevelManager->GetPhysics()->Clear();
+}
+
 bool GameSceneManager::PlayerWonGame() {
 	if (mLevelManager->CheckGameWon())
 		return true;
@@ -89,22 +94,19 @@ bool GameSceneManager::PlayerWonGame() {
 
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
+	ClearLevel();
 	Debug::Print("Welcome", Vector2(45, 50));
 	Debug::Print("Press SPACE to continue", Vector2(30, 55));
 }
 
 void GameSceneManager::DisplayVictory() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
+	ClearLevel();
 	Debug::Print("VICTORY", Vector2(45, 50));
 }
 
 void GameSceneManager::DisplayDefeat() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
+	ClearLevel();
 	Debug::Print("DEFEAT", Vector2(45, 50));
 }
