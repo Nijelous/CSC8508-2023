@@ -38,6 +38,7 @@ namespace NCL {
 			
 
 			void AddLight(Light* light);
+			void ClearLights();
 
 		protected:
 			void NewRenderLines();
