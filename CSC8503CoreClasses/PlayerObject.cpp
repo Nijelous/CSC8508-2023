@@ -5,6 +5,7 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "../CSC8503/InventoryBuffSystem/Item.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -109,6 +110,14 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
+
+				Item* item = (Item*)objectHit;
+
+				if (item!= nullptr)
+				{
+					item->AddToPlayerInventory(mPlayerID);
+				}
+				
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
