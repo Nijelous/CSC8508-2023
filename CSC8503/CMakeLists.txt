@@ -32,6 +32,8 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/FlagGameObject.cpp"
     "InventoryBuffSystem/SoundEmitter.h"
     "InventoryBuffSystem/SoundEmitter.cpp"
+    "InventoryBuffSystem/Item.h"
+    "InventoryBuffSystem/Item.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
