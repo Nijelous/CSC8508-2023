@@ -67,6 +67,7 @@ namespace NCL {
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+			void SendWallFloorInstancesToGPU();
 
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);

@@ -41,16 +41,17 @@ void OGLMesh::BindVertexAttribute(int attribSlot, int buffer, int bindingID, int
 }
 
 void OGLMesh::SetInstanceMatrices(const std::vector<Matrix4>& mat) {
+	mInstanceMatricesCount = mat.size();
 	glBindVertexArray(vao);
-	CreateVertexBuffer(attributeBuffers[VertexAttribute::InstanceMatrices], mat.size() * sizeof(Matrix4), (char*)&mat);
+	CreateVertexBuffer(attributeBuffers[VertexAttribute::InstanceMatrices], mat.size() * sizeof(Matrix4), (char*)&mat[0]);
 	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices);
-	glVertexAttribPointer(VertexAttribute::InstanceMatrices, VertexAttribute::InstanceMatrices + 1, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)0);
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)0);
 	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 1);
-	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 1, VertexAttribute::InstanceMatrices + 1, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)sizeof(Vector4));
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 1, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)sizeof(Vector4));
 	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 2);
-	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 2, VertexAttribute::InstanceMatrices + 1, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(2 * sizeof(Vector4)));
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 2, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(2 * sizeof(Vector4)));
 	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 3);
-	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 6, VertexAttribute::InstanceMatrices + 1, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(3 * sizeof(Vector4)));
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 3, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(3 * sizeof(Vector4)));
 
 	glVertexAttribDivisor(VertexAttribute::InstanceMatrices, 1);
 	glVertexAttribDivisor(VertexAttribute::InstanceMatrices + 1, 1);

@@ -159,9 +159,17 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
-	
-	LoadItems(itemPositions);
+	SendWallFloorInstancesToGPU();
+	LoadItems(itemPositions);	
 	delete[] levelSize;
+}
+
+void LevelManager::SendWallFloorInstancesToGPU() {
+	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
+	instance->SetInstanceMatrices(mLevelMatrices);
+	if (!mLevelLayout.empty()) {
+		mRenderer->SetWallFloorObject(mLevelLayout[0]);
+	}
 }
 
 void LevelManager::Update(float dt, bool isUpdatingObjects) {
@@ -227,8 +235,7 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 			break;
 		}
 	}
-	OGLMesh* instance = (OGLMesh*) mWallFloorCubeMesh;
-	instance->SetInstanceMatrices(mLevelMatrices);
+	
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
