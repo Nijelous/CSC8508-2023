@@ -48,12 +48,12 @@ float* RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
 			verts[vCount++] = (vertsVector[j].x * objects[i]->GetTransform().GetScale().x) + objects[i]->GetTransform().GetPosition().x;
 			verts[vCount++] = (vertsVector[j].y * objects[i]->GetTransform().GetScale().y) + objects[i]->GetTransform().GetPosition().y;
 			verts[vCount++] = (vertsVector[j].z * objects[i]->GetTransform().GetScale().z) + objects[i]->GetTransform().GetPosition().z;
-			bmin[0] = std::min(bmin[x], verts[vCount + (x-3)]);
-			bmin[1] = std::min(bmin[y], verts[vCount + (y-3)]);
-			bmin[2] = std::min(bmin[z], verts[vCount + (z-3)]);
-			bmax[0] = std::max(bmax[x], verts[vCount + (x-3)]);
-			bmax[1] = std::max(bmax[y], verts[vCount + (y-3)]);
-			bmax[2] = std::max(bmax[z], verts[vCount + (z-3)]);
+			bmin[x] = std::min(bmin[x], verts[vCount + (x-3)]);
+			bmin[y] = std::min(bmin[y], verts[vCount + (y-3)]);
+			bmin[z] = std::min(bmin[z], verts[vCount + (z-3)]);
+			bmax[x] = std::max(bmax[x], verts[vCount + (x-3)]);
+			bmax[y] = std::max(bmax[y], verts[vCount + (y-3)]);
+			bmax[z] = std::max(bmax[z], verts[vCount + (z-3)]);
 		}
 
 		std::vector<unsigned int> trisVector = objects[i]->GetRenderObject()->GetMesh()->GetIndexData();

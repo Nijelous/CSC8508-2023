@@ -1,5 +1,6 @@
 #pragma once
 #include "Room.h"
+#include "PrisonDoor.h"
 using namespace NCL::Maths;
 
 namespace NCL {
@@ -12,8 +13,8 @@ namespace NCL {
 		public:
 			Level(std::string levelPath);
 			~Level();
-			std::map<Vector3, TileType> GetTileMap() const { return mTileMap; }
-			std::map<Vector3, Room*> GetRooms() const { return mRoomList; }
+			const std::map<Vector3, TileType>& GetTileMap() { return mTileMap; }
+			const std::map<Vector3, Room*>& GetRooms() { return mRoomList; }
 			std::vector<std::vector<Vector3>> GetGuardPaths() const { return mGuardPaths; }
 			int GetGuardCount() const { return mGuardCount; }
 			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
@@ -23,7 +24,10 @@ namespace NCL {
 			std::vector<Light*> GetLights() const { return mLights; }
 			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
 			std::vector<Vent*> GetVents() const { return mVents; }
+			std::vector<int> GetVentConnections() const { return mVentConnections; }
 			Vector3 GetHelipadPosition() const { return mHelipadPosition; }
+			std::vector<Door*> GetDoors() const { return mDoors; }
+			PrisonDoor* GetPrisonDoor() const { return mPrisonDoor; }
 
 			friend class JsonParser;
 		protected:
@@ -37,11 +41,12 @@ namespace NCL {
 			Vector3 mPrisonPosition;
 			Transform* mPlayerStartTransforms;
 			std::vector<Light*> mLights;
-			//NavMesh
 			std::vector<Vector3> mItemPositions;
 			std::vector<Vent*> mVents;
 			std::vector<int> mVentConnections;
 			Vector3 mHelipadPosition;
+			std::vector<Door*> mDoors;
+			PrisonDoor* mPrisonDoor;
 		};
 	}
 }

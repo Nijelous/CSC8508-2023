@@ -22,6 +22,7 @@ namespace NCL {
 		public:
 			LevelManager();
 			~LevelManager();
+			void ResetLevel();
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -37,6 +38,8 @@ namespace NCL {
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
+
+			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
 
 			virtual void Update(float dt, bool isUpdatingObjects);
 
@@ -59,11 +62,18 @@ namespace NCL {
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3> itemPositions);
+			void LoadItems(const std::vector<Vector3>& itemPositions);
+
+			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
+
+			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
 
 			GameObject* AddWallToWorld(const Vector3& position);
 			GameObject* AddFloorToWorld(const Vector3& position);
 			Helipad* AddHelipadToWorld(const Vector3& position);
+			Vent* AddVentToWorld(Vent* vent);
+			Door* AddDoorToWorld(Door* door, const Vector3& offset);
+			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
@@ -71,11 +81,12 @@ namespace NCL {
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
-			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
 
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
 			std::vector<GameObject*> mLevelLayout;
+			std::vector<Matrix4> mLevelMatrices;
 
 			RecastBuilder* mBuilder;
 			GameTechRenderer* mRenderer;
@@ -127,7 +138,7 @@ namespace NCL {
 
 			PlayerObject* mTempPlayer;
 
-			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
 
 			int mActiveLevel;
 		};
