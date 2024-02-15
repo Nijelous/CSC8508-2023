@@ -43,8 +43,7 @@ PlayerObject::~PlayerObject() {
 
 }
 
-void PlayerObject::UpdateObject(float dt)
-{
+void PlayerObject::UpdateObject(float dt){
 	MovePlayer(dt);
 	//temp if
 	if (mInventoryBuffSystemClassPtr != nullptr)
@@ -88,8 +87,7 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void PlayerObject::ControlInventory()
-{
+void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
 
