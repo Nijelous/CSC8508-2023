@@ -258,9 +258,12 @@ void LevelManager::LoadGuards(int guardCount) {
 
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		//AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
-		AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
-		return;
+		if (i == itemPositions.size() / 2) {
+			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+		}
+		else {
+			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+		}
 	}
 }
 
