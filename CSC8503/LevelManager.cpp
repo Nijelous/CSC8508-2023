@@ -16,6 +16,7 @@
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
+#include "InventoryBuffSystem/SoundEmitter.h"
 #include "UI.h"
 
 #include <filesystem>
@@ -267,7 +268,8 @@ void LevelManager::LoadGuards(int guardCount) {
 
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		//AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
+		AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		return;
 	}
 }
@@ -524,11 +526,13 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 
 	mWorld->AddGameObject(pickup);
 
+	mUpdatableObjects.push_back(pickup);
+
 	return pickup;
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
-	mTempPlayer = new PlayerObject(mWorld, playerName);
+	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
@@ -623,4 +627,42 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	mUpdatableObjects.push_back(guard);
 
 	return guard;
+}
+
+void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+	switch (invEvent)
+	{
+	case soundEmitterUsed:
+		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
+			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+		break;
+	default:
+		break;
+	}
+}
+
+SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR)
+{
+	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	soundEmitterObjectPtr->SetBoundingVolume((CollisionVolume*)volume);
+	soundEmitterObjectPtr->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
+	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
+
+	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
+
+	soundEmitterObjectPtr->GetPhysicsObject()->SetInverseMass(0);
+	soundEmitterObjectPtr->GetPhysicsObject()->InitSphereInertia(false);
+
+	soundEmitterObjectPtr->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
+
+	mWorld->AddGameObject(soundEmitterObjectPtr);
+
+	return soundEmitterObjectPtr;
 }

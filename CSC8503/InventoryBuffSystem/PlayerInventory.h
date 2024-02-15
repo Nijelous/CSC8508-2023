@@ -3,7 +3,6 @@
 #include <map>
 #include <random>
 #include "Vector3.h"
-#include "PlayerBuffs.h"
 #include "Level.h"
 
 using namespace NCL::CSC8503;
@@ -15,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped
+		flagDropped,disguiseItemUsed,soundEmitterUsed
 	};
 
 	class PlayerInventoryObserver
@@ -32,7 +31,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			disguise, item2, none, flag, slowEveryoneElse, soundEmitter
+			none, disguise, soundEmitter, flag
 		};
 
 		PlayerInventory()
@@ -44,7 +43,6 @@ namespace InventoryBuffSystem
 		void AddItemToPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(item inItem, int playerNo);
 		void DropItemFromPlayer(int playerNo, int invSlot);
-		void DropFlagFromPlayer(int playerNo);
 		void UseItemInPlayerSlot(int itemSlot, int playerNo);
 		bool ItemInPlayerInventory(item inItem, int playerNo);
 
@@ -58,7 +56,7 @@ namespace InventoryBuffSystem
 
 		std::vector<item> mItemsInRandomPool =
 		{
-			disguise, slowEveryoneElse
+			disguise, soundEmitter
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =
@@ -73,11 +71,12 @@ namespace InventoryBuffSystem
 
 		std::map<item, InventoryEvent > mOnItemUsedInventoryEventMap =
 		{
-
+			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}
 		};
+		
+		std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
-		PlayerBuffs* mPlayerBuffsPtr;
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};
