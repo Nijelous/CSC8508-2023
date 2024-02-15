@@ -16,7 +16,10 @@ namespace {
 	constexpr float CHAR_CROUCH_HEIGHT = .7f;
 	constexpr float CROUCH_OFFSET = 1;
 
-	constexpr float BRAKING_SPEED = 50.0f;
+	constexpr int MAX_CROUCH_SPEED = 5;
+	constexpr int MAX_WALK_SPEED = 9;
+	constexpr int MAX_SPRINT_SPEED = 20;
+
 	constexpr float WALK_ACCELERATING_SPEED = 1000.0f;
 	constexpr float SPRINT_ACCELERATING_SPEED = 2000.0f;
 }
@@ -43,12 +46,13 @@ PlayerObject::~PlayerObject() {
 
 }
 
-void PlayerObject::UpdateObject(float dt){
+
+void PlayerObject::UpdateObject(float dt) {
 	MovePlayer(dt);
+	RayCastFromPlayer(mGameWorld);
 	//temp if
 	if (mInventoryBuffSystemClassPtr != nullptr)
 		ControlInventory();
-
 	AttachCameraToPlayer(mGameWorld);
 
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
@@ -87,6 +91,29 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
+void PlayerObject::RayCastFromPlayer(GameWorld* world){
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::E)) {
+		std::cout << "Ray fired" << std::endl;
+		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+		RayCollision closestCollision;
+
+		if (world->Raycast(ray, closestCollision, true, this)) {
+			auto* objectHit = (GameObject*)closestCollision.node;
+			if (objectHit) {
+				Vector3 objPos = objectHit->GetTransform().GetPosition();
+				Vector3 playerPos = GetTransform().GetPosition();
+
+				float distance = (objPos - playerPos).Length();
+
+				if (distance > 10.f) {
+					std::cout << "Nothing hit in range" << std::endl;
+					return;
+				}
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+			}
+		}
+	}
+}
 void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
@@ -172,18 +199,17 @@ void PlayerObject::EnforceMaxSpeeds() {
 
 	switch (mPlayerState) {
 	case(Crouch):
-		if (mPhysicsObject->GetLinearVelocity().Length() > 5)
-			mPhysicsObject->AddForce(-velocityDirection * BRAKING_SPEED);
+		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_CROUCH_SPEED)
+			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_CROUCH_SPEED);
 		break;
 	case(Walk):
-		if (mPhysicsObject->GetLinearVelocity().Length() > 9)
-			mPhysicsObject->AddForce(-velocityDirection * BRAKING_SPEED);
+		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_WALK_SPEED)
+			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_WALK_SPEED);
 		break;
 	case(Sprint):
-		if (mPhysicsObject->GetLinearVelocity().Length() > 20)
-			mPhysicsObject->AddForce(-velocityDirection * BRAKING_SPEED);
+		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_SPRINT_SPEED)
+			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
-
 	}
 }
 

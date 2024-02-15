@@ -41,6 +41,8 @@ namespace NCL {
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
 
 			virtual void MovePlayer(float dt);
+			
+			void RayCastFromPlayer(GameWorld* world);
 
 			void ControlInventory();
 
