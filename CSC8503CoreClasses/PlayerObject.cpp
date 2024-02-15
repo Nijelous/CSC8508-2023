@@ -21,8 +21,10 @@ namespace {
 	constexpr float SPRINT_ACCELERATING_SPEED = 2000.0f;
 }
 
-PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, int playerID,
-	int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
+PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
+	InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
@@ -66,18 +68,26 @@ void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 void PlayerObject::MovePlayer(float dt) {
 	Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
-
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::W))
+	bool isIdle = true;
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)){
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		isIdle = false;
+	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::S))
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)){
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		isIdle = false;
+	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::A))
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)){
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		isIdle = false;
+	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::D))
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)){
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		isIdle = false;
+	}
 
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
@@ -85,6 +95,14 @@ void PlayerObject::MovePlayer(float dt) {
 	ToggleCrouch(isCrouching);
 
 	StopSliding();
+
+	if (isIdle)
+	{
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+	}
 }
 
 void PlayerObject::ControlInventory(){
@@ -108,25 +126,51 @@ void PlayerObject::ControlInventory(){
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
 	if (isCrouching && mPlayerState == Crouch)
+	{
+		//Crouch -> Walk
 		StartWalking();
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+	}
 	else if (isCrouching && mPlayerState == Walk)
+	{
+		//Walk -> Crouch
 		StartCrouching();
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+	}
 }
 
 void PlayerObject::ActivateSprint(bool isSprinting) {
-	if (isSprinting)
+	if (isSprinting) {
+		//Sprint->Sprint 
 		StartSprinting();
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+	}
 	else if (!mIsCrouched)
+	{
+		//Sprint->Walk
 		StartWalking();
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+	}
 	else if (mIsCrouched)
+	{
+		//Sprint->Crouch
 		StartCrouching();
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+	}
 }
 
 void PlayerObject::StartWalking() {
 	if (!(mPlayerState == Walk)) {
 		if (mPlayerState == Crouch)
 			mMovementSpeed = WALK_ACCELERATING_SPEED;
-
+		
 		mPlayerState = Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
