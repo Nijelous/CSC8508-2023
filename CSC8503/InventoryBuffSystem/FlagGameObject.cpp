@@ -5,11 +5,14 @@
 #include "PhysicsObject.h"
 #include "Vector3.h"
 #include "map";
+#include "PlayerInventory.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
 FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap) {
+	mName = "Flag";
+	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);

@@ -3,12 +3,12 @@
 #include "Vector3.h"
 #include "StateMachine.h"
 #include "InventoryBuffSystem.h"
-#include "PlayerInventory.h"
+#include "Item.h"
 using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
-        class FlagGameObject : public GameObject,PlayerInventoryObserver {
+        class FlagGameObject : public Item {
         public:
             FlagGameObject() {};
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr);
