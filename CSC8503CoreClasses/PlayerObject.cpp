@@ -24,9 +24,11 @@ namespace {
 	constexpr float SPRINT_ACCELERATING_SPEED = 2000.0f;
 }
 
-PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
+PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, int playerID,
+	int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
+	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 
 	mWalkSpeed = walkSpeed;
 	mSprintSpeed = sprintSpeed;
@@ -34,7 +36,9 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, int wal
 	mMovementSpeed = walkSpeed;
 	mPlayerState = Walk;
 	mIsCrouched = false;
+	mActiveItemSlot = 0;
 
+	mPlayerID = playerID;
 	mIsPlayer = true;
 }
 
@@ -42,9 +46,13 @@ PlayerObject::~PlayerObject() {
 
 }
 
+
 void PlayerObject::UpdateObject(float dt) {
 	MovePlayer(dt);
 	RayCastFromPlayer(mGameWorld);
+	//temp if
+	if (mInventoryBuffSystemClassPtr != nullptr)
+		ControlInventory();
 	AttachCameraToPlayer(mGameWorld);
 
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
@@ -83,7 +91,7 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void PlayerObject::RayCastFromPlayer(GameWorld* world) {
+void PlayerObject::RayCastFromPlayer(GameWorld* world){
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::E)) {
 		std::cout << "Ray fired" << std::endl;
 		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
@@ -105,6 +113,24 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 			}
 		}
 	}
+}
+void PlayerObject::ControlInventory(){
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
+		mActiveItemSlot = 0;
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2))
+		mActiveItemSlot = 1;
+
+	if (Window::GetMouse()->GetWheelMovement() > 0)
+		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
+						 ? mActiveItemSlot + 1 : 0;
+
+	if (Window::GetMouse()->GetWheelMovement() < 0)
+		mActiveItemSlot = (mActiveItemSlot > 0)
+						 ? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
+
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left))
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot( mPlayerID, mActiveItemSlot);
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {

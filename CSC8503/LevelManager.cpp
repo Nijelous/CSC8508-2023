@@ -522,7 +522,7 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
-	mTempPlayer = new PlayerObject(mWorld, playerName);
+	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
