@@ -12,7 +12,7 @@ namespace NCL{
 			SoundManager();
 			~SoundManager();
 
-			ISound* GetSound();
+			ISound* GetSound(std::string soundName);
 			vec3df ConvertToVec3df(Vector3 soundPos);
 
 			void UpdateSound(ISound* sound, Vector3 soundPos, bool isPaused);

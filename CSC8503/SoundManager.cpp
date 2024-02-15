@@ -16,7 +16,7 @@ SoundManager::~SoundManager() {
 	mSoundEngine->drop();
 }
 
-ISound* SoundManager::GetSound() {
+ISound* SoundManager::GetSound(std::string soundName) {
 	/*mSound = FootStep;
 	switch (mSound) {
 	case FootStep:

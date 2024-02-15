@@ -10,6 +10,7 @@ namespace NCL {
 		class UI {
 		public:
 			UI();
+			~UI();
 
 			struct Icon {
 				Vector2 position;
@@ -32,7 +33,6 @@ namespace NCL {
 	
 			std::vector<UI::Icon> icons;
 		protected:
-			~UI();
 			Vector2 mPos;
 			Icon icon;
 		};

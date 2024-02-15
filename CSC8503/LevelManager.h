@@ -101,7 +101,7 @@ namespace NCL {
 			Texture* mFloorNormal;
 
 			//icons
-			UI* ui;
+			UI* mUi;
 			Texture* mInventorySlotTex;
 
 			Texture* mHighlightAwardTex;

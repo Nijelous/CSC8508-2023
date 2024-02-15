@@ -25,7 +25,7 @@ LevelManager::LevelManager() {
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 	mAnimation = new AnimationSystem(*mWorld);
-	ui = new UI();
+	mUi = new UI();
 
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
@@ -64,6 +64,7 @@ LevelManager::~LevelManager() {
 	mUpdatableObjects.clear();
 
 	delete mTempPlayer;
+	delete mUi;
 
 	delete mCubeMesh;
 	delete mSphereMesh;
@@ -246,22 +247,22 @@ void LevelManager::LoadItems(const std::vector<Vector3> itemPositions) {
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon mInventoryIcon1 = ui->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 
-	UI::Icon mInventoryIcon2 = ui->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
 
-	UI::Icon mHighlightAwardIcon = ui->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
-	UI::Icon mLightOffIcon = ui->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UI::Icon mMakingNoiseIcon = ui->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UI::Icon mSilentRunIcon = ui->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UI::Icon mSlowDownIcon = ui->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
-	UI::Icon mStunIcon = ui->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UI::Icon mSwapPositionIcon = ui->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
+	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UI::Icon mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UI::Icon mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UI::Icon mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UI::Icon mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
+	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
 
-	UI::Icon mSuspensionBarIcon = ui->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UI::Icon mSuspensionIndicatorIcon = ui->AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
+	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
 
-	mRenderer->SetUIObject(ui);
+	mRenderer->SetUIObject(mUi);
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
