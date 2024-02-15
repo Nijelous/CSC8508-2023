@@ -87,8 +87,7 @@ void PickupGameObject::UpdateObject(float dt) {
 	mStateMachine->Update(dt);
 }
 
-void PickupGameObject::ChangeToRandomPickup()
-{
+void PickupGameObject::ChangeToRandomPickup(){
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::bernoulli_distribution d(0.5);
@@ -99,8 +98,7 @@ void PickupGameObject::ChangeToRandomPickup()
 		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed);
 }
 
-void PickupGameObject::ActivatePickup(int playerNo)
-{
+void PickupGameObject::ActivatePickup(int playerNo){
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 	else
@@ -109,8 +107,7 @@ void PickupGameObject::ActivatePickup(int playerNo)
 	mCooldown = INT_MAX;
 }
 
-void PickupGameObject::OnCollisionBegin(GameObject* otherObject)
-{
+void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
 	if (mCooldown == 0)
 	{
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
@@ -131,8 +128,7 @@ void PickupGameObject::GoUnder(float dt) {
 	ChangeToRandomPickup();
 }
 
-void PickupGameObject::Waiting(float dt)
-{
+void PickupGameObject::Waiting(float dt){
 	mCooldown = std::max(mCooldown - dt, 0.0f);
 }
 
