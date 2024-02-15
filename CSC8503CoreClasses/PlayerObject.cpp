@@ -20,6 +20,15 @@ namespace {
 	constexpr int MAX_WALK_SPEED = 9;
 	constexpr int MAX_SPRINT_SPEED = 20;
 
+	constexpr int DEFAULT_CROUCH_SPEED = 35;
+	constexpr int DEFAULT_WALK_SPEED = 40;
+	constexpr int DEFAULT_SPRINT_SPEED = 50;
+
+	//75% * Default speed, Rounded up
+	constexpr int SLOWED_CROUCH_SPEED = 26;
+	constexpr int SLOWED_WALK_SPEED = 30;
+	constexpr int SLOWED_SPRINT_SPEED = 38;
+
 	constexpr float WALK_ACCELERATING_SPEED = 1000.0f;
 	constexpr float SPRINT_ACCELERATING_SPEED = 2000.0f;
 }
@@ -40,7 +49,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
 
-	mPlayerID = playerID;
+	mPlayerNo = playerID;
 	mIsPlayer = true;
 }
 
@@ -61,6 +70,21 @@ void PlayerObject::UpdateObject(float dt) {
 	MatchCameraRotation(yawValue);
 
 	EnforceMaxSpeeds();
+}
+
+void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
+	if (mPlayerNo != playerNo)
+		return;
+
+	switch (buffEvent){
+	case slowApplied:
+		ChangeToSlowedSpeeds();
+		break;
+	case slowRemoved:
+		ChangeToDefaultSpeeds();
+		break;
+	default:
+	}
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
@@ -103,9 +127,9 @@ void PlayerObject::MovePlayer(float dt) {
 	if (isIdle)
 	{
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 }
 
@@ -148,7 +172,7 @@ void PlayerObject::ControlInventory(){
 						 ? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left))
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot( mPlayerID, mActiveItemSlot);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot( mPlayerNo, mActiveItemSlot);
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
@@ -157,14 +181,14 @@ void PlayerObject::ToggleCrouch(bool isCrouching) {
 		//Crouch -> Walk
 		StartWalking();
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 	else if (isCrouching && mPlayerState == Walk)
 	{
 		//Walk -> Crouch
 		StartCrouching();
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 }
 
@@ -173,23 +197,23 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 		//Sprint->Sprint 
 		StartSprinting();
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 	else if (!mIsCrouched)
 	{
 		//Sprint->Walk
 		StartWalking();
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 	else if (mIsCrouched)
 	{
 		//Sprint->Crouch
 		StartCrouching();
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 	}
 }
 
@@ -255,6 +279,20 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+void PlayerObject::ChangeToDefaultSpeeds()
+{
+	mCrouchSpeed = DEFAULT_CROUCH_SPEED;
+	mWalkSpeed = DEFAULT_WALK_SPEED;
+	mSprintSpeed = DEFAULT_SPRINT_SPEED;
+}
+
+void PlayerObject::ChangeToSlowedSpeeds()
+{
+	mCrouchSpeed = SLOWED_CROUCH_SPEED;
+	mWalkSpeed = SLOWED_WALK_SPEED;
+	mSprintSpeed = SLOWED_SPRINT_SPEED;
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {

@@ -16,7 +16,7 @@ namespace NCL {
 			Crouch
 		};
 
-		class PlayerObject : public GameObject {
+		class PlayerObject : public GameObject, PlayerBuffsObserver {
 		public:
 			PlayerObject(GameWorld* world, const std::string& objName = "",
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr,
@@ -25,7 +25,7 @@ namespace NCL {
 			~PlayerObject();
 
 			virtual void UpdateObject(float dt);
-
+			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 		protected:
 			bool mIsCrouched;
 
