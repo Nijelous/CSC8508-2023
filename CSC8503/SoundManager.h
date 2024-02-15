@@ -20,7 +20,7 @@ namespace NCL{
 
 		protected:
 			//ISound* footStep;
-			ISoundEngine* soundEngine;
+			ISoundEngine* mSoundEngine;
 		};
 	}
 }

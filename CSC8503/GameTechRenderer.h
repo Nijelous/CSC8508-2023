@@ -39,6 +39,10 @@ namespace NCL {
 
 			void AddLight(Light* light);
 
+			void SetUIObject(UI* ui) {
+				mUi = ui;
+			}
+
 		protected:
 			void NewRenderLines();
 			void NewRenderText();
@@ -146,6 +150,8 @@ namespace NCL {
 			vector<Light*> mLights;
 
 			Frustum mFrameFrustum;
+
+			UI* mUi;
 		};
 	}
 }

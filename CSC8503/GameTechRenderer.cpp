@@ -23,7 +23,6 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	mOutlineShader = new OGLShader("basic.vert", "basic.frag");
 	iconShader = new OGLShader("UI.vert", "UI.frag");
 
-
 	glGenTextures(1, &shadowTex);
 	glBindTexture(GL_TEXTURE_2D, shadowTex);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -191,8 +190,8 @@ void GameTechRenderer::RenderFrame() {
 	
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UI::Icon>& icons = UI::GetInventorySlot();
-	for (const auto& i : icons) {
+	const std::vector<UI::Icon> icons = mUi->GetInventorySlot();
+	for ( auto& i : icons) {
 		RenderIcons(i);
 	}
 	glDisable(GL_BLEND);
@@ -601,7 +600,7 @@ void GameTechRenderer::RenderIcons(UI::Icon i) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	UI::BuildVerticesForIcon(1, i.position, i.length, i.height, UIiconPos, UIiconUVs);
+	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
 
 	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
 	glUniform1i(texSlot, i.isAppear);

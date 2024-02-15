@@ -9,6 +9,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class UI {
 		public:
+			UI();
 
 			struct Icon {
 				Vector2 position;
@@ -17,22 +18,23 @@ namespace NCL {
 				Texture* texture;
 				bool isAppear;
 			};
-			static Icon AddIcon(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
+			Icon AddIcon(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
 
-			static const std::vector<Icon>& GetInventorySlot();
+			const std::vector<Icon>& GetInventorySlot();
 
-			static void SetIconPosition(Vector2 newPos, Icon icon);
+			void SetIconPosition(Vector2 newPos, Icon icon);
 
-			static void SetIconTransparency(bool isShown, Icon icon);
+			void SetIconTransparency(bool isShown, Icon icon);
 
-			static void DeleteIcon(Icon icon);
+			void DeleteIcon(Icon icon);
 
-			static void BuildVerticesForIcon(const int& iconNum, const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
-
+			void BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
+	
+			std::vector<UI::Icon> icons;
 		protected:
-			UI();
 			~UI();
 			Vector2 mPos;
+			Icon icon;
 		};
 	}
 }

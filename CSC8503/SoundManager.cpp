@@ -5,19 +5,27 @@ using namespace NCL::CSC8503;
 using namespace NCL::Maths;
 
 SoundManager::SoundManager() {
-	soundEngine = createIrrKlangDevice();
-	footStep = soundEngine->play3D("", vec3df(0, 0, 0), true, true);
+	mSoundEngine = createIrrKlangDevice();
+	footStep = mSoundEngine->play3D("", vec3df(0, 0, 0), true, true);
 }
 
 SoundManager::~SoundManager() {
 	if (footStep) {
 		footStep->drop();
 	}
-	soundEngine->drop();
+	mSoundEngine->drop();
 }
 
 ISound* SoundManager::GetSound() {
-
+	/*mSound = FootStep;
+	switch (mSound) {
+	case FootStep:
+		return footStep;
+		break;
+	case :
+		break;
+	}*/
+	return footStep;
 }
 
 vec3df SoundManager::ConvertToVec3df(Vector3 soundPos) {
