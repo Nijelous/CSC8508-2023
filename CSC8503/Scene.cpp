@@ -2,7 +2,7 @@
 
 #include "LevelManager.h"
 
-NCL::CSC8503::Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()){
+Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()){
     mLevelManager = new LevelManager();
     mLevelManager->GetGameWorld()->GetMainCamera().SetController(mController);
     mController.MapAxis(0, "Sidestep");
@@ -20,7 +20,7 @@ void Scene::UpdateGame(float dt){
     mLevelManager->Update(dt, true);
 }
 
-LevelManager* NCL::CSC8503::Scene::GetLevelManager(){
+LevelManager* Scene::GetLevelManager(){
     return mLevelManager;
 }
 

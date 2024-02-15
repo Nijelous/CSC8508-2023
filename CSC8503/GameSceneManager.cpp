@@ -9,7 +9,7 @@
 
 #include <irrKlang.h>
 
-#include "PushdownStates.h"
+#include "SinglePlayerStates.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -20,6 +20,8 @@ namespace {
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
 
+GameSceneManager* GameSceneManager::instance = nullptr;
+
 GameSceneManager::GameSceneManager(bool isNetworkGame) {
 	if (!isNetworkGame){
 		InitInGameMenuManager();
@@ -28,6 +30,13 @@ GameSceneManager::GameSceneManager(bool isNetworkGame) {
 }
 
 GameSceneManager::~GameSceneManager() {
+}
+
+GameSceneManager GameSceneManager::GetGameSceneManager() {
+	if (instance == nullptr) {
+		instance = new GameSceneManager();
+	}
+	return instance;
 }
 
 void GameSceneManager::UpdateGame(float dt) {

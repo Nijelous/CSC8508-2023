@@ -26,6 +26,8 @@ namespace NCL {
 			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
 
+			GameSceneManager GetGameSceneManager();
+
 			virtual void UpdateGame(float dt);
 
 			void SetMainMenu() { mGameState = MainMenuState; }
@@ -56,7 +58,7 @@ namespace NCL {
 			PushdownMachine* mPushdownMachine;
 
 		private:
-			
+			static GameSceneManager* instance;
 		};
 	}
 }
