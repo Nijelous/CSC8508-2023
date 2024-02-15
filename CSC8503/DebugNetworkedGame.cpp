@@ -82,6 +82,8 @@ void DebugNetworkedGame::UpdateGame(float dt){
     
     if (mIsGameStarted){
         //TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
+
+        mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
         if (mIsGameFinished){
             Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
             mLevelManager->GetRenderer()->Render();
