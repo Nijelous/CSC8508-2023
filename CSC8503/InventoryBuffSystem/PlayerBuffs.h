@@ -10,7 +10,7 @@ using namespace NCL::CSC8503;
 namespace InventoryBuffSystem {
 	const enum BuffEvent
 	{
-		Null, disguiseBuffApplied, disguiseBuffRemoved,slowApplied, slowRemoved, playerMakesSound
+		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved, playerMakesSound
 	};
 
 	class PlayerBuffsObserver

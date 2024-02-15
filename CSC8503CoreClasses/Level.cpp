@@ -16,10 +16,6 @@ Level::Level(std::string levelPath) {
 	JsonParser parser = JsonParser();
 
 	parser.ParseJson(line, this, nullptr);
-
-	for (int i = 0; i < mVentConnections.size(); i++) {
-		mVents[i]->ConnectVent(mVents[mVentConnections[i]]);
-	}
 }
 
 Level::~Level() {

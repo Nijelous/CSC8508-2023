@@ -23,13 +23,30 @@ namespace NCL {
             void SetGameWorld(GameWorld* newWorld) {
                 mWorld = newWorld;
             }
+
+            void SetPrisonPosition(Vector3 prisonPosition) {
+                mPrisonPosition = prisonPosition;
+            }
+
+            void SetPatrolNodes(vector<Vector3> nodes) {
+                mNodes = nodes;
+            }
+
+            void SetCurrentNode(int node) {
+                mCurrentNode = node;
+            }
         protected:
             void RaycastToPlayer();
-            Vector3 AngleOfSight();
+            Vector3 GuardForwardVector();
+            float AngleFromFocalPoint(Vector3 direction);
 
             GameObject* mSightedObject;
             GameObject* mPlayer;
-            GameWorld* mWorld;
+            const GameWorld* mWorld;
+            Vector3 mPrisonPosition;
+            vector<Vector3> mNodes;
+            int mCurrentNode;
+            int mNextNode;
         private:
             bool mCanSeePlayer;
             bool mHasCaughtPlayer;
@@ -37,10 +54,12 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
-            Quaternion VectorToQuaternion(Vector3 dir);
-            Quaternion Matrix3ToQuaternion(Matrix3 m);
+            void MoveTowardFocalPoint(Vector3 direction);
+            void LookTowardFocalPoint(Vector3 direction);
+            void GrabPlayer();
 
             float mConfiscateItemsTime;
+            int mGuardSpeedMultiplier;
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();

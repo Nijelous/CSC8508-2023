@@ -22,7 +22,7 @@ namespace SuspicionSystem
 
         const enum activeLocalSusCause
         {
-            guardsLOS, cameraLOS, hiddenInShadow, disguiseBuff, passiveRecovery
+            guardsLOS, cameraLOS, hiddenInShadow, disguiseBuff, passiveRecovery, playerWalk, playerSprint
         };
 
         LocalSuspicionMetre(GlobalSuspicionMetre* globalSusMeterPTR) {
@@ -57,7 +57,7 @@ namespace SuspicionSystem
 
         std::map<activeLocalSusCause, float>  mActiveLocalSusCauseSeverityMap =
         {
-            {guardsLOS, 3}, {cameraLOS, 3}, {disguiseBuff, 5}
+            {guardsLOS, 3}, {cameraLOS, 3}, {disguiseBuff, 5}, {playerWalk,3}, {playerSprint,9}
         };
 
         float mPlayerMeters[NCL::CSC8503::MAX_PLAYERS];
