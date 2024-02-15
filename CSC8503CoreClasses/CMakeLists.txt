@@ -89,6 +89,10 @@ set(NavMesh
 source_group("Level\\NavMesh" FILES ${NavMesh})
 
 set(Level_Objects
+    "Door.h"
+    "Door.cpp"
+    "PrisonDoor.h"
+    "PrisonDoor.cpp"
     "Helipad.h"
     "Helipad.cpp"
     "Vent.h"

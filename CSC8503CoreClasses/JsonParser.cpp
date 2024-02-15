@@ -2,11 +2,13 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "Door.h"
+#include "PrisonDoor.h"
 #include "Vent.h"
 
 using namespace NCL::CSC8503;
 
-constexpr ParserVariables LEVEL_VARIABLES[14] = {
+constexpr ParserVariables LEVEL_VARIABLES[16] = {
 	TileMap,
 	RoomList,
 	GuardCount,
@@ -20,16 +22,19 @@ constexpr ParserVariables LEVEL_VARIABLES[14] = {
 	Spotlight,
 	ItemPositions,
 	Vents,
-	Helipad
+	Helipad,
+	PrisonDoorPos,
+	Doors
 };
 
-constexpr ParserVariables ROOM_VARIABLES[6] = {
+constexpr ParserVariables ROOM_VARIABLES[7] = {
 	SetRoomType,
 	TileMap,
 	CCTVTransforms,
 	Pointlight,
 	Spotlight,
 	ItemPositions,
+	Doors
 };
 
 void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
@@ -181,7 +186,11 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 	case Spotlight:
 		if (keyValuePairs.size() == 1) return;
 	{
-		Light* newLight = (Light*)new SpotLight(Vector3(keyValuePairs[4]["x"], keyValuePairs[4]["y"]-180, -keyValuePairs[4]["z"]),
+			Matrix4 xRot = Matrix4::Rotation(keyValuePairs[4]["x"], Vector3(-1, 0, 0));
+			Matrix4 yRot = Matrix4::Rotation(keyValuePairs[4]["y"]-180, Vector3(0, 1, 0));
+			Matrix4 zRot = Matrix4::Rotation(-keyValuePairs[4]["z"], Vector3(0, 0, 1));
+			Vector3 direction = xRot * yRot * zRot * Vector3(0, 0, 1);
+			Light* newLight = (Light*)new SpotLight(direction,
 			Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]),
 			Vector4(keyValuePairs[3]["x"], keyValuePairs[3]["y"], keyValuePairs[3]["z"], keyValuePairs[3]["w"]),
 			keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
@@ -211,6 +220,24 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 	case Helipad:
 		level->mHelipadPosition = Vector3(keyValuePairs[1]["x"], keyValuePairs[1]["y"], -keyValuePairs[1]["z"]);
 		break;
+	case Doors:
+		if (keyValuePairs.size() == 1) return;
+		{
+			Door* door = new Door();
+			door->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+				.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
+			if (level) level->mDoors.push_back(door);
+			else room->mDoors.push_back(door);
+		}
+		break;
+	case PrisonDoorPos:
+	{
+		PrisonDoor* pDoor = new PrisonDoor();
+		pDoor->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+			.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
+		level->mPrisonDoor = pDoor;
+	}
+	break;
 	}
 }
 

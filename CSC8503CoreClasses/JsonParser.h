@@ -18,7 +18,9 @@ namespace NCL {
 			Spotlight,
 			ItemPositions,
 			Vents,
-			Helipad
+			Helipad,
+			Doors,
+			PrisonDoorPos
 		};
 		class JsonParser {
 		public:

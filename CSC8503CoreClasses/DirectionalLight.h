@@ -28,6 +28,10 @@ public:
 		return mRadius;
 	}
 
+	Vector3 GetCentre() const {
+		return mCentre;
+	}
+
 	const float* GetDirectionAddress() const {
 		const float* address = &mDirection.x;
 		return address;
