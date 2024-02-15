@@ -101,10 +101,8 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
-				std::cout << "Object hit" << objectHit->GetName() << std::endl;
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
-			else
-				std::cout << "Nothing hit at all" << std::endl;
 		}
 	}
 }
