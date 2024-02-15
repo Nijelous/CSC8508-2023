@@ -304,6 +304,10 @@ void GameTechRenderer::RenderCamera() {
 	CombineBuffers();
 }
 
+void GameTechRenderer::DrawWallsFloorsInstanced() {
+
+}
+
 void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glBindFramebuffer(GL_FRAMEBUFFER, mGBufferFBO);
 	glEnable(GL_STENCIL_TEST);
@@ -311,6 +315,8 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
+
+	DrawWallsFloorsInstanced();
 
 	OGLShader* activeShader = nullptr;
 	int projLocation = 0;

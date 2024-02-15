@@ -68,6 +68,7 @@ namespace NCL {
 			void DrawOutlinedObjects();
 			void LoadSkybox();
 
+			void DrawWallsFloorsInstanced();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);

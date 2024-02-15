@@ -181,6 +181,7 @@ void LevelManager::Update(float dt, bool isUpdatingObjects) {
 
 void LevelManager::InitialiseAssets() {
 	mCubeMesh = mRenderer->LoadMesh("cube.msh");
+	mWallFloorCubeMesh = mRenderer->LoadMesh("cube.msh");
 	mSphereMesh = mRenderer->LoadMesh("sphere.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("Capsule.msh");
 	mCharMesh = mRenderer->LoadMesh("goat.msh");
@@ -226,7 +227,8 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 			break;
 		}
 	}
-	mWallFloorCubeMesh->SetInstanceMatrices(mLevelMatrices);
+	OGLMesh* instance = (OGLMesh*) mWallFloorCubeMesh;
+	instance->SetInstanceMatrices(mLevelMatrices);
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
