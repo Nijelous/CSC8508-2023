@@ -23,6 +23,7 @@ namespace NCL::Rendering {
 
 		void UploadToGPU(Rendering::RendererBase* renderer = nullptr) override;
 		void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount);
+		void SetInstanceMatrices(const std::vector<Matrix4>& mat);
 
 	protected:
 		GLuint	GetVAO()			const { return vao;			}

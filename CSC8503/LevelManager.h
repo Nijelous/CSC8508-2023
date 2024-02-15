@@ -98,6 +98,7 @@ namespace NCL {
 
 			// meshes
 			Mesh* mCubeMesh;
+			Mesh* mWallFloorCubeMesh;
 			Mesh* mSphereMesh;
 			Mesh* mCapsuleMesh;
 			Mesh* mCharMesh;

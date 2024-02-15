@@ -40,6 +40,11 @@ void OGLMesh::BindVertexAttribute(int attribSlot, int buffer, int bindingID, int
 	glBindVertexBuffer(bindingID, buffer, elementOffset, elementSize);
 }
 
+void OGLMesh::SetInstanceMatrices(const std::vector<Matrix4>& mat) {
+	CreateVertexBuffer(attributeBuffers[VertexAttribute::InstanceMatrices]);
+}
+
+
 void OGLMesh::UploadToGPU(Rendering::RendererBase* renderer) {
 	if (!ValidateMeshData()) {
 		return;
