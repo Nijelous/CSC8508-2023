@@ -164,19 +164,23 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	delete[] levelSize;
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects) {
+void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
 	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
 		for (GameObject* obj : mUpdatableObjects) {
 			obj->UpdateObject(dt);
 		}
 	}
 
-	mWorld->UpdateWorld(dt);
-	mRenderer->Update(dt);
-	mPhysics->Update(dt);
-	mAnimation->Update(dt);
-	mRenderer->Render();
-	Debug::UpdateRenderables(dt);
+	if (isPaused)
+		mRenderer->Render(); // needed to see dubug message
+	else {
+		mWorld->UpdateWorld(dt);
+		mRenderer->Update(dt);
+		mPhysics->Update(dt);
+		mAnimation->Update(dt);
+		mRenderer->Render();
+		Debug::UpdateRenderables(dt);
+	}
 }
 
 void LevelManager::InitialiseAssets() {

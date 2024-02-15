@@ -4,6 +4,20 @@
 
 using namespace NCL::CSC8503;
 
+// pause screen
+
+PushdownState::PushdownResult Pause::OnUpdate(float dt, PushdownState** newState) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P)) {
+		*newState = new PlayingLevel(mGameSceneManager);
+		return PushdownResult::Push;
+	}
+	return PushdownResult::NoChange;
+}
+
+void Pause::OnAwake() {
+	mGameSceneManager->SetPause();
+}
+
 // defeat screen
 
 PushdownState::PushdownResult Defeat::OnUpdate(float dt, PushdownState** newState) {
@@ -41,11 +55,26 @@ PushdownState::PushdownResult PlayingLevel::OnUpdate(float dt, PushdownState** n
 		*newState = new Defeat(mGameSceneManager);
 		return PushdownResult::Push;
 	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P)) {
+		*newState = new Pause(mGameSceneManager);
+		return PushdownResult::Push;
+	}
 	return PushdownResult::NoChange;
 }
 
 void PlayingLevel::OnAwake() {
 	mGameSceneManager->SetLevel();
+}
+
+// initialising level state
+
+PushdownState::PushdownResult InitialisingLevel::OnUpdate(float dt, PushdownState** newState) {
+	*newState = new PlayingLevel(mGameSceneManager);
+	return PushdownResult::Push;
+}
+
+void InitialisingLevel::OnAwake() {
+	mGameSceneManager->SetInitLevel();
 	mGameSceneManager->CreateLevel();
 }
 
@@ -53,7 +82,7 @@ void PlayingLevel::OnAwake() {
 
 PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-		*newState = new PlayingLevel(mGameSceneManager);
+		*newState = new InitialisingLevel(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
