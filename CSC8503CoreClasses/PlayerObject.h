@@ -24,6 +24,12 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
+			virtual void OnCollisionBegin(GameObject* otherObject) override;
+
+			int GetPoints() { return mPlayerPoints; }
+			void ResetPlayerPoints() { mPlayerPoints = 0; }
+			void AddPlayerPoints(int addedPoints) { mPlayerPoints += mPlayerPoints; }
+
 		protected:
 			bool mIsCrouched;
 
@@ -34,6 +40,8 @@ namespace NCL {
 			int mActiveItemSlot;
 
 			int mPlayerID;
+
+			int mPlayerPoints;
 
 			PlayerState mPlayerState;
 

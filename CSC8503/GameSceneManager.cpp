@@ -82,8 +82,10 @@ void GameSceneManager::CreateLevel() {
 }
 
 bool GameSceneManager::PlayerWonGame() {
-	if (mLevelManager->CheckGameWon())
+	if (mLevelManager->CheckGameWon().mGameWon) {
+		mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
 		return true;
+	}
 	return false;
 }
 
@@ -104,6 +106,7 @@ void GameSceneManager::DisplayVictory() {
 	// to be replaced by proper UI
 	mLevelManager->ResetLevel();
 	Debug::Print("VICTORY", Vector2(45, 50));
+	Debug::Print("YOU GOT " + std::to_string(mPlayersFinalPoints) + " POINTS", Vector2(38, 53));
 }
 
 void GameSceneManager::DisplayDefeat() {

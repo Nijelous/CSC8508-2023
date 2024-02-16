@@ -44,8 +44,6 @@ LevelManager::LevelManager() {
 	}
 	mActiveLevel = -1;
 
-	mPlayerPoints = 0.0f;
-
 	InitialiseAssets();
 	InitialiseIcons();
 }
@@ -171,7 +169,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mTimer = 20.f;
 }
 
-
 void LevelManager::SendWallFloorInstancesToGPU() {
 	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
 	instance->SetInstanceMatrices(mLevelMatrices);
@@ -181,14 +178,15 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 }
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
-	if ((mUpdatableObjects.size() > 0) && isPlayingLevel) {
-		for (GameObject* obj : mUpdatableObjects) {
-			obj->UpdateObject(dt);
-		}
-	}
-
 	if (isPlayingLevel) {
-		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 5));
+		if ((mUpdatableObjects.size() > 0)) {
+			for (GameObject* obj : mUpdatableObjects) {
+				obj->UpdateObject(dt);
+			}
+		}
+		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+		if (mTempPlayer)
+			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 		mTimer -= dt;
 	}
 
@@ -288,7 +286,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
-			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 	}
 }
@@ -600,14 +598,16 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-bool LevelManager::CheckGameWon() {
+GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
 			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
-				return true;
+				return GameResults(true, mTempPlayer->GetPoints());
 		}
 	}
-	return false;
+	if (mTempPlayer)
+		return GameResults(false, mTempPlayer->GetPoints());
+	return GameResults(false, 0);
 }
 
 bool LevelManager::CheckGameLost() {

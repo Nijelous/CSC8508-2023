@@ -22,6 +22,17 @@ namespace NCL {
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
+
+		struct GameResults {
+			bool mGameWon;
+			int mCurrentPoints;
+
+			GameResults(bool gameWon, int currentPoints) {
+				mGameWon = gameWon;
+				mCurrentPoints = currentPoints;
+			}
+		};
+
 		class LevelManager : PlayerInventoryObserver {
 		public:
 			LevelManager();
@@ -55,7 +66,7 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
-			bool CheckGameWon();
+			GameResults CheckGameWon();
 			bool CheckGameLost();
 		
 		protected:
@@ -156,7 +167,6 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
-			float mPlayerPoints;
 		};
 	}
 }

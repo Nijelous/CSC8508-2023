@@ -6,6 +6,8 @@
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
 
+#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
+
 #include "Window.h"
 #include "GameWorld.h"
 
@@ -39,6 +41,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 	mActiveItemSlot = 0;
 
 	mPlayerID = playerID;
+	mPlayerPoints = 0;
 	mIsPlayer = true;
 }
 
@@ -59,6 +62,12 @@ void PlayerObject::UpdateObject(float dt) {
 	MatchCameraRotation(yawValue);
 
 	EnforceMaxSpeeds();
+}
+
+void PlayerObject::OnCollisionBegin(GameObject* otherObject) {
+	if (FlagGameObject* temp = dynamic_cast<FlagGameObject*>(otherObject)) {
+		mPlayerPoints += temp->GetPoints();
+	}
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

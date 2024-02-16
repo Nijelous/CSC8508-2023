@@ -63,6 +63,8 @@ namespace NCL {
 
 		private:
 			static GameSceneManager* instance;
+
+			int mPlayersFinalPoints;
 		};
 	}
 }
