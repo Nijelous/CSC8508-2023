@@ -2,16 +2,16 @@
 
 #include "Debug.h"
 
-NCL::CSC8503::MainMenuScene::MainMenuScene() : Scene()
-{
+using namespace NCL::CSC8503;
+
+MainMenuScene::MainMenuScene() : Scene() {
     Scene::InitCamera();
 }
 
-NCL::CSC8503::MainMenuScene::~MainMenuScene(){
-
+MainMenuScene::~MainMenuScene() {
 }
 
-void NCL::CSC8503::MainMenuScene::UpdateGame(float dt) {
+void MainMenuScene::UpdateGame(float dt) {
 
     Debug::Print("1-) Start Single Player", Vector2(30, 70));
     Debug::Print("2-) Start Multi Player (Server)", Vector2(30, 75));

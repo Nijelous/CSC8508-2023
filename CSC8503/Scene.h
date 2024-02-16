@@ -1,12 +1,12 @@
-﻿
-#pragma once
+﻿#pragma once
+
 #include <memory>
 #include "../NCLCoreClasses/KeyboardMouseController.h"
 namespace NCL{
     namespace CSC8503{
         class LevelManager;
 
-        class Scene{
+        class Scene {
         public:
             Scene();
             ~Scene();

@@ -47,7 +47,7 @@ namespace NCL {
 
 			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
 
-			virtual void Update(float dt, bool isUpdatingObjects);
+			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 

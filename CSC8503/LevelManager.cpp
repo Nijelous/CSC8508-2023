@@ -108,9 +108,11 @@ void LevelManager::ResetLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
-		.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
-	mWorld->GetMainCamera().SetYaw((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation().ToEuler().y);
+	if (mActiveLevel > -1) {
+		mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
+			.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
+		mWorld->GetMainCamera().SetYaw((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation().ToEuler().y);
+	}
 }
 
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
@@ -165,6 +167,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	delete[] levelSize;
 }
 
+
 void LevelManager::SendWallFloorInstancesToGPU() {
 	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
 	instance->SetInstanceMatrices(mLevelMatrices);
@@ -173,19 +176,23 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	}
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects) {
+void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
 	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
 		for (GameObject* obj : mUpdatableObjects) {
 			obj->UpdateObject(dt);
 		}
 	}
 
-	mWorld->UpdateWorld(dt);
-	mRenderer->Update(dt);
-	mPhysics->Update(dt);
-	mAnimation->Update(dt);
-	mRenderer->Render();
-	Debug::UpdateRenderables(dt);
+	if (isPaused)
+		mRenderer->Render(); // needed to see dubug message
+	else {
+		mWorld->UpdateWorld(dt);
+		mRenderer->Update(dt);
+		mPhysics->Update(dt);
+		mAnimation->Update(dt);
+		mRenderer->Render();
+		Debug::UpdateRenderables(dt);
+	}
 }
 
 void LevelManager::InitialiseAssets() {
