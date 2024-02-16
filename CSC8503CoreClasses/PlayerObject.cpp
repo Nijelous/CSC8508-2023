@@ -5,6 +5,7 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 
 #include "Window.h"
@@ -110,19 +111,19 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
-
-				Item* item = (Item*)objectHit;
-
-				if (item!= nullptr)
-				{
-					item->AddToPlayerInventory(mPlayerID);
-				}
 				
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+				//Check if object is an item.
+				Item* item = (Item*)objectHit;
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
+
 			}
 		}
 	}
 }
+
 void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
