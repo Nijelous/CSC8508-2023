@@ -16,6 +16,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : mGameWorld(g) {
 	mDTOffset = 0.0f;
 	mGlobalDamping = 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
+	baseTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -26,10 +27,15 @@ void PhysicsSystem::SetGravity(const Vector3& g) {
 }
 
 void PhysicsSystem::SetNewBroadphaseSize(const Vector3& levelSize) {
-	int xz = 64;
-	while(levelSize.x > xz || levelSize.z > xz){
-		xz *= 2;
+	mBroadphaseX = 64;
+	mBroadphaseZ = 64;
+	while(levelSize.x > mBroadphaseX){
+		mBroadphaseX *= 2;
 	}
+	while (levelSize.z > mBroadphaseZ) {
+		mBroadphaseZ *= 2;
+	}
+	baseTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
 }
 
 /*
@@ -358,17 +364,24 @@ void PhysicsSystem::BroadPhase() {
  	mBroadphaseCollisions.clear();
 
 	// create quadtree to store all objects
-	QuadTree<GameObject*> tree(Vector2(mBroadphaseXZ, mBroadphaseXZ), 7, 6);
 	std::vector<GameObject*>::const_iterator first;
 	std::vector<GameObject*>::const_iterator last;
 	mGameWorld.GetObjectIterators(first, last);
+	if (first == last) return;
+	QuadTree<GameObject*> tree;
+	tree.CopyTree(&baseTree, Vector2(mBroadphaseX, mBroadphaseZ));
+	bool populateBase = baseTree.Empty();
 	// add all objects to tree
 	for (auto i = first; i != last; i++) {
+		if (!populateBase && (*i)->GetCollisionLayer() & StaticObj) continue;
 		Vector3 halfSizes;
 		if (!(*i)->GetBroadphaseAABB(halfSizes))
 			continue;
 		Vector3 pos = (*i)->GetTransform().GetPosition();
 		tree.Insert(*i, pos, halfSizes);
+		if (populateBase && (*i)->GetCollisionLayer() & StaticObj) {
+			baseTree.Insert(*i, pos, halfSizes);
+		}
 	}
 
 	// find what objects may be colliding

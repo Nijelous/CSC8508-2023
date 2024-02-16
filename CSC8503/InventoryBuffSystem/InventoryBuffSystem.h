@@ -11,8 +11,9 @@ namespace InventoryBuffSystem
 
         InventoryBuffSystemClass()
         {
-            mPlayerBuffsPtr = new PlayerBuffs();
             mPlayerInventoryPtr = new PlayerInventory();
+            mPlayerBuffsPtr = new PlayerBuffs();
+            mPlayerInventoryPtr->Attach(mPlayerBuffsPtr);
         };
 
         void Reset()

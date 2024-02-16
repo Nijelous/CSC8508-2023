@@ -38,6 +38,10 @@ namespace NCL {
 			
 
 			void AddLight(Light* light);
+			void ClearLights();
+			void SetWallFloorObject(GameObject* wallFloorTile) {
+				mWallFloorTile = wallFloorTile;
+			}
 
 			void SetUIObject(UI* ui) {
 				mUi = ui;
@@ -71,6 +75,7 @@ namespace NCL {
 			void DrawOutlinedObjects();
 			void LoadSkybox();
 
+			void DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix);
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
@@ -116,6 +121,7 @@ namespace NCL {
 			Shader* mCombineShader;
 			const OGLMesh* mSphereMesh;
 			OGLMesh* mQuad;
+			GameObject* mWallFloorTile;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;

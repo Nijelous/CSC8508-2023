@@ -9,7 +9,7 @@
 
 #include <irrKlang.h>
 
-#include "PushdownStates.h"
+#include "SinglePlayerStates.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -19,6 +19,8 @@ namespace {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
 }
+
+GameSceneManager* GameSceneManager::instance = nullptr;
 
 GameSceneManager::GameSceneManager(bool isNetworkGame) {
 	if (!isNetworkGame){
@@ -30,24 +32,34 @@ GameSceneManager::GameSceneManager(bool isNetworkGame) {
 GameSceneManager::~GameSceneManager() {
 }
 
+GameSceneManager GameSceneManager::GetGameSceneManager() {
+	if (instance == nullptr) {
+		instance = new GameSceneManager();
+	}
+	return instance;
+}
+
 void GameSceneManager::UpdateGame(float dt) {
 
-	if (mPushdownMachine != nullptr){
+	if (mPushdownMachine != nullptr) {
 		mPushdownMachine->Update(dt);
 	}
 
-	mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
+
+	if (!(mGameState == PauseScreenState))
+		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
+	else
+		Debug::Print("PAUSED", Vector2(50, 50));
+
 
 	if (mGameState == MainMenuState)
 		DisplayMainMenu();
-
 	if (mGameState == VictoryScreenState)
 		DisplayVictory();
-
 	if (mGameState == DefeatScreenState)
 		DisplayDefeat();
 
-	mLevelManager->Update(dt, mGameState == LevelState);
+	mLevelManager->Update(dt, mGameState == PlayingLevelState, mGameState == PauseScreenState);
 
 	PlayerWonGame();
 }
@@ -77,22 +89,19 @@ bool GameSceneManager::PlayerWonGame() {
 
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
-	std::cout << "WELCOME" << std::endl;
-	std::cout << "PRESS SPACE TO PLAY" << std::endl;
+	mLevelManager->ResetLevel();
+	Debug::Print("Welcome", Vector2(45, 50));
+	Debug::Print("Press SPACE to continue", Vector2(30, 55));
 }
 
 void GameSceneManager::DisplayVictory() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
-	std::cout << "VICTORY!!!!!!!" << std::endl;
+	mLevelManager->ResetLevel();
+	Debug::Print("VICTORY", Vector2(45, 50));
 }
 
 void GameSceneManager::DisplayDefeat() {
 	// to be replaced by proper UI
-	mLevelManager->GetGameWorld()->ClearAndErase();
-	mLevelManager->GetPhysics()->Clear();
-	std::cout << "defeat :(((((((" << std::endl;
+	mLevelManager->ResetLevel();
+	Debug::Print("DEFEAT", Vector2(45, 50));
 }

@@ -77,6 +77,16 @@ namespace NCL {
 			void DebugDraw() {
 			}
 
+			void CopyNode(QuadTreeNode<T>* node) {
+				this->contents = node->contents;
+				if (node->children) {
+					Split();
+					for (int i = 0; i < 4; i++) {
+						this->children[i].CopyNode(&(node->children[i]));
+					}
+				}
+			}
+
 			void OperateOnContents(QuadTreeFunc& func) {
 				if (children) {
 					for (int i = 0; i < 4; i++) {
@@ -108,6 +118,7 @@ namespace NCL {
 		template<class T>
 		class QuadTree {
 		public:
+			QuadTree() {}
 			QuadTree(Vector2 size, int maxDepth = 6, int maxSize = 5) {
 				root = QuadTreeNode<T>(Vector2(), size);
 				this->maxDepth = maxDepth;
@@ -126,6 +137,17 @@ namespace NCL {
 
 			void OperateOnContents(typename QuadTreeNode<T>::QuadTreeFunc  func) {
 				root.OperateOnContents(func);
+			}
+
+			void CopyTree(QuadTree<T>* baseTree, Vector2 size) {
+				root = QuadTreeNode<T>(Vector2(), size);
+				root.CopyNode(&baseTree->root);
+				this->maxDepth = baseTree->maxDepth;
+				this->maxSize = baseTree->maxSize;
+			}
+
+			bool Empty() {
+				return !root.children && root.contents.empty();
 			}
 
 		protected:
