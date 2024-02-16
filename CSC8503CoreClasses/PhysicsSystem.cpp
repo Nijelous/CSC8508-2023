@@ -378,9 +378,9 @@ void PhysicsSystem::BroadPhase() {
 		if (!(*i)->GetBroadphaseAABB(halfSizes))
 			continue;
 		Vector3 pos = (*i)->GetTransform().GetPosition();
-		tree.Insert(*i, pos, halfSizes);
+		tree.Insert(*i, pos, halfSizes, (*i)->GetCollisionLayer() & STATIC_COLLISION_LAYERS);
 		if (populateBase && (*i)->GetCollisionLayer() & StaticObj) {
-			baseTree.Insert(*i, pos, halfSizes);
+			baseTree.Insert(*i, pos, halfSizes, true);
 		}
 	}
 

@@ -104,10 +104,15 @@ LevelManager::~LevelManager() {
 	delete mSuspensionIndicatorTex;
 }
 
-void LevelManager::ResetLevel() {
+void LevelManager::ClearLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
+	mLevelMatrices.clear();
+	mRenderer->SetWallFloorObject(nullptr);
+}
+
+void LevelManager::ResetLevel() {
 	if (mActiveLevel > -1) {
 		mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
 			.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
