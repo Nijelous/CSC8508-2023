@@ -121,6 +121,7 @@ GameTechRenderer::~GameTechRenderer() {
 	delete mSpotLightShader;
 	delete mDirLightShader;
 	delete mCombineShader;
+	ClearLights();
 }
 
 void GameTechRenderer::LoadSkybox() {
@@ -799,6 +800,13 @@ void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 void GameTechRenderer::AddLight(Light* lightPtr) {
 
 	mLights.push_back(lightPtr);
+}
+
+void GameTechRenderer::ClearLights() {
+	for (int i = 0; i < mLights.size(); i++) {
+		delete(mLights[i]);
+	}
+	mLights.clear();
 }
 
 void GameTechRenderer::BindSpecificLightDataToShader(Light* l)

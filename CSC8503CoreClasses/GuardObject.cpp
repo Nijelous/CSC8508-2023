@@ -117,9 +117,18 @@ BehaviourAction* GuardObject::Patrol() {
 	BehaviourAction* Patrol = new BehaviourAction("Patrol", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
+
 			mGuardState = Walk;
 			//std::cout << "guard start walk" << std::endl;
 			mNextNode = mCurrentNode + 1;
+
+			if (mCurrentNode == mNodes.size() - 1) {
+				mNextNode = 0;
+			}
+			else {
+				mNextNode = mCurrentNode + 1;
+			}
+
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
@@ -129,7 +138,7 @@ BehaviourAction* GuardObject::Patrol() {
 				MoveTowardFocalPoint(direction);
 				float dist = direction.LengthSquared();
 				if (dist < 36) {
-					mCurrentNode += 1;
+					mCurrentNode = mNextNode;
 					if (mCurrentNode == mNodes.size() - 1) {
 						mNextNode = 0;
 					}

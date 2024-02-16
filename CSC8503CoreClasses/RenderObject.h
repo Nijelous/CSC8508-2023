@@ -89,6 +89,13 @@ namespace NCL {
 				return mOutlined;
 			}
 
+			void SetIsInstanced(bool isInstanced) {
+				mIsInstanced = isInstanced;
+			}
+
+			bool IsInstanced() const {
+				return mIsInstanced;
+			}
 
 			void SetAnimation(MeshAnimation* animation) {
 				mAnimation = animation;
@@ -143,6 +150,7 @@ namespace NCL {
 			float		mCullSphereRadius;
 			float mSqDistToCam;
 			bool mOutlined = false;
+			bool mIsInstanced = false;
 
 			vector<GLuint>  mMatTextures;
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
