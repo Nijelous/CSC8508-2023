@@ -3,8 +3,8 @@
 #include "LevelManager.h"
 
 Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()){
-    mLevelManager = new LevelManager();
-    mLevelManager->GetGameWorld()->GetMainCamera().SetController(mController);
+    LevelManager* levelManager = LevelManager::GetLevelManager();
+    levelManager->GetGameWorld()->GetMainCamera().SetController(mController);
     mController.MapAxis(0, "Sidestep");
     mController.MapAxis(1, "UpDown");
     mController.MapAxis(2, "Forward");
@@ -13,15 +13,11 @@ Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWi
 }
 
 Scene::~Scene(){
-    delete mLevelManager;
+
 }
 
 void Scene::UpdateGame(float dt){
-    mLevelManager->Update(dt, true, false);
-}
-
-LevelManager* Scene::GetLevelManager(){
-    return mLevelManager;
+    LevelManager::GetLevelManager()->Update(dt, true, false);
 }
 
 void Scene::InitCamera(){

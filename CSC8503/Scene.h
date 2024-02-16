@@ -13,11 +13,7 @@ namespace NCL{
 
             virtual void UpdateGame(float dt);
 
-            LevelManager* GetLevelManager();
-
         protected:
-            LevelManager* mLevelManager;
-
             virtual void InitCamera();
 
             KeyboardMouseController mController;

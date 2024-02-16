@@ -24,8 +24,7 @@ namespace NCL {
 		class SoundEmitter;
 		class LevelManager : PlayerInventoryObserver {
 		public:
-			LevelManager();
-			~LevelManager();
+			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
 			std::vector<Level*> GetLevels() { return mLevelList; }
@@ -59,6 +58,11 @@ namespace NCL {
 			bool CheckGameWon();
 		
 		protected:
+			LevelManager();
+			~LevelManager();
+
+			static LevelManager* instance;
+
 			virtual void InitialiseAssets();
 
 			void InitialiseIcons();
