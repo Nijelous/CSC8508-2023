@@ -160,9 +160,17 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
-	
-	LoadItems(itemPositions);
+	SendWallFloorInstancesToGPU();
+	LoadItems(itemPositions);	
 	delete[] levelSize;
+}
+
+void LevelManager::SendWallFloorInstancesToGPU() {
+	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
+	instance->SetInstanceMatrices(mLevelMatrices);
+	if (!mLevelLayout.empty()) {
+		mRenderer->SetWallFloorObject(mLevelLayout[0]);
+	}
 }
 
 void LevelManager::Update(float dt, bool isUpdatingObjects) {
@@ -182,6 +190,7 @@ void LevelManager::Update(float dt, bool isUpdatingObjects) {
 
 void LevelManager::InitialiseAssets() {
 	mCubeMesh = mRenderer->LoadMesh("cube.msh");
+	mWallFloorCubeMesh = mRenderer->LoadMesh("cube.msh");
 	mSphereMesh = mRenderer->LoadMesh("sphere.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("Capsule.msh");
 	mCharMesh = mRenderer->LoadMesh("goat.msh");
@@ -227,6 +236,7 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 			break;
 		}
 	}
+	
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
@@ -306,7 +316,7 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -336,7 +346,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
