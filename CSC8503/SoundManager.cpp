@@ -17,17 +17,6 @@ SoundManager::~SoundManager() {
 	mSoundEngine->drop();
 }
 
-//ISound* SoundManager::GetSound(std::string soundName) {
-//	/*mSound = FootStep;
-//	switch (mSound) {
-//	case FootStep:
-//		return footStep;
-//		break;
-//	case :
-//		break;
-//	}*/
-//	return footStep;
-//}
 
 void SoundManager::UpdateSound(int sound, Vector3 position, bool isPaused) {
 	switch (sound) {
@@ -36,6 +25,7 @@ void SoundManager::UpdateSound(int sound, Vector3 position, bool isPaused) {
 			mFootStep->setPosition(ConvertToVec3df(position));
 			mFootStep->setIsPaused(isPaused);
 		}
+		break;
 	case PickupSound:
 		if (mPickupSound) {
 			if (mPickupSound->isFinished()) {
@@ -47,6 +37,7 @@ void SoundManager::UpdateSound(int sound, Vector3 position, bool isPaused) {
 				mPickupSound->setIsPaused(isPaused);
 			}
 		}
+		break;
 	}
 
 }
@@ -54,10 +45,3 @@ void SoundManager::UpdateSound(int sound, Vector3 position, bool isPaused) {
 vec3df SoundManager::ConvertToVec3df(Vector3 soundPos) {
 	return vec3df(soundPos.x, soundPos.y, soundPos.z);
 }
-
-//void SoundManager::UpdateSound(ISound* sound, Vector3 soundPos, bool isPaused) {
-//	if (sound) {
-//		sound->setPosition(ConvertToVec3df(soundPos));
-//		sound->setIsPaused(isPaused);
-//	}
-//}
