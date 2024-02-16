@@ -5,8 +5,8 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
-#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
 #include "../CSC8503/InventoryBuffSystem/Item.h"
+#include "Interactable.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -111,14 +111,21 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
-				
 				//Check if object is an item.
-				Item* item = (Item*)objectHit;
+				Item* item = dynamic_cast<Item*>(objectHit);
 				if (item != nullptr) {
 					item->OnPlayerInteract(mPlayerID);
 					return;
 				}
 
+				//Check if object is an interactable.
+				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+				if (interactablePtr != nullptr)
+				{
+					interactablePtr->Interact();
+					return;
+				}
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
 	}
