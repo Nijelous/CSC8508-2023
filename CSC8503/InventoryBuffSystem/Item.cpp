@@ -1,8 +1,11 @@
 ﻿#include "Item.h"
 #include "InventoryBuffSystem.h"
 
-void InventoryBuffSystem::Item::AddToPlayerInventory(int playerId) {
-	auto* playerInventory = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr();
-
-	playerInventory->AddItemToPlayer(mItemType, playerId);
+InventoryBuffSystem::Item::Item(PlayerInventory::item itemType, InventoryBuffSystemClass& inventoryBuffSystemClass) {
+	mItemType = itemType;
+	mInventoryBuffSystemClassPtr = &inventoryBuffSystemClass;
 }
+
+void InventoryBuffSystem::Item::OnPlayerInteract(int playerId) {
+}
+

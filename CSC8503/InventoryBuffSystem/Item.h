@@ -7,7 +7,11 @@ namespace InventoryBuffSystem{
 
     class Item : public NCL::CSC8503::GameObject, public PlayerInventoryObserver {
     public:
-        virtual void AddToPlayerInventory(int playerId = 0);
+        Item(PlayerInventory::item, InventoryBuffSystemClass& inventoryBuffSystemClass);
+        
+        PlayerInventory::item GetItemType() const { return mItemType;  };
+        
+        virtual void OnPlayerInteract(int playerId = 0);
         
     protected:
         PlayerInventory::item mItemType;
