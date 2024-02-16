@@ -83,7 +83,8 @@ void GameSceneManager::CreateLevel() {
 
 bool GameSceneManager::PlayerWonGame() {
 	if (mLevelManager->CheckGameWon().mGameWon) {
-		mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
+		if (mLevelManager->CheckGameWon().mCurrentPoints > 0)
+			mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
 		return true;
 	}
 	return false;
