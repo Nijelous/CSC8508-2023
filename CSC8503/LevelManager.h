@@ -27,6 +27,7 @@ namespace NCL {
 			LevelManager();
 			~LevelManager();
 			void ResetLevel();
+			void ClearLevel();
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -122,6 +123,7 @@ namespace NCL {
 			Texture* mFloorNormal;
 
 			//icons
+			UI* mUi;
 			Texture* mInventorySlotTex;
 
 			Texture* mHighlightAwardTex;
