@@ -12,11 +12,21 @@ namespace NCL{
 			SoundManager();
 			~SoundManager();
 
-			ISound* GetSound(std::string soundName);
-			vec3df ConvertToVec3df(Vector3 soundPos);
+			enum Sounds {
+				FootStep,
+				PickupSound,
+			};
 
-			void UpdateSound(ISound* sound, Vector3 soundPos, bool isPaused);
-			ISound* footStep;
+			//ISound* GetSound(std::string soundName);
+			vec3df ConvertToVec3df(Vector3 soundPos);
+			
+			//void UpdateSound(ISound* sound, Vector3 soundPos, bool isPaused);
+			
+			void UpdateSound(int sound, Vector3 position, bool isPaused);
+
+			ISound* mFootStep;
+
+			ISound* mPickupSound;
 
 		protected:
 			//ISound* footStep;

@@ -19,9 +19,9 @@ namespace NCL {
 				Texture* texture;
 				bool isAppear;
 			};
-			Icon AddIcon(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
+			Icon AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
 
-			const std::vector<Icon>& GetInventorySlot();
+			const std::vector<Icon>& GetIcons();
 
 			void SetIconPosition(Vector2 newPos, Icon icon);
 
@@ -34,7 +34,7 @@ namespace NCL {
 			std::vector<UI::Icon> icons;
 		protected:
 			Vector2 mPos;
-			Icon icon;
+			Icon mIcon;
 		};
 	}
 }

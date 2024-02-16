@@ -190,7 +190,7 @@ void GameTechRenderer::RenderFrame() {
 	
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UI::Icon> icons = mUi->GetInventorySlot();
+	const std::vector<UI::Icon> icons = mUi->GetIcons();
 	for ( auto& i : icons) {
 		RenderIcons(i);
 	}

@@ -13,14 +13,14 @@ UI::~UI(){
 }
 
 
-UI::Icon UI::AddIcon(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown) {
-	icon.position = newPos;
-	icon.length = horiSize;
-	icon.height = vertSize;
-	icon.texture = tex;
-	icon.isAppear = isShown;
-	icons.emplace_back(icon);
-	return icon;
+UI::Icon UI::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
+	mIcon.position = Pos;
+	mIcon.length = horiSize;
+	mIcon.height = vertSize;
+	mIcon.texture = tex;
+	mIcon.isAppear = isShown;
+	icons.emplace_back(mIcon);
+	return mIcon;
 }
 
 
@@ -32,7 +32,7 @@ void UI::SetIconTransparency(bool isShown, Icon icon) {
 	icon.isAppear = isShown;
 }
 
-const std::vector<UI::Icon>& UI::GetInventorySlot() {
+const std::vector<UI::Icon>& UI::GetIcons() {
 	return icons;
 }
 

@@ -155,7 +155,7 @@ void LevelManager::Update(float dt, bool isUpdatingObjects) {
 			obj->UpdateObject(dt);
 		}
 	}
-	Debug::Print("ssdasd", Vector2(50, 50), Vector4(1, 0, 1, 1));
+
 	mWorld->UpdateWorld(dt);
 	mRenderer->Update(dt);
 	mPhysics->Update(dt);
