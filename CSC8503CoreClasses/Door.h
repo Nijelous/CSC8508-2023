@@ -8,12 +8,7 @@ namespace NCL {
 			Door(){
 				mName = "Door";
 			}
-
-			virtual void Open();
-			virtual void Close();
-
 		protected:
-			bool mIsOpen;
 		};
 	}
 }

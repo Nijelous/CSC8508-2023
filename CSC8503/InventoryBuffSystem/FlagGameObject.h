@@ -14,6 +14,8 @@ namespace NCL {
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr);
             ~FlagGameObject();
 
+            bool isServerPlayer(GameObject* otherObject);
+
             void GetFlag(int playerNo);
             void Reset();
             
