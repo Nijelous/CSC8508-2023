@@ -10,7 +10,6 @@ namespace NCL {
     namespace CSC8503 {
         class FlagGameObject : public Item {
         public:
-            FlagGameObject() {};
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr);
             ~FlagGameObject();
 
@@ -18,7 +17,9 @@ namespace NCL {
 
             void GetFlag(int playerNo);
             void Reset();
-            
+
+            void OnPlayerInteract(int playerId = 0) override;
+   
             virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 

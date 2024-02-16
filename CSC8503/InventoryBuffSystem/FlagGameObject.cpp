@@ -10,7 +10,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap) {
+FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap) : Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr) {
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
@@ -31,6 +31,15 @@ void FlagGameObject::Reset(){
 	if(!this->IsActive())
 		this->SetActive();
 }
+
+void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
+{
+	if (this->IsActive())
+	{
+		GetFlag(playerId);
+	}
+}
+
 
 void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo){
 	switch (invEvent)
