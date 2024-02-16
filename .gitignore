@@ -71,3 +71,8 @@ Detour/Detour.vcxproj.filters
 INSTALL.vcxproj.filters
 Recast/Recast.vcxproj.filters
 DetourTileCache/DetourTileCache.vcxproj.filters
+DebugUtils/DebugUtils.vcxproj.user
+Detour/Detour.vcxproj.user
+DetourTileCache/DetourTileCache.vcxproj.user
+INSTALL.vcxproj.user
+Recast/Recast.vcxproj.user
