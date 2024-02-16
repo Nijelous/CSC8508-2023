@@ -8,8 +8,9 @@ namespace NCL {
 				if (!CanBeInteractedWith())
 					return; 
 			};
-			virtual bool CanBeInteractedWith() = 0;
+			virtual bool CanBeInteractedWith() { return mInteractable; };
 		protected:
+			bool mInteractable = false;
 		};
 	}
 }
