@@ -5,6 +5,7 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "Interactable.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -110,6 +111,12 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					return;
 				}
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+
+				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+				if (interactablePtr != nullptr)
+				{
+					interactablePtr->Interact();
+				}
 			}
 		}
 	}
