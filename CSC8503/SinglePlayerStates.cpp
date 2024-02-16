@@ -22,6 +22,7 @@ void Pause::OnAwake() {
 
 PushdownState::PushdownResult Defeat::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
+		*newState = new MainMenu(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -35,6 +36,7 @@ void Defeat::OnAwake() {
 
 PushdownState::PushdownResult Victory::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
+		*newState = new MainMenu(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;

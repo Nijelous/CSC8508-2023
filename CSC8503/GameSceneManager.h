@@ -23,7 +23,7 @@ namespace NCL {
 			PauseScreenState
 		};
 
-		class GameSceneManager : public Scene{
+		class GameSceneManager : public Scene {
 		public:
 			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
