@@ -36,7 +36,7 @@ TutorialGame::TutorialGame(bool isInitingAssets) : controller(*Window::GetWindow
 	physics		= new PhysicsSystem(*world);
 	mAnimation   = new AnimationSystem(*world);
 
-	mLevelManager = new LevelManager();
+	//mLevelManager = new LevelManager();
 
 	forceMagnitude	= 10.0f;
 	useGravity		= true;
