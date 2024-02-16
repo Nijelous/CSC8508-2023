@@ -56,6 +56,7 @@ namespace NCL {
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
 			bool CheckGameWon();
+			bool CheckGameLost();
 		
 		protected:
 			virtual void InitialiseAssets();
@@ -144,14 +145,18 @@ namespace NCL {
 			MeshAnimation* mSoldierAnimation;
 			MeshMaterial* mSoldierMaterial;
 
+			// game objects
 			Helipad* mHelipad;
-
 			PlayerObject* mTempPlayer;
 
+			// inventory objects
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 			SuspicionSystemClass* mSuspicionSystemClassPtr = new SuspicionSystemClass();
 
+			// key variables
 			int mActiveLevel;
+			float mTimer;
+			float mPlayerPoints;
 		};
 	}
 }

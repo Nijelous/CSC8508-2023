@@ -44,6 +44,8 @@ LevelManager::LevelManager() {
 	}
 	mActiveLevel = -1;
 
+	mPlayerPoints = 0.0f;
+
 	InitialiseAssets();
 	InitialiseIcons();
 }
@@ -165,6 +167,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions);	
 	delete[] levelSize;
+
+	mTimer = 20.f;
 }
 
 
@@ -176,15 +180,20 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	}
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
-	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
+void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
+	if ((mUpdatableObjects.size() > 0) && isPlayingLevel) {
 		for (GameObject* obj : mUpdatableObjects) {
 			obj->UpdateObject(dt);
 		}
 	}
 
+	if (isPlayingLevel) {
+		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 5));
+		mTimer -= dt;
+	}
+
 	if (isPaused)
-		mRenderer->Render(); // needed to see dubug message
+		mRenderer->Render();
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
@@ -598,6 +607,12 @@ bool LevelManager::CheckGameWon() {
 				return true;
 		}
 	}
+	return false;
+}
+
+bool LevelManager::CheckGameLost() {
+	if (mTimer <= 0.f)
+		return true;
 	return false;
 }
 

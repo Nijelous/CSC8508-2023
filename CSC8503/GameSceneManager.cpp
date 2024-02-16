@@ -87,6 +87,12 @@ bool GameSceneManager::PlayerWonGame() {
 	return false;
 }
 
+bool GameSceneManager::PLayerLostGame() {
+	if (mLevelManager->CheckGameLost())
+		return true;
+	return false;
+}
+
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
 	mLevelManager->ResetLevel();
