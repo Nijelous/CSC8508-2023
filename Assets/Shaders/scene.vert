@@ -31,16 +31,22 @@ out Vertex
 void main(void)
 {
 	mat4 mvp;
+	mat3 normalMatrix;
 	if(hasInstanceMatrix) {
 		mvp 		  = (projMatrix * viewMatrix * instanceMatrix);
+		normalMatrix = transpose ( inverse ( mat3 ( instanceMatrix )));
+		OUT.worldPos 	= ( instanceMatrix * vec4 ( position ,1)). xyz ;
 	}
-	else mvp 		  = (projMatrix * viewMatrix * modelMatrix);
-	mat3 normalMatrix = transpose ( inverse ( mat3 ( modelMatrix )));
+	else{ 
+	mvp 		  = (projMatrix * viewMatrix * modelMatrix);
+	normalMatrix = transpose ( inverse ( mat3 ( modelMatrix )));
+	OUT.worldPos 	= ( modelMatrix * vec4 ( position ,1)). xyz ;
+	}
 	vec3 wNormal = normalize ( normalMatrix * normalize ( normal ));
 	vec3 wTangent = normalize(normalMatrix * normalize(tangent.xyz));
 
 	OUT.shadowProj 	=  shadowMatrix * vec4 ( position,1);
-	OUT.worldPos 	= ( modelMatrix * vec4 ( position ,1)). xyz ;
+	
 	OUT.normal 		= wNormal;
 	OUT.tangent = wTangent;
 	OUT.binormal = cross(wTangent, wNormal) * tangent.w;
