@@ -123,6 +123,7 @@ namespace NCL {
 			Texture* mFloorNormal;
 
 			//icons
+			UI* mUi;
 			Texture* mInventorySlotTex;
 
 			Texture* mHighlightAwardTex;
