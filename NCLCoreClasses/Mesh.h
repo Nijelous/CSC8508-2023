@@ -57,17 +57,22 @@ namespace NCL::Rendering {
 			std::string("Joint Indices")
 		};
 	};
-
+	
 	struct SubMesh {
 		int start = 0;
 		int count = 0;
-		int base  = 0;
+		int base = 0;
 	};
 
 	class Mesh	{
 	public:		
 		virtual ~Mesh();
+		
 
+		struct SubMeshPoses { //New!
+			int start;
+			int count;
+		};
 		GeometryPrimitive::Type GetPrimitiveType() const {
 			return primType;
 		}
@@ -135,6 +140,10 @@ namespace NCL::Rendering {
 			}
 			return &subMeshes[i];
 		}
+		const int* GetBindPoseIndices() const {
+			return mBindPoseIndices.data();
+		}
+		
 
 		void AddSubMesh(int startIndex, int indexCount, int baseVertex, const std::string& newName = "") {
 			SubMesh m;
@@ -198,6 +207,15 @@ namespace NCL::Rendering {
 
 		virtual void UploadToGPU(Rendering::RendererBase* renderer = nullptr) = 0;
 
+
+		void SetBindPoseIndices(const std::vector<int>& newIndices); //new
+		void SetBindPoseStates(std::vector<SubMeshPoses>& newState); //new
+
+		const int* GetBindPoseIndices()  {			
+			return mBindPoseIndices.data();
+		}
+		bool GetBindPoseState(int subMesh, SubMeshPoses& pose) const; //New!
+
 		uint32_t GetAssetID() const {
 			return assetID;
 		}
@@ -230,6 +248,9 @@ namespace NCL::Rendering {
 		std::vector<int>			jointParents;
 		std::vector<Matrix4>		bindPose;
 		std::vector<Matrix4>		inverseBindPose;
+
+		std::vector<int>			mBindPoseIndices; //New!
+		std::vector<SubMeshPoses>	mBindPoseStates;  //New!
 	};
 
 	using UniqueMesh = std::unique_ptr<Mesh>;

@@ -96,18 +96,28 @@ LevelManager::~LevelManager() {
 	delete mSuspensionIndicatorTex;
 
 	delete mAnimationShader;
-	delete mSoldierAnimation;
-	delete mSoldierMaterial;
-	delete mSoldierMesh;
 	delete mGuardMaterial;
 	delete mGuardMesh;
-	delete mAnimation;
+
+	delete mPlayerMaterial;
+	delete mPlayerMesh;
+
+	delete mRigMaterial;
+	delete mRigMesh;
 
 	delete mGuardAnimationStand;
-	delete mGuardAnimationWalk;
 	delete mGuardAnimationSprint;
+	delete mGuardAnimationWalk;
 	delete mGuardAnimationHappy;
 	delete mGuardAnimationAngry;
+	
+	delete mPlayerAnimationStand;
+	delete mPlayerAnimationSprint;
+	delete mPlayerAnimationWalk;
+	
+	delete mRigAnimationStand;
+	delete mRigAnimationSprint;
+	delete mRigAnimationWalk;
 }
 
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
@@ -169,7 +179,7 @@ void LevelManager::Update(float dt, bool isUpdatingObjects) {
 	mWorld->UpdateWorld(dt);
 	mRenderer->Update(dt);
 	mPhysics->Update(dt);
-	mAnimation->Update(dt, preAnimationList);
+	mAnimation->Update(dt, mUpdatableObjects, preAnimationList);
 	mRenderer->Render();
 	Debug::UpdateRenderables(dt);
 }
@@ -193,8 +203,15 @@ void LevelManager::InitialiseAssets() {
 	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
 
 
+
 	mGuardMesh = mRenderer->LoadMesh("MaleGuard/Male_Guard.msh");	
 	mGuardMaterial = mRenderer->LoadMaterial("MaleGuard/Male_Guard.mat");
+
+	mPlayerMesh = mRenderer->LoadMesh("FemaleGuard/Female_Guard.msh");
+	mPlayerMaterial = mRenderer->LoadMaterial("FemaleGuard/Female_Guard.mat");
+	
+	mRigMesh = mRenderer->LoadMesh("Max/Rig_Maximilian.msh");
+	mRigMaterial = mRenderer->LoadMaterial("Max/Rig_Maximilian.mat");
 	//Animations
 	mGuardAnimationStand = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
 	mGuardAnimationWalk = mRenderer->LoadAnimation("MaleGuard/StepForwardOneHand.anm");
@@ -202,21 +219,29 @@ void LevelManager::InitialiseAssets() {
 	mGuardAnimationHappy = mRenderer->LoadAnimation("MaleGuard/Happy.anm");
 	mGuardAnimationAngry = mRenderer->LoadAnimation("MaleGuard/Angry.anm");
 
-	
-	preAnimationList.insert(std::make_pair("Stand", mGuardAnimationStand));
-	preAnimationList.insert(std::make_pair("Walk", mGuardAnimationWalk));
-	preAnimationList.insert(std::make_pair("Sprint", mGuardAnimationSprint));
-	preAnimationList.insert(std::make_pair("Happy", mGuardAnimationHappy));
-	preAnimationList.insert(std::make_pair("Angry", mGuardAnimationAngry));
-	
+	mPlayerAnimationStand = mRenderer->LoadAnimation("FemaleGuard/Idle1.anm");
+	mPlayerAnimationWalk = mRenderer->LoadAnimation("FemaleGuard/StepForwardOneHand.anm");
+	mPlayerAnimationSprint = mRenderer->LoadAnimation("FemaleGuard/StepForward.anm");
+
+	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
+	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
+	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Run.anm");
 
 
+	
+	preAnimationList.insert(std::make_pair("GStand", mGuardAnimationStand));
+	preAnimationList.insert(std::make_pair("GWalk", mGuardAnimationWalk));
+	preAnimationList.insert(std::make_pair("GSprint", mGuardAnimationSprint));
+	preAnimationList.insert(std::make_pair("GHappy", mGuardAnimationHappy));
+	preAnimationList.insert(std::make_pair("GAngry", mGuardAnimationAngry));
+
+	preAnimationList.insert(std::make_pair("PStand", mPlayerAnimationStand));
+	preAnimationList.insert(std::make_pair("PWalk", mPlayerAnimationWalk));
+	preAnimationList.insert(std::make_pair("PSprint", mPlayerAnimationSprint));
+
 
 	
-	mSoldierMesh = mRenderer->LoadMesh("Role_T.msh");
-	mSoldierAnimation = mRenderer->LoadAnimation("Role_T.anm");
-	mSoldierMaterial = mRenderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = mRenderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+	
 
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
@@ -496,9 +521,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, PLAYER_MESH_SIZE));
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
-
+	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationHappy, mGuardMaterial));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -533,9 +558,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(nodes[currentNode]);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
-	guard->SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
+	guard->SetAnimationObject(new AnimationObject(mRigAnimationWalk, mRigMaterial));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);

@@ -18,7 +18,7 @@ AnimationObject::~AnimationObject() {
 }
 
 void AnimationObject::Update(float dt){
-	mFrameTime -= 2*dt;
+	mFrameTime -= dt;
 
 	while (mFrameTime < 0.0f) {
 		mCurrentFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();

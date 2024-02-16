@@ -19,13 +19,11 @@ namespace NCL {
 
 			void Clear();
 
-			void Update(float dt, std::map<std::string, MeshAnimation*> preAnimationList);
+			void Update(float dt, vector<GameObject*> mUpdatableObjects , std::map<std::string, MeshAnimation*> preAnimationList);
 
-			void UpdateAllAnimationObjects(float dt);
+			void UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects);
 
 			void UpdateCurrentFrames(float dt);
-
-			void UpdateMaterials();
 
 			void UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList);
 

@@ -122,12 +122,15 @@ namespace NCL {
 			Shader* mSoldierShader;
 
 			// animation 
-			Mesh* mSoldierMesh;
-			MeshAnimation* mSoldierAnimation;
-			MeshMaterial* mSoldierMaterial;
 			Mesh* mGuardMesh;
+			Mesh* mPlayerMesh;
+			Mesh* mRigMesh;
+			MeshMaterial* mRigMaterial;
 			MeshMaterial* mGuardMaterial;
+			MeshMaterial* mPlayerMaterial;
+
 			Shader* mAnimationShader;
+			Shader* mAnimationShader2;
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> preAnimationList;
@@ -136,6 +139,15 @@ namespace NCL {
 			MeshAnimation* mGuardAnimationWalk;
 			MeshAnimation* mGuardAnimationHappy;
 			MeshAnimation* mGuardAnimationAngry;
+
+			MeshAnimation* mPlayerAnimationStand;
+			MeshAnimation* mPlayerAnimationSprint;
+			MeshAnimation* mPlayerAnimationWalk;
+
+			MeshAnimation* mRigAnimationStand;
+			MeshAnimation* mRigAnimationSprint;
+			MeshAnimation* mRigAnimationWalk;
+			
 			
 
 			Helipad* mHelipad;
