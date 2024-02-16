@@ -9,7 +9,7 @@
 using namespace NCL;
 using namespace CSC8503;
 
-FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth) {
+FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, int pointsWorth, std::map<GameObject*, int>* playerObjectToPlayerNoMap) {
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);

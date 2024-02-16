@@ -295,7 +295,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
-			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 	}
 }
