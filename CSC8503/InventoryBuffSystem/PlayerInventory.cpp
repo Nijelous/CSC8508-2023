@@ -30,7 +30,7 @@ void PlayerInventory::AddItemToPlayer(item inItem, int playerNo){
 		if (mPlayerInventory[playerNo][invSlot] == none)
 		{
 			mPlayerInventory[playerNo][invSlot] = inItem;
-
+			mItemInventory[invSlot] = inItem;
 			if (mOnItemAddedInventoryEventMap.find(inItem) != mOnItemAddedInventoryEventMap.end())
 			{
 				Notify(mOnItemAddedInventoryEventMap[inItem], playerNo);
@@ -83,6 +83,10 @@ bool PlayerInventory::ItemInPlayerInventory(item inItem, int playerNo){
 	}
 
 	return false;
+}
+
+map<int, PlayerInventory::item> PlayerInventory::GetInventorySlotItem() {
+	return mItemInventory;
 }
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer){

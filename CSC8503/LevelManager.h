@@ -62,6 +62,8 @@ namespace NCL {
 
 			void InitialiseIcons();
 
+			void UpdateIcons();
+
 			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);

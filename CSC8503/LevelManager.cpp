@@ -323,6 +323,14 @@ void LevelManager::InitialiseIcons() {
 	mRenderer->SetUIObject(mUi);
 }
 
+void LevelManager::UpdateIcons() {
+	vector<UI::Icon> icons = mUi->GetIcons();
+	int item = 2;
+	if (item == 0) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetInventorySlotItem();
+	}
+}
+
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 	GameObject* wall = new GameObject(StaticObj, "Wall");
 

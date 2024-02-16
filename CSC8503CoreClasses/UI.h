@@ -31,6 +31,7 @@ namespace NCL {
 
 			void BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
 	
+			
 			std::vector<UI::Icon> icons;
 		protected:
 			Vector2 mPos;
