@@ -4,14 +4,14 @@ using namespace NCL::CSC8503;
 
 void Door::Open()
 {
-	if (IsActive)
+	if (!this->IsActive())
 		SetActive();
 	mIsOpen = true;
 }
 
 void Door::Close()
 {
-	if (IsActive)
+	if (this->IsActive())
 		SetActive();
 	mIsOpen = false;
 }

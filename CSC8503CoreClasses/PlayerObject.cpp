@@ -76,7 +76,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	if (mPlayerNo != playerNo)
 		return;
 
-	switch (buffEvent){
+	switch (buffEvent) {
 	case slowApplied:
 		ChangeToSlowedSpeeds();
 		break;
@@ -84,6 +84,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		ChangeToDefaultSpeeds();
 		break;
 	default:
+		break;
 	}
 }
 
@@ -124,7 +125,7 @@ void PlayerObject::MovePlayer(float dt) {
 
 	StopSliding();
 
-	if (isIdle)
+	if (isIdle && mSuspicionSystemClassPtr!=nullptr)
 	{
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
@@ -180,13 +181,15 @@ void PlayerObject::ToggleCrouch(bool isCrouching) {
 	{
 		//Crouch -> Walk
 		StartWalking();
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+		if(mSuspicionSystemClassPtr != nullptr)
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 	else if (isCrouching && mPlayerState == Walk)
 	{
 		//Walk -> Crouch
-		StartCrouching();
+		StartCrouching(); 
+		if (mSuspicionSystemClassPtr != nullptr)
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
@@ -196,6 +199,7 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 	if (isSprinting) {
 		//Sprint->Sprint 
 		StartSprinting();
+		if (mSuspicionSystemClassPtr != nullptr)
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
@@ -203,10 +207,13 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 	{
 		//Sprint->Walk
 		StartWalking();
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+		if (mSuspicionSystemClassPtr != nullptr)
+		{
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+		}
 	}
 	else if (mIsCrouched)
 	{

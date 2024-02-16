@@ -35,7 +35,7 @@ namespace NCL {
 			int mCrouchSpeed;
 			int mActiveItemSlot;
 
-			int mPlayerID;
+			int mPlayerNo;
 
 			PlayerState mPlayerState;
 
@@ -68,6 +68,8 @@ namespace NCL {
 			void	ChangeCharacterSize(float newSize);
 
 			void	EnforceMaxSpeeds();
+			void	ChangeToSlowedSpeeds();
+			void	ChangeToDefaultSpeeds();
 		private:
 		};
 	}
