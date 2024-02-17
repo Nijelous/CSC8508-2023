@@ -232,6 +232,8 @@ void LevelManager::InitialiseAssets() {
 	mStunTex = mRenderer->LoadTexture("Stun.png");
 	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
 
+	itemTest = mRenderer->LoadTexture("Default.png");
+
 	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionPointer.png");
 }
@@ -305,9 +307,9 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(42, 91), 5, 9, mInventorySlotTex);
 
-	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(48, 91), 5, 9, mInventorySlotTex);
 
 	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
 	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
@@ -317,18 +319,39 @@ void LevelManager::InitialiseIcons() {
 	UI::Icon mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
 	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
 
-	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
 	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
 
 	mRenderer->SetUIObject(mUi);
 }
 
-void LevelManager::UpdateIcons() {
+void LevelManager::UpdateItemIcons() {
+	Vector2 slot1 = Vector2(42.5, 91.5);
+	Vector2 slot2 = Vector2(48.5, 91.5);
+	vector<Vector2> slotsPos;
+	slotsPos.resize(2);
+	slotsPos.emplace_back(slot1);
+	slotsPos.emplace_back(slot2);
+	pair<bool, UI::Icon> hasIconInPosition;
 	vector<UI::Icon> icons = mUi->GetIcons();
-	int item = 2;
-	if (item == 0) {
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetInventorySlotItem();
+	map<int, PlayerInventory::item> itemInventory = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetInventorySlotItem();
+	for (int i = 0; i < 2; i++) {
+		switch (itemInventory[i]) {
+		case 0 :
+			hasIconInPosition = mUi->HaveIcon(slotsPos[i]);
+			if (hasIconInPosition.first) {
+				mUi->DeleteIcon(hasIconInPosition.second);
+			}
+			break;
+
+		case 1:
+			mUi->AddIcon(Vector2(42.5, 91.5), 4.5, 8.6, itemTest);
+		}
 	}
+}
+
+void LevelManager::UpdateSuspicionIndicatorPos() {
+	
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {

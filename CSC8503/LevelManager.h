@@ -62,7 +62,9 @@ namespace NCL {
 
 			void InitialiseIcons();
 
-			void UpdateIcons();
+			void UpdateItemIcons();
+
+			void UpdateSuspicionIndicatorPos();
 
 			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
 
@@ -123,10 +125,10 @@ namespace NCL {
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
 
-			//icons
 			UI* mUi;
 			Texture* mInventorySlotTex;
 
+			//powerup
 			Texture* mHighlightAwardTex;
 			Texture* mLightOffTex;
 			Texture* mMakingNoiseTex;
@@ -135,8 +137,13 @@ namespace NCL {
 			Texture* mStunTex;
 			Texture* mSwapPositionTex;
 
+			//items
+			Texture* itemTest;
+
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
+
+			UI::Icon mSuspensionBarIcon;
 
 			// shaders
 			Shader* mBasicShader;

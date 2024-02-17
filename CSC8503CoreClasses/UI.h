@@ -29,12 +29,13 @@ namespace NCL {
 
 			void DeleteIcon(Icon icon);
 
+			std::pair<bool, Icon> HaveIcon(Vector2 iconPosition);
+
 			void BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
 	
 			
 			std::vector<UI::Icon> icons;
 		protected:
-			Vector2 mPos;
 			Icon mIcon;
 		};
 	}
