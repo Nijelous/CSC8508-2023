@@ -5,12 +5,13 @@
 #include "SceneManager.h"
 #include "MainMenuScene.h"
 
-void NCL::CSC8503::MainMenuSceneState::OnAwake(){	
+using namespace NCL::CSC8503;
+
+void MainMenuSceneState::OnAwake() {	
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
 }
 
-NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::MainMenuSceneState::OnUpdate(float dt, PushdownState** newState)
-{
+PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
@@ -33,9 +34,7 @@ NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::MainMenuSceneState::On
 	return PushdownResult::NoChange;
 }
 
-
-NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::SingleplayerState::OnUpdate(float dt, PushdownState** newState)
-{
+PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
@@ -43,12 +42,12 @@ NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::SingleplayerState::OnU
 	return PushdownResult::NoChange;
 }
 
-void NCL::CSC8503::SingleplayerState::OnAwake() {
+void SingleplayerState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Singleplayer);
 	auto* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
 }
 
-NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::ServerState::OnUpdate(float dt, PushdownState** newState) {
+PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
@@ -56,13 +55,13 @@ NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::ServerState::OnUpdate(
 	return PushdownResult::NoChange;
 }
 
-void NCL::CSC8503::ServerState::OnAwake(){
+void ServerState::OnAwake(){
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	auto* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 	server->StartAsServer();
 }
 
-NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::ClientState::OnUpdate(float dt, PushdownState** newState) {
+PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
@@ -70,8 +69,7 @@ NCL::CSC8503::PushdownState::PushdownResult NCL::CSC8503::ClientState::OnUpdate(
 	return PushdownResult::NoChange;
 }
 
-void NCL::CSC8503::ClientState::OnAwake()
-{
+void ClientState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	auto* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 	client->StartAsClient(127, 0, 0, 1);

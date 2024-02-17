@@ -101,7 +101,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
             Debug::Print("CLIENT", Vector2(5, 10), Debug::MAGENTA);
         }
         
-        mLevelManager->Update(dt, mGameState == LevelState);
+        mLevelManager->Update(dt, mGameState == InitialisingLevelState, false);
     }
     else{
         if (mThisServer){
@@ -130,7 +130,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
-        mGameState = GameStates::LevelState;
+        mGameState = GameStates::InitialisingLevelState;
         StartLevel();
     }
 }

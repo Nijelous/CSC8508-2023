@@ -100,6 +100,7 @@ set(Level_Objects
     "Helipad.cpp"
     "Vent.h"
     "Vent.cpp"
+    "Interactable.h"
 )
 source_group("Level\\Level Objects" FILES ${Level_Objects})
 

@@ -12,7 +12,7 @@ using namespace NCL::Rendering;
 using namespace NCL::Maths;
 
 OGLMesh::OGLMesh() {
-	vao			= 0;
+	vao = 0;
 
 	for (int i = 0; i < VertexAttribute::MAX_ATTRIBUTES; ++i) {
 		attributeBuffers[i] = 0;
@@ -20,7 +20,7 @@ OGLMesh::OGLMesh() {
 	indexBuffer = 0;
 }
 
-OGLMesh::~OGLMesh()	{
+OGLMesh::~OGLMesh() {
 	glDeleteVertexArrays(1, &vao);			//Delete our VAO
 	glDeleteBuffers(VertexAttribute::MAX_ATTRIBUTES, attributeBuffers);	//Delete our VBOs
 	glDeleteBuffers(1, &indexBuffer);	//Delete our indices
@@ -40,6 +40,28 @@ void OGLMesh::BindVertexAttribute(int attribSlot, int buffer, int bindingID, int
 	glBindVertexBuffer(bindingID, buffer, elementOffset, elementSize);
 }
 
+void OGLMesh::SetInstanceMatrices(const std::vector<Matrix4>& mat) {
+	mInstanceMatricesCount = mat.size();
+	glBindVertexArray(vao);
+	CreateVertexBuffer(attributeBuffers[VertexAttribute::InstanceMatrices], mat.size() * sizeof(Matrix4), (char*)&mat[0]);
+	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices);
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)0);
+	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 1);
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 1, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)sizeof(Vector4));
+	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 2);
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 2, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(2 * sizeof(Vector4)));
+	glEnableVertexAttribArray(VertexAttribute::InstanceMatrices + 3);
+	glVertexAttribPointer(VertexAttribute::InstanceMatrices + 3, 4, GL_FLOAT, GL_FALSE, sizeof(Matrix4), (void*)(3 * sizeof(Vector4)));
+
+	glVertexAttribDivisor(VertexAttribute::InstanceMatrices, 1);
+	glVertexAttribDivisor(VertexAttribute::InstanceMatrices + 1, 1);
+	glVertexAttribDivisor(VertexAttribute::InstanceMatrices + 2, 1);
+	glVertexAttribDivisor(VertexAttribute::InstanceMatrices + 3, 1);
+
+	glBindVertexArray(0);
+}
+
+
 void OGLMesh::UploadToGPU(Rendering::RendererBase* renderer) {
 	if (!ValidateMeshData()) {
 		return;
@@ -48,7 +70,7 @@ void OGLMesh::UploadToGPU(Rendering::RendererBase* renderer) {
 	glBindVertexArray(vao);
 
 	int numVertices = GetVertexCount();
-	int numIndices	= GetIndexCount();
+	int numIndices = GetIndexCount();
 
 	if (!GetPositionData().empty()) {
 		CreateVertexBuffer(attributeBuffers[VertexAttribute::Positions], numVertices * sizeof(Vector3), (char*)GetPositionData().data());
@@ -140,9 +162,9 @@ void OGLMesh::RecalculateNormals() {
 		}
 
 		for (size_t i = 0; i < indices.size(); i += 3) {
-			Vector3& a = positions[indices[i+0]];
-			Vector3& b = positions[indices[i+1]];
-			Vector3& c = positions[indices[i+2]];
+			Vector3& a = positions[indices[i + 0]];
+			Vector3& b = positions[indices[i + 1]];
+			Vector3& c = positions[indices[i + 2]];
 
 			Vector3 normal = Vector3::Cross(b - a, c - a);
 			normal.Normalise();

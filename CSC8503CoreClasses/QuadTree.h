@@ -35,17 +35,19 @@ namespace NCL {
 				children = nullptr;
 				this->position = pos;
 				this->size = size;
+				isStatic = true;
 			}
 
 			~QuadTreeNode() {
 				delete[] children;
 			}
 
-			void Insert(T& object, const Vector3& objectPos, const Vector3& objectSize, int depthLeft, int maxSize) {
+			void Insert(T& object, const Vector3& objectPos, const Vector3& objectSize, int depthLeft, int maxSize, bool addingStatic) {
 				if (!CollisionDetection::AABBTest(objectPos, Vector3(position.x, 0, position.y), objectSize, Vector3(size.x, 1000.0f, size.y))) return;
+				if (!addingStatic) isStatic = false;
 				if (children) {
 					for (int i = 0; i < 4; i++) {
-						children[i].Insert(object, objectPos, objectSize, depthLeft - 1, maxSize);
+						children[i].Insert(object, objectPos, objectSize, depthLeft - 1, maxSize, addingStatic);
 					}
 				}
 				else {
@@ -56,7 +58,7 @@ namespace NCL {
 							for (const auto& i : contents) {
 								for (int j = 0; j < 4; j++) {
 									auto entry = i;
-									children[j].Insert(entry.object, entry.pos, entry.size, depthLeft - 1, maxSize);
+									children[j].Insert(entry.object, entry.pos, entry.size, depthLeft - 1, maxSize, addingStatic);
 								}
 							}
 							contents.clear();
@@ -77,8 +79,18 @@ namespace NCL {
 			void DebugDraw() {
 			}
 
+			void CopyNode(QuadTreeNode<T>* node) {
+				this->contents = node->contents;
+				if (node->children) {
+					Split();
+					for (int i = 0; i < 4; i++) {
+						this->children[i].CopyNode(&(node->children[i]));
+					}
+				}
+			}
+
 			void OperateOnContents(QuadTreeFunc& func) {
-				if (children) {
+				if (children && !isStatic) {
 					for (int i = 0; i < 4; i++) {
 						children[i].OperateOnContents(func);
 					}
@@ -96,6 +108,8 @@ namespace NCL {
 			Vector2 position;
 			Vector2 size;
 
+			bool isStatic;
+
 			QuadTreeNode<T>* children;
 		};
 	}
@@ -108,6 +122,7 @@ namespace NCL {
 		template<class T>
 		class QuadTree {
 		public:
+			QuadTree() {}
 			QuadTree(Vector2 size, int maxDepth = 6, int maxSize = 5) {
 				root = QuadTreeNode<T>(Vector2(), size);
 				this->maxDepth = maxDepth;
@@ -116,8 +131,8 @@ namespace NCL {
 			~QuadTree() {
 			}
 
-			void Insert(T object, const Vector3& pos, const Vector3& size) {
-				root.Insert(object, pos, size, maxDepth, maxSize);
+			void Insert(T object, const Vector3& pos, const Vector3& size, bool addingStatic) {
+				root.Insert(object, pos, size, maxDepth, maxSize, addingStatic);
 			}
 
 			void DebugDraw() {
@@ -126,6 +141,17 @@ namespace NCL {
 
 			void OperateOnContents(typename QuadTreeNode<T>::QuadTreeFunc  func) {
 				root.OperateOnContents(func);
+			}
+
+			void CopyTree(QuadTree<T>* baseTree, Vector2 size) {
+				root = QuadTreeNode<T>(Vector2(), size);
+				root.CopyNode(&baseTree->root);
+				this->maxDepth = baseTree->maxDepth;
+				this->maxSize = baseTree->maxSize;
+			}
+
+			bool Empty() {
+				return !root.children && root.contents.empty();
 			}
 
 		protected:

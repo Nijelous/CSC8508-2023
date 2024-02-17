@@ -138,7 +138,7 @@ void OGLRenderer::DrawBoundMesh(uint32_t subLayer, uint32_t numInstances) {
 
 	if (numInstances > 1) {
 		if (boundMesh->GetIndexCount() > 0) {
-			glDrawElementsInstanced(mode, count, GL_UNSIGNED_INT, (const GLvoid*)(offset * sizeof(unsigned int)), numInstances);
+			glDrawElementsInstanced(mode, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(unsigned int)), numInstances);
 		}
 		else {
 			glDrawArraysInstanced(mode, 0, count, numInstances);

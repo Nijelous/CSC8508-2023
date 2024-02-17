@@ -16,9 +16,11 @@ namespace NCL {
 
 		enum GameStates {
 			MainMenuState,
-			LevelState,
+			InitialisingLevelState,
+			PlayingLevelState,
 			VictoryScreenState,
-			DefeatScreenState
+			DefeatScreenState,
+			PauseScreenState
 		};
 
 		class GameSceneManager : public Scene{
@@ -26,12 +28,16 @@ namespace NCL {
 			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
 
+			GameSceneManager GetGameSceneManager();
+
 			virtual void UpdateGame(float dt);
 
 			void SetMainMenu() { mGameState = MainMenuState; }
-			void SetLevel() { mGameState = LevelState; }
+			void SetInitLevel() { mGameState = InitialisingLevelState; }
+			void SetLevel() { mGameState = PlayingLevelState; }
 			void SetVictory() { mGameState = VictoryScreenState; }
 			void SetDefeat() { mGameState = DefeatScreenState; }
+			void SetPause() { mGameState = PauseScreenState; }
 
 			// to be repalced by actual game logic
 			bool PlayerWonGame();
@@ -56,7 +62,7 @@ namespace NCL {
 			PushdownMachine* mPushdownMachine;
 
 		private:
-			
+			static GameSceneManager* instance;
 		};
 	}
 }

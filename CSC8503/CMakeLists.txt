@@ -12,11 +12,12 @@ set(Header_Files
     "TutorialGame.h"
     "DebugNetworkedGame.h"
     "GameSceneManager.h"
-    "PushdownStates.h"
+    "SinglePlayerStates.h"
     "Scene.h"
     "SceneManager.h"
     "SceneStates.h"
     "MainMenuScene.h"
+    "SoundManager.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -59,10 +60,12 @@ set(Source_Files
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
     "GameSceneManager.cpp"
+    "SinglePlayerStates.cpp"
     "Scene.cpp"
     "SceneManager.cpp"
     "SceneStates.cpp"
     "MainMenuScene.cpp"
+    "SoundManager.cpp"
 )
 
 if(USE_VULKAN)
