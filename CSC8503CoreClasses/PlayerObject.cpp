@@ -144,7 +144,8 @@ void PlayerObject::MovePlayer(float dt) {
 }
 
 void PlayerObject::RayCastFromPlayer(GameWorld* world){
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::E)) {
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::E) ||
+		Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
 		std::cout << "Ray fired" << std::endl;
 		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
 		RayCollision closestCollision;
@@ -179,6 +180,11 @@ void PlayerObject::InteractWithInteractable(Interactable* interactable)
 		interactable->Interact(InteractType::Use);
 	else
 		interactable->Interact(InteractType::LongUse);
+
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
+		interactable->GetRelatedItem() ==
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerNo))
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot, mPlayerNo);
 };
 
 void PlayerObject::ControlInventory(){
