@@ -24,6 +24,8 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
+			PlayerInventory::item GetEquippedItem();
+
 		protected:
 			bool mIsCrouched;
 
