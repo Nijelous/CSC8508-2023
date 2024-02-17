@@ -10,7 +10,9 @@ namespace NCL {
             void ConnectVent(Vent* vent);
             bool IsOpen() { return mIsOpen; }
             void ToggleOpen() { mIsOpen = !mIsOpen; }
-            void Interact() override;
+            void HandleItemUse();
+            void HandlePlayerUse();
+            void Interact(NCL::CSC8503::InteractType interactType) override;
         protected:
             bool mIsOpen;
             Vent* mConnectedVent;
