@@ -23,6 +23,8 @@
 
 using namespace NCL::CSC8503;
 
+LevelManager* LevelManager::instance = nullptr;
+
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
@@ -114,6 +116,13 @@ void LevelManager::ClearLevel() {
 	mPhysics->Clear();
 	mLevelMatrices.clear();
 	mRenderer->SetWallFloorObject(nullptr);
+}
+
+LevelManager* LevelManager::GetLevelManager() {
+	if (instance == nullptr) {
+		instance = new LevelManager();
+	}
+	return instance;
 }
 
 void LevelManager::ResetLevel() {
