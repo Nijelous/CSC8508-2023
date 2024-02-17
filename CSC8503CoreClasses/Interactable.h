@@ -2,9 +2,15 @@
 
 namespace NCL {
 	namespace CSC8503 {
+
+		enum InteractType {
+			Use,
+			ItemUse
+		};
+
 		class Interactable{
 		public:
-			virtual void Interact() { 
+			virtual void Interact(InteractType interactType) { 
 				if (!CanBeInteractedWith())
 					return; 
 			};
