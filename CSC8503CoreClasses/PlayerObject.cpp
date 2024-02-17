@@ -32,6 +32,8 @@ namespace {
 
 	constexpr float WALK_ACCELERATING_SPEED = 1000.0f;
 	constexpr float SPRINT_ACCELERATING_SPEED = 2000.0f;
+
+	constexpr float TIME_UNTIL_LONG_INTERACT = 5.0f;
 }
 
 PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
@@ -52,6 +54,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 
 	mPlayerNo = playerID;
 	mIsPlayer = true;
+	mInteractHeldDt = 0;
 }
 
 PlayerObject::~PlayerObject() {
@@ -71,6 +74,11 @@ void PlayerObject::UpdateObject(float dt) {
 	MatchCameraRotation(yawValue);
 
 	EnforceMaxSpeeds();
+
+	if (Window::GetKeyboard()->KeyHeld(KeyCodes::E))
+		mInteractHeldDt += dt;
+	else
+		mInteractHeldDt = 0;
 }
 
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
@@ -158,12 +166,21 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr)
 				{
-					interactablePtr->Interact();
+					InteractWithInteractable(interactablePtr);
 				}
 			}
 		}
 	}
 }
+
+void PlayerObject::InteractWithInteractable(Interactable* interactable)
+{
+	if (mInteractHeldDt < TIME_UNTIL_LONG_INTERACT)
+		interactable->Interact(InteractType::Use);
+	else
+		interactable->Interact(InteractType::LongUse);
+};
+
 void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;

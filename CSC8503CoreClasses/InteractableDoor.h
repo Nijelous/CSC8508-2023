@@ -8,16 +8,17 @@ namespace NCL {
 		public:
 			InteractableDoor(){
 				GameObject::mName = "InteractableDoor";
-				mIsOpen = false;
 				mIsLocked = false;
 			}
 
 			void Unlock();
 			void Lock();
-			void Interact() override;
-			bool CanBeInteractedWith() override;
+			void Interact(InteractType interactType) override;
+			bool CanBeInteractedWith(InteractType interactType) override;
+			virtual void InitStateMachuine();
 
 		protected:
+			const float initDoorTimer = 7.0f;
 			bool mIsLocked;
 		};
 	}

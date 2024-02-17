@@ -1,5 +1,8 @@
 #include "Door.h"
 #include "InteractableDoor.h"
+#include "StateMachine.h"
+#include "StateTransition.h"
+#include "State.h"
 
 using namespace NCL::CSC8503;
 
@@ -11,15 +14,110 @@ void InteractableDoor::Lock(){
 	mIsLocked = true;
 }
 
-void InteractableDoor::Interact()
+void InteractableDoor::Interact(InteractType interactType)
 {
-	if (!CanBeInteractedWith())
+	if (!CanBeInteractedWith(interactType))
 		return;
 
-	Open();
+	switch (interactType)
+	{
+	case Use:
+		if (mIsOpen)
+			Close();
+		else
+			Open();
+		break;
+	case Item:
+	case LongUse:
+		if (mIsLocked)
+			Unlock();
+		else
+			Lock();
+		break;
+	default:
+		break;
+	}
 }
 
-bool InteractableDoor::CanBeInteractedWith()
+bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 {
-	return (!mIsOpen && !mIsLocked);
+	switch (interactType)
+	{
+	case Use:
+		return !mIsLocked;
+		break;
+	case Item:
+	case LongUse:
+		return !mIsOpen;
+		break;
+	default:
+		return false;
+		break;
+	}
+}
+
+void InteractableDoor::InitStateMachuine()
+{
+	mStateMachine = new StateMachine();
+
+	State* DoorOpenAndUnlocked = new State([&](float dt) -> void
+		{
+			this->CountDownTimer(dt);
+
+			if (mTimer == 0)
+				Close();
+		}
+	);
+
+	State* DoorOpenAndLocked = new State([&](float dt) -> void
+		{
+
+		}
+	);
+
+	State* DoorClosedAndUnlocked = new State([&](float dt) -> void
+		{
+
+		}
+	);
+
+
+	State* DoorClosedAndLocked = new State([&](float dt) -> void
+		{
+
+		}
+	);
+
+	mStateMachine->AddState(DoorOpenAndUnlocked);
+	mStateMachine->AddState(DoorOpenAndLocked);
+	mStateMachine->AddState(DoorClosedAndUnlocked);
+	mStateMachine->AddState(DoorClosedAndLocked);
+
+	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorClosedAndUnlocked,
+		[&]() -> bool
+		{
+			return !mIsOpen;
+		}
+	));
+
+	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorOpenAndLocked,
+		[&]() -> bool
+		{
+			return mIsLocked;
+		}
+	));
+
+	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorOpenAndUnlocked,
+		[&]() -> bool
+		{
+			return !mIsOpen;
+		}
+	));
+
+	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorClosedAndLocked,
+		[&]() -> bool
+		{
+			return mIsLocked;
+		}
+	));
 }

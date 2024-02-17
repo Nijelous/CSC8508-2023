@@ -8,7 +8,7 @@ namespace NCL {
 		typedef std::multimap<State*, StateTransition*> TransitionContainer;
 		typedef TransitionContainer::iterator TransitionIterator;
 
-		class StateMachine	{
+		class StateMachine {
 		public:
 			StateMachine();
 			virtual ~StateMachine(); //made it virtual!
@@ -18,6 +18,7 @@ namespace NCL {
 
 			virtual void Update(float dt); //made it virtual!
 
+			State* GetActiveState() { return activeState; };
 		protected:
 			State * activeState;
 
