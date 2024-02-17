@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed
+		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed
 	};
 
 	class PlayerInventoryObserver
@@ -31,7 +31,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			none, disguise, soundEmitter, flag
+			none, disguise, soundEmitter, flag, doorKey
 		};
 
 		PlayerInventory()
@@ -52,6 +52,10 @@ namespace InventoryBuffSystem
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 		PlayerInventory::item GetItemInInventorySlot(int itemSlot, int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
+	
+		void SetPlayerAbleToUseItem(item inItem, int playerNo, bool isAbleToUseKey) {
+			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
+		};
 	private:
 
 		std::vector<item> mItemsInRandomPool =
@@ -71,13 +75,14 @@ namespace InventoryBuffSystem
 
 		std::map<item, InventoryEvent > mOnItemUsedInventoryEventMap =
 		{
-			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}
+			{disguise, disguiseItemUsed}, {soundEmitter, soundEmitterUsed}, {doorKey,doorKeyUsed}
 		};
 		
 		std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
+		std::map < item ,bool[NCL::CSC8503::MAX_PLAYERS]> PlayerAbleToUseItem;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};
 

@@ -20,6 +20,7 @@ void PlayerInventory::Init(){
 			{disguise,[](int playerno) { return true; }},
 			{soundEmitter,[](int playerno) { return true; }},
 			{flag ,[](int playerno) { return false; }},
+			{doorKey ,[this](int playerno) { return PlayerAbleToUseItem[doorKey][playerno]; }},
 		}
 	};
 }

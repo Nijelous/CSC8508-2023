@@ -181,10 +181,15 @@ void PlayerObject::InteractWithInteractable(Interactable* interactable)
 	else
 		interactable->Interact(InteractType::LongUse);
 
+	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
+
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
-		interactable->GetRelatedItem() ==
+		*interactableRelatedItem ==
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerNo))
+	{
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->SetPlayerAbleToUseItem(*interactableRelatedItem,mPlayerNo,true);
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot, mPlayerNo);
+	}
 };
 
 void PlayerObject::ControlInventory(){
