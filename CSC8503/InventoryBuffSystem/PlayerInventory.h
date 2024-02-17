@@ -51,7 +51,7 @@ namespace InventoryBuffSystem
 		void Notify(InventoryEvent invEvent,int playerNo);
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
-
+		PlayerInventory::item GetItemInInventorySlot(int itemSlot, int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
 	private:
 
 		std::vector<item> mItemsInRandomPool =

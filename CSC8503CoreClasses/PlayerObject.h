@@ -7,7 +7,7 @@
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
-
+		class Interactable;
 
 		enum PlayerState {
 			//idle,
@@ -36,6 +36,7 @@ namespace NCL {
 			int mActiveItemSlot;
 
 			int mPlayerNo;
+			float mInteractHeldDt;
 
 			PlayerState mPlayerState;
 
@@ -70,6 +71,7 @@ namespace NCL {
 			void	EnforceMaxSpeeds();
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
+			void	InteractWithInteractable(Interactable* interactable);
 		private:
 		};
 	}
