@@ -4,6 +4,10 @@
 
 using namespace NCL::CSC8503;
 
+namespace {
+	constexpr int VENT_TP_X_OFFSET = 5;
+}
+
 Vent::Vent() {
 	mIsOpen = false;
 	mConnectedVent = nullptr;
@@ -36,7 +40,7 @@ void NCL::CSC8503::Vent::HandlePlayerUse() {
 		const Vector3& playerPos = localPlayer->GetTransform().GetPosition();
 
 		const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
-		const Vector3 newPlayerPos = Vector3(teleportPos.x + 5, playerPos.y, teleportPos.z);
+		const Vector3 newPlayerPos = Vector3(teleportPos.x + VENT_TP_X_OFFSET, playerPos.y, teleportPos.z);
 
 		playerTransform.SetPosition(newPlayerPos);
 		mIsOpen = false;
