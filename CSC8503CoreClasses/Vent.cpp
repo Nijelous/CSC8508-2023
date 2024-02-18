@@ -49,8 +49,7 @@ void NCL::CSC8503::Vent::HandlePlayerUse() {
 
 void Vent::Interact(NCL::CSC8503::InteractType interactType) {
 
-	switch (interactType)
-	{
+	switch (interactType) {
 	case NCL::CSC8503::Use:
 		HandlePlayerUse();
 		break;

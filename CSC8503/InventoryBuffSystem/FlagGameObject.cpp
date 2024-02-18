@@ -21,29 +21,27 @@ FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClas
 FlagGameObject::~FlagGameObject() {
 }
 
-void FlagGameObject::GetFlag(int playerNo){
+void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 
 	this->SetActive();
 }
 
-void FlagGameObject::Reset(){
-	if(!this->IsActive())
+void FlagGameObject::Reset() {
+	if (!this->IsActive())
 		this->SetActive();
 }
 
 void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 {
-	if (this->IsActive())
-	{
+	if (this->IsActive()) {
 		GetFlag(playerId);
 	}
 }
 
 
-void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo){
-	switch (invEvent)
-	{
+void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+	switch (invEvent) {
 	case InventoryBuffSystem::flagDropped:
 		Reset();
 	default:
@@ -51,10 +49,8 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
-void FlagGameObject::OnCollisionBegin(GameObject* otherObject){
-	if (this->IsActive())
-	{
-		//GetFlag((*mPlayerObjectToPlayerNoMap)[otherObject]);
+void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
+	if (this->IsActive()) {
 		GetFlag(0);
 	}
 }
