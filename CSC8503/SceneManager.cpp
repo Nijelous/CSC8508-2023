@@ -4,19 +4,20 @@
 #include "MainMenuScene.h"
 #include "SceneStates.h"
 
-SceneManager* NCL::CSC8503::SceneManager::instance = nullptr;
+using namespace NCL::CSC8503;
 
-NCL::CSC8503::SceneManager::SceneManager() {
+SceneManager* SceneManager::instance = nullptr;
+
+SceneManager::SceneManager() {
 	currentScene = nullptr;
 	InitScenes();
 	InitPushdownMachine();
 }
 
-NCL::CSC8503::SceneManager::~SceneManager()
-{
+SceneManager::~SceneManager() {
 }
 
-void NCL::CSC8503::SceneManager::InitScenes(){
+void SceneManager::InitScenes() {
 	auto* singlePlayerScene = new GameSceneManager();
 	auto* mainMenuScene = new MainMenuScene();
 	auto* multiplayerScene = new DebugNetworkedGame();
@@ -29,37 +30,32 @@ void NCL::CSC8503::SceneManager::InitScenes(){
 	};
 }
 
-void NCL::CSC8503::SceneManager::InitPushdownMachine()
-{
+void SceneManager::InitPushdownMachine() {
 	pushdownMachine = new PushdownMachine(new MainMenuSceneState());
 }
 
-void NCL::CSC8503::SceneManager::SetCurrentScene(Scenes scene){
+void SceneManager::SetCurrentScene(Scenes scene) {
 	auto* nextScene = gameScenesMap[scene];
 	currentScene = nextScene;
 }
 
-bool NCL::CSC8503::SceneManager::GetIsForceQuit()
-{
+bool SceneManager::GetIsForceQuit() {
 	return isForceQuit;
 }
 
-void NCL::CSC8503::SceneManager::SetIsForceQuit(bool isForceQuit)
-{
+void SceneManager::SetIsForceQuit(bool isForceQuit) {
 	this->isForceQuit = isForceQuit;
 }
 
-NCL::CSC8503::PushdownMachine* NCL::CSC8503::SceneManager::GetScenePushdownMachine()
-{
+PushdownMachine* SceneManager::GetScenePushdownMachine() {
 	return pushdownMachine;
 }
 
-Scene* NCL::CSC8503::SceneManager::GetCurrentScene() {
+Scene* SceneManager::GetCurrentScene() {
 	return currentScene;
 }
 
-SceneManager* NCL::CSC8503::SceneManager::GetSceneManager()
-{
+SceneManager* SceneManager::GetSceneManager() {
 	if (instance == nullptr){
 		instance = new SceneManager();
 	}

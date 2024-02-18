@@ -30,8 +30,6 @@ using namespace CSC8503;
 #include <thread>
 #include <sstream>
 
-
-
 namespace{
     constexpr int SERVER_CHOICE = 1;
 }
@@ -94,12 +92,10 @@ int main(){
         w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
         //gm->UpdateGame(dt);
 
-        if (sceneManager->GetScenePushdownMachine() != nullptr)
-        {
+        if (sceneManager->GetScenePushdownMachine() != nullptr) {
             sceneManager->GetScenePushdownMachine()->Update(dt);
         }
-        if (sceneManager->GetCurrentScene() != nullptr)
-        {
+        if (sceneManager->GetCurrentScene() != nullptr) {
             sceneManager->GetCurrentScene()->UpdateGame(dt);
         }
     }
