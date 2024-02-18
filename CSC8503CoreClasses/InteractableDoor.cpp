@@ -56,7 +56,7 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 	}
 }
 
-void InteractableDoor::InitStateMachuine()
+void InteractableDoor::InitStateMachine()
 {
 	mStateMachine = new StateMachine();
 
