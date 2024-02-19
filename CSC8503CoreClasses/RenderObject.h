@@ -129,12 +129,12 @@ namespace NCL {
 				return mMatTextures;
 			}
 
-			void SetFrameMatrices(vector<Matrix4> frameMatrices) {
-				mFrameMatrices = frameMatrices;
+			void SetFrameMatricesVec(std::vector<std::vector<Matrix4>> frameMatrices) {
+				mFrameMatricesVec = frameMatrices;
 			}
 
-			vector<Matrix4>  GetFrameMatrices() const {
-				return mFrameMatrices;
+			std::vector<std::vector<Matrix4>>  GetFrameMatricesVec() const {
+				return mFrameMatricesVec;
 			}
 
 		protected:
@@ -153,7 +153,7 @@ namespace NCL {
 			bool mIsInstanced = false;
 
 			vector<GLuint>  mMatTextures;
-			vector<Matrix4> mFrameMatrices;
+			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 
 			int		mCurrentFrame;

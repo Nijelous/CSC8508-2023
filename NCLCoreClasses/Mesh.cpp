@@ -125,6 +125,27 @@ void Mesh::SetDebugName(const std::string& newName) {
 	debugName = newName;
 }
 
+void NCL::Rendering::Mesh::SetBindPoseIndices(const std::vector<int>& newIndices) //new
+{
+	mBindPoseIndices = newIndices;
+}
+
+void NCL::Rendering::Mesh::SetBindPoseStates(std::vector<SubMeshPoses>& newState)
+{
+	mBindPoseStates = newState;
+}
+
+
+
+bool NCL::Rendering::Mesh::GetBindPoseState(int subMesh, SubMeshPoses& pose) const //new
+{
+	if (subMesh < 0 || subMesh >= (int)mBindPoseStates.size()) {
+		return false;
+	}
+	pose = mBindPoseStates[subMesh];
+	return true;
+}
+
 void Mesh::SetJointNames(const std::vector < std::string >& newNames) {
 	jointNames = newNames;
 }
