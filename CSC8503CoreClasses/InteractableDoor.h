@@ -9,7 +9,7 @@ namespace NCL {
 			InteractableDoor(){
 				GameObject::mName = "InteractableDoor";
 				mIsLocked = false;
-				mRelatedItem = InventoryBuffSystem::PlayerInventory::doorKey;
+				//mRelatedItem = InventoryBuffSystem::PlayerInventory::doorKey;
 			}
 
 			void Unlock();

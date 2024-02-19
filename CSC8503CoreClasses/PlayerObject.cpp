@@ -106,7 +106,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 }
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
-	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetPlayerItem(mPlayerID, mActiveItemSlot);
+	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot,mPlayerNo);
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
@@ -191,7 +191,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 				//Check if object is an item.
 				Item* item = dynamic_cast<Item*>(objectHit);
 				if (item != nullptr) {
-					item->OnPlayerInteract(mPlayerID);
+					item->OnPlayerInteract(mPlayerNo);
 					return;
 				}
 
@@ -212,9 +212,9 @@ void PlayerObject::InteractWithInteractable(Interactable* interactable)
 		interactable->Interact(InteractType::Use);
 	else
 		interactable->Interact(InteractType::LongUse);
-
-	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
 	/*
+	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
+	
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
 		*interactableRelatedItem ==
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerNo))

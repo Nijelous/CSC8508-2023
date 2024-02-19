@@ -7,7 +7,7 @@ namespace NCL {
 		{
 			Use,
 			LongUse, 
-			Item
+			ItemUse
 		};
 
 		class Interactable{
