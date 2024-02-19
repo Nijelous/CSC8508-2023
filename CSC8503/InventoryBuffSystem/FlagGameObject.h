@@ -3,14 +3,13 @@
 #include "Vector3.h"
 #include "StateMachine.h"
 #include "InventoryBuffSystem.h"
-#include "PlayerInventory.h"
+#include "Item.h"
 using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
-        class FlagGameObject : public GameObject,PlayerInventoryObserver {
+        class FlagGameObject : public Item {
         public:
-            FlagGameObject() {};
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr);
             ~FlagGameObject();
 
@@ -18,7 +17,9 @@ namespace NCL {
 
             void GetFlag(int playerNo);
             void Reset();
-            
+
+            void OnPlayerInteract(int playerId = 0) override;
+   
             virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
