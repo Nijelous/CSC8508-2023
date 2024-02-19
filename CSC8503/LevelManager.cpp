@@ -129,9 +129,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	for (int i = 0; i < mLevelLayout.size(); i++) {
-		delete(mLevelLayout[i]);
-	}
+	mUpdatableObjects.clear();
 	mLevelLayout.clear();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
