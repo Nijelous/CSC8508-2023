@@ -25,7 +25,6 @@ void AnimationObject::Update(float dt){
 		mCurrentFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();
 		mNextFrame = (mCurrentFrame + 1) % mAnimation->GetFrameCount();
 		mFrameTime += 1.0f/mAnimation->GetFrameRate();
-		//std::cout << currentFrame << std::endl; 
 	}
 }
 

@@ -532,33 +532,7 @@ GameObject* TutorialGame::AddBonusToWorld(const Vector3& position, const std::st
 	return apple;
 }
 
-//GameObject* TutorialGame::AddAnimationTest(const Vector3& position, const std::string& objectName)
-//{
-//	float meshSize = 1.0f;
-//	float inverseMass = 0.5f;
-//
-//	GameObject* animTest = new GameObject();
-//	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
-//	animTest->SetBoundingVolume((CollisionVolume*)volume);
-//
-//	animTest->GetTransform()
-//		.SetScale(Vector3(meshSize*2, meshSize * 2, meshSize * 2))
-//		.SetPosition(position);
-//
-//	animTest->SetRenderObject(new RenderObject(&animTest->GetTransform(), mGuardMesh, nullptr, nullptr, mAnimationShader, meshSize));
-//	animTest->SetPhysicsObject(new PhysicsObject(&animTest->GetTransform(), animTest->GetBoundingVolume()));
-//	
-//	animTest->SetAnimationObject(new AnimationObject(mGuardAnimation, mGuardMaterial));
-//	
-//
-//	animTest->GetPhysicsObject()->SetInverseMass(inverseMass);
-//	animTest->GetPhysicsObject()->InitSphereInertia(false);
-//
-//	world->AddGameObject(animTest);
-//
-//	return animTest;
-//
-//}
+
 
 StateGameObject* TutorialGame::AddStateObjectToWorld(const Vector3& position, const std::string& objectName) {
 	StateGameObject* apple = new StateGameObject(objectName);

@@ -32,7 +32,6 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 	UpdateCurrentFrames(dt);
 	UpdateAnimations(preAnimationList);
 	UpdateAllAnimationObjects(dt, UpdatableObjects);
-	/*UpdateMaterials();*/
 	
 }
 
@@ -41,18 +40,16 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 	mAnimationList.clear();
 	mGuardList.clear();
 	mPlayerList.clear();
-		for (auto& o : UpdatableObjects) {
+		for (auto& obj : UpdatableObjects) {
 			//Animation List
 			
-			if (o->GetAnimationObject()) {
-				AnimationObject* animObj = o->GetAnimationObject();
+			if (obj->GetAnimationObject()) {
+				AnimationObject* animObj = obj->GetAnimationObject();
 				mAnimationList.emplace_back(animObj);
-				//TODO may it is not a good position to run
-				
 				int currentFrame = animObj->GetCurrentFrame();
-				mMesh = o->GetRenderObject()->GetMesh();
+				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
-				mShader = o->GetRenderObject()->GetShader();
+				mShader = obj->GetRenderObject()->GetShader();
 				
 				const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 				const Matrix4* frameData = mAnim->GetJointData(currentFrame);
@@ -68,37 +65,27 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 					vector<Matrix4> frameMatrices;
 					for (unsigned int i = 0; i < pose.count; ++i) {
-						/*
-						We can now grab the correct matrix for a given pose.
-						Each matrix is relative to a given joint on the original mesh.
-						We can perform the lookup for this by grabbing a set of indices
-						from the mesh.
-						*/
 						int jointID = bindPoseIndices[pose.start + i];
-
 						Matrix4 mat = frameData[jointID] * invBindPose[pose.start + i];
-
 						frameMatrices.emplace_back(mat);
 					}
 					frameMatricesVec.emplace_back(frameMatrices);
 				}
-				o->GetRenderObject()->SetAnimation(o->GetAnimationObject()->GetAnimation());
-				o->GetRenderObject()->SetMaterial(o->GetAnimationObject()->GetMaterial());
-				o->GetRenderObject()->SetCurrentFrame(currentFrame);
-				o->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
+				obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
+				obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
+				obj->GetRenderObject()->SetCurrentFrame(currentFrame);
+				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 				
 				frameMatricesVec.clear();
 				
 				
 				
 
-				if (o->GetName() == "Guard") {
-					mGuardList.emplace_back((GuardObject*)o);
-					/*std::cout << "find the guard" << std::endl;*/
+				if (obj->GetName() == "Guard") {
+					mGuardList.emplace_back((GuardObject*)obj);
 				}
-				if (o->GetName() == "Player") {
-					mPlayerList.emplace_back((PlayerObject*)o);
-					/*std::cout << "find the player" << std::endl;*/
+				if (obj->GetName() == "Player") {
+					mPlayerList.emplace_back((PlayerObject*)obj);
 				}
 			}
 
@@ -132,17 +119,14 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			switch (GuardState)
 			{
 			case GuardObject::GuardState::Stand:
-				//std::cout << (*a).GetGuardState() << std::endl;
 				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
 				
 				break;
 			case GuardObject::GuardState::Walk:
-				//std::cout << (*a).GetGuardState() << std::endl;
 				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
 				
 				break;
 			case GuardObject::GuardState::Sprint:
-				//std::cout << (*a).GetGuardState() << std::endl;
 				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
 				
 				break;
@@ -161,17 +145,14 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 		switch (PlayerState)
 		{
 		case PlayerObject::PlayerState::Stand:
-			//std::cout << (*a).GetPlayerState()<< std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
 
 			break;
 		case PlayerObject::PlayerState::Walk:
-			//std::cout << (*a).GetPlayerState() << std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
 
 			break;
 		case PlayerObject::PlayerState::Sprint:
-			//std::cout << (*a).GetPlayerState()<< std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
 
 			break;
