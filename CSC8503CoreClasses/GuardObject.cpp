@@ -119,7 +119,6 @@ BehaviourAction* GuardObject::Patrol() {
 			state = Ongoing;
 			mNextNode = mCurrentNode + 1;
 			mGuardState = Walk;
-			std::cout << "guard start walk" << std::endl;
 			if (mCurrentNode == mNodes.size() - 1) {
 				mNextNode = 0;
 			}
@@ -162,7 +161,6 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		if (state == Initialise) {
 			state = Ongoing;
 			mGuardState = Sprint;
-			std::cout << "guard start sprint" << std::endl;
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
@@ -235,7 +233,6 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(mPrisonPosition);
 				mHasCaughtPlayer = false;
-				
 				return Success;
 			}
 			else {

@@ -161,17 +161,17 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 		switch (PlayerState)
 		{
 		case PlayerObject::PlayerState::Stand:
-			std::cout << (*a).GetPlayerState()<< std::endl;
+			//std::cout << (*a).GetPlayerState()<< std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
 
 			break;
 		case PlayerObject::PlayerState::Walk:
-			std::cout << (*a).GetPlayerState() << std::endl;
+			//std::cout << (*a).GetPlayerState() << std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
 
 			break;
 		case PlayerObject::PlayerState::Sprint:
-			std::cout << (*a).GetPlayerState()<< std::endl;
+			//std::cout << (*a).GetPlayerState()<< std::endl;
 			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
 
 			break;
