@@ -20,23 +20,18 @@ namespace NCL {
         class AnimationObject
         {
         public:
-            enum mAnimationState {
-                stand,
-                run,
-                jumpUp,
-                jumpDown
-            };
+            
 
             AnimationObject(MeshAnimation* animation, MeshMaterial* material);
             ~AnimationObject();
 
             void Update(float dt);
 
-            void SetAnimation(MeshAnimation* animation){
+            void SetAnimation(MeshAnimation* animation) {
                 mAnimation = animation;
             }
 
-            void SetMaterial(MeshMaterial* material){
+            void SetMaterial(MeshMaterial* material) {
                 mMaterial = material;
             }
 
@@ -51,24 +46,29 @@ namespace NCL {
             int	GetCurrentFrame() {
                 return mCurrentFrame;
             }
-           
-            void SetAnimationState(mAnimationState animationState) {
-                mState = animationState;
-            }
 
-            mAnimationState GetAnimationState() {
-                return mState;
+            void ReSetCurrentFrame() {
+                mCurrentFrame = 0;
             }
             
+            void SetRate(float rate) {
+                mRate = rate;
+            }
+
+            float GetRate() {
+                return mRate;
+            }
+           
             
         protected:
             MeshAnimation* mAnimation;
             MeshMaterial* mMaterial;
-            mAnimationState mState;
+           
            
             int		mCurrentFrame;
             int		mNextFrame;
             float	mFrameTime;
+            float		mRate;
            
         };
     }

@@ -10,11 +10,7 @@ namespace NCL {
 		class GameWorld;
 
 
-		enum PlayerState {
-			Walk,
-			Sprint,
-			Crouch
-		};
+		
 
 		class PlayerObject : public GameObject {
 		public:
@@ -24,7 +20,21 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
+
+			enum PlayerState {
+				Stand,
+				Walk,
+				Sprint,
+				Happy,
+				Crouch
+			};
+
+			PlayerState GetPlayerState() {
+				return mPlayerState;
+			}
+
 			PlayerInventory::item GetEquippedItem();
+
 
 		protected:
 			bool mIsCrouched;
@@ -67,6 +77,8 @@ namespace NCL {
 			void	ChangeCharacterSize(float newSize);
 
 			void	EnforceMaxSpeeds();
+
+			
 		private:
 		};
 	}
