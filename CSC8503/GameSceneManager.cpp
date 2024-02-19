@@ -23,7 +23,7 @@ namespace {
 GameSceneManager* GameSceneManager::instance = nullptr;
 
 GameSceneManager::GameSceneManager(bool isNetworkGame) {
-	if (!isNetworkGame){
+	if (!isNetworkGame) {
 		InitInGameMenuManager();
 	}
 	InitCamera();
@@ -64,7 +64,7 @@ void GameSceneManager::UpdateGame(float dt) {
 	PlayerWonGame();
 }
 
-void GameSceneManager::InitInGameMenuManager(){
+void GameSceneManager::InitInGameMenuManager() {
 	auto* mainMenu = new MainMenu(this);
 	mPushdownMachine = new PushdownMachine(mainMenu);
 }
@@ -83,8 +83,7 @@ void GameSceneManager::CreateLevel() {
 
 bool GameSceneManager::PlayerWonGame() {
 	if (mLevelManager->CheckGameWon().mGameWon) {
-		if (mLevelManager->CheckGameWon().mCurrentPoints > 0)
-			mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
+		mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
 		return true;
 	}
 	return false;

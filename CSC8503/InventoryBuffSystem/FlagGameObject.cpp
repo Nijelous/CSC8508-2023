@@ -26,18 +26,20 @@ FlagGameObject::~FlagGameObject() {
 void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 
-	this->ToggleActive();
+	this->ToggleIsRendered();
 }
 
 void FlagGameObject::Reset() {
-	if (!this->IsActive())
-		this->ToggleActive();
+	if (!this->IsRendered())
+		this->SetIsRendered(true);
 }
 
 void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 {
-	if (this->IsActive()) {
+	if (this->IsRendered()) {
 		GetFlag(playerId);
+		SetIsRendered(false);
+		SetHasPhysics(false);
 	}
 }
 
@@ -52,7 +54,9 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 }
 
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if (this->IsActive()) {
+	if (this->IsRendered() || this->HasPhysics()) {
 		GetFlag(0);
+		SetIsRendered(false);
+		SetHasPhysics(false);
 	}
 }

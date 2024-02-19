@@ -119,6 +119,7 @@ void LevelManager::ClearLevel() {
 	mUpdatableObjects.clear();
 	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
+	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -414,7 +415,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -577,7 +578,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
-	mTempPlayer->ToggleActive();
+	mTempPlayer->SetIsRendered(false);
 	return mTempPlayer;
 }
 

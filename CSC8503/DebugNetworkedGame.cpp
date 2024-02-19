@@ -337,7 +337,7 @@ void DebugNetworkedGame::SpawnPlayers(){
     
     mServerPlayers[playerPeerId]->SetIsLocalPlayer(true);
     mLevelManager->SetTempPlayer((PlayerObject*)mLocalPlayer);
-    mLocalPlayer->ToggleActive();
+    mLocalPlayer->ToggleIsRendered();
 }
 
 NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int playerNum){
