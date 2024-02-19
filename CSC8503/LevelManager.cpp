@@ -18,10 +18,12 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "UI.h"
-
+#include "SoundManager.h"
 #include <filesystem>
 
 using namespace NCL::CSC8503;
+
+LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
@@ -30,7 +32,9 @@ LevelManager::LevelManager() {
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 	mAnimation = new AnimationSystem(*mWorld);
+	mUi = new UI();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+	mSuspicionSystemClassPtr = new SuspicionSystemClass();
 
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
@@ -44,6 +48,8 @@ LevelManager::LevelManager() {
 	}
 	mActiveLevel = -1;
 
+	SoundManager* a = new SoundManager();
+	
 	InitialiseAssets();
 	InitialiseIcons();
 }
@@ -67,6 +73,7 @@ LevelManager::~LevelManager() {
 	mUpdatableObjects.clear();
 
 	delete mTempPlayer;
+	delete mUi;
 
 	delete mCubeMesh;
 	delete mSphereMesh;
@@ -125,10 +132,22 @@ LevelManager::~LevelManager() {
 	delete mRigAnimationWalk;
 }
 
-void LevelManager::ResetLevel() {
+void LevelManager::ClearLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
+	mLevelMatrices.clear();
+	mRenderer->SetWallFloorObject(nullptr);
+}
+
+LevelManager* LevelManager::GetLevelManager() {
+	if (instance == nullptr) {
+		instance = new LevelManager();
+	}
+	return instance;
+}
+
+void LevelManager::ResetLevel() {
 	if (mActiveLevel > -1) {
 		mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
 			.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
@@ -363,19 +382,22 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon mInventoryIcon1 = UI::AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
-	UI::Icon mInventoryIcon2 = UI::AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 
-	UI::Icon mHighlightAwardIcon = UI::AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
-	UI::Icon mLightOffIcon = UI::AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UI::Icon mMakingNoiseIcon = UI::AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UI::Icon mSilentRunIcon = UI::AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UI::Icon mSlowDownIcon = UI::AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
-	UI::Icon mStunIcon = UI::AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UI::Icon mSwapPositionIcon = UI::AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
 
-	UI::Icon mSuspensionBarIcon = UI::AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UI::Icon mSuspensionIndicatorIcon = UI::AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
+	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
+	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UI::Icon mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UI::Icon mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UI::Icon mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UI::Icon mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
+	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+
+	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
+
+	mRenderer->SetUIObject(mUi);
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {

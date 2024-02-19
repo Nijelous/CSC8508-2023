@@ -4,16 +4,23 @@
 using namespace NCL;
 using namespace CSC8503;
 
-std::vector<UI::Icon> icons;
-UI::Icon UI::AddIcon(Vector2 newPos, int horiSize, int vertSize, Texture* tex, bool isShown) {
-	Icon icon;
-	icon.position = newPos;
-	icon.length = horiSize;
-	icon.height = vertSize;
-	icon.texture = tex;
-	icon.isAppear = isShown;
-	icons.emplace_back(icon);
-	return icon;
+UI::UI() {
+
+}
+
+UI::~UI(){
+
+}
+
+
+UI::Icon UI::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
+	mIcon.position = Pos;
+	mIcon.length = horiSize;
+	mIcon.height = vertSize;
+	mIcon.texture = tex;
+	mIcon.isAppear = isShown;
+	icons.emplace_back(mIcon);
+	return mIcon;
 }
 
 
@@ -25,7 +32,7 @@ void UI::SetIconTransparency(bool isShown, Icon icon) {
 	icon.isAppear = isShown;
 }
 
-const std::vector<UI::Icon>& UI::GetInventorySlot() {
+const std::vector<UI::Icon>& UI::GetIcons() {
 	return icons;
 }
 
@@ -43,9 +50,9 @@ void UI::DeleteIcon(Icon icon) {
 }
 
 
-void UI::BuildVerticesForIcon(const int& iconNum, const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
-	positions.reserve(positions.size() + (iconNum * 6));
-	texCoords.reserve(positions.size() + (iconNum * 6));
+void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
+	positions.reserve(positions.size() +  6);
+	texCoords.reserve(positions.size() + 6);
 
 	positions.emplace_back(Vector3(iconPos.x, iconPos.y + vertSize, 0));
 	positions.emplace_back(Vector3(iconPos.x, iconPos.y, 0));
