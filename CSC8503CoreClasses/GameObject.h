@@ -38,7 +38,7 @@ namespace NCL::CSC8503 {
 			return mIsActive;
 		}
 
-		void SetActive() {
+		void ToggleActive() {
 			mIsActive = !mIsActive;
 		}
 

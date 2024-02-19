@@ -116,6 +116,8 @@ void LevelManager::ClearLevel() {
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
 	mLevelMatrices.clear();
+	mUpdatableObjects.clear();
+	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
 }
 
@@ -139,8 +141,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	mUpdatableObjects.clear();
-	mLevelLayout.clear();
+	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
@@ -516,6 +517,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
@@ -575,7 +577,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
-	mTempPlayer->SetActive();
+	mTempPlayer->ToggleActive();
 	return mTempPlayer;
 }
 
