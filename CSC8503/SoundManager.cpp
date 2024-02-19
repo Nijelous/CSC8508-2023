@@ -6,40 +6,41 @@ using namespace NCL::Maths;
 
 SoundManager::SoundManager() {
 	mSoundEngine = createIrrKlangDevice();
-	mFootStep = mSoundEngine->play3D("", vec3df(0, 0, 0), true, true);
-	mPickupSound = mSoundEngine->play3D("", vec3df(0, 0, 0), false, true);
+	//mFootStep = mSoundEngine->play3D("", vec3df(0, 0, 0), true, true);
 }
 
 SoundManager::~SoundManager() {
-	if (mFootStep) {
+	/*if (mFootStep) {
 		mFootStep->drop();
-	}
+	}*/
+	DeleteSounds();
 	mSoundEngine->drop();
 }
 
+ISound* SoundManager::AddFootStepSound(Vector3 soundPos) {
+	ISound* footStep = mSoundEngine->play3D("", ConvertToVec3df(soundPos), true);
+	mSounds.emplace_back(footStep);
+	return footStep;
+}
 
-void SoundManager::UpdateSound(int sound, Vector3 position, bool isPaused) {
-	switch (sound) {
-	case FootStep:
-		if (mFootStep) {
-			mFootStep->setPosition(ConvertToVec3df(position));
-			mFootStep->setIsPaused(isPaused);
+void SoundManager::PlayOneTimeSound(Vector3 position) {
+	ISound* oneTimeSound = mSoundEngine->play3D("soundFile.mp3", ConvertToVec3df(position));
+}
+
+void SoundManager::SetSoundPauseState(ISound* sound, bool isPaused) {
+	sound->setIsPaused(isPaused);
+}
+
+void SoundManager::SetSoundPosition(ISound* sound, Vector3 pos) {
+	sound->setPosition(ConvertToVec3df(pos));
+}
+
+void SoundManager::DeleteSounds() {
+	for (int i = 0; i < mSounds.size(); i++) {
+		if (mSounds[i]) {
+			mSounds[i]->drop();
 		}
-		break;
-	case PickupSound:
-		if (mPickupSound) {
-			if (mPickupSound->isFinished()) {
-				mPickupSound->stop();
-				mPickupSound = mSoundEngine->play3D("", ConvertToVec3df(position), false, false);
-			}
-			else {
-				mPickupSound->setPosition(ConvertToVec3df(position));
-				mPickupSound->setIsPaused(isPaused);
-			}
-		}
-		break;
 	}
-
 }
 
 vec3df SoundManager::ConvertToVec3df(Vector3 soundPos) {
