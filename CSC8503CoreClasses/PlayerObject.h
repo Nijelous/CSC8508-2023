@@ -8,8 +8,6 @@ using namespace InventoryBuffSystem;
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
-
-
 		
 
 		class PlayerObject : public GameObject {

@@ -140,6 +140,7 @@ void LevelManager::ClearLevel() {
 	mUpdatableObjects.clear();
 	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
+	mAnimation->Clear();
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
@@ -207,6 +208,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	mAnimation->PreloadMatTextures(*mRenderer);
 
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
+
 	delete[] levelSize;
 
 	mTimer = 20.f;
@@ -239,7 +242,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
-		mAnimation->Update(dt, mUpdatableObjects,preAnimationList);
+		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 	}
@@ -289,14 +292,14 @@ void LevelManager::InitialiseAssets() {
 
 
 	//preLoadList
-	preAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
-	preAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
-	preAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
+	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
+	mPreAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
 	
 
-	preAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
-	preAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
-	preAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
+	mPreAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
+	mPreAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
 
 	
 

@@ -6,11 +6,12 @@
 #include "Vector3.h"
 #include "map";
 #include "PlayerInventory.h"
+#include "PlayerObject.h"
 
 using namespace NCL;
 using namespace CSC8503;
 
-FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth) 
+FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
 	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr) {
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
@@ -53,10 +54,16 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
+//TODO - Eren/Kyriakos: we need a way of getting the player number for this player
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if (this->IsRendered() || this->HasPhysics()) {
+	if (otherObject->GetCollisionLayer() & Player && (this->IsRendered())
+		&& this->mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(InventoryBuffSystem::PlayerInventory::flag, 0)) {
 		GetFlag(0);
 		SetIsRendered(false);
 		SetHasPhysics(false);
+
+		PlayerObject* plObj = (PlayerObject*)otherObject;
+		plObj->AddPlayerPoints(mPoints);
+
 	}
 }

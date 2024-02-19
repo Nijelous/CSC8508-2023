@@ -76,7 +76,6 @@ PushdownState::PushdownResult InitialisingLevel::OnUpdate(float dt, PushdownStat
 }
 
 void InitialisingLevel::OnAwake() {
-	mGameSceneManager->GetLevelManager()->ResetLevel();
 	mGameSceneManager->SetInitLevel();
 	mGameSceneManager->CreateLevel();
 }

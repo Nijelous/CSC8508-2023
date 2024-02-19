@@ -40,6 +40,8 @@ namespace NCL {
 				mGuardState = animationState;
 			}
 
+			void SetGameObjectLists(vector<GameObject*> UpdatableObjects);
+
 			AnimationState GetGuardAnimationState() {
 				return mGuardState;
 			}

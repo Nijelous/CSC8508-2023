@@ -60,8 +60,6 @@ void GameSceneManager::UpdateGame(float dt) {
 		DisplayDefeat();
 
 	mLevelManager->Update(dt, mGameState == PlayingLevelState, mGameState == PauseScreenState);
-
-	PlayerWonGame();
 }
 
 void GameSceneManager::InitInGameMenuManager() {

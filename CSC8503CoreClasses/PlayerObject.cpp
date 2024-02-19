@@ -8,8 +8,6 @@
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
 
-#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
-
 #include "Window.h"
 #include "GameWorld.h"
 
@@ -71,9 +69,7 @@ PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 }
 
 void PlayerObject::OnCollisionBegin(GameObject* otherObject) {
-	if (FlagGameObject* temp = dynamic_cast<FlagGameObject*>(otherObject)) {
-		mPlayerPoints += temp->GetPoints();
-	}
+
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

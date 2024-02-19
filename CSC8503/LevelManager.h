@@ -169,7 +169,7 @@ namespace NCL {
 			Shader* mAnimationShader2;
 
 			//animation guard
-			std::map<std::string, MeshAnimation*> preAnimationList;
+			std::map<std::string, MeshAnimation*> mPreAnimationList;
 			MeshAnimation* mGuardAnimationStand;
 			MeshAnimation* mGuardAnimationSprint;
 			MeshAnimation* mGuardAnimationWalk;
