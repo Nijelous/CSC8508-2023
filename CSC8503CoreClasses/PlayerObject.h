@@ -75,7 +75,7 @@ namespace NCL {
 			void	EnforceMaxSpeeds();
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
-			void	InteractWithInteractable(Interactable* interactable);
+			void	UseItemForInteractable(Interactable* interactable);
 		private:
 		};
 	}

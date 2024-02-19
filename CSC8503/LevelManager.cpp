@@ -10,7 +10,7 @@
 #include "GuardObject.h"
 #include "Helipad.h"
 #include "Vent.h"
-#include "Door.h"
+#include "InteractableDoor.h"
 #include "PrisonDoor.h"
 
 #include "InventoryBuffSystem/FlagGameObject.h"
@@ -211,6 +211,8 @@ void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
 		mAnimation->Update(dt);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
+		mInventoryBuffSystemClassPtr->Update(dt);
+		mSuspicionSystemClassPtr->Update(dt);
 	}
 }
 
@@ -453,7 +455,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent) {
 }
 
 Door* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset) {
-	Door* newDoor = new Door();
+	Door* newDoor = new InteractableDoor();
 	Vector3 size = Vector3(0.5f, 4.5f, 5);
 	OBBVolume* volume = new OBBVolume(size);
 

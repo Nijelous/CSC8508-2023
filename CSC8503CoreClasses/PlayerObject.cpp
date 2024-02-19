@@ -164,7 +164,12 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::Use;
 	}
-	else if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E) && mInteractHeldDt < TIME_UNTIL_LONG_INTERACT)
+	{
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::LongUse;
+	}
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
 	}
@@ -199,19 +204,20 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr)
 				{
-					InteractWithInteractable(interactablePtr);
+					interactablePtr->Interact(interactType);
+
+					return;
 				}
+
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
 	}
 }
 
-void PlayerObject::InteractWithInteractable(Interactable* interactable)
+void PlayerObject::UseItemForInteractable(Interactable* interactable)
 {
-	if (mInteractHeldDt < TIME_UNTIL_LONG_INTERACT)
-		interactable->Interact(InteractType::Use);
-	else
-		interactable->Interact(InteractType::LongUse);
+
 	/*
 	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
 	
