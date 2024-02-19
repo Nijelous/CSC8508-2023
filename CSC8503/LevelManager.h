@@ -22,6 +22,7 @@ namespace NCL {
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
+		class InteractableDoor;
 		class LevelManager : PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
@@ -84,7 +85,7 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
-			Door* AddDoorToWorld(Door* door, const Vector3& offset);
+			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);

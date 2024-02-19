@@ -23,7 +23,7 @@ namespace InventoryBuffSystem
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) = 0;
 	};
 
-	const int MAX_INVENTORY_SLOTS = 2;
+	constexpr int MAX_INVENTORY_SLOTS = 2;
 
 	class PlayerInventory
 	{
@@ -60,7 +60,7 @@ namespace InventoryBuffSystem
 
 		std::vector<item> mItemsInRandomPool =
 		{
-			screwdriver
+			screwdriver, disguise
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =

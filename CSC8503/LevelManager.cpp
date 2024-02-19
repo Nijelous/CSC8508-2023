@@ -317,7 +317,8 @@ void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> v
 
 void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre) {
 	for (int i = 0; i < doors.size(); i++) {
-		AddDoorToWorld(doors[i], centre);
+		InteractableDoor* interactableDoorPtr =AddDoorToWorld(doors[i], centre);
+		mUpdatableObjects.push_back(interactableDoorPtr);
 	}
 }
 
@@ -454,8 +455,8 @@ Vent* LevelManager::AddVentToWorld(Vent* vent) {
 	return newVent;
 }
 
-Door* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset) {
-	Door* newDoor = new InteractableDoor();
+InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset) {
+	InteractableDoor* newDoor = new InteractableDoor();
 	Vector3 size = Vector3(0.5f, 4.5f, 5);
 	OBBVolume* volume = new OBBVolume(size);
 
@@ -566,7 +567,7 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
-	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr);
+	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 

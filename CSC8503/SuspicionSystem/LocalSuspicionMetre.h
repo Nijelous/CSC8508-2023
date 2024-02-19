@@ -10,7 +10,7 @@ using namespace InventoryBuffSystem;
 
 namespace SuspicionSystem
 {
-    const float DT_UNTIL_LOCAL_RECOVERY = 5;
+    const float DT_UNTIL_LOCAL_RECOVERY = 0.75f;
     class LocalSuspicionMetre :
         public SuspicionMetre, PlayerBuffsObserver
     {
@@ -57,7 +57,7 @@ namespace SuspicionSystem
 
         std::map<activeLocalSusCause, float>  mActiveLocalSusCauseSeverityMap =
         {
-            {guardsLOS, 3}, {cameraLOS, 3}, {disguiseBuff, 5}, {playerWalk,3}, {playerSprint,9}
+            {guardsLOS, 3}, {cameraLOS, 3}, {disguiseBuff, -15}, {playerWalk,3}, {playerSprint,9}, {passiveRecovery,-10}
         };
 
         float mPlayerMeters[NCL::CSC8503::MAX_PLAYERS];

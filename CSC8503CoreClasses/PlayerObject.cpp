@@ -44,6 +44,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
+	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 
 	mWalkSpeed = walkSpeed;
 	mSprintSpeed = sprintSpeed;
@@ -141,18 +142,23 @@ void PlayerObject::MovePlayer(float dt) {
 
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
-	ActivateSprint(isSprinting);
+
+	if (isIdle){
+		if(mPlayerState!=Idle && mSuspicionSystemClassPtr!=nullptr ){
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+			mPlayerState = Idle;
+		}
+	}
+	else
+	{
+		ActivateSprint(isSprinting);
+	}
 	ToggleCrouch(isCrouching);
 
 	StopSliding();
-
-	if (isIdle && mSuspicionSystemClassPtr!=nullptr)
-	{
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
-	}
 }
 
 void PlayerObject::RayCastFromPlayer(GameWorld* world){
@@ -273,33 +279,32 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 	if (isSprinting) {
 		//Sprint->Sprint 
 		StartSprinting();
-		if (!mHasSilentSprintBuff && mSuspicionSystemClassPtr != nullptr)
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+
 	}
 	else if (!mIsCrouched)
 	{
 		//Sprint->Walk
 		StartWalking();
-		if (mSuspicionSystemClassPtr != nullptr)
-		{
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
-		}
+
 	}
 	else if (mIsCrouched)
 	{
 		//Sprint->Crouch
 		StartCrouching();
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+
 	}
 }
 
 void PlayerObject::StartWalking() {
 	if (!(mPlayerState == Walk)) {
+		if (mSuspicionSystemClassPtr != nullptr)
+		{
+			if (mPlayerState == Sprint)
+				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+		}
 		if (mPlayerState == Crouch)
 			mMovementSpeed = WALK_ACCELERATING_SPEED;
 		
@@ -313,6 +318,17 @@ void PlayerObject::StartWalking() {
 
 void PlayerObject::StartSprinting() {
 	if (!(mPlayerState == Sprint)) {
+		if (mSuspicionSystemClassPtr != nullptr)
+		{
+			if (mPlayerState==Walk)
+				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+
+			if (!mHasSilentSprintBuff)
+ 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+					AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+		}
+
 		mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
 		mPlayerState = Sprint;
@@ -326,6 +342,15 @@ void PlayerObject::StartSprinting() {
 
 void PlayerObject::StartCrouching() {
 	if (!(mPlayerState == Crouch)) {
+		if (mSuspicionSystemClassPtr != nullptr){
+			if (mPlayerState == Sprint)
+				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+			if (mPlayerState == Walk)
+				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+		}
+
 		mPlayerState = Crouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;

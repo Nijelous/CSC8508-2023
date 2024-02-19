@@ -47,6 +47,7 @@ void GlobalSuspicionMetre::Notify(SuspicionMetre::SusBreakpoint susBreakpoint) {
 }
 
 void GlobalSuspicionMetre::Update(float dt){
+
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
     {
         ChangePlayerGlobalSusMetre(mContinuousCauseSusSeverityMap[thisCause]);

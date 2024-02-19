@@ -42,12 +42,12 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			slowEveryoneElse, everyoneElseMakesSound, silentSprint
+			silentSprint
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,10}, {slowEveryoneElse,0}, {everyoneElseMakesSound,0}, {slow,4}, {silentSprint, 5}
+			{disguiseBuff,10}, {slow,4}, {silentSprint, 5}, {makeSound,0}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =

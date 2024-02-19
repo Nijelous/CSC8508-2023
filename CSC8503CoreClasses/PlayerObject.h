@@ -10,7 +10,7 @@ namespace NCL {
 		class Interactable;
 
 		enum PlayerState {
-			//idle,
+			Idle,
 			Walk,
 			Sprint,
 			Crouch

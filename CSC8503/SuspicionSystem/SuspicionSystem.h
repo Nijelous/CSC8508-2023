@@ -9,6 +9,11 @@ namespace SuspicionSystem
 	class SuspicionSystemClass
 	{
 	public:
+		SuspicionSystemClass()
+		{
+			Init();
+		}
+
 		void Init()
 		{
 			mGlobalSuspicionMetrePtr = new GlobalSuspicionMetre();

@@ -91,36 +91,36 @@ void InteractableDoor::InitStateMachine()
 		}
 	);
 
-	mStateMachine->AddState(DoorOpenAndUnlocked);
-	mStateMachine->AddState(DoorOpenAndLocked);
 	mStateMachine->AddState(DoorClosedAndUnlocked);
+	mStateMachine->AddState(DoorOpenAndLocked);
+	mStateMachine->AddState(DoorOpenAndUnlocked);
 	mStateMachine->AddState(DoorClosedAndLocked);
 
 	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorClosedAndUnlocked,
 		[&]() -> bool
 		{
-			return !mIsOpen;
+			return (!this->mIsOpen);
 		}
 	));
 
 	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorOpenAndLocked,
 		[&]() -> bool
 		{
-			return mIsLocked;
+			return this->mIsLocked;
 		}
 	));
 
 	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorOpenAndUnlocked,
 		[&]() -> bool
 		{
-			return !mIsOpen;
+			return this->mIsOpen;
 		}
 	));
 
 	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorClosedAndLocked,
 		[&]() -> bool
 		{
-			return mIsLocked;
+			return this->mIsLocked;
 		}
 	));
 }
@@ -134,4 +134,8 @@ void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionM
 	default:
 		break;
 	}
+}
+
+void InteractableDoor::UpdateObject(float dt) {
+	mStateMachine->Update(dt);
 }
