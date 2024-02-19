@@ -10,7 +10,8 @@ using namespace NCL::CSC8503;
 namespace InventoryBuffSystem {
 	const enum BuffEvent
 	{
-		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved, playerMakesSound
+		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved,
+		playerMakesSound, silentSprintApplied, silentSprintRemoved
 	};
 
 	class PlayerBuffsObserver
@@ -23,7 +24,7 @@ namespace InventoryBuffSystem {
 	public:
 		enum buff
 		{
-			Null, disguiseBuff, slow, makeSound, slowEveryoneElse, everyoneElseMakesSound
+			Null, disguiseBuff, slow, makeSound, slowEveryoneElse, everyoneElseMakesSound, silentSprint
 		};
 
 		void Init();
@@ -41,17 +42,17 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			slowEveryoneElse, everyoneElseMakesSound
+			slowEveryoneElse, everyoneElseMakesSound, silentSprint
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,10}, {slowEveryoneElse,0}, {everyoneElseMakesSound,0}, {slow,4}
+			{disguiseBuff,10}, {slowEveryoneElse,0}, {everyoneElseMakesSound,0}, {slow,4}, {silentSprint, 5}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied}, {makeSound, playerMakesSound}
+			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied}, {makeSound, playerMakesSound}, {silentSprint, silentSprintApplied}
 		};
 
 		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
@@ -61,7 +62,7 @@ namespace InventoryBuffSystem {
 
 		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved}
+			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved}, {silentSprint, silentSprintRemoved}
 		};
 
 		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap

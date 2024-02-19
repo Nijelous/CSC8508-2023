@@ -27,8 +27,10 @@ void InteractableDoor::Interact(InteractType interactType)
 		else
 			Open();
 		break;
-	case Item:
 	case LongUse:
+		Unlock();
+		break;
+	case Item:
 		if (mIsLocked)
 			Unlock();
 		else
@@ -47,8 +49,9 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 		return !mIsLocked;
 		break;
 	case Item:
-	case LongUse:
 		return !mIsOpen;
+	case LongUse:
+		return (mIsLocked && !mIsOpen);
 		break;
 	default:
 		return false;
@@ -120,4 +123,15 @@ void InteractableDoor::InitStateMachine()
 			return mIsLocked;
 		}
 	));
+}
+
+void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint){
+	switch (susBreakpoint)
+	{
+	case SuspicionSystem::SuspicionMetre::high:
+		Close();
+		break;
+	default:
+		break;
+	}
 }

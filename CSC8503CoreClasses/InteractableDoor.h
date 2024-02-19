@@ -1,10 +1,10 @@
 #pragma once
 #include "Door.h"
 #include "Interactable.h"
-//#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
+#include "../CSC8503/SuspicionSystem/GlobalSuspicionMetre.h"
 namespace NCL {
 	namespace CSC8503 {
-		class InteractableDoor : public Door, Interactable {
+		class InteractableDoor : public Door, Interactable, SuspicionSystem::GlobalSuspicionObserver {
 		public:
 			InteractableDoor(){
 				GameObject::mName = "InteractableDoor";
@@ -17,6 +17,8 @@ namespace NCL {
 			void Interact(InteractType interactType) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
 			virtual void InitStateMachine();
+
+			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 
 		protected:
 			const float initDoorTimer = 7.0f;

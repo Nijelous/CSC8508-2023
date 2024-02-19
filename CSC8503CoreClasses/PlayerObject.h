@@ -37,6 +37,7 @@ namespace NCL {
 
 			int mPlayerNo;
 			float mInteractHeldDt;
+			bool mHasSilentSprintBuff;
 
 			PlayerState mPlayerState;
 

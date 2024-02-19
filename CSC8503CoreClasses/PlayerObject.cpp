@@ -54,6 +54,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 
 	mPlayerNo = playerID;
 	mIsPlayer = true;
+	mHasSilentSprintBuff = false;
 	mInteractHeldDt = 0;
 }
 
@@ -91,6 +92,12 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		break;
 	case slowRemoved:
 		ChangeToDefaultSpeeds();
+		break;
+	case silentSprintApplied:
+		mHasSilentSprintBuff = true;
+		break;
+	case silentSprintRemoved:
+		mHasSilentSprintBuff = false;
 		break;
 	default:
 		break;
@@ -234,7 +241,7 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 	if (isSprinting) {
 		//Sprint->Sprint 
 		StartSprinting();
-		if (mSuspicionSystemClassPtr != nullptr)
+		if (!mHasSilentSprintBuff && mSuspicionSystemClassPtr != nullptr)
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
