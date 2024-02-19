@@ -34,6 +34,7 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 	mUi = new UI();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+	mSuspicionSystemClassPtr = new SuspicionSystemClass();
 
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {

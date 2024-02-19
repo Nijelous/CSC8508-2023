@@ -154,8 +154,8 @@ namespace NCL {
 
 			PlayerObject* mTempPlayer;
 
-			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-			SuspicionSystemClass* mSuspicionSystemClassPtr = new SuspicionSystemClass();
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
+			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			int mActiveLevel;
 		};

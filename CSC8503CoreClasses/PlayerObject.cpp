@@ -5,6 +5,7 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
 
 #include "Window.h"
@@ -104,6 +105,10 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	}
 }
 
+PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
+	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetPlayerItem(mPlayerID, mActiveItemSlot);
+}
+
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
 	offset.y += 3;
@@ -151,8 +156,21 @@ void PlayerObject::MovePlayer(float dt) {
 }
 
 void PlayerObject::RayCastFromPlayer(GameWorld* world){
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::E) ||
-		Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
+	bool isRaycastTriggered = false;
+	NCL::CSC8503::InteractType interactType;
+	
+	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::Use;
+	}
+	else if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::ItemUse;
+	}
+
+	if (isRaycastTriggered)
+	{
 		std::cout << "Ray fired" << std::endl;
 		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
 		RayCollision closestCollision;
@@ -169,8 +187,15 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 
+				//Check if object is an item.
+				Item* item = dynamic_cast<Item*>(objectHit);
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
+
+				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr)
 				{
@@ -189,7 +214,7 @@ void PlayerObject::InteractWithInteractable(Interactable* interactable)
 		interactable->Interact(InteractType::LongUse);
 
 	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
-
+	/*
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
 		*interactableRelatedItem ==
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerNo))
@@ -197,6 +222,7 @@ void PlayerObject::InteractWithInteractable(Interactable* interactable)
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->SetPlayerAbleToUseItem(*interactableRelatedItem,mPlayerNo,true);
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot, mPlayerNo);
 	}
+	*/
 };
 
 void PlayerObject::ControlInventory(){

@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed
+		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed
 	};
 
 	class PlayerInventoryObserver
@@ -31,7 +31,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			none, disguise, soundEmitter, flag, doorKey
+			none, disguise, soundEmitter, flag, screwdriver, doorKey
 		};
 
 		PlayerInventory()
@@ -60,7 +60,7 @@ namespace InventoryBuffSystem
 
 		std::vector<item> mItemsInRandomPool =
 		{
-			disguise, soundEmitter
+			screwdriver
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =

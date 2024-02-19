@@ -26,6 +26,9 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
+
+			PlayerInventory::item GetEquippedItem();
+
 		protected:
 			bool mIsCrouched;
 

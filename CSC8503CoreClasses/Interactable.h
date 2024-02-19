@@ -18,10 +18,10 @@ namespace NCL {
 			};
 			virtual bool CanBeInteractedWith(InteractType interactType) { return mInteractable; } ;
 
-			virtual InventoryBuffSystem::PlayerInventory::item* GetRelatedItem() { return &mRelatedItem; };
+			//virtual InventoryBuffSystem::PlayerInventory::item* GetRelatedItem() { return &mRelatedItem; };
 		protected:
 			bool mInteractable = false;
-			InventoryBuffSystem::PlayerInventory::item mRelatedItem;
+			//InventoryBuffSystem::PlayerInventory::item mRelatedItem;
 		};
 	}
 }
