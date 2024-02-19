@@ -30,7 +30,7 @@ void InteractableDoor::Interact(InteractType interactType)
 	case LongUse:
 		Unlock();
 		break;
-	case Item:
+	case ItemUse:
 		if (mIsLocked)
 			Unlock();
 		else
@@ -48,7 +48,7 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 	case Use:
 		return !mIsLocked;
 		break;
-	case Item:
+	case ItemUse:
 		return !mIsOpen;
 	case LongUse:
 		return (mIsLocked && !mIsOpen);

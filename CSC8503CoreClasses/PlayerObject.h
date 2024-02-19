@@ -26,6 +26,9 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
+
+			PlayerInventory::item GetEquippedItem();
+
 		protected:
 			bool mIsCrouched;
 
@@ -72,7 +75,7 @@ namespace NCL {
 			void	EnforceMaxSpeeds();
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
-			void	InteractWithInteractable(Interactable* interactable);
+			void	UseItemForInteractable(Interactable* interactable);
 		private:
 		};
 	}
