@@ -101,6 +101,7 @@ LevelManager::~LevelManager() {
 	delete mSuspensionIndicatorTex;
 
 	delete mAnimationShader;
+
 	delete mGuardMaterial;
 	delete mGuardMesh;
 
@@ -113,8 +114,7 @@ LevelManager::~LevelManager() {
 	delete mGuardAnimationStand;
 	delete mGuardAnimationSprint;
 	delete mGuardAnimationWalk;
-	delete mGuardAnimationHappy;
-	delete mGuardAnimationAngry;
+
 	
 	delete mPlayerAnimationStand;
 	delete mPlayerAnimationSprint;
@@ -186,7 +186,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions);	
 
-	mAnimation->PreloadMatTextures(mRenderer);
+	mAnimation->PreloadMatTextures(*mRenderer);
 
 	delete[] levelSize;
 
@@ -214,7 +214,7 @@ void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
-		mAnimation->Update(dt);
+		mAnimation->Update(dt, mUpdatableObjects,preAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 	}
@@ -253,8 +253,6 @@ void LevelManager::InitialiseAssets() {
 	mGuardAnimationStand = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
 	mGuardAnimationWalk = mRenderer->LoadAnimation("MaleGuard/StepForwardOneHand.anm");
 	mGuardAnimationSprint = mRenderer->LoadAnimation("MaleGuard/StepForward.anm");
-	mGuardAnimationHappy = mRenderer->LoadAnimation("MaleGuard/Happy.anm");
-	mGuardAnimationAngry = mRenderer->LoadAnimation("MaleGuard/Angry.anm");
 
 	mPlayerAnimationStand = mRenderer->LoadAnimation("FemaleGuard/Idle1.anm");
 	mPlayerAnimationWalk = mRenderer->LoadAnimation("FemaleGuard/StepForwardOneHand.anm");
@@ -262,19 +260,20 @@ void LevelManager::InitialiseAssets() {
 
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
-	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Run.anm");
+	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
 
+
+	//preLoadList
+	preAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
+	preAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
+	preAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
+	
+
+	preAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
+	preAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
+	preAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
 
 	
-	preAnimationList.insert(std::make_pair("GStand", mGuardAnimationStand));
-	preAnimationList.insert(std::make_pair("GWalk", mGuardAnimationWalk));
-	preAnimationList.insert(std::make_pair("GSprint", mGuardAnimationSprint));
-	preAnimationList.insert(std::make_pair("GHappy", mGuardAnimationHappy));
-	preAnimationList.insert(std::make_pair("GAngry", mGuardAnimationAngry));
-
-	preAnimationList.insert(std::make_pair("PStand", mPlayerAnimationStand));
-	preAnimationList.insert(std::make_pair("PWalk", mPlayerAnimationWalk));
-	preAnimationList.insert(std::make_pair("PSprint", mPlayerAnimationSprint));
 
 
 	
@@ -646,7 +645,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
-	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationHappy, mGuardMaterial));
+	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -684,7 +683,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
-	guard->SetAnimationObject(new AnimationObject(mRigAnimationWalk, mRigMaterial));
+	guard->SetAnimationObject(new AnimationObject(mRigAnimationStand, mRigMaterial));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
@@ -710,7 +709,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 	{
 	case soundEmitterUsed:
 		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
-			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
 		break;
 	default:
 		break;

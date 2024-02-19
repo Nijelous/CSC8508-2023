@@ -10,8 +10,11 @@
 
 AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g)
 {
-	
-	
+	mShader = nullptr;
+	mMesh = nullptr;
+	mAnim = nullptr;
+	mGuardState = Stand;
+	mPlayerState = Stand;
 	
 }
 
@@ -26,16 +29,18 @@ void AnimationSystem::Clear()
 
 void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std::map<std::string,MeshAnimation*> preAnimationList)
 {
+	UpdateCurrentFrames(dt);
 	UpdateAnimations(preAnimationList);
 	UpdateAllAnimationObjects(dt, UpdatableObjects);
 	/*UpdateMaterials();*/
-	UpdateCurrentFrames(dt);
+	
 }
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
 {
 	mAnimationList.clear();
 	mGuardList.clear();
+	mPlayerList.clear();
 		for (auto& o : UpdatableObjects) {
 			//Animation List
 			
@@ -89,11 +94,11 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 				if (o->GetName() == "Guard") {
 					mGuardList.emplace_back((GuardObject*)o);
-					std::cout << "find the guard" << std::endl;
+					/*std::cout << "find the guard" << std::endl;*/
 				}
 				if (o->GetName() == "Player") {
-					
-					std::cout << "find the player" << std::endl;
+					mPlayerList.emplace_back((PlayerObject*)o);
+					/*std::cout << "find the player" << std::endl;*/
 				}
 			}
 
@@ -107,7 +112,7 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
 	for ( auto& a : mAnimationList) {
-		(*a).Update(dt);
+		a->Update(dt);
 	}
 }
 
@@ -115,37 +120,67 @@ void AnimationSystem::UpdateCurrentFrames(float dt)
 void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
 {
 	
-	//for (auto& a : mGuardList) {
-	//	GuardObject::GuardState state = (*a).GetGuardState();
-	//	
-	//	switch (state)
-	//	{
-	//	case AnimationObject::mAnimationState::Stand:
-	//		//std::cout << (*a).GetGuardState() << std::endl;
-	//		a->GetAnimationObject()->SetAnimation(preAnimationList["GStand"]);
-	//		
-	//		break;
-	//	case AnimationObject::mAnimationState::Walk:
-	//		//std::cout << (*a).GetGuardState() << std::endl;
-	//		a->GetAnimationObject()->SetAnimation(preAnimationList["GWalk"]);
-	//		break;
-	//	case AnimationObject::mAnimationState::Sprint:
-	//		//std::cout << (*a).GetGuardState() << std::endl;
-	//		a->GetAnimationObject()->SetAnimation(preAnimationList["GSprint"]);
-	//		break;
-	//	case AnimationObject::mAnimationState::Happy:
-	//		//std::cout << (*a).GetGuardState() << std::endl;
-	//		a->GetAnimationObject()->SetAnimation(preAnimationList["GHappy"]);
-	//		break;
-	//	}
-	//	
-	//	
-	//	
-	//}
+	for (auto& a : mGuardList) {
+
+		GuardObject::GuardState GuardState = a->GetGuardState();
+		
+		if (mGuardState != GuardState) {
+			mGuardState =(AnimationState) GuardState;
+			a->GetAnimationObject()->ReSetCurrentFrame();
+
+		}
+			switch (GuardState)
+			{
+			case GuardObject::GuardState::Stand:
+				//std::cout << (*a).GetGuardState() << std::endl;
+				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
+				
+				break;
+			case GuardObject::GuardState::Walk:
+				//std::cout << (*a).GetGuardState() << std::endl;
+				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
+				
+				break;
+			case GuardObject::GuardState::Sprint:
+				//std::cout << (*a).GetGuardState() << std::endl;
+				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
+				
+				break;
+			}
+	}
+
+	for (auto& a : mPlayerList) {
+
+		PlayerObject::PlayerState PlayerState = a->GetPlayerState();
+
+		if (mPlayerState != PlayerState) {
+			mPlayerState = (AnimationState)PlayerState;
+			a->GetAnimationObject()->ReSetCurrentFrame();
+
+		}
+		switch (PlayerState)
+		{
+		case PlayerObject::PlayerState::Stand:
+			std::cout << (*a).GetPlayerState()<< std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
+
+			break;
+		case PlayerObject::PlayerState::Walk:
+			std::cout << (*a).GetPlayerState() << std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
+
+			break;
+		case PlayerObject::PlayerState::Sprint:
+			std::cout << (*a).GetPlayerState()<< std::endl;
+			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
+
+			break;
+		}
+	}
 	
 }
 
-void AnimationSystem::PreloadMatTextures(GameTechRenderer* renderer)
+void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
@@ -160,7 +195,7 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer* renderer)
 					if (filename) {
 						string path = *filename;  
 						std::cout << path << std::endl;
-						mAnimTexture = renderer->LoadTexture(path.c_str());
+						mAnimTexture = renderer.LoadTexture(path.c_str());
 						texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
 						std::cout << texID << endl;
 						NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);

@@ -6,6 +6,7 @@
 #include "OGLTexture.h"
 #include "../CSC8503/GameTechRenderer.h"
 #include "GuardObject.h"
+#include "PlayerObject.h"
 
 
 namespace NCL {
@@ -14,6 +15,12 @@ namespace NCL {
 	namespace CSC8503 {
 		class AnimationSystem {
 		public:
+			enum AnimationState {
+                Stand,
+                Walk,
+                Sprint,
+                Happy
+            };
 			AnimationSystem(GameWorld& g);
 			~AnimationSystem();
 
@@ -27,7 +34,23 @@ namespace NCL {
 
 			void UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList);
 
-			void PreloadMatTextures(GameTechRenderer* renderer);
+			void PreloadMatTextures(GameTechRenderer& renderer);
+
+			void SetGuardAnimationState(AnimationState animationState) {
+				mGuardState = animationState;
+			}
+
+			AnimationState GetGuardAnimationState() {
+				return mGuardState;
+			}
+
+			void SetPlayerAnimationState(AnimationState animationState) {
+				mPlayerState = animationState;
+			}
+
+			AnimationState GetPlayerAnimationState() {
+				return mPlayerState;
+			}
 
 		protected:
 
@@ -35,11 +58,15 @@ namespace NCL {
 			GameWorld& gameWorld;
 			vector<AnimationObject*> mAnimationList;
 			vector<GuardObject*> mGuardList;
+			vector<PlayerObject*> mPlayerList;
 			vector<GLuint>  mMatTextures;
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
 			Texture* mAnimTexture = nullptr;	
+
+			AnimationState mGuardState;
+			AnimationState mPlayerState;
 		};
 	}
 }
