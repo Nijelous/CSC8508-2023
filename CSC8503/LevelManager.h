@@ -166,9 +166,8 @@ namespace NCL {
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
 
-			// inventory objects
-			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-			SuspicionSystemClass* mSuspicionSystemClassPtr = new SuspicionSystemClass();
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
+			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			// key variables
 			int mActiveLevel;

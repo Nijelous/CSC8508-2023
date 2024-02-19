@@ -5,6 +5,7 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
 
 #include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
@@ -65,6 +66,10 @@ void PlayerObject::UpdateObject(float dt) {
 	EnforceMaxSpeeds();
 }
 
+PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
+	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetPlayerItem(mPlayerID, mActiveItemSlot);
+}
+
 void PlayerObject::OnCollisionBegin(GameObject* otherObject) {
 	if (FlagGameObject* temp = dynamic_cast<FlagGameObject*>(otherObject)) {
 		mPlayerPoints += temp->GetPoints();
@@ -102,7 +107,21 @@ void PlayerObject::MovePlayer(float dt) {
 }
 
 void PlayerObject::RayCastFromPlayer(GameWorld* world){
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::E)) {
+	bool isRaycastTriggered = false;
+	NCL::CSC8503::InteractType interactType;
+	
+	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::Use;
+	}
+	else if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::ItemUse;
+	}
+
+	if (isRaycastTriggered)
+	{
 		std::cout << "Ray fired" << std::endl;
 		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
 		RayCollision closestCollision;
@@ -119,17 +138,28 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 
+				//Check if object is an item.
+				Item* item = dynamic_cast<Item*>(objectHit);
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
+
+				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr)
 				{
-					interactablePtr->Interact();
+					interactablePtr->Interact(interactType);
+					return;
 				}
+
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
 	}
 }
+
 void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;

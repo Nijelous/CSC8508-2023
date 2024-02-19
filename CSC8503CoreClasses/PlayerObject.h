@@ -30,6 +30,8 @@ namespace NCL {
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
 			void AddPlayerPoints(int addedPoints) { mPlayerPoints += mPlayerPoints; }
 
+			PlayerInventory::item GetEquippedItem();
+
 		protected:
 			bool mIsCrouched;
 
