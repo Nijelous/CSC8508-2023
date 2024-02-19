@@ -20,6 +20,7 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
+
 			enum PlayerState {
 				Stand,
 				Walk,
@@ -31,6 +32,9 @@ namespace NCL {
 			PlayerState GetPlayerState() {
 				return mPlayerState;
 			}
+
+			PlayerInventory::item GetEquippedItem();
+
 
 		protected:
 			bool mIsCrouched;

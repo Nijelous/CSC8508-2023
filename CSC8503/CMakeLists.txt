@@ -17,6 +17,7 @@ set(Header_Files
     "SceneManager.h"
     "SceneStates.h"
     "MainMenuScene.h"
+    "SoundManager.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -32,6 +33,8 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/FlagGameObject.cpp"
     "InventoryBuffSystem/SoundEmitter.h"
     "InventoryBuffSystem/SoundEmitter.cpp"
+    "InventoryBuffSystem/Item.h"
+    "InventoryBuffSystem/Item.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
@@ -64,6 +67,7 @@ set(Source_Files
     "SceneManager.cpp"
     "SceneStates.cpp"
     "MainMenuScene.cpp"
+    "SoundManager.cpp"
 )
 
 if(USE_VULKAN)
