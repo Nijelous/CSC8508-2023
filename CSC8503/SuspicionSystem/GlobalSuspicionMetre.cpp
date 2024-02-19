@@ -3,19 +3,16 @@
 
 using namespace SuspicionSystem;
 
-void SuspicionSystem::GlobalSuspicionMetre::Init()
-{
+void SuspicionSystem::GlobalSuspicionMetre::Init(){
     mGlobalSusMeter = 0;
     mGlobalRecoveryCooldown = 0;
 }
 
-void GlobalSuspicionMetre::AddInstantGlobalSusCause(instantGlobalSusCause inCause)
-{
+void GlobalSuspicionMetre::AddInstantGlobalSusCause(instantGlobalSusCause inCause){
     ChangePlayerGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
 }
 
-void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause)
-{
+void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause){
     auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
     if (foundCause == mContinuousGlobalSusCauseVector.end())
@@ -24,8 +21,7 @@ void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause 
     }
 }
 
-void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause)
-{
+void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause){
     auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
     if (foundCause != mContinuousGlobalSusCauseVector.end())
@@ -34,8 +30,7 @@ void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCau
     }
 };
 
-void GlobalSuspicionMetre::Update(float dt)
-{
+void GlobalSuspicionMetre::Update(float dt){
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
     {
         ChangePlayerGlobalSusMetre(mContinuousCauseSusSeverityMap[thisCause]);
@@ -51,8 +46,7 @@ void GlobalSuspicionMetre::Update(float dt)
         AddContinuousGlobalSusCause(passiveRecovery);
 }
 
-void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount)
-{
+void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount){
     mGlobalSusMeter += amount;
     mGlobalSusMeter = std::clamp(mGlobalSusMeter,
         0.0f,

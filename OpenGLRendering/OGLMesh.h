@@ -23,11 +23,15 @@ namespace NCL::Rendering {
 
 		void UploadToGPU(Rendering::RendererBase* renderer = nullptr) override;
 		void UpdateGPUBuffers(unsigned int startVertex, unsigned int vertexCount);
+		void SetInstanceMatrices(const std::vector<Matrix4>& mat);
 
+		int GetInstanceMatricesSize() {
+			return mInstanceMatricesCount;
+		}
 	protected:
 		GLuint	GetVAO()			const { return vao;			}
 		void	BindVertexAttribute(int attribSlot, int bufferID, int bindingID, int elementCount, int elementSize, int elementOffset);
-
+		int mInstanceMatricesCount;
 		GLuint vao;
 		GLuint attributeBuffers[VertexAttribute::MAX_ATTRIBUTES];
 		GLuint indexBuffer;

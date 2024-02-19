@@ -3,8 +3,7 @@
 
 using namespace SuspicionSystem;
 
-void LocalSuspicionMetre::Init()
-{
+void LocalSuspicionMetre::Init(){
     for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++)
     {
         mPlayerMeters[i] = 0;
@@ -13,13 +12,11 @@ void LocalSuspicionMetre::Init()
     }
 }
 
-void LocalSuspicionMetre::AddInstantLocalSusCause(instantLocalSusCause inCause, int playerNo)
-{
+void LocalSuspicionMetre::AddInstantLocalSusCause(instantLocalSusCause inCause, int playerNo){
     ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
 };
 
-bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, int playerNo)
-{
+bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, int playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already in the activeSusCauses vector of that player
@@ -32,8 +29,7 @@ bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, in
     return false;
 };
 
-bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause, int playerNo)
-{
+bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause, int playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already int the activeSusCauses vector of that player
@@ -46,8 +42,21 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
     return false;
 }
 
-void LocalSuspicionMetre::Update(float dt)
-{
+void LocalSuspicionMetre::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
+    switch (buffEvent)
+    {
+    case disguiseBuffApplied:
+        AddActiveLocalSusCause(disguiseBuff, playerNo);
+        break;
+    case disguiseBuffRemoved:
+        RemoveActiveLocalSusCause(disguiseBuff, playerNo);
+        break;
+    default:
+        break;
+    }
+}
+
+void LocalSuspicionMetre::Update(float dt){
     for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
     {
         for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
@@ -66,8 +75,7 @@ void LocalSuspicionMetre::Update(float dt)
     }
 }
 
-void LocalSuspicionMetre::ChangePlayerLocalSusMetre(int playerNo, float ammount)
-{
+void LocalSuspicionMetre::ChangePlayerLocalSusMetre(int playerNo, float ammount){
     mPlayerMeters[playerNo] += ammount;
     mPlayerMeters[playerNo] = std::clamp(2.0f,
         mGlobalSusMeterPTR->GetGlobalSusMeter(),

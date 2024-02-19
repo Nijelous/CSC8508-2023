@@ -73,9 +73,11 @@ namespace NCL {
 			std::set<CollisionDetection::CollisionInfo> mAllCollisions;
 			std::set<CollisionDetection::CollisionInfo> mBroadphaseCollisions;
 			std::vector<CollisionDetection::CollisionInfo> mBroadphaseCollisionsVec;
+			QuadTree<GameObject*> baseTree;
 			bool mUseBroadPhase		= true;
 			int mNumCollisionFrames	= 5;
-			int mBroadphaseXZ = 256;
+			int mBroadphaseX = 256;
+			int mBroadphaseZ = 256;
 		};
 	}
 }

@@ -12,7 +12,7 @@ set(Header_Files
     "TutorialGame.h"
     "DebugNetworkedGame.h"
     "GameSceneManager.h"
-    "PushdownStates.h"
+    "SinglePlayerStates.h"
     "Scene.h"
     "SceneManager.h"
     "SceneStates.h"
@@ -30,6 +30,8 @@ set(Inventory_Buff_System
     "InventoryBuffSystem/PickupGameObject.cpp"    
     "InventoryBuffSystem/FlagGameObject.h"
     "InventoryBuffSystem/FlagGameObject.cpp"
+    "InventoryBuffSystem/SoundEmitter.h"
+    "InventoryBuffSystem/SoundEmitter.cpp"
 )
 source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
 
@@ -57,6 +59,7 @@ set(Source_Files
     "TutorialGame.cpp"
     "DebugNetworkedGame.cpp"
     "GameSceneManager.cpp"
+    "SinglePlayerStates.cpp"
     "Scene.cpp"
     "SceneManager.cpp"
     "SceneStates.cpp"

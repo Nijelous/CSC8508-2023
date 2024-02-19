@@ -82,6 +82,8 @@ void DebugNetworkedGame::UpdateGame(float dt){
     
     if (mIsGameStarted){
         //TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
+
+        mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
         if (mIsGameFinished){
             Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
             mLevelManager->GetRenderer()->Render();
@@ -99,7 +101,7 @@ void DebugNetworkedGame::UpdateGame(float dt){
             Debug::Print("CLIENT", Vector2(5, 10), Debug::MAGENTA);
         }
         
-        mLevelManager->Update(dt, mGameState == LevelState);
+        mLevelManager->Update(dt, mGameState == InitialisingLevelState, false);
     }
     else{
         if (mThisServer){
@@ -128,7 +130,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
-        mGameState = GameStates::LevelState;
+        mGameState = GameStates::InitialisingLevelState;
         StartLevel();
     }
 }

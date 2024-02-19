@@ -16,6 +16,7 @@
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
+#include "InventoryBuffSystem/SoundEmitter.h"
 #include "UI.h"
 
 #include <filesystem>
@@ -128,9 +129,11 @@ void LevelManager::ResetLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
-		.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
-	mWorld->GetMainCamera().SetYaw((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation().ToEuler().y);
+	if (mActiveLevel > -1) {
+		mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
+			.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
+		mWorld->GetMainCamera().SetYaw((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation().ToEuler().y);
+	}
 }
 
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
@@ -180,8 +183,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
-	
-	LoadItems(itemPositions);
+	SendWallFloorInstancesToGPU();
+	LoadItems(itemPositions);	
 
 	mAnimation->PreloadMatTextures(mRenderer);
 
@@ -189,23 +192,37 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects) {
+
+void LevelManager::SendWallFloorInstancesToGPU() {
+	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
+	instance->SetInstanceMatrices(mLevelMatrices);
+	if (!mLevelLayout.empty()) {
+		mRenderer->SetWallFloorObject(mLevelLayout[0]);
+	}
+}
+
+void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
 	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
 		for (GameObject* obj : mUpdatableObjects) {
 			obj->UpdateObject(dt);
 		}
 	}
 
-	mWorld->UpdateWorld(dt);
-	mRenderer->Update(dt);
-	mPhysics->Update(dt);
-	mAnimation->Update(dt, mUpdatableObjects, preAnimationList);
-	mRenderer->Render();
-	Debug::UpdateRenderables(dt);
+	if (isPaused)
+		mRenderer->Render(); // needed to see dubug message
+	else {
+		mWorld->UpdateWorld(dt);
+		mRenderer->Update(dt);
+		mPhysics->Update(dt);
+		mAnimation->Update(dt);
+		mRenderer->Render();
+		Debug::UpdateRenderables(dt);
+	}
 }
 
 void LevelManager::InitialiseAssets() {
 	mCubeMesh = mRenderer->LoadMesh("cube.msh");
+	mWallFloorCubeMesh = mRenderer->LoadMesh("cube.msh");
 	mSphereMesh = mRenderer->LoadMesh("sphere.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("Capsule.msh");
 	mCharMesh = mRenderer->LoadMesh("goat.msh");
@@ -288,6 +305,7 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 			break;
 		}
 	}
+	
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
@@ -320,8 +338,12 @@ void LevelManager::LoadGuards(int guardCount) {
 
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		AddFlagToWorld(itemPositions[i],mInventoryBuffSystemClassPtr);
-		return;
+		if (i == itemPositions.size() / 2) {
+			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+		}
+		else {
+			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+		}
 	}
 }
 
@@ -367,7 +389,7 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -397,7 +419,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
@@ -577,11 +599,13 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 
 	mWorld->AddGameObject(pickup);
 
+	mUpdatableObjects.push_back(pickup);
+
 	return pickup;
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
-	mTempPlayer = new PlayerObject(mWorld, playerName);
+	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
@@ -679,4 +703,42 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	mUpdatableObjects.push_back(guard);
 
 	return guard;
+}
+
+void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+	switch (invEvent)
+	{
+	case soundEmitterUsed:
+		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
+			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+		break;
+	default:
+		break;
+	}
+}
+
+SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR)
+{
+	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	soundEmitterObjectPtr->SetBoundingVolume((CollisionVolume*)volume);
+	soundEmitterObjectPtr->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
+	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
+
+	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
+
+	soundEmitterObjectPtr->GetPhysicsObject()->SetInverseMass(0);
+	soundEmitterObjectPtr->GetPhysicsObject()->InitSphereInertia(false);
+
+	soundEmitterObjectPtr->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
+
+	mWorld->AddGameObject(soundEmitterObjectPtr);
+
+	return soundEmitterObjectPtr;
 }

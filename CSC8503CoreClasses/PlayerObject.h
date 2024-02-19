@@ -1,6 +1,9 @@
 #pragma once
 
 #include "GameObject.h"
+#include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
+
+using namespace InventoryBuffSystem;
 
 namespace NCL {
 	namespace CSC8503 {
@@ -17,7 +20,8 @@ namespace NCL {
 
 		class PlayerObject : public GameObject {
 		public:
-			PlayerObject(GameWorld* world, const std::string& objName = "", int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
+			PlayerObject(GameWorld* world, const std::string& objName = "", InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr, int playerID = 0,
+				int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
 			virtual void UpdateObject(float dt);
@@ -29,12 +33,20 @@ namespace NCL {
 			int mWalkSpeed;
 			int mSprintSpeed;
 			int mCrouchSpeed;
+			int mActiveItemSlot;
+
+			int mPlayerID;
 
 			PlayerState mPlayerState;
 
 			GameWorld* mGameWorld;
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
 
 			virtual void MovePlayer(float dt);
+			
+			void RayCastFromPlayer(GameWorld* world);
+
+			void ControlInventory();
 
 			void AttachCameraToPlayer(GameWorld* world);
 
