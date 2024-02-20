@@ -85,8 +85,8 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
-	for ( auto& a : mAnimationList) {
-		a->Update(dt);
+	for ( auto& animList : mAnimationList) {
+		animList->Update(dt);
 	}
 }
 
