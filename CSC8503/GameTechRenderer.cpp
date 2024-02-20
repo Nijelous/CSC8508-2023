@@ -540,12 +540,15 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
-
-		BindMesh((OGLMesh&)*(*mOutlinedObjects[i]).GetMesh());
-		size_t layerCount = (*mOutlinedObjects[i]).GetMesh()->GetSubMeshCount();
-		for (size_t i = 0; i < layerCount; ++i) {
-			DrawBoundMesh((uint32_t)i);
-		}
+		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i];
+		BindMesh(*mesh);
+		size_t layerCount = mesh->GetSubMeshCount();
+		for (size_t b = 0; b < layerCount; ++b) {
+			glActiveTexture(GL_TEXTURE3);
+			GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
+			glBindTexture(GL_TEXTURE_2D, textureID);
+			glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
+			DrawBoundMesh((uint32_t)b);
 	}
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
