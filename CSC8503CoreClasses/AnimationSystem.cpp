@@ -39,15 +39,9 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
 {
-	mAnimationList.clear();
-	mGuardList.clear();
-	mPlayerList.clear();
 		for (auto& obj : UpdatableObjects) {
-			//Animation List
-			
 			if (obj->GetAnimationObject()) {
 				AnimationObject* animObj = obj->GetAnimationObject();
-				mAnimationList.emplace_back(animObj);
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
@@ -79,9 +73,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 				
 				frameMatricesVec.clear();
-				
-				
-				
 
 			}
 
@@ -196,11 +187,16 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 
 void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects) {
 	for (auto& obj : UpdatableObjects) {
+		
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
 		}
 	}
 }
