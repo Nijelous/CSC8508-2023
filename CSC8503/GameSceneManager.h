@@ -23,7 +23,7 @@ namespace NCL {
 			PauseScreenState
 		};
 
-		class GameSceneManager : public Scene{
+		class GameSceneManager : public Scene {
 		public:
 			GameSceneManager(bool isNetworkGame = false);
 			~GameSceneManager();
@@ -41,7 +41,7 @@ namespace NCL {
 
 			// to be repalced by actual game logic
 			bool PlayerWonGame();
-			bool PLayerLostGame() { return false; }
+			bool PlayerLostGame();
 
 			void CreateLevel();
 
@@ -63,6 +63,8 @@ namespace NCL {
 
 		private:
 			static GameSceneManager* instance;
+
+			int mPlayersFinalPoints;
 		};
 	}
 }

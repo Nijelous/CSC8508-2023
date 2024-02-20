@@ -1,4 +1,5 @@
 ﻿#include "SceneStates.h"
+#include "Scene.h"
 
 #include "DebugNetworkedGame.h"
 #include "Window.h"
@@ -13,17 +14,17 @@ void MainMenuSceneState::OnAwake() {
 
 PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
-		*newState = new SingleplayerState();
+		*newState = new SingleplayerState(mScene);
 		return PushdownResult::Push;
 	}
 	
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
-		*newState = new ServerState();
+		*newState = new ServerState(mScene);
 		return PushdownResult::Push;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM3)) {
-		*newState = new ClientState();
+		*newState = new ClientState(mScene);
 		return PushdownResult::Push;
 	}
 
@@ -36,7 +37,7 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 
 PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState();
+		*newState = new MainMenuSceneState(mScene);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -49,7 +50,7 @@ void SingleplayerState::OnAwake() {
 
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState();
+		*newState = new MainMenuSceneState(mScene);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -63,7 +64,7 @@ void ServerState::OnAwake(){
 
 PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState();
+		*newState = new MainMenuSceneState(mScene);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;

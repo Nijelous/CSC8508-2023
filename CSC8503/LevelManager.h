@@ -22,6 +22,17 @@ namespace NCL {
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
+
+		struct GameResults {
+			bool mGameWon;
+			int mCurrentPoints;
+
+			GameResults(bool gameWon, int currentPoints) {
+				mGameWon = gameWon;
+				mCurrentPoints = currentPoints;
+			}
+		};
+
 		class LevelManager : PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
@@ -55,7 +66,8 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
-			bool CheckGameWon();
+			GameResults CheckGameWon();
+			bool CheckGameLost();
 		
 		protected:
 			LevelManager();
@@ -157,7 +169,7 @@ namespace NCL {
 			Shader* mAnimationShader2;
 
 			//animation guard
-			std::map<std::string, MeshAnimation*> preAnimationList;
+			std::map<std::string, MeshAnimation*> mPreAnimationList;
 			MeshAnimation* mGuardAnimationStand;
 			MeshAnimation* mGuardAnimationSprint;
 			MeshAnimation* mGuardAnimationWalk;
@@ -174,14 +186,16 @@ namespace NCL {
 			
 			
 
+			// game objects
 			Helipad* mHelipad;
-
 			PlayerObject* mTempPlayer;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
+			// key variables
 			int mActiveLevel;
+			float mTimer;
 		};
 	}
 }
