@@ -39,6 +39,9 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
 {
+	mAnimationList.clear();
+	mGuardList.clear();
+	mPlayerList.clear();
 		for (auto& obj : UpdatableObjects) {
 			//Animation List
 			
