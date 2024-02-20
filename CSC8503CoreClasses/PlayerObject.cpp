@@ -43,7 +43,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 }
 
 PlayerObject::~PlayerObject() {
-
+	
 }
 
 

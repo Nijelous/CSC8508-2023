@@ -6,28 +6,30 @@ using namespace NCL::Maths;
 
 SoundManager::SoundManager() {
 	mSoundEngine = createIrrKlangDevice();
-	//mFootStep = mSoundEngine->play3D("", vec3df(0, 0, 0), true, true);
 }
 
 SoundManager::~SoundManager() {
-	/*if (mFootStep) {
-		mFootStep->drop();
-	}*/
 	DeleteSounds();
 	mSoundEngine->drop();
 }
 
-ISound* SoundManager::AddFootStepSound(Vector3 soundPos) {
-	ISound* footStep = mSoundEngine->play3D("", ConvertToVec3df(soundPos), true);
-	mSounds.emplace_back(footStep);
-	return footStep;
+ISound* SoundManager::AddWalkSound() {
+	ISound* walk = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
+	mSounds.emplace_back(walk);
+	return walk;
+}
+
+ISound* SoundManager::AddRunSound() {
+	ISound* run = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
+	mSounds.emplace_back(run);
+	return run;
 }
 
 void SoundManager::PlayOneTimeSound(Vector3 position) {
 	ISound* oneTimeSound = mSoundEngine->play3D("soundFile.mp3", ConvertToVec3df(position));
 }
 
-void SoundManager::SetSoundPauseState(ISound* sound, bool isPaused) {
+void SoundManager::SetSoundToBePaused(ISound* sound, bool isPaused) {
 	sound->setIsPaused(isPaused);
 }
 
