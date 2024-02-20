@@ -53,7 +53,7 @@ PushdownState::PushdownResult PlayingLevel::OnUpdate(float dt, PushdownState** n
 		*newState = new Victory(mGameSceneManager);
 		return PushdownResult::Push;
 	}
-	if (mGameSceneManager->PLayerLostGame()) {
+	if (mGameSceneManager->PlayerLostGame()) {
 		*newState = new Defeat(mGameSceneManager);
 		return PushdownResult::Push;
 	}

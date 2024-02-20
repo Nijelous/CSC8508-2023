@@ -87,7 +87,7 @@ bool GameSceneManager::PlayerWonGame() {
 	return false;
 }
 
-bool GameSceneManager::PLayerLostGame() {
+bool GameSceneManager::PlayerLostGame() {
 	if (mLevelManager->CheckGameLost())
 		return true;
 	return false;

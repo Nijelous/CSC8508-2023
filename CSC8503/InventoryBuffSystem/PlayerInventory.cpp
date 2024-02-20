@@ -111,7 +111,3 @@ PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed){
 PlayerInventory::item PlayerInventory::GetPlayerItem(int playerId, int itemSlot) {
 	return mPlayerInventory[playerId][itemSlot];
 }
-
-bool PlayerInventory::IsPlayerInventoryFull(int playerId) {
-	return false; //TODO - Kyriakos: Make this function, because we need it when checking whether a player should be given points
-}

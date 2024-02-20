@@ -26,8 +26,9 @@ FlagGameObject::~FlagGameObject() {
 
 void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
-
-	this->ToggleIsRendered();
+	
+	SetIsRendered(false);
+	SetHasPhysics(false);
 }
 
 void FlagGameObject::Reset() {
@@ -54,16 +55,10 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
-//TODO - Eren/Kyriakos: we need a way of getting the player number for this player
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if (otherObject->GetCollisionLayer() & Player && (this->IsRendered())
-		&& this->mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(InventoryBuffSystem::PlayerInventory::flag, 0)) {
-		GetFlag(0);
-		SetIsRendered(false);
-		SetHasPhysics(false);
-
+	if (otherObject->GetCollisionLayer() & Player) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		plObj->AddPlayerPoints(mPoints);
-
+		GetFlag(0);
 	}
 }

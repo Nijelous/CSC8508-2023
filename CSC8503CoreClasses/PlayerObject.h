@@ -35,7 +35,7 @@ namespace NCL {
 
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
-			void AddPlayerPoints(int addedPoints) { mPlayerPoints += mPlayerPoints; }
+			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
 
 			PlayerInventory::item GetEquippedItem();
 

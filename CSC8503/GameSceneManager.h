@@ -41,7 +41,7 @@ namespace NCL {
 
 			// to be repalced by actual game logic
 			bool PlayerWonGame();
-			bool PLayerLostGame();
+			bool PlayerLostGame();
 
 			void CreateLevel();
 
