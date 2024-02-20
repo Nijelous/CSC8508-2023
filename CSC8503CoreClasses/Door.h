@@ -9,11 +9,12 @@ namespace NCL {
 		public:
 			Door(){
 				mName = "Door";
+				InitStateMachine();
 			}	
 
 			virtual void Open();
 			virtual void Close();
-			virtual void InitStateMachuine();
+			virtual void InitStateMachine();
 			virtual void CountDownTimer(float dt);
 		protected:
 			const float initDoorTimer = 10.0f;

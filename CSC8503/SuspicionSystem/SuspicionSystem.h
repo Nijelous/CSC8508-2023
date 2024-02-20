@@ -3,21 +3,25 @@
 #include "GlobalSuspicionMetre.h"
 #include "LocationBasedSuspicion.h"
 #include "SuspicionMetre.h"
+#include "../InventoryBuffSystem/InventoryBuffSystem.h"
+
+using namespace InventoryBuffSystem;
 
 namespace SuspicionSystem 
 {
 	class SuspicionSystemClass
 	{
 	public:
-		SuspicionSystemClass()
+		SuspicionSystemClass(InventoryBuffSystemClass* InventoryBuffSystemClassPtr)
 		{
-			Init();
+			Init(InventoryBuffSystemClassPtr);
 		}
 
-		void Init()
+		void Init(InventoryBuffSystemClass* InventoryBuffSystemClassPtr)
 		{
 			mGlobalSuspicionMetrePtr = new GlobalSuspicionMetre();
 			mLocalSuspicionMetrePtr = new LocalSuspicionMetre(mGlobalSuspicionMetrePtr);
+			InventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mLocalSuspicionMetrePtr);
 			mLocationBasedSuspicionPtr = new LocationBasedSuspicion();
 		}
 
@@ -42,5 +46,6 @@ namespace SuspicionSystem
 		LocalSuspicionMetre* mLocalSuspicionMetrePtr;
 		GlobalSuspicionMetre* mGlobalSuspicionMetrePtr;
 		LocationBasedSuspicion* mLocationBasedSuspicionPtr;
+		InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
 	};
 };

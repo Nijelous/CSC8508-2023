@@ -34,7 +34,7 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 	mUi = new UI();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-	mSuspicionSystemClassPtr = new SuspicionSystemClass();
+	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
 
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
@@ -149,7 +149,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	PrisonDoor* prisonDoorPtr=AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+
+	mUpdatableObjects.push_back(prisonDoorPtr);
+
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
 		itemPositions.push_back(itemPos);
 	}

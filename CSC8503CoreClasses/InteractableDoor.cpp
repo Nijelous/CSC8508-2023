@@ -72,12 +72,6 @@ void InteractableDoor::InitStateMachine()
 		}
 	);
 
-	State* DoorOpenAndLocked = new State([&](float dt) -> void
-		{
-
-		}
-	);
-
 	State* DoorClosedAndUnlocked = new State([&](float dt) -> void
 		{
 
@@ -92,7 +86,6 @@ void InteractableDoor::InitStateMachine()
 	);
 
 	mStateMachine->AddState(DoorClosedAndUnlocked);
-	mStateMachine->AddState(DoorOpenAndLocked);
 	mStateMachine->AddState(DoorOpenAndUnlocked);
 	mStateMachine->AddState(DoorClosedAndLocked);
 
@@ -100,13 +93,6 @@ void InteractableDoor::InitStateMachine()
 		[&]() -> bool
 		{
 			return (!this->mIsOpen);
-		}
-	));
-
-	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorOpenAndLocked,
-		[&]() -> bool
-		{
-			return this->mIsLocked;
 		}
 	));
 
@@ -121,6 +107,13 @@ void InteractableDoor::InitStateMachine()
 		[&]() -> bool
 		{
 			return this->mIsLocked;
+		}
+	));
+
+	mStateMachine->AddTransition(new StateTransition(DoorClosedAndLocked, DoorClosedAndUnlocked,
+		[&]() -> bool
+		{
+			return !this->mIsLocked;
 		}
 	));
 }

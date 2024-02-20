@@ -82,8 +82,6 @@ void LocalSuspicionMetre::Update(float dt) {
 
     }
 
-    Debug::Print("Sus:" + std::to_string(GetLocalSusMetreValue(0)), Vector2(70, 90));
-    Debug::Print(std::to_string(mRecoveryCooldowns[0]), Vector2(70, 95));
 }
 
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(int playerNo, float ammount){

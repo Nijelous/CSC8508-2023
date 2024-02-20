@@ -16,7 +16,13 @@ namespace NCL {
 			Crouch
 		};
 
-		class PlayerObject : public GameObject, PlayerBuffsObserver {
+		enum PlayerSpeedState {
+			Default,
+			SpedUp,
+			SlowedDown
+		};
+
+		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 			PlayerObject(GameWorld* world, const std::string& objName = "",
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr,
@@ -26,6 +32,7 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
+			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
 
 			PlayerInventory::item GetEquippedItem();
 
@@ -43,6 +50,7 @@ namespace NCL {
 			bool mHasSilentSprintBuff;
 
 			PlayerState mPlayerState;
+			PlayerSpeedState mPlayerSpeedState;
 
 			GameWorld* mGameWorld;
 			InventoryBuffSystem::InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
@@ -73,8 +81,10 @@ namespace NCL {
 			void	ChangeCharacterSize(float newSize);
 
 			void	EnforceMaxSpeeds();
+			void	EnforceSpedUpMaxSpeeds();
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
+			void	ChangeToSpedUpSpeeds();
 			void	UseItemForInteractable(Interactable* interactable);
 		private:
 		};

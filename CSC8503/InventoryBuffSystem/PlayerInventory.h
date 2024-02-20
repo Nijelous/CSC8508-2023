@@ -60,7 +60,7 @@ namespace InventoryBuffSystem
 
 		std::vector<item> mItemsInRandomPool =
 		{
-			screwdriver, disguise
+			doorKey
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap =

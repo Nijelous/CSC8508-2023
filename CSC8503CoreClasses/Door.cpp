@@ -4,7 +4,7 @@
 
 using namespace NCL::CSC8503;
 
-void Door::InitStateMachuine()
+void Door::InitStateMachine()
 {
 	mStateMachine = new StateMachine();
 
