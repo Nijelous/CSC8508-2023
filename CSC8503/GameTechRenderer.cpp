@@ -270,7 +270,7 @@ void GameTechRenderer::RenderSkybox() {
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	int width = hostWindow.GetScreenSize().x;
 	int height = hostWindow.GetScreenSize().y;
-	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
@@ -524,12 +524,18 @@ void GameTechRenderer::CombineBuffers() {
 
 void GameTechRenderer::DrawOutlinedObjects() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	glDepthFunc(GL_GEQUAL);
+
+	glDisable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
 	BindShader(*mOutlineShader);
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
+	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
 	glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "projMatrix"), 1, false, (float*)&projMatrix);
 	glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "viewMatrix"), 1, false, (float*)&viewMatrix);
+	glUniform2f(glGetUniformLocation(mOutlineShader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
@@ -541,7 +547,8 @@ void GameTechRenderer::DrawOutlinedObjects() {
 			DrawBoundMesh((uint32_t)i);
 		}
 	}
-	glDepthFunc(GL_LESS);
+	glDepthMask(GL_TRUE);
+	glEnable(GL_DEPTH_TEST);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
