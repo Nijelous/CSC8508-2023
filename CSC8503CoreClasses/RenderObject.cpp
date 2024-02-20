@@ -42,6 +42,5 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 }
 
 RenderObject::~RenderObject() {
-	delete mAnimation;
-	delete mMaterial;
+
 }

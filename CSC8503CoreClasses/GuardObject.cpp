@@ -19,9 +19,6 @@ GuardObject::GuardObject(const std::string& objectName) {
 }
 
 GuardObject::~GuardObject() {
-	delete mPlayer;
-	delete mWorld;
-	delete mSightedObject;
 	delete mRootSequence;
 }
 

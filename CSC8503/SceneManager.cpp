@@ -31,7 +31,7 @@ void SceneManager::InitScenes() {
 }
 
 void SceneManager::InitPushdownMachine() {
-	pushdownMachine = new PushdownMachine(new MainMenuSceneState());
+	pushdownMachine = new PushdownMachine(new MainMenuSceneState(currentScene));
 }
 
 void SceneManager::SetCurrentScene(Scenes scene) {

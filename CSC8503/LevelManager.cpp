@@ -137,7 +137,11 @@ void LevelManager::ClearLevel() {
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
 	mLevelMatrices.clear();
+	mUpdatableObjects.clear();
+	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
+	mAnimation->Clear();
+	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -160,10 +164,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	for (int i = 0; i < mLevelLayout.size(); i++) {
-		delete(mLevelLayout[i]);
-	}
-	mLevelLayout.clear();
+	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
@@ -207,10 +208,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	mAnimation->PreloadMatTextures(*mRenderer);
 
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
+
 	delete[] levelSize;
 
+	mTimer = 20.f;
 }
-
 
 void LevelManager::SendWallFloorInstancesToGPU() {
 	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
@@ -220,20 +223,26 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	}
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
-	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
-		for (GameObject* obj : mUpdatableObjects) {
-			obj->UpdateObject(dt);
+void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
+	if (isPlayingLevel) {
+		if ((mUpdatableObjects.size() > 0)) {
+			for (GameObject* obj : mUpdatableObjects) {
+				obj->UpdateObject(dt);
+			}
 		}
+		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+		if (mTempPlayer)
+			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+		mTimer -= dt;
 	}
 
 	if (isPaused)
-		mRenderer->Render(); // needed to see dubug message
+		mRenderer->Render();
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
-		mAnimation->Update(dt, mUpdatableObjects,preAnimationList);
+		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 	}
@@ -283,14 +292,14 @@ void LevelManager::InitialiseAssets() {
 
 
 	//preLoadList
-	preAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
-	preAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
-	preAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
+	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
+	mPreAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
 	
 
-	preAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
-	preAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
-	preAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
+	mPreAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
+	mPreAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
 
 	
 
@@ -470,7 +479,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -573,6 +582,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
@@ -632,7 +642,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
-	mTempPlayer->SetActive();
+	mTempPlayer->SetIsRendered(false);
 	return mTempPlayer;
 }
 
@@ -675,13 +685,21 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-bool LevelManager::CheckGameWon() {
+GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
 			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
-				return true;
+				return GameResults(true, mTempPlayer->GetPoints());
 		}
 	}
+	if (mTempPlayer)
+		return GameResults(false, mTempPlayer->GetPoints());
+	return GameResults(false, 0);
+}
+
+bool LevelManager::CheckGameLost() {
+	if (mTimer <= 0.f)
+		return true;
 	return false;
 }
 

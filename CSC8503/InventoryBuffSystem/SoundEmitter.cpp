@@ -27,7 +27,7 @@ void SoundEmitter::Update(float dt) {
 
 	if (mInitCooldown < 0)
 	{
-		this->SetActive();
+		this->SetIsRendered(false);
 		NCL::Maths::Vector3 pos = GetTransform().GetPosition();
 		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos.x, pos.z);
 	}

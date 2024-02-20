@@ -8,8 +8,6 @@ using namespace InventoryBuffSystem;
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
-
-
 		
 
 		class PlayerObject : public GameObject {
@@ -33,6 +31,12 @@ namespace NCL {
 				return mPlayerState;
 			}
 
+			virtual void OnCollisionBegin(GameObject* otherObject) override;
+
+			int GetPoints() { return mPlayerPoints; }
+			void ResetPlayerPoints() { mPlayerPoints = 0; }
+			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
+
 			PlayerInventory::item GetEquippedItem();
 
 
@@ -46,6 +50,8 @@ namespace NCL {
 			int mActiveItemSlot;
 
 			int mPlayerID;
+
+			int mPlayerPoints;
 
 			PlayerState mPlayerState;
 
