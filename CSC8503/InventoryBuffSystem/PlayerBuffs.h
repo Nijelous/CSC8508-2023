@@ -10,7 +10,9 @@ using namespace NCL::CSC8503;
 namespace InventoryBuffSystem {
 	const enum BuffEvent
 	{
-		disguiseBuffApplied, disguiseBuffRemoved
+		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved,
+		playerMakesSound, silentSprintApplied, silentSprintRemoved, speedApplied,
+		speedRemoved
 	};
 
 	class PlayerBuffsObserver
@@ -23,9 +25,16 @@ namespace InventoryBuffSystem {
 	public:
 		enum buff
 		{
-			disguiseBuff, buff2
+			Null, disguiseBuff, slow, makeSound, slowEveryoneElse,
+			everyoneElseMakesSound, silentSprint, speed
+		};
+		PlayerBuffs() {
+			Init();
 		};
 
+		~PlayerBuffs() {
+			
+		};
 		void Init();
 		void ApplyBuffToPlayer(buff inBuff, int playerNo);
 		void RemoveBuffFromPlayer(buff inBuff, int playerNo);
@@ -41,17 +50,19 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			disguiseBuff, buff2
+			silentSprint, speed
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,10},{buff2,4}
+			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffApplied}
+			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied},
+			{makeSound, playerMakesSound}, {silentSprint, silentSprintApplied},
+			{speed, speedApplied}
 		};
 
 		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
@@ -61,7 +72,30 @@ namespace InventoryBuffSystem {
 
 		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
-			{disguiseBuff, disguiseBuffRemoved}
+			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved},
+			{silentSprint, silentSprintRemoved}, {speed, speedRemoved}
+		};
+
+		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap
+		{
+			{slowEveryoneElse,[this](int playerNo)
+				{
+					for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++){
+						if(i!=playerNo){
+							ApplyBuffToPlayer(slow,i);
+						}
+					}
+				}
+			},
+			{everyoneElseMakesSound,[this](int playerNo)
+				{
+					for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++) {
+						if (i != playerNo) {
+							ApplyBuffToPlayer(makeSound,i);
+						}
+					}
+				}
+			}
 		};
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
