@@ -10,7 +10,7 @@ namespace NCL {
 		class GameWorld;
 		
 
-		class PlayerObject : public GameObject {
+		class PlayerObject : public GameObject, public PlayerInventoryObserver {
 		public:
 			PlayerObject(GameWorld* world, const std::string& objName = "", InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr, int playerID = 0,
 				int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
@@ -36,6 +36,9 @@ namespace NCL {
 			int mCrouchSpeed;
 			int mActiveItemSlot;
 
+			int mFirstInventorySlotUsageCount;
+			int mSecondInventorySlotUsageCount;
+
 			int mPlayerID;
 
 			int mPlayerPoints;
@@ -53,6 +56,8 @@ namespace NCL {
 
 			virtual void MatchCameraRotation(float yawValue);
 
+			void ResetEquippedItemUsageCount(int inventorySlot);
+
 			void StopSliding();
 
 			void	ToggleCrouch(bool isCrouching);
@@ -69,7 +74,7 @@ namespace NCL {
 
 			void	EnforceMaxSpeeds();
 
-			
+			void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 		private:
 		};
 	}
