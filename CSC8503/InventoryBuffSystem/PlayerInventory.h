@@ -20,7 +20,7 @@ namespace InventoryBuffSystem
 	class PlayerInventoryObserver
 	{
 	public:
-		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) = 0;
+		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) = 0;
 	};
 
 	const int MAX_INVENTORY_SLOTS = 2;
