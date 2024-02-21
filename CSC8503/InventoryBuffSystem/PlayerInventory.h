@@ -51,7 +51,7 @@ namespace InventoryBuffSystem
 		void UseItemInPlayerSlot(int itemSlot, int playerNo, int itemUseCount);
 		bool ItemInPlayerInventory(item inItem, int playerNo);
 		bool HandleOnItemUsed(item item, int playerNo, int invSlot, int itemUseCount);
-		ItemUseType GetItemUseType(item item);
+		ItemUseType GetItemUseType(item inItem);
 
 
 		void Attach(PlayerInventoryObserver* observer);
