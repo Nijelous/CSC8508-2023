@@ -23,7 +23,7 @@ namespace {
 GameSceneManager* GameSceneManager::instance = nullptr;
 
 GameSceneManager::GameSceneManager(bool isNetworkGame) {
-	if (!isNetworkGame){
+	if (!isNetworkGame) {
 		InitInGameMenuManager();
 	}
 	InitCamera();
@@ -60,11 +60,9 @@ void GameSceneManager::UpdateGame(float dt) {
 		DisplayDefeat();
 
 	mLevelManager->Update(dt, mGameState == PlayingLevelState, mGameState == PauseScreenState);
-
-	PlayerWonGame();
 }
 
-void GameSceneManager::InitInGameMenuManager(){
+void GameSceneManager::InitInGameMenuManager() {
 	auto* mainMenu = new MainMenu(this);
 	mPushdownMachine = new PushdownMachine(mainMenu);
 }
@@ -82,26 +80,32 @@ void GameSceneManager::CreateLevel() {
 }
 
 bool GameSceneManager::PlayerWonGame() {
-	if (mLevelManager->CheckGameWon())
+	if (mLevelManager->CheckGameWon().mGameWon) {
+		mPlayersFinalPoints = mLevelManager->CheckGameWon().mCurrentPoints;
+		return true;
+	}
+	return false;
+}
+
+bool GameSceneManager::PlayerLostGame() {
+	if (mLevelManager->CheckGameLost())
 		return true;
 	return false;
 }
 
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
-	mLevelManager->ClearLevel();
 	Debug::Print("Welcome", Vector2(45, 50));
 	Debug::Print("Press SPACE to continue", Vector2(30, 55));
 }
 
 void GameSceneManager::DisplayVictory() {
 	// to be replaced by proper UI
-	mLevelManager->ClearLevel();
 	Debug::Print("VICTORY", Vector2(45, 50));
+	Debug::Print("YOU GOT " + std::to_string(mPlayersFinalPoints) + " POINTS", Vector2(38, 53));
 }
 
 void GameSceneManager::DisplayDefeat() {
 	// to be replaced by proper UI
-	mLevelManager->ClearLevel();
 	Debug::Print("DEFEAT", Vector2(45, 50));
 }

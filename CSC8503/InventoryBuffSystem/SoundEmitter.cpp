@@ -25,11 +25,11 @@ SoundEmitter::~SoundEmitter() {
 void SoundEmitter::UpdateObject(float dt) {
 	mCooldown -= dt;
 
-	if (mCooldown <= 0 && mIsActive)
+	if (mCooldown <= 0 && this->IsActive())
 	{
 		NCL::Maths::Vector3 pos = GetTransform().GetPosition();
 		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos.x, pos.z);
-		SetActive();
+		this->SetActive(false);
 	}
 }
 

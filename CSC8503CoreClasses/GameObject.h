@@ -34,12 +34,37 @@ namespace NCL::CSC8503 {
 			return mBoundingVolume;
 		}
 
-		bool IsActive() const {
-			return mIsActive;
+		bool IsRendered() const {
+			return mIsRendered;
 		}
 
-		void SetActive() {
-			mIsActive = !mIsActive;
+		bool HasPhysics() const {
+			return mHasPhysics;
+		}
+
+		void SetIsRendered(bool isRendered) {
+			mIsRendered = isRendered;
+		}
+
+		void SetHasPhysics(bool hasPhysics) {
+			mHasPhysics = hasPhysics;
+		}
+
+		void ToggleIsRendered() {
+			mIsRendered = !mIsRendered;
+		}
+
+		void ToggleHasPhysics() {
+			mHasPhysics = !mHasPhysics;
+		}
+
+		void SetActive(bool isActive){
+			mIsRendered = isActive;
+			mHasPhysics = isActive;
+		}
+
+		bool IsActive() {
+			return mIsRendered && mHasPhysics;
 		}
 
 		Transform& GetTransform() {
@@ -131,7 +156,8 @@ namespace NCL::CSC8503 {
 		AnimationObject*    mAnimationObject;
 
 		bool		mIsSensed;
-		bool		mIsActive;
+		bool		mHasPhysics;
+		bool		mIsRendered;
 		int			mWorldID;
 		std::string	mName;
 

@@ -8,28 +8,31 @@ namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
 		class Interactable;
-
-		enum PlayerState {
-			Idle,
-			Walk,
-			Sprint,
-			Crouch
-		};
-
-		enum PlayerSpeedState {
-			Default,
-			SpedUp,
-			SlowedDown
-		};
-
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
+			enum PlayerState {
+				Stand,
+				Walk,
+				Sprint,
+				Crouch,
+				Happy
+			};
+
+			enum PlayerSpeedState {
+				Default,
+				SpedUp,
+				SlowedDown
+			};
+
 			PlayerObject(GameWorld* world, const std::string& objName = "",
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr,
 				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr = nullptr, PrisonDoor* prisonDoorPtr = nullptr,
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
+			int GetPoints() { return mPlayerPoints; }
+			void ResetPlayerPoints() { mPlayerPoints = 0; }
+			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
@@ -37,6 +40,8 @@ namespace NCL {
 			PlayerInventory::item GetEquippedItem();
 
 			void ClosePrisonDoor();
+
+			PlayerState GetPlayerState() { return mPlayerState; };
 
 		protected:
 			bool mIsCrouched;
@@ -50,6 +55,8 @@ namespace NCL {
 			int mPlayerNo;
 			float mInteractHeldDt;
 			bool mHasSilentSprintBuff;
+
+			int mPlayerPoints;
 
 			PlayerState mPlayerState;
 			PlayerSpeedState mPlayerSpeedState;
@@ -83,12 +90,13 @@ namespace NCL {
 
 			void	ChangeCharacterSize(float newSize);
 
-			void	EnforceMaxSpeeds();
 			void	EnforceSpedUpMaxSpeeds();
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
 			void	ChangeToSpedUpSpeeds();
 			void	UseItemForInteractable(Interactable* interactable);
+
+			void	EnforceMaxSpeeds();
 		private:
 		};
 	}

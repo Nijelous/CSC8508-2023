@@ -23,6 +23,16 @@ namespace NCL {
 		class PickupGameObject;
 		class SoundEmitter;
 		class InteractableDoor;
+		struct GameResults {
+			bool mGameWon;
+			int mCurrentPoints;
+
+			GameResults(bool gameWon, int currentPoints) {
+				mGameWon = gameWon;
+				mCurrentPoints = currentPoints;
+			}
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
@@ -56,7 +66,8 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
-			bool CheckGameWon();
+			GameResults CheckGameWon();
+			bool CheckGameLost();
 		
 		protected:
 			LevelManager();
@@ -146,19 +157,45 @@ namespace NCL {
 			Shader* mBasicShader;
 			Shader* mSoldierShader;
 
-			// animated meshes
-			Mesh* mSoldierMesh;
-			MeshAnimation* mSoldierAnimation;
-			MeshMaterial* mSoldierMaterial;
+			// animation 
+			Mesh* mGuardMesh;
+			Mesh* mPlayerMesh;
+			Mesh* mRigMesh;
+			MeshMaterial* mRigMaterial;
+			MeshMaterial* mGuardMaterial;
+			MeshMaterial* mPlayerMaterial;
 
+			Shader* mAnimationShader;
+			Shader* mAnimationShader2;
+
+			//animation guard
+			std::map<std::string, MeshAnimation*> mPreAnimationList;
+			MeshAnimation* mGuardAnimationStand;
+			MeshAnimation* mGuardAnimationSprint;
+			MeshAnimation* mGuardAnimationWalk;
+			MeshAnimation* mGuardAnimationHappy;
+			MeshAnimation* mGuardAnimationAngry;
+
+			MeshAnimation* mPlayerAnimationStand;
+			MeshAnimation* mPlayerAnimationSprint;
+			MeshAnimation* mPlayerAnimationWalk;
+
+			MeshAnimation* mRigAnimationStand;
+			MeshAnimation* mRigAnimationSprint;
+			MeshAnimation* mRigAnimationWalk;
+			
+			
+
+			// game objects
 			Helipad* mHelipad;
-
 			PlayerObject* mTempPlayer;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
+			// key variables
 			int mActiveLevel;
+			float mTimer;
 		};
 	}
 }

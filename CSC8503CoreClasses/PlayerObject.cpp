@@ -73,6 +73,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mActiveItemSlot = 0;
 
 	mPlayerNo = playerID;
+	mPlayerPoints = 0;
 	mIsPlayer = true;
 	mHasSilentSprintBuff = false;
 	mInteractHeldDt = 0;
@@ -142,7 +143,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-		mPlayerState = Idle;
+		mPlayerState = Stand;
 		break;
 	default:
 		break;
@@ -152,8 +153,6 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 void PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo){
 	if (mPlayerNo != playerNo)
 		return;
-
-
 }
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
@@ -197,13 +196,13 @@ void PlayerObject::MovePlayer(float dt) {
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
 
-	if (isIdle){
-		if(mPlayerState!=Idle && mSuspicionSystemClassPtr!=nullptr ){
+	if (isStand){
+		if(mPlayerState!=Stand && mSuspicionSystemClassPtr!=nullptr ){
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
-			mPlayerState = Idle;
+			mPlayerState = Stand;
 		}
 	}
 	else
@@ -474,7 +473,7 @@ void PlayerObject::ChangeToDefaultSpeeds()
 	mSprintSpeed = DEFAULT_SPRINT_SPEED;
 
 	mPlayerSpeedState = Default;
-	mPlayerState = Idle;
+	mPlayerState = Stand;
 }
 
 void PlayerObject::ChangeToSlowedSpeeds()
@@ -484,7 +483,7 @@ void PlayerObject::ChangeToSlowedSpeeds()
 	mSprintSpeed = SLOWED_SPRINT_SPEED;
 
 	mPlayerSpeedState = SlowedDown;
-	mPlayerState = Idle;
+	mPlayerState = Stand;
 }
 
 void PlayerObject::ChangeToSpedUpSpeeds()
@@ -494,7 +493,7 @@ void PlayerObject::ChangeToSpedUpSpeeds()
 	mSprintSpeed = SPED_UP_SPRINT_SPEED;
 
 	mPlayerSpeedState = SpedUp;
-	mPlayerState = Idle;
+	mPlayerState = Stand;
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {

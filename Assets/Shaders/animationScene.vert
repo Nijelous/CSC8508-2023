@@ -67,7 +67,7 @@ void main(void)
 	OUT.worldPos 	= ( modelMatrix * vec4 ( skelPos.xyz ,1)). xyz ;
 	OUT.tangent = wTangent;
 	OUT.binormal = cross(wTangent, wNormal) * tangent.w;
-	OUT.texCoord	= vec2(texCoord.x, 1- texCoord.y);
+	OUT.texCoord	= vec2(texCoord.x,1-texCoord.y);
 	OUT.colour		= objectColour;
 	OUT.normal 		= skelNormal.xyz;
 	
