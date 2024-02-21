@@ -55,6 +55,8 @@ namespace NCL {
 			int mPlayerNo;
 			float mInteractHeldDt;
 			bool mHasSilentSprintBuff;
+			int mFirstInventorySlotUsageCount;
+			int mSecondInventorySlotUsageCount;
 
 			int mPlayerPoints;
 
