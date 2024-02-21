@@ -36,7 +36,6 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mPlayerState = Walk;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
 
@@ -176,9 +175,9 @@ void PlayerObject::ControlInventory(){
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
-	if (isCrouching && mPlayerState == Crouch)
+	if (isCrouching && mObjectState == Crouch)
 		StartWalking();
-	else if (isCrouching && mPlayerState == Walk)
+	else if (isCrouching && mObjectState == Walk)
 		StartCrouching();
 }
 
@@ -192,11 +191,11 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 }
 
 void PlayerObject::StartWalking() {
-	if (!(mPlayerState == Walk)) {
-		if (mPlayerState == Crouch)
+	if (!(mObjectState == Walk)) {
+		if (mObjectState == Crouch)
 			mMovementSpeed = WALK_ACCELERATING_SPEED;
 
-		mPlayerState = Walk;
+		mObjectState = Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -205,10 +204,10 @@ void PlayerObject::StartWalking() {
 }
 
 void PlayerObject::StartSprinting() {
-	if (!(mPlayerState == Sprint)) {
+	if (!(mObjectState == Sprint)) {
 		mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mPlayerState = Sprint;
+		mObjectState = Sprint;
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -218,8 +217,8 @@ void PlayerObject::StartSprinting() {
 }
 
 void PlayerObject::StartCrouching() {
-	if (!(mPlayerState == Crouch)) {
-		mPlayerState = Crouch;
+	if (!(mObjectState == Crouch)) {
+		mObjectState = Crouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
 
@@ -239,7 +238,7 @@ void PlayerObject::EnforceMaxSpeeds() {
 	Vector3 velocityDirection = mPhysicsObject->GetLinearVelocity();
 	velocityDirection.Normalise();
 
-	switch (mPlayerState) {
+	switch (mObjectState) {
 	case(Crouch):
 		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_CROUCH_SPEED)
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_CROUCH_SPEED);

@@ -18,19 +18,6 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
-
-			enum PlayerState {
-				Stand,
-				Walk,
-				Sprint,
-				Happy,
-				Crouch
-			};
-
-			PlayerState GetPlayerState() {
-				return mPlayerState;
-			}
-
 			virtual void OnCollisionBegin(GameObject* otherObject) override;
 
 			int GetPoints() { return mPlayerPoints; }
@@ -52,8 +39,6 @@ namespace NCL {
 			int mPlayerID;
 
 			int mPlayerPoints;
-
-			PlayerState mPlayerState;
 
 			GameWorld* mGameWorld;
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
