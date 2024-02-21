@@ -34,6 +34,7 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 	mUi = new UI();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
 
 	mRoomList = std::vector<Room*>();
@@ -179,7 +180,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if(levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
 
 	if (!isMultiplayer){
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player",prisonDoorPtr);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
@@ -569,8 +570,8 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	return pickup;
 }
 
-PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
-	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr);
+PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
+	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, prisonDoor);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
@@ -645,7 +646,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	int currentNode = 1;
 	guard->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(nodes[currentNode]);
+		.SetPosition(nodes[currentNode] + Vector3(20,0,20));
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
@@ -657,7 +658,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetPlayer(mTempPlayer);
 	guard->SetGameWorld(mWorld);
-	guard->SetPrisonPosition(prisonPosition);
+	guard->SetPrisonPosition(prisonPosition + Vector3(15,0,0));
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
 
@@ -701,6 +702,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	soundEmitterObjectPtr->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
 
 	mWorld->AddGameObject(soundEmitterObjectPtr);
+
+	mUpdatableObjects.push_back(soundEmitterObjectPtr);
 
 	return soundEmitterObjectPtr;
 }

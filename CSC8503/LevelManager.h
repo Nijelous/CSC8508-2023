@@ -23,7 +23,7 @@ namespace NCL {
 		class PickupGameObject;
 		class SoundEmitter;
 		class InteractableDoor;
-		class LevelManager : PlayerInventoryObserver {
+		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
@@ -92,7 +92,7 @@ namespace NCL {
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
 			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
 

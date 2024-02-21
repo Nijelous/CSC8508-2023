@@ -54,12 +54,13 @@ namespace {
 
 PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
-	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr, PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
+	mPrisonDoorPtr = prisonDoorPtr;
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;
@@ -157,6 +158,10 @@ void PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot,mPlayerNo);
+}
+
+void PlayerObject::ClosePrisonDoor(){
+	mPrisonDoorPtr->Close();
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

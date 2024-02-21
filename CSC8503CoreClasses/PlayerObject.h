@@ -26,7 +26,7 @@ namespace NCL {
 		public:
 			PlayerObject(GameWorld* world, const std::string& objName = "",
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr,
-				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr = nullptr,
+				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr = nullptr, PrisonDoor* prisonDoorPtr = nullptr,
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
@@ -35,6 +35,8 @@ namespace NCL {
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
 
 			PlayerInventory::item GetEquippedItem();
+
+			void ClosePrisonDoor();
 
 		protected:
 			bool mIsCrouched;
@@ -51,6 +53,7 @@ namespace NCL {
 
 			PlayerState mPlayerState;
 			PlayerSpeedState mPlayerSpeedState;
+			PrisonDoor* mPrisonDoorPtr;
 
 			GameWorld* mGameWorld;
 			InventoryBuffSystem::InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;

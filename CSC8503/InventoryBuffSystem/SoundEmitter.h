@@ -12,13 +12,13 @@ namespace NCL {
         class SoundEmitter : public GameObject {
         public:
             SoundEmitter() {};
-            SoundEmitter(int initCooldown, LocationBasedSuspicion* locationBasedSuspicionPTR);
+            SoundEmitter(float initCooldown, LocationBasedSuspicion* locationBasedSuspicionPTR);
             ~SoundEmitter();
 
-            virtual void Update(float dt);
+            virtual void UpdateObject(float dt) override;
 
         protected:
-            int mInitCooldown;
+            float mCooldown;
             LocationBasedSuspicion* mLocationBasedSuspicionPTR;
         };
     }
