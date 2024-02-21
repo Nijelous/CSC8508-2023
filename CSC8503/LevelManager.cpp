@@ -756,8 +756,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	return guard;
 }
 
-InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem()
-{
+InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
 	return mInventoryBuffSystemClassPtr;
 }
 
