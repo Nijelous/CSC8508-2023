@@ -103,6 +103,10 @@ bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(item item, int playe
 	return false;
 }
 
+ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(item item) {
+	return mItemToItemUseTypeMap[item];
+}
+
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer) {
 	mInventoryObserverList.push_back(observer);
 }
