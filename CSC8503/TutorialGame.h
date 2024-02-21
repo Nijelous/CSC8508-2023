@@ -64,7 +64,6 @@ namespace NCL {
 			GameObject* AddPlayerToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddEnemyToWorld(const Vector3& position, const std::string& objectName);
 			GameObject* AddBonusToWorld(const Vector3& position, const std::string& objectName);
-			GameObject* AddAnimationTest(const Vector3& position, const std::string& objectName);
 
 			GuardObject* AddGuardToWorld(const Vector3& position, const std::string& objectName);
 
@@ -104,20 +103,9 @@ namespace NCL {
 			Shader*		basicShader = nullptr;
 
 			//Animation Thing
-			Shader* mAnimationShader = nullptr;
-
-			Mesh* mSoldierMesh = nullptr;
-			MeshAnimation* mSoldierAnimation = nullptr;
-			MeshMaterial* mSoldierMaterial = nullptr;
 			
 
-			Mesh* mGuardMesh = nullptr;
-			MeshAnimation* mGuardAnimation = nullptr;
-			MeshMaterial* mGuardMaterial = nullptr;
 			
-			
-			
-			AnimationSystem* mAnimation;
 
 
 			//Coursework Meshes

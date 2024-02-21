@@ -10,8 +10,11 @@
 
 AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g)
 {
-	
-	
+	mShader = nullptr;
+	mMesh = nullptr;
+	mAnim = nullptr;
+	mGuardState = Stand;
+	mPlayerState = Stand;
 	
 }
 
@@ -22,89 +25,130 @@ AnimationSystem::~AnimationSystem()
 void AnimationSystem::Clear()
 {
 	mAnimationList.clear();
+	mGuardList.clear();
+	mPlayerList.clear();
 }
 
-void AnimationSystem::Update(float dt)
+void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std::map<std::string,MeshAnimation*> preAnimationList)
 {
-	
-	UpdateAllAnimationObjects(dt);
-	UpdateMaterials();
+	UpdateCurrentFrames(dt);
+	UpdateAnimations(preAnimationList);
+	UpdateAllAnimationObjects(dt, UpdatableObjects);
 	
 }
 
-void AnimationSystem::UpdateAllAnimationObjects(float dt)
+void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
 {
-	mAnimationList.clear();
-	
-	gameWorld.OperateOnContents(
-		[&](GameObject* o) {
-			if (o->GetAnimationObject()) {
-				AnimationObject* animObj = o->GetAnimationObject();
-				mAnimationList.emplace_back(animObj);
-				//TODO may it is not a good position to run
-				UpdateCurrentFrames(dt);
-
-				mMesh = o->GetRenderObject()->GetMesh();
-				mAnim = animObj->GetAnimation();
-				mShader = o->GetRenderObject()->GetShader();
+		for (auto& obj : UpdatableObjects) {
+			if (obj->GetAnimationObject()) {
+				AnimationObject* animObj = obj->GetAnimationObject();
 				int currentFrame = animObj->GetCurrentFrame();
-
-				const Matrix4* bindPose = mMesh->GetBindPose().data();
+				mMesh = obj->GetRenderObject()->GetMesh();
+				mAnim = animObj->GetAnimation();
+				mShader = obj->GetRenderObject()->GetShader();
+				
 				const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 				const Matrix4* frameData = mAnim->GetJointData(currentFrame);
-				vector<Matrix4> frameMatrices;
-
 				
-				for (unsigned int a = 0; a < mMesh->GetJointCount(); ++a) {
-					frameMatrices.emplace_back(frameData[a] * invBindPose[a]);
-				}
+				const int* bindPoseIndices = mMesh->GetBindPoseIndices();
+				std::vector<std::vector<Matrix4>> frameMatricesVec;
+				for (unsigned int i = 0; i < mMesh->GetSubMeshCount(); ++i) {
 
-				o->GetRenderObject()->SetAnimation(o->GetAnimationObject()->GetAnimation());
-				o->GetRenderObject()->SetMaterial(o->GetAnimationObject()->GetMaterial());
-				o->GetRenderObject()->SetCurrentFrame(o->GetAnimationObject()->GetCurrentFrame());
-				o->GetRenderObject()->SetFrameMatrices(frameMatrices);
+					
+					Mesh::SubMeshPoses pose;
+					mMesh->GetBindPoseState(i, pose);
+					
+
+					vector<Matrix4> frameMatrices;
+					for (unsigned int i = 0; i < pose.count; ++i) {
+						int jointID = bindPoseIndices[pose.start + i];
+						Matrix4 mat = frameData[jointID] * invBindPose[pose.start + i];
+						frameMatrices.emplace_back(mat);
+					}
+					frameMatricesVec.emplace_back(frameMatrices);
+				}
+				obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
+				obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
+				obj->GetRenderObject()->SetCurrentFrame(currentFrame);
+				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
+				
+				frameMatricesVec.clear();
+
 			}
+
+			
+			
 		}
-	);
+	
+	
 }
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
-	for ( auto& a : mAnimationList) {
-		(*a).Update(dt);
+	for ( auto& animList : mAnimationList) {
+		animList->Update(dt);
 	}
 }
 
-void AnimationSystem::UpdateMaterials()
-{
-	
-	
-}
 
-void AnimationSystem::UpdateAnimations()
+void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
 {
 	
-	for (auto& a : mAnimationList) {
-		AnimationObject::mAnimationState state = (*a).GetAnimationState();
-		switch (state)
+	for (auto& obj : mGuardList) {
+
+		GuardObject::GuardState GuardState = obj->GetGuardState();
+		
+		if (mGuardState != GuardState) {
+			mGuardState =(AnimationState) GuardState;
+			obj->GetAnimationObject()->ReSetCurrentFrame();
+
+		}
+			switch (GuardState)
+			{
+			case GuardObject::GuardState::Stand:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
+				
+				break;
+			case GuardObject::GuardState::Walk:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
+				
+				break;
+			case GuardObject::GuardState::Sprint:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
+				
+				break;
+			}
+	}
+
+	for (auto& obj : mPlayerList) {
+
+		PlayerObject::PlayerState PlayerState = obj->GetPlayerState();
+
+		if (mPlayerState != PlayerState) {
+			mPlayerState = (AnimationState)PlayerState;
+			obj->GetAnimationObject()->ReSetCurrentFrame();
+
+		}
+		switch (PlayerState)
 		{
-		case AnimationObject::mAnimationState::stand:
+		case PlayerObject::PlayerState::Stand:
+			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
+
 			break;
-		case AnimationObject::mAnimationState::run:
+		case PlayerObject::PlayerState::Walk:
+			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
+
 			break;
-		case AnimationObject::mAnimationState::jumpUp:
-			break;
-		case AnimationObject::mAnimationState::jumpDown:
+		case PlayerObject::PlayerState::Sprint:
+			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
+
 			break;
 		}
-		
-		
-		
 	}
 	
 }
 
-void AnimationSystem::PreloadMatTextures(GameTechRenderer* renderer)
+void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 {
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
@@ -119,14 +163,16 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer* renderer)
 					if (filename) {
 						string path = *filename;  
 						std::cout << path << std::endl;
-						mAnimTexture = renderer->LoadTexture(path.c_str());
+						mAnimTexture = renderer.LoadTexture(path.c_str());
 						texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
+						std::cout << texID << endl;
 						NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
 					}
 					
 					mMatTextures.emplace_back(texID);
-					if (mMatTextures.size() ==4) {
+					if (mMatTextures.size() == o->GetRenderObject()->GetMesh()->GetSubMeshCount()) {
 						o->GetRenderObject()->SetMatTextures(mMatTextures);	
+						mMatTextures.clear();
 					}
 				
 					
@@ -137,4 +183,20 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer* renderer)
 
 		}
 	);
+}
+
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects) {
+	for (auto& obj : UpdatableObjects) {
+		
+		if (obj->GetName() == "Guard") {
+			mGuardList.emplace_back((GuardObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
+		}
+		if (obj->GetName() == "Player") {
+			mPlayerList.emplace_back((PlayerObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
+		}
+	}
 }

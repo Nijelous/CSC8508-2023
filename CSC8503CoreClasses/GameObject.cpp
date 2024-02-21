@@ -11,14 +11,15 @@ GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectN
 
 	mName			= objectName;
 	mWorldID			= -1;
-	mIsActive		= true;
+	mIsRendered		= true;
+	mHasPhysics		= true;
 	mBoundingVolume	= nullptr;
 	mPhysicsObject	= nullptr;
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
 
-  mAnimationObject = nullptr;
-  mCollisionLayer = collisionLayer;
+	mAnimationObject = nullptr;
+	mCollisionLayer = collisionLayer;
 
 
 	mIsPlayer = false;
@@ -29,7 +30,6 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
-
 	delete mAnimationObject;
 
 }

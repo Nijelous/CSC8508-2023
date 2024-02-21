@@ -8,13 +8,7 @@ using namespace InventoryBuffSystem;
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
-
-
-		enum PlayerState {
-			Walk,
-			Sprint,
-			Crouch
-		};
+		
 
 		class PlayerObject : public GameObject, public PlayerInventoryObserver {
 		public:
@@ -24,7 +18,27 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 
+
+			enum PlayerState {
+				Stand,
+				Walk,
+				Sprint,
+				Happy,
+				Crouch
+			};
+
+			PlayerState GetPlayerState() {
+				return mPlayerState;
+			}
+
+			virtual void OnCollisionBegin(GameObject* otherObject) override;
+
+			int GetPoints() { return mPlayerPoints; }
+			void ResetPlayerPoints() { mPlayerPoints = 0; }
+			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
+
 			PlayerInventory::item GetEquippedItem();
+
 
 		protected:
 			bool mIsCrouched;
@@ -39,6 +53,8 @@ namespace NCL {
 			int mSecondInventorySlotUsageCount;
 
 			int mPlayerID;
+
+			int mPlayerPoints;
 
 			PlayerState mPlayerState;
 

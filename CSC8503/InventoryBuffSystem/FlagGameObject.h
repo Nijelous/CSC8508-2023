@@ -10,7 +10,7 @@ namespace NCL {
     namespace CSC8503 {
         class FlagGameObject : public Item {
         public:
-            FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr);
+            FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
             ~FlagGameObject();
 
             bool isServerPlayer(GameObject* otherObject);
@@ -23,9 +23,16 @@ namespace NCL {
             virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
+            int GetPoints() { return mPoints; }
+            void SetPoints(int points) {
+                mPoints = points;
+            }
+            
         protected:
             std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
+
+            int mPoints;
         };
     }
 }

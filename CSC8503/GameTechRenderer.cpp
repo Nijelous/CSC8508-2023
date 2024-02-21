@@ -207,7 +207,7 @@ void GameTechRenderer::BuildObjectList() {
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
-			if (o->IsActive()) {
+			if (o->IsRendered()) {
 				RenderObject* rendObj = o->GetRenderObject();
 				bool isInFrustum = mFrameFrustum.SphereInsideFrustum(o->GetTransform().GetPosition(), o->GetRenderObject()->GetCullSphereRadius());
 				if (rendObj && isInFrustum && !rendObj->IsInstanced()) {
@@ -437,7 +437,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = (*i).GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
-				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatrices().size(), false, (float*)(*i).GetFrameMatrices().data());
+				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatricesVec()[b].size(), false, (float*)(*i).GetFrameMatricesVec()[b].data());
 				DrawBoundMesh((uint32_t)b);
 			}
 			

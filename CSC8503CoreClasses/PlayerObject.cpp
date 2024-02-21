@@ -44,6 +44,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 	mSecondInventorySlotUsageCount = 0;
 
 	mPlayerID = playerID;
+	mPlayerPoints = 0;
 	mIsPlayer = true;
 
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
@@ -70,6 +71,10 @@ void PlayerObject::UpdateObject(float dt) {
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetPlayerItem(mPlayerID, mActiveItemSlot);
+}
+
+void PlayerObject::OnCollisionBegin(GameObject* otherObject) {
+
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

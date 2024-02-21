@@ -56,6 +56,8 @@ namespace InventoryBuffSystem
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 		PlayerInventory::item GetPlayerItem(int playerId, int itemSlot);
 
+		bool IsPlayerInventoryFull(int playerId);
+
 	private:
 
 		std::vector<item> mItemsInRandomPool = {
