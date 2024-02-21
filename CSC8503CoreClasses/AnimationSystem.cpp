@@ -102,22 +102,24 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			mGuardState =(AnimationState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
-		}
 			switch (mObjectState)
 			{
 			case GameObject::GameObjectState::Stand:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
-				
+
 				break;
 			case GameObject::GameObjectState::Walk:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
-				
+
 				break;
 			case GameObject::GameObjectState::Sprint:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
-				
+
 				break;
 			}
+
+		}
+			
 	}
 
 	for (auto& obj : mPlayerList) {
@@ -128,22 +130,23 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			mPlayerState = (AnimationState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
+			switch (mObjectState)
+			{
+			case GameObject::GameObjectState::Stand:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
+
+				break;
+			case GameObject::GameObjectState::Walk:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
+
+				break;
+			case GameObject::GameObjectState::Sprint:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
+
+				break;
+			}
 		}
-		switch (mObjectState)
-		{
-		case GameObject::GameObjectState::Stand:
-			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
-
-			break;
-		case GameObject::GameObjectState::Walk:
-			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
-
-			break;
-		case GameObject::GameObjectState::Sprint:
-			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
-
-			break;
-		}
+		
 	}
 	
 }
