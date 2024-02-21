@@ -5,6 +5,8 @@
 #include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
+#include "../CSC8503/InventoryBuffSystem/Item.h"
+#include "Interactable.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -34,11 +36,11 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mPlayerState = Walk;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
 
 	mPlayerID = playerID;
+	mPlayerPoints = 0;
 	mIsPlayer = true;
 }
 
@@ -59,6 +61,14 @@ void PlayerObject::UpdateObject(float dt) {
 	MatchCameraRotation(yawValue);
 
 	EnforceMaxSpeeds();
+}
+
+PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
+	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetPlayerItem(mPlayerID, mActiveItemSlot);
+}
+
+void PlayerObject::OnCollisionBegin(GameObject* otherObject) {
+
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
@@ -92,7 +102,21 @@ void PlayerObject::MovePlayer(float dt) {
 }
 
 void PlayerObject::RayCastFromPlayer(GameWorld* world){
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::E)) {
+	bool isRaycastTriggered = false;
+	NCL::CSC8503::InteractType interactType;
+	
+	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::Use;
+	}
+	else if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::ItemUse;
+	}
+
+	if (isRaycastTriggered)
+	{
 		std::cout << "Ray fired" << std::endl;
 		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
 		RayCollision closestCollision;
@@ -109,11 +133,28 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
+
+				//Check if object is an item.
+				Item* item = dynamic_cast<Item*>(objectHit);
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
+
+				//Check if object is an interactable.
+				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+				if (interactablePtr != nullptr)
+				{
+					interactablePtr->Interact(interactType);
+					return;
+				}
+
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
 	}
 }
+
 void PlayerObject::ControlInventory(){
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
@@ -134,9 +175,9 @@ void PlayerObject::ControlInventory(){
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
-	if (isCrouching && mPlayerState == Crouch)
+	if (isCrouching && mObjectState == Crouch)
 		StartWalking();
-	else if (isCrouching && mPlayerState == Walk)
+	else if (isCrouching && mObjectState == Walk)
 		StartCrouching();
 }
 
@@ -150,11 +191,11 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 }
 
 void PlayerObject::StartWalking() {
-	if (!(mPlayerState == Walk)) {
-		if (mPlayerState == Crouch)
+	if (!(mObjectState == Walk)) {
+		if (mObjectState == Crouch)
 			mMovementSpeed = WALK_ACCELERATING_SPEED;
 
-		mPlayerState = Walk;
+		mObjectState = Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -163,10 +204,10 @@ void PlayerObject::StartWalking() {
 }
 
 void PlayerObject::StartSprinting() {
-	if (!(mPlayerState == Sprint)) {
+	if (!(mObjectState == Sprint)) {
 		mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mPlayerState = Sprint;
+		mObjectState = Sprint;
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -176,8 +217,8 @@ void PlayerObject::StartSprinting() {
 }
 
 void PlayerObject::StartCrouching() {
-	if (!(mPlayerState == Crouch)) {
-		mPlayerState = Crouch;
+	if (!(mObjectState == Crouch)) {
+		mObjectState = Crouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
 
@@ -197,7 +238,7 @@ void PlayerObject::EnforceMaxSpeeds() {
 	Vector3 velocityDirection = mPhysicsObject->GetLinearVelocity();
 	velocityDirection.Normalise();
 
-	switch (mPlayerState) {
+	switch (mObjectState) {
 	case(Crouch):
 		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_CROUCH_SPEED)
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_CROUCH_SPEED);

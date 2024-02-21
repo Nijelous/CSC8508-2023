@@ -26,6 +26,14 @@ namespace NCL::CSC8503 {
 		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
 		~GameObject();
 
+		enum GameObjectState {
+			Stand,
+			Walk,
+			Sprint,
+			Happy,
+			Crouch
+		};
+
 		void SetBoundingVolume(CollisionVolume* vol) {
 			mBoundingVolume = vol;
 		}
@@ -34,12 +42,28 @@ namespace NCL::CSC8503 {
 			return mBoundingVolume;
 		}
 
-		bool IsActive() const {
-			return mIsActive;
+		bool IsRendered() const {
+			return mIsRendered;
 		}
 
-		void SetActive() {
-			mIsActive = !mIsActive;
+		bool HasPhysics() const {
+			return mHasPhysics;
+		}
+
+		void SetIsRendered(bool isRendered) {
+			mIsRendered = isRendered;
+		}
+
+		void SetHasPhysics(bool hasPhysics) {
+			mHasPhysics = hasPhysics;
+		}
+
+		void ToggleIsRendered() {
+			mIsRendered = !mIsRendered;
+		}
+
+		void ToggleHasPhysics() {
+			mHasPhysics = !mHasPhysics;
 		}
 
 		Transform& GetTransform() {
@@ -121,6 +145,10 @@ namespace NCL::CSC8503 {
 			mCollisionLayer = collisionLayer;
 		}
 
+		GameObjectState GetGameOjbectState() {
+			return mObjectState;
+		}
+
 	protected:
 		Transform			mTransform;
 
@@ -131,7 +159,8 @@ namespace NCL::CSC8503 {
 		AnimationObject*    mAnimationObject;
 
 		bool		mIsSensed;
-		bool		mIsActive;
+		bool		mHasPhysics;
+		bool		mIsRendered;
 		int			mWorldID;
 		std::string	mName;
 
@@ -139,6 +168,8 @@ namespace NCL::CSC8503 {
 
 		CollisionLayer mCollisionLayer;
 		bool mIsPlayer;
+
+		GameObjectState mObjectState;
 	};
 }
 

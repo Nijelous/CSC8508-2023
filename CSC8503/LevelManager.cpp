@@ -26,6 +26,8 @@
 using namespace NCL::CSC8503;
 using namespace irrklang;
 
+LevelManager* LevelManager::instance = nullptr;
+
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
@@ -35,6 +37,7 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 	mUi = new UI();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
+	mSuspicionSystemClassPtr = new SuspicionSystemClass();
 
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
@@ -81,10 +84,7 @@ LevelManager::~LevelManager() {
 	delete mCharMesh;
 	delete mEnemyMesh;
 	delete mBonusMesh;
-	delete mSoldierAnimation;
-	delete mSoldierMaterial;
-	delete mSoldierMesh;
-	delete mSoldierShader;
+
 
 	delete mBasicTex;
 	delete mBasicShader;
@@ -109,12 +109,52 @@ LevelManager::~LevelManager() {
 
 	delete mSuspensionBarTex;
 	delete mSuspensionIndicatorTex;
+
+	delete mAnimationShader;
+
+	delete mGuardMaterial;
+	delete mGuardMesh;
+
+	delete mPlayerMaterial;
+	delete mPlayerMesh;
+
+	delete mRigMaterial;
+	delete mRigMesh;
+
+	delete mGuardAnimationStand;
+	delete mGuardAnimationSprint;
+	delete mGuardAnimationWalk;
+
+	
+	delete mPlayerAnimationStand;
+	delete mPlayerAnimationSprint;
+	delete mPlayerAnimationWalk;
+	
+	delete mRigAnimationStand;
+	delete mRigAnimationSprint;
+	delete mRigAnimationWalk;
 }
 
-void LevelManager::ResetLevel() {
+void LevelManager::ClearLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
+	mLevelMatrices.clear();
+	mUpdatableObjects.clear();
+	mLevelLayout.clear();
+	mRenderer->SetWallFloorObject(nullptr);
+	mAnimation->Clear();
+	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
+}
+
+LevelManager* LevelManager::GetLevelManager() {
+	if (instance == nullptr) {
+		instance = new LevelManager();
+	}
+	return instance;
+}
+
+void LevelManager::ResetLevel() {
 	if (mActiveLevel > -1) {
 		mTempPlayer->GetTransform().SetPosition((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetPosition())
 			.SetOrientation((*mLevelList[mActiveLevel]).GetPlayerStartTransform(0).GetOrientation());
@@ -127,10 +167,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mActiveLevel = levelID;
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	for (int i = 0; i < mLevelLayout.size(); i++) {
-		delete(mLevelLayout[i]);
-	}
-	mLevelLayout.clear();
+	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
@@ -171,9 +208,15 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions);	
-	delete[] levelSize;
-}
 
+	mAnimation->PreloadMatTextures(*mRenderer);
+
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
+
+	delete[] levelSize;
+
+	mTimer = 20.f;
+}
 
 void LevelManager::SendWallFloorInstancesToGPU() {
 	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
@@ -183,20 +226,26 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	}
 }
 
-void LevelManager::Update(float dt, bool isUpdatingObjects, bool isPaused) {
-	if ((mUpdatableObjects.size() > 0) && isUpdatingObjects) {
-		for (GameObject* obj : mUpdatableObjects) {
-			obj->UpdateObject(dt);
+void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
+	if (isPlayingLevel) {
+		if ((mUpdatableObjects.size() > 0)) {
+			for (GameObject* obj : mUpdatableObjects) {
+				obj->UpdateObject(dt);
+			}
 		}
+		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+		if (mTempPlayer)
+			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+		mTimer -= dt;
 	}
 
 	if (isPaused)
-		mRenderer->Render(); // needed to see dubug message
+		mRenderer->Render();
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
-		mAnimation->Update(dt);
+		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 	}
@@ -219,11 +268,47 @@ void LevelManager::InitialiseAssets() {
 	mFloorNormal = mRenderer->LoadTexture("panel_normal.png");
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
+	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
 
-	mSoldierMesh = mRenderer->LoadMesh("Role_T.msh");
-	mSoldierAnimation = mRenderer->LoadAnimation("Role_T.anm");
-	mSoldierMaterial = mRenderer->LoadMaterial("Role_T.mat");
-	mSoldierShader = mRenderer->LoadShader("SkinningVertex.glsl", "scene.frag");
+
+
+	mGuardMesh = mRenderer->LoadMesh("MaleGuard/Male_Guard.msh");	
+	mGuardMaterial = mRenderer->LoadMaterial("MaleGuard/Male_Guard.mat");
+
+	mPlayerMesh = mRenderer->LoadMesh("FemaleGuard/Female_Guard.msh");
+	mPlayerMaterial = mRenderer->LoadMaterial("FemaleGuard/Female_Guard.mat");
+	
+	mRigMesh = mRenderer->LoadMesh("Max/Rig_Maximilian.msh");
+	mRigMaterial = mRenderer->LoadMaterial("Max/Rig_Maximilian.mat");
+	//Animations
+	mGuardAnimationStand = mRenderer->LoadAnimation("MaleGuard/Idle1.anm");
+	mGuardAnimationWalk = mRenderer->LoadAnimation("MaleGuard/StepForwardOneHand.anm");
+	mGuardAnimationSprint = mRenderer->LoadAnimation("MaleGuard/StepForward.anm");
+
+	mPlayerAnimationStand = mRenderer->LoadAnimation("FemaleGuard/Idle1.anm");
+	mPlayerAnimationWalk = mRenderer->LoadAnimation("FemaleGuard/StepForwardOneHand.anm");
+	mPlayerAnimationSprint = mRenderer->LoadAnimation("FemaleGuard/StepForward.anm");
+
+	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
+	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
+	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
+
+
+	//preLoadList
+	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
+	mPreAnimationList.insert(std::make_pair("GuardWalk", mRigAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("GuardSprint", mRigAnimationSprint));
+	
+
+	mPreAnimationList.insert(std::make_pair("PlayerStand", mGuardAnimationStand));
+	mPreAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
+	mPreAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
+
+	
+
+
+	
+	
 
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
@@ -278,6 +363,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
 		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
+
 
 	}
 }
@@ -432,7 +518,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -535,6 +621,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
@@ -594,7 +681,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
-	mTempPlayer->SetActive();
+	mTempPlayer->SetIsRendered(false);
 	return mTempPlayer;
 }
 
@@ -627,9 +714,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, PLAYER_MESH_SIZE));
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
-
+	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -637,13 +724,21 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-bool LevelManager::CheckGameWon() {
+GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
 			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
-				return true;
+				return GameResults(true, mTempPlayer->GetPoints());
 		}
 	}
+	if (mTempPlayer)
+		return GameResults(false, mTempPlayer->GetPoints());
+	return GameResults(false, 0);
+}
+
+bool LevelManager::CheckGameLost() {
+	if (mTimer <= 0.f)
+		return true;
 	return false;
 }
 
@@ -665,11 +760,14 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(nodes[currentNode]);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, meshSize));
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
+	guard->SetAnimationObject(new AnimationObject(mRigAnimationStand, mRigMaterial));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
+
+
 
 	guard->SetCollisionLayer(Npc);
 
@@ -690,7 +788,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 	{
 	case soundEmitterUsed:
 		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
-			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
 		break;
 	default:
 		break;

@@ -14,6 +14,8 @@ namespace NCL {
             GuardObject(const std::string& name = "");
             ~GuardObject();
 
+
+
             virtual void UpdateObject(float dt) override;
 
             void SetPlayer(GameObject* newPlayer) {
@@ -35,6 +37,8 @@ namespace NCL {
             void SetCurrentNode(int node) {
                 mCurrentNode = node;
             }
+
+
         protected:
             void RaycastToPlayer();
             Vector3 GuardForwardVector();
@@ -68,6 +72,7 @@ namespace NCL {
 
             BehaviourSequence* mRootSequence;
             BehaviourState mState = Ongoing;
+
         };
     }
 }

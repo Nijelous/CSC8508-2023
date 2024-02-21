@@ -111,3 +111,7 @@ PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed){
 	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), gen);
 	return mItemsInRandomPool[0];
 }
+
+PlayerInventory::item PlayerInventory::GetPlayerItem(int playerId, int itemSlot) {
+	return mPlayerInventory[playerId][itemSlot];
+}

@@ -22,11 +22,22 @@ namespace NCL {
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
+
+		struct GameResults {
+			bool mGameWon;
+			int mCurrentPoints;
+
+			GameResults(bool gameWon, int currentPoints) {
+				mGameWon = gameWon;
+				mCurrentPoints = currentPoints;
+			}
+		};
+
 		class LevelManager : PlayerInventoryObserver {
 		public:
-			LevelManager();
-			~LevelManager();
+			static LevelManager* GetLevelManager();
 			void ResetLevel();
+			void ClearLevel();
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -55,9 +66,15 @@ namespace NCL {
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
-			bool CheckGameWon();
+			GameResults CheckGameWon();
+			bool CheckGameLost();
 		
 		protected:
+			LevelManager();
+			~LevelManager();
+
+			static LevelManager* instance;
+
 			virtual void InitialiseAssets();
 
 			void InitialiseIcons();
@@ -151,19 +168,45 @@ namespace NCL {
 			Shader* mBasicShader;
 			Shader* mSoldierShader;
 
-			// animated meshes
-			Mesh* mSoldierMesh;
-			MeshAnimation* mSoldierAnimation;
-			MeshMaterial* mSoldierMaterial;
+			// animation 
+			Mesh* mGuardMesh;
+			Mesh* mPlayerMesh;
+			Mesh* mRigMesh;
+			MeshMaterial* mRigMaterial;
+			MeshMaterial* mGuardMaterial;
+			MeshMaterial* mPlayerMaterial;
 
+			Shader* mAnimationShader;
+			Shader* mAnimationShader2;
+
+			//animation guard
+			std::map<std::string, MeshAnimation*> mPreAnimationList;
+			MeshAnimation* mGuardAnimationStand;
+			MeshAnimation* mGuardAnimationSprint;
+			MeshAnimation* mGuardAnimationWalk;
+			MeshAnimation* mGuardAnimationHappy;
+			MeshAnimation* mGuardAnimationAngry;
+
+			MeshAnimation* mPlayerAnimationStand;
+			MeshAnimation* mPlayerAnimationSprint;
+			MeshAnimation* mPlayerAnimationWalk;
+
+			MeshAnimation* mRigAnimationStand;
+			MeshAnimation* mRigAnimationSprint;
+			MeshAnimation* mRigAnimationWalk;
+			
+			
+
+			// game objects
 			Helipad* mHelipad;
-
 			PlayerObject* mTempPlayer;
 
-			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-			SuspicionSystemClass* mSuspicionSystemClassPtr = new SuspicionSystemClass();
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
+			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
+			// key variables
 			int mActiveLevel;
+			float mTimer;
 		};
 	}
 }

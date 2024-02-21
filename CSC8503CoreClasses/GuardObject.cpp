@@ -18,9 +18,6 @@ GuardObject::GuardObject(const std::string& objectName) {
 }
 
 GuardObject::~GuardObject() {
-	delete mPlayer;
-	delete mWorld;
-	delete mSightedObject;
 	delete mRootSequence;
 }
 
@@ -116,15 +113,19 @@ BehaviourAction* GuardObject::Patrol() {
 	BehaviourAction* Patrol = new BehaviourAction("Patrol", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
+			mNextNode = mCurrentNode + 1;
+			mObjectState = Walk;
 			if (mCurrentNode == mNodes.size() - 1) {
 				mNextNode = 0;
 			}
 			else {
 				mNextNode = mCurrentNode + 1;
 			}
+
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
+				
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				LookTowardFocalPoint(direction);
@@ -142,6 +143,7 @@ BehaviourAction* GuardObject::Patrol() {
 			}
 			else if (mCanSeePlayer == true) {
 				return Failure;
+				
 			}
 		}
 		return state;
@@ -154,9 +156,11 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 	BehaviourAction* ChasePlayer = new BehaviourAction("Chase Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
+			mObjectState = Sprint;
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
+				
 				int GuardCatchingDistanceSquared = 25;
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
