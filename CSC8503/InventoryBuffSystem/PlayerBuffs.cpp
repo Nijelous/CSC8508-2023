@@ -7,6 +7,8 @@ using namespace NCL::CSC8503;
 void PlayerBuffs::Init(){
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 		mActiveBuffDurationMap[playerNo].clear();
+
+	mBuffsObserverList.clear();
 }
 
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){

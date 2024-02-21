@@ -116,14 +116,12 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
 }
 
 void PickupGameObject::GoOver(float dt) {
-	Vector3 OverPos = GetTransform().GetPosition() + Vector3(0, 10, 0);
-	GetTransform().SetPosition(OverPos);
+	SetActive(true);
 	mCooldown = 0;
 }
 
 void PickupGameObject::GoUnder(float dt) {
-	Vector3 UnderPos = GetTransform().GetPosition() + Vector3(0, -10, 0);
-	GetTransform().SetPosition(UnderPos);
+	SetActive(false);
 	mCooldown = mInitCooldown;
 	ChangeToRandomPickup();
 }

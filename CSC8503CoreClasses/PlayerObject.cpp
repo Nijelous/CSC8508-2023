@@ -80,7 +80,8 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 }
 
 PlayerObject::~PlayerObject() {
-
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Detach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);
 }
 
 
@@ -196,7 +197,7 @@ void PlayerObject::MovePlayer(float dt) {
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
 
-	if (isStand){
+	if (isIdle){
 		if(mPlayerState!=Stand && mSuspicionSystemClassPtr!=nullptr ){
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);

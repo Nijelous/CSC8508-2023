@@ -21,7 +21,8 @@ namespace SuspicionSystem
 		{
 			mGlobalSuspicionMetrePtr = new GlobalSuspicionMetre();
 			mLocalSuspicionMetrePtr = new LocalSuspicionMetre(mGlobalSuspicionMetrePtr);
-			InventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mLocalSuspicionMetrePtr);
+			mInventoryBuffSystemClassPtr = InventoryBuffSystemClassPtr;
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mLocalSuspicionMetrePtr);
 			mLocationBasedSuspicionPtr = new LocationBasedSuspicion();
 		}
 
@@ -38,6 +39,13 @@ namespace SuspicionSystem
 			mLocalSuspicionMetrePtr->Update(dt);
 			mLocationBasedSuspicionPtr->Update(dt);
 		}
+
+		~SuspicionSystemClass() {
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Detach(mLocalSuspicionMetrePtr);
+			delete mLocalSuspicionMetrePtr;
+			delete mGlobalSuspicionMetrePtr;
+			delete mInventoryBuffSystemClassPtr;
+		};
 
 		LocalSuspicionMetre* GetLocalSuspicionMetre() { return mLocalSuspicionMetrePtr; };
 		GlobalSuspicionMetre* GetGlobalSuspicionMetre() { return mGlobalSuspicionMetrePtr; };

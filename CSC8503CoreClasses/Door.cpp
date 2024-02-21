@@ -44,16 +44,14 @@ void Door::InitStateMachine()
 
 void Door::Open()
 {
-	Vector3 UnderPos = GetTransform().GetPosition() + Vector3(0, -10, 0);
-	GetTransform().SetPosition(UnderPos);
+	SetActive(false);
 	mTimer = initDoorTimer;
 	mIsOpen = true;
 }
 
 void Door::Close()
 {
-	Vector3 OverPos = GetTransform().GetPosition() + Vector3(0, 10, 0);
-	GetTransform().SetPosition(OverPos);
+	SetActive(true);
 	mIsOpen = false;
 }
 

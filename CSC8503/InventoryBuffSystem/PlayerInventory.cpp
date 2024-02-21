@@ -23,6 +23,8 @@ void PlayerInventory::Init(){
 			{doorKey ,[this](int playerno) { return PlayerAbleToUseItem[doorKey][playerno]; }},
 		}
 	};
+
+	mInventoryObserverList.clear();
 }
 
 void PlayerInventory::AddItemToPlayer(item inItem, int playerNo){

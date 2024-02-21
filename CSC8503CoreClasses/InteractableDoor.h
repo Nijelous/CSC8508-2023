@@ -13,6 +13,9 @@ namespace NCL {
 				InitStateMachine();
 				//mRelatedItem = InventoryBuffSystem::PlayerInventory::doorKey;
 			}
+			~InteractableDoor() {
+
+			}
 
 			void Unlock();
 			void Lock();
@@ -22,7 +25,6 @@ namespace NCL {
 
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
-
 		protected:
 			const float initDoorTimer = 3.0f;
 			bool mIsLocked;

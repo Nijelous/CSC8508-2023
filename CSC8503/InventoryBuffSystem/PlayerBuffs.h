@@ -28,7 +28,13 @@ namespace InventoryBuffSystem {
 			Null, disguiseBuff, slow, makeSound, slowEveryoneElse,
 			everyoneElseMakesSound, silentSprint, speed
 		};
+		PlayerBuffs() {
+			Init();
+		};
 
+		~PlayerBuffs() {
+			
+		};
 		void Init();
 		void ApplyBuffToPlayer(buff inBuff, int playerNo);
 		void RemoveBuffFromPlayer(buff inBuff, int playerNo);

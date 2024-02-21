@@ -27,6 +27,12 @@ namespace InventoryBuffSystem
             mPlayerBuffsPtr->Update(dt);
         };
 
+        ~InventoryBuffSystemClass() {
+            mPlayerInventoryPtr->Detach(mPlayerBuffsPtr);
+            delete mPlayerBuffsPtr;
+            delete mPlayerInventoryPtr;
+        }
+
         PlayerBuffs* GetPlayerBuffsPtr() { return mPlayerBuffsPtr; };
         PlayerInventory* GetPlayerInventoryPtr() { return mPlayerInventoryPtr; };
     private:

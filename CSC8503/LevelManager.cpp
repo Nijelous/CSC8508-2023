@@ -56,6 +56,8 @@ LevelManager::LevelManager() {
 }
 
 LevelManager::~LevelManager() {
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);
+
 	for (int i = 0; i < mRoomList.size(); i++) {
 		delete(mRoomList[i]);
 	}
@@ -131,6 +133,9 @@ LevelManager::~LevelManager() {
 	delete mRigAnimationStand;
 	delete mRigAnimationSprint;
 	delete mRigAnimationWalk;
+
+	delete mInventoryBuffSystemClassPtr;
+	delete mSuspicionSystemClassPtr;
 }
 
 void LevelManager::ClearLevel() {
@@ -216,7 +221,17 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 20.f;
+	mTimer = 10.f;
+
+	//Temp fix for crash problem
+	mInventoryBuffSystemClassPtr->Reset();
+	mSuspicionSystemClassPtr->Reset();
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	if (mTempPlayer)
+	{
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
+	}
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
