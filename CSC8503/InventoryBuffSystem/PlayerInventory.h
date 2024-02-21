@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, screwdriverUsed
+		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed
 	};
 
 	class PlayerInventoryObserver
@@ -23,7 +23,7 @@ namespace InventoryBuffSystem
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) = 0;
 	};
 
-	const int MAX_INVENTORY_SLOTS = 2;
+	constexpr int MAX_INVENTORY_SLOTS = 2;
 
 	class PlayerInventory
 	{
@@ -31,7 +31,7 @@ namespace InventoryBuffSystem
 
 		enum item
 		{
-			none, disguise, soundEmitter, flag, screwdriver
+			none, disguise, soundEmitter, flag, screwdriver, doorKey
 		};
 
 		PlayerInventory()
@@ -54,14 +54,16 @@ namespace InventoryBuffSystem
 		std::string& GetItemName(item item);
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
-		PlayerInventory::item GetPlayerItem(int playerId, int itemSlot);
-
-		bool IsPlayerInventoryFull(int playerId);
-
+		PlayerInventory::item GetItemInInventorySlot(int itemSlot, int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
+	
+		void SetPlayerAbleToUseItem(item inItem, int playerNo, bool isAbleToUseKey) {
+			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
+		};
 	private:
 
-		std::vector<item> mItemsInRandomPool = {
-			screwdriver
+		std::vector<item> mItemsInRandomPool =
+		{
+			soundEmitter, screwdriver
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap = {
@@ -95,6 +97,7 @@ namespace InventoryBuffSystem
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
+		std::map < item ,bool[NCL::CSC8503::MAX_PLAYERS]> PlayerAbleToUseItem;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
 	};
 
