@@ -25,6 +25,11 @@ namespace InventoryBuffSystem
 
 	const int MAX_INVENTORY_SLOTS = 2;
 
+	enum ItemUseType {
+		DirectUse,
+		NeedInteractableToUse
+	};
+
 	class PlayerInventory
 	{
 	public:
@@ -89,6 +94,13 @@ namespace InventoryBuffSystem
 			{ screwdriver, 2 },
 			{ disguise, 1 },
 			{ soundEmitter, 1 }
+		};
+
+		std::map<item, ItemUseType> mItemToItemUseTypeMap = {
+			{ screwdriver, NeedInteractableToUse},
+			{ disguise, DirectUse },
+			{ soundEmitter, DirectUse },
+			{ none, DirectUse }
 		};
 
 		std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
