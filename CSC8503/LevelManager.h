@@ -43,7 +43,9 @@ namespace NCL {
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
 
-			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+			InventoryBuffSystemClass* GetInventoryBuffSystem();
+
+			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
 			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
 
@@ -56,6 +58,8 @@ namespace NCL {
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
 			bool CheckGameWon();
+
+			void ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem);
 		
 		protected:
 			LevelManager();
@@ -156,6 +160,8 @@ namespace NCL {
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
+
+			std::map<PlayerInventory::item, Texture*> mItemTextureMap;
 
 			int mActiveLevel;
 		};

@@ -49,9 +49,15 @@ LevelManager::LevelManager() {
 	mActiveLevel = -1;
 
 	SoundManager* a = new SoundManager();
-	
+
 	InitialiseAssets();
 	InitialiseIcons();
+
+	mItemTextureMap = {
+	{PlayerInventory::item::none, mInventorySlotTex},
+	{PlayerInventory::item::screwdriver, mStunTex}
+	};
+
 }
 
 LevelManager::~LevelManager() {
@@ -173,16 +179,16 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 	float* levelSize = new float[3];
 	levelSize = mBuilder->BuildNavMesh(mLevelLayout);
-	if(levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
+	if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
 
-	if (!isMultiplayer){
+	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 	SendWallFloorInstancesToGPU();
-	LoadItems(itemPositions);	
+	LoadItems(itemPositions);
 	delete[] levelSize;
 }
 
@@ -262,7 +268,7 @@ void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vec
 			break;
 		}
 	}
-	
+
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
@@ -320,9 +326,11 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon& mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(0, mInventoryIcon1);
 
-	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon& mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(1, mInventoryIcon2);
 
 	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
 	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
@@ -338,6 +346,11 @@ void LevelManager::InitialiseIcons() {
 	mRenderer->SetUIObject(mUi);
 }
 
+void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
+	Texture& itemTex = *mItemTextureMap[equippedItem];
+	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 	GameObject* wall = new GameObject(StaticObj, "Wall");
 
@@ -348,7 +361,7 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -378,7 +391,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
@@ -391,7 +404,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 
 	mWorld->AddGameObject(floor);
 
-	if(position.y < 0) mLevelLayout.push_back(floor);
+	if (position.y < 0) mLevelLayout.push_back(floor);
 
 	mLevelMatrices.push_back(floor->GetTransform().GetMatrix());
 
@@ -408,7 +421,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -435,7 +448,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent) {
 	newVent->GetTransform()
 		.SetPosition(vent->GetTransform().GetPosition())
 		.SetOrientation(vent->GetTransform().GetOrientation())
-		.SetScale(size*2);
+		.SetScale(size * 2);
 
 	newVent->SetRenderObject(new RenderObject(&newVent->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
@@ -616,14 +629,14 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 bool LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
-			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
+			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag, 0))
 				return true;
 		}
 	}
 	return false;
 }
 
-void LevelManager::AddUpdateableGameObject(GameObject& object){
+void LevelManager::AddUpdateableGameObject(GameObject& object) {
 	mUpdatableObjects.push_back(&object);
 }
 
@@ -661,7 +674,11 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	return guard;
 }
 
-void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
+	return mInventoryBuffSystemClassPtr;
+}
+
+void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent)
 	{
 	case soundEmitterUsed:
