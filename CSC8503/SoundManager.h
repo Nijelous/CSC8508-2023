@@ -12,16 +12,11 @@ namespace NCL{
 			SoundManager();
 			~SoundManager();
 
-			enum Sounds{
-				walk,
-				run,
-			};
-
 			vec3df ConvertToVec3df(Vector3 soundPos);
 			
 			ISound* AddWalkSound();
 
-			ISound* AddRunSound();
+			ISound* AddSprintSound();
 
 			void PlayOneTimeSound(Vector3 position);
 
@@ -33,7 +28,7 @@ namespace NCL{
 
 		protected:
 			//ISound* mFootStep;
-			std::map<Sounds, std::function<ISound()>> mSoundMap;
+			//std::map<Sounds, ISound*(SoundManager::*)()> mSoundMap;
 			std::vector<ISound*> mSounds;
 			ISoundEngine* mSoundEngine;
 		};

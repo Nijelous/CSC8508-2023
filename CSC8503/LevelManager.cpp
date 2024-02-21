@@ -21,7 +21,10 @@
 #include "SoundManager.h"
 #include <filesystem>
 
+#include <irrKlang.h>
+
 using namespace NCL::CSC8503;
+using namespace irrklang;
 
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
@@ -351,6 +354,11 @@ void LevelManager::UpdateItemIcons() {
 }
 
 void LevelManager::UpdateSuspicionIndicatorPos() {
+	
+}
+
+void LevelManager::UpdateSound() {
+	ISound* sound;
 	
 }
 

@@ -6,6 +6,7 @@ using namespace NCL::Maths;
 
 SoundManager::SoundManager() {
 	mSoundEngine = createIrrKlangDevice();
+	//mSoundMap = { { Walk, AddWalkSound}, {Sprint, AddSprintSound}};
 }
 
 SoundManager::~SoundManager() {
@@ -19,7 +20,7 @@ ISound* SoundManager::AddWalkSound() {
 	return walk;
 }
 
-ISound* SoundManager::AddRunSound() {
+ISound* SoundManager::AddSprintSound() {
 	ISound* run = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
 	mSounds.emplace_back(run);
 	return run;
@@ -27,6 +28,7 @@ ISound* SoundManager::AddRunSound() {
 
 void SoundManager::PlayOneTimeSound(Vector3 position) {
 	ISound* oneTimeSound = mSoundEngine->play3D("soundFile.mp3", ConvertToVec3df(position));
+	mSounds.emplace_back(oneTimeSound);
 }
 
 void SoundManager::SetSoundToBePaused(ISound* sound, bool isPaused) {
