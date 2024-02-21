@@ -96,24 +96,24 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 	
 	for (auto& obj : mGuardList) {
 
-		GuardObject::GuardState GuardState = obj->GetGuardState();
+		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 		
-		if (mGuardState != GuardState) {
-			mGuardState =(AnimationState) GuardState;
+		if (mGuardState != mObjectState) {
+			mGuardState =(AnimationState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
 		}
-			switch (GuardState)
+			switch (mObjectState)
 			{
-			case GuardObject::GuardState::Stand:
+			case GameObject::GameObjectState::Stand:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
 				
 				break;
-			case GuardObject::GuardState::Walk:
+			case GameObject::GameObjectState::Walk:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
 				
 				break;
-			case GuardObject::GuardState::Sprint:
+			case GameObject::GameObjectState::Sprint:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
 				
 				break;
@@ -122,24 +122,24 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 
 	for (auto& obj : mPlayerList) {
 
-		PlayerObject::PlayerState PlayerState = obj->GetPlayerState();
+		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 
-		if (mPlayerState != PlayerState) {
-			mPlayerState = (AnimationState)PlayerState;
+		if (mPlayerState != mObjectState) {
+			mPlayerState = (AnimationState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
 		}
-		switch (PlayerState)
+		switch (mObjectState)
 		{
-		case PlayerObject::PlayerState::Stand:
+		case GameObject::GameObjectState::Stand:
 			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
 
 			break;
-		case PlayerObject::PlayerState::Walk:
+		case GameObject::GameObjectState::Walk:
 			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
 
 			break;
-		case PlayerObject::PlayerState::Sprint:
+		case GameObject::GameObjectState::Sprint:
 			obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
 
 			break;
