@@ -51,7 +51,6 @@ LevelManager::LevelManager() {
 	}
 	mActiveLevel = -1;
 	
-	SoundManager* a = new SoundManager();
 	
 	InitialiseAssets();
 	InitialiseIcons();
