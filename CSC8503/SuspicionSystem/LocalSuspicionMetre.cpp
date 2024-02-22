@@ -1,5 +1,7 @@
 #include "LocalSuspicionMetre.h"
 #include <algorithm>
+#include "Debug.h"
+#include <string>
 
 using namespace SuspicionSystem;
 
@@ -51,36 +53,44 @@ void LocalSuspicionMetre::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int pla
     case disguiseBuffRemoved:
         RemoveActiveLocalSusCause(disguiseBuff, playerNo);
         break;
+    case playerMakesSound:
+        AddInstantLocalSusCause(soundEmitted, playerNo);
+        break;
     default:
         break;
     }
 }
 
-void LocalSuspicionMetre::Update(float dt){
+void LocalSuspicionMetre::Update(float dt) {
     for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
     {
-        for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
+        if (GetLocalSusMetreValue(playerNo) != 0.0f ||
+            mActiveLocalSusCauseVector[playerNo].size() > 1)
         {
-            ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause]);
+            for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
+            {
+                ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause] * dt);
+            }
+
+            if (mRecoveryCooldowns[playerNo] == DT_UNTIL_LOCAL_RECOVERY)
+                RemoveActiveLocalSusCause(passiveRecovery, playerNo);
         }
+        mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
 
-        if (mRecoveryCooldowns[playerNo] == DT_UNTIL_LOCAL_RECOVERY)
-            RemoveActiveLocalSusCause(passiveRecovery, playerNo);
-
-        mRecoveryCooldowns[playerNo] -= dt;
-        mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo], 0.0f);
-
-        if (mRecoveryCooldowns[playerNo] == 0)
+        if (mRecoveryCooldowns[playerNo] == 0.0f)
             AddActiveLocalSusCause(passiveRecovery, playerNo);
+
     }
+
 }
 
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(int playerNo, float ammount){
     mPlayerMeters[playerNo] += ammount;
-    mPlayerMeters[playerNo] = std::clamp(2.0f,
+    mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo],
         mGlobalSusMeterPTR->GetGlobalSusMeter(),
         100.0f);
 
-    if (ammount < 0)
+    if (ammount > 0)
         mRecoveryCooldowns[playerNo] = DT_UNTIL_LOCAL_RECOVERY;
+
 }
