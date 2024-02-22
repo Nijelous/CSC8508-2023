@@ -21,11 +21,9 @@
 #include "SoundManager.h"
 #include <filesystem>
 
-#include <irrKlang.h>
 #include <fmod.hpp>
 
 using namespace NCL::CSC8503;
-using namespace irrklang;
 
 LevelManager* LevelManager::instance = nullptr;
 
@@ -305,12 +303,6 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
 	mPreAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
 
-	
-
-
-	
-	
-
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
 	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
@@ -320,8 +312,6 @@ void LevelManager::InitialiseAssets() {
 	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
 	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
-
-	itemTest = mRenderer->LoadTexture("Default.png");
 
 	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
@@ -409,39 +399,10 @@ void LevelManager::InitialiseIcons() {
 	UI::Icon mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
 	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
 
-	mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
 	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
 
 	mRenderer->SetUIObject(mUi);
-}
-
-void LevelManager::UpdateItemIcons() {
-	Vector2 slot1 = Vector2(42.5, 91.5);
-	Vector2 slot2 = Vector2(48.5, 91.5);
-	vector<Vector2> slotsPos;
-	slotsPos.resize(2);
-	slotsPos.emplace_back(slot1);
-	slotsPos.emplace_back(slot2);
-	pair<bool, UI::Icon> hasIconInPosition;
-	vector<UI::Icon> icons = mUi->GetIcons();
-	map<int, PlayerInventory::item> itemInventory = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetInventorySlotItem();
-	for (int i = 0; i < 2; i++) {
-		switch (itemInventory[i]) {
-		case 0 :
-			hasIconInPosition = mUi->HaveIcon(slotsPos[i]);
-			if (hasIconInPosition.first) {
-				mUi->DeleteIcon(hasIconInPosition.second);
-			}
-			break;
-
-		case 1:
-			mUi->AddIcon(Vector2(42.5, 91.5), 4.5, 8.6, itemTest);
-		}
-	}
-}
-
-void LevelManager::UpdateSuspicionIndicatorPos() {
-	
 }
 
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {

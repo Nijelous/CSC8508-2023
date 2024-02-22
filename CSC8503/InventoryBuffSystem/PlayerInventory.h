@@ -50,8 +50,6 @@ namespace InventoryBuffSystem
 		void Detach(PlayerInventoryObserver* observer);
 		void Notify(InventoryEvent invEvent,int playerNo);
 
-		std::map<int, item> GetInventorySlotItem();
-
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
 		PlayerInventory::item GetPlayerItem(int playerId, int itemSlot);
 
@@ -84,8 +82,6 @@ namespace InventoryBuffSystem
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
-
-		std::map<int, item> mItemInventory;
 	};
 
 
