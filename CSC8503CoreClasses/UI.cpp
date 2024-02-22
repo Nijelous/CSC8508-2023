@@ -61,16 +61,6 @@ void UI::DeleteIcon(Icon icon) {
 	}
 }
 
-std::pair<bool, UI::Icon> UI::HaveIcon(Vector2 iconPosition) {
-	for (auto& i : icons) {
-		if (iconPosition == i.position) {
-			return std::make_pair(true, i);
-		}
-	}
-	return std::make_pair(false, mIcon);
-}
-
-
 void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
 	positions.reserve(positions.size() + 6);
 	texCoords.reserve(positions.size() + 6);
