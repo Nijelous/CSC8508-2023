@@ -14,12 +14,6 @@ namespace NCL {
             GuardObject(const std::string& name = "");
             ~GuardObject();
 
-            enum GuardState {
-                Stand,
-                Walk,
-                Sprint,
-                Happy
-            };
 
 
             virtual void UpdateObject(float dt) override;
@@ -44,9 +38,7 @@ namespace NCL {
                 mCurrentNode = node;
             }
 
-            GuardState GetGuardState() {
-                return  mGuardState;
-            }
+
         protected:
             void RaycastToPlayer();
             Vector3 GuardForwardVector();
@@ -81,7 +73,6 @@ namespace NCL {
             BehaviourSequence* mRootSequence;
             BehaviourState mState = Ongoing;
 
-            GuardState mGuardState;
         };
     }
 }

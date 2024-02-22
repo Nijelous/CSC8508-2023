@@ -36,13 +36,17 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName, Invento
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mPlayerState = Walk;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
+
+	mFirstInventorySlotUsageCount = 0;
+	mSecondInventorySlotUsageCount = 0;
 
 	mPlayerID = playerID;
 	mPlayerPoints = 0;
 	mIsPlayer = true;
+
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 }
 
 PlayerObject::~PlayerObject() {
@@ -102,10 +106,10 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void PlayerObject::RayCastFromPlayer(GameWorld* world){
+void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 	bool isRaycastTriggered = false;
 	NCL::CSC8503::InteractType interactType;
-	
+
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
 		isRaycastTriggered = true;
@@ -156,7 +160,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world){
 	}
 }
 
-void PlayerObject::ControlInventory(){
+void PlayerObject::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
 
@@ -165,20 +169,34 @@ void PlayerObject::ControlInventory(){
 
 	if (Window::GetMouse()->GetWheelMovement() > 0)
 		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
-						 ? mActiveItemSlot + 1 : 0;
+		? mActiveItemSlot + 1 : 0;
 
 	if (Window::GetMouse()->GetWheelMovement() < 0)
 		mActiveItemSlot = (mActiveItemSlot > 0)
-						 ? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
+		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left))
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot( mPlayerID, mActiveItemSlot);
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
+		if (mActiveItemSlot == 0) {
+			mFirstInventorySlotUsageCount++;
+		}
+		else {
+			mSecondInventorySlotUsageCount++;
+		}
+
+		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+	}
+
+	//Handle Equipped Item Log
+	PlayerInventory::item equippedItem = GetEquippedItem();
+	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+	Debug::Print(itemName, Vector2(10, 80));
 }
 
 void PlayerObject::ToggleCrouch(bool isCrouching) {
-	if (isCrouching && mPlayerState == Crouch)
+	if (isCrouching && mObjectState == Crouch)
 		StartWalking();
-	else if (isCrouching && mPlayerState == Walk)
+	else if (isCrouching && mObjectState == Walk)
 		StartCrouching();
 }
 
@@ -192,11 +210,11 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 }
 
 void PlayerObject::StartWalking() {
-	if (!(mPlayerState == Walk)) {
-		if (mPlayerState == Crouch)
+	if (!(mObjectState == Walk)) {
+		if (mObjectState == Crouch)
 			mMovementSpeed = WALK_ACCELERATING_SPEED;
 
-		mPlayerState = Walk;
+		mObjectState = Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -205,10 +223,10 @@ void PlayerObject::StartWalking() {
 }
 
 void PlayerObject::StartSprinting() {
-	if (!(mPlayerState == Sprint)) {
+	if (!(mObjectState == Sprint)) {
 		mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mPlayerState = Sprint;
+		mObjectState = Sprint;
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -218,8 +236,8 @@ void PlayerObject::StartSprinting() {
 }
 
 void PlayerObject::StartCrouching() {
-	if (!(mPlayerState == Crouch)) {
-		mPlayerState = Crouch;
+	if (!(mObjectState == Crouch)) {
+		mObjectState = Crouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
 
@@ -239,7 +257,7 @@ void PlayerObject::EnforceMaxSpeeds() {
 	Vector3 velocityDirection = mPhysicsObject->GetLinearVelocity();
 	velocityDirection.Normalise();
 
-	switch (mPlayerState) {
+	switch (mObjectState) {
 	case(Crouch):
 		if (mPhysicsObject->GetLinearVelocity().Length() > MAX_CROUCH_SPEED)
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_CROUCH_SPEED);
@@ -255,9 +273,45 @@ void PlayerObject::EnforceMaxSpeeds() {
 	}
 }
 
+void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
+	
+	if (isItemRemoved) {
+		ResetEquippedItemUsageCount(invSlot);
+	}
+
+	switch (invEvent)
+	{
+	case InventoryBuffSystem::flagDropped:
+		break;
+	case InventoryBuffSystem::disguiseItemUsed:
+		break;
+	case InventoryBuffSystem::soundEmitterUsed:
+		break;
+	case InventoryBuffSystem::screwdriverUsed:
+		break;
+	default:
+		break;
+	}
+}
+
 void PlayerObject::MatchCameraRotation(float yawValue) {
 	Matrix4 yawRotation = Matrix4::Rotation(yawValue, Vector3(0, 1, 0));
 	GetTransform().SetOrientation(yawRotation);
+}
+
+void NCL::CSC8503::PlayerObject::ResetEquippedItemUsageCount(int inventorySlot) {
+	switch (inventorySlot) {
+	case 0: {
+		mFirstInventorySlotUsageCount = 0;
+		break;
+	}
+	case 1: {
+		mSecondInventorySlotUsageCount = 0;
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 void PlayerObject::StopSliding() {

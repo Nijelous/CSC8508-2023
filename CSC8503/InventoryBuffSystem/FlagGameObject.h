@@ -20,7 +20,7 @@ namespace NCL {
 
             void OnPlayerInteract(int playerId = 0) override;
    
-            virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+            virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
             int GetPoints() { return mPoints; }
