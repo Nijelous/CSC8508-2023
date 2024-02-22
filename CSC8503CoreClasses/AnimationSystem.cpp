@@ -27,6 +27,11 @@ void AnimationSystem::Clear()
 	mAnimationList.clear();
 	mGuardList.clear();
 	mPlayerList.clear();
+	for (auto& texID : mAnimTexID) {
+		glDeleteTextures(1, &texID);
+	}
+	mAnimTexID.clear();
+	
 }
 
 void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std::map<std::string,MeshAnimation*> preAnimationList)
@@ -171,7 +176,7 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 						std::cout << texID << endl;
 						NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
 					}
-					
+					mAnimTexID.emplace_back(texID);
 					mMatTextures.emplace_back(texID);
 					if (mMatTextures.size() == o->GetRenderObject()->GetMesh()->GetSubMeshCount()) {
 						o->GetRenderObject()->SetMatTextures(mMatTextures);	
