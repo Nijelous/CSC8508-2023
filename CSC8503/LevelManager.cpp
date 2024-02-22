@@ -443,11 +443,6 @@ void LevelManager::UpdateSuspicionIndicatorPos() {
 	
 }
 
-void LevelManager::UpdateSound() {
-	ISound* sound;
-	
-}
-
 GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 	GameObject* wall = new GameObject(StaticObj, "Wall");
 
