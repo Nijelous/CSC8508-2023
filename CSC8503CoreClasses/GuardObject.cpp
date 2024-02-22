@@ -4,6 +4,7 @@
 #include "Debug.h"
 #include "PhysicsObject.h"
 #include "BehaviourSelector.h"
+#include "PlayerObject.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -228,6 +229,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 		if (state == Initialise) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(mPrisonPosition);
+				mPlayer->ClosePrisonDoor();
 				mHasCaughtPlayer = false;
 				return Success;
 			}

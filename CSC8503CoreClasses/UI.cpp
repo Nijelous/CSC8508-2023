@@ -85,6 +85,7 @@ void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize
 }
 
 void NCL::CSC8503::UI::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
+	return;
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
 		mFirstEquippedItem->texture = &texture;

@@ -22,8 +22,11 @@ void PlayerInventory::Init() {
 			{soundEmitter,[](int playerno) { return true; }},
 			{flag ,[](int playerno) { return false; }},
 			{screwdriver, [](int playerno) { return true; }},
+			{doorKey ,[this](int playerno) { return PlayerAbleToUseItem[doorKey][playerno]; }},
 		}
 	};
+
+	mInventoryObserverList.clear();
 }
 
 void PlayerInventory::AddItemToPlayer(item inItem, int playerNo) {
@@ -132,8 +135,4 @@ PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed) 
 	std::mt19937 gen(rd());
 	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), gen);
 	return mItemsInRandomPool[0];
-}
-
-PlayerInventory::item PlayerInventory::GetPlayerItem(int playerId, int itemSlot) {
-	return mPlayerInventory[playerId][itemSlot];
 }

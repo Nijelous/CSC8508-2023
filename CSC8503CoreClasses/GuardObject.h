@@ -9,6 +9,7 @@ using namespace std;
 
 namespace NCL {
     namespace CSC8503 {
+        class PlayerObject;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -18,7 +19,7 @@ namespace NCL {
 
             virtual void UpdateObject(float dt) override;
 
-            void SetPlayer(GameObject* newPlayer) {
+            void SetPlayer(PlayerObject* newPlayer) {
                 mPlayer = newPlayer;
             }
 
@@ -45,7 +46,7 @@ namespace NCL {
             float AngleFromFocalPoint(Vector3 direction);
 
             GameObject* mSightedObject;
-            GameObject* mPlayer;
+            PlayerObject* mPlayer;
             const GameWorld* mWorld;
             Vector3 mPrisonPosition;
             vector<Vector3> mNodes;

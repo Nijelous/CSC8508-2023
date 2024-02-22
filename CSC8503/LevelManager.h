@@ -22,7 +22,7 @@ namespace NCL {
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
-
+		class InteractableDoor;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -33,7 +33,7 @@ namespace NCL {
 			}
 		};
 
-		class LevelManager : PlayerInventoryObserver {
+		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
@@ -100,14 +100,14 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Vector3& position);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
-			Door* AddDoorToWorld(Door* door, const Vector3& offset);
+			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
 			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
 
@@ -191,7 +191,7 @@ namespace NCL {
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
 
-			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr; 
+			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			std::map<PlayerInventory::item, Texture*> mItemTextureMap;
