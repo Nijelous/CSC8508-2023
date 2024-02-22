@@ -116,10 +116,18 @@ void PlayerObject::UpdateObject(float dt) {
 		), Vector2(70, 90));
 		if(mHasSilentSprintBuff)
 			Debug::Print("HasSilentSprint", Vector2(70, 95));
-		if(mWalkSpeed==SPED_UP_WALK_SPEED)
-			Debug::Print("SpedUpSpeed", Vector2(70, 100));
-		Debug::Print("CurrentItem", Vector2(20, 85));
-		Debug::Print(std::to_string(GetEquippedItem()), Vector2(20, 90));
+		switch(mPlayerSpeedState){
+		case SpedUp:
+			Debug::Print("Sped Up", Vector2(45, 80));
+			break;
+		case SlowedDown:
+			Debug::Print("Slowed Down", Vector2(45, 80));
+			break;
+		case Stunned:
+			Debug::Print("Stunned", Vector2(45, 80));
+			break;
+		}
+			
 	}
 }
 

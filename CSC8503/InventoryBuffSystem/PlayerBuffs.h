@@ -51,7 +51,7 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			stun
+			stun,slow,speed,silentSprint
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
