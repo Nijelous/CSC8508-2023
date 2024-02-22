@@ -5,6 +5,12 @@
 
 namespace SuspicionSystem
 {
+    class GlobalSuspicionObserver
+    {
+    public:
+        virtual void UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint) = 0;
+    };
+
     const int DT_UNTIL_GlOBAL_RECOVERY = 8;
 
     class GlobalSuspicionMetre :
@@ -32,9 +38,13 @@ namespace SuspicionSystem
             return mGlobalSusMeter;
         };
 
-        SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(int playerNo) {
+        SuspicionMetre::SusBreakpoint GetGlobalSusMetreBreakpoint() {
             return SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter);
         }
+
+        void Attach(GlobalSuspicionObserver* observer);
+        void Detach(GlobalSuspicionObserver* observer);
+        void Notify(SuspicionMetre::SusBreakpoint susBreakpoint);
 
         void Update(float dt);
     private:
@@ -51,6 +61,7 @@ namespace SuspicionSystem
         float mGlobalSusMeter;
         float mGlobalRecoveryCooldown;
         std::vector<continuousGlobalSusCause> mContinuousGlobalSusCauseVector;
+        std::list<GlobalSuspicionObserver*> mGlobalSuspicionObserverList;
 
         void ChangePlayerGlobalSusMetre(float amount);
     };

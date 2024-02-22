@@ -20,7 +20,19 @@ namespace InventoryBuffSystem
         {
             mPlayerBuffsPtr->Init();
             mPlayerInventoryPtr->Init();
+            mPlayerInventoryPtr->Attach(mPlayerBuffsPtr);
         };
+
+        void Update(float dt)
+        {
+            mPlayerBuffsPtr->Update(dt);
+        };
+
+        ~InventoryBuffSystemClass() {
+            mPlayerInventoryPtr->Detach(mPlayerBuffsPtr);
+            delete mPlayerBuffsPtr;
+            delete mPlayerInventoryPtr;
+        }
 
         PlayerBuffs* GetPlayerBuffsPtr() { return mPlayerBuffsPtr; };
         PlayerInventory* GetPlayerInventoryPtr() { return mPlayerInventoryPtr; };

@@ -12,7 +12,6 @@ namespace InventoryBuffSystem{
         PlayerInventory::item GetItemType() const { return mItemType;  };
         
         virtual void OnPlayerInteract(int playerId = 0);
-        
     protected:
         PlayerInventory::item mItemType;
         InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;

@@ -7,12 +7,15 @@ using namespace NCL::CSC8503;
 void PlayerBuffs::Init(){
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 		mActiveBuffDurationMap[playerNo].clear();
+
+	mBuffsObserverList.clear();
 }
 
 void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){
-	Notify(mOnBuffAppliedBuffEventMap[inBuff],playerNo);
-
-	if (mBuffInitDurationMap[inBuff] != 0)
+	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
+	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
+	if (foundBuffDuration != mBuffInitDurationMap.end())
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
@@ -36,6 +39,7 @@ PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed){
 }
 
 void PlayerBuffs::Update(float dt){
+	vector<buff> buffsToRemove;
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 	{
 		for (auto entry = mActiveBuffDurationMap[playerNo].begin();
@@ -49,9 +53,16 @@ void PlayerBuffs::Update(float dt){
 			}
 			else
 			{
-				RemoveBuffFromPlayer(entry->first, playerNo);
+				buffsToRemove.push_back(entry->first);
 			}
 		}
+
+		for (const buff thisBuff : buffsToRemove)
+		{
+			RemoveBuffFromPlayer(thisBuff, playerNo);
+		}
+
+		buffsToRemove.clear();
 	}
 }
 
