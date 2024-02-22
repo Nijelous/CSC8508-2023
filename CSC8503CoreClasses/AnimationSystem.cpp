@@ -182,11 +182,9 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 						o->GetRenderObject()->SetMatTextures(mMatTextures);	
 						mMatTextures.clear();
 					}
-				
-					
+
 				}
-				
-				
+	
 			}
 
 		}
