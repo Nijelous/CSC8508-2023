@@ -55,7 +55,9 @@ LevelManager::LevelManager() {
 
 	mItemTextureMap = {
 	{PlayerInventory::item::none, mInventorySlotTex},
-	{PlayerInventory::item::screwdriver, mStunTex}
+	{PlayerInventory::item::disguise, mStunTex},
+	{PlayerInventory::item::soundEmitter,  mStunTex},
+	{PlayerInventory::item::flag , mStunTex}
 	};
 }
 
