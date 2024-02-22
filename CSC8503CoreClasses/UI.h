@@ -1,11 +1,13 @@
 #pragma once
 #include "Vector2.h"
 #include "SimpleFont.h"
+#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
 
 namespace NCL {
 
 	using namespace Maths;
 	using namespace Rendering;
+
 	namespace CSC8503 {
 		class UI {
 		public:
@@ -19,9 +21,10 @@ namespace NCL {
 				Texture* texture;
 				bool isAppear;
 			};
-			Icon AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
+			Icon& AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
+			Icon& AddIcon(Icon* icon, bool isShown = true);
 
-			const std::vector<Icon>& GetIcons();
+			std::vector<Icon*>& GetIcons();
 
 			void SetIconPosition(Vector2 newPos, Icon icon);
 
@@ -29,14 +32,19 @@ namespace NCL {
 
 			void DeleteIcon(Icon icon);
 
-			std::pair<bool, Icon> HaveIcon(Vector2 iconPosition);
-
 			void BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
-	
-			
-			std::vector<UI::Icon> icons;
+
+			void ChangeEquipmentSlotTexture(int slotNum, Texture& texture);
+
+			void SetEquippedItemIcon(int slotNum, Icon& icon);
+
 		protected:
 			Icon mIcon;
+
+			Icon* mFirstEquippedItem;
+			Icon* mSecondEquippedItem;
+
+			std::vector<UI::Icon*> icons;
 		};
 	}
 }

@@ -13,16 +13,16 @@ namespace {
     constexpr int MOVE_FORWARD_INDEX = 0; 
     constexpr int MOVE_LEFT_INDEX = 1; 
     constexpr int MOVE_BACKWARDS_INDEX = 2; 
-    constexpr int MOVE_RIGHT_INDEX = 3; 
+    constexpr int MOVE_RIGHT_INDEX = 3;
 }
 
-NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : PlayerObject(game->GetLevelManager()->GetGameWorld(), ""){
+NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : PlayerObject(game->GetLevelManager()->GetGameWorld(), "", LevelManager::GetLevelManager()->GetInventoryBuffSystem()){
     //this->game = game;
     playerNum = num;
 }
 
 NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(
-    game->GetLevelManager()->GetGameWorld(), objName) {
+    game->GetLevelManager()->GetGameWorld(), objName, LevelManager::GetLevelManager()->GetInventoryBuffSystem()) {
     this->game = game;
     playerNum = num;
 }
@@ -61,11 +61,16 @@ void NetworkPlayer::UpdateObject(float dt){
     if (mIsLocalPlayer){
         AttachCameraToPlayer(game->GetLevelManager()->GetGameWorld());
         mCameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
+        RayCastFromPlayer(mGameWorld);
+        if (mInventoryBuffSystemClassPtr != nullptr)
+            ControlInventory();
     }
 
     if (mIsLocalPlayer || game->GetIsServer()){
         MatchCameraRotation(mCameraYaw);   
     }
+
+    EnforceMaxSpeeds();
 }
 
 void NetworkPlayer::MovePlayer(float dt){
