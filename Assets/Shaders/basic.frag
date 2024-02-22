@@ -13,6 +13,6 @@ in Vertex
 void main(void) {
 	vec2 coord = vec2(gl_FragCoord.xy * pixelSize);
 	float depth = texture(depthTex, coord.xy).r;
-	if(gl_FragCoord.z < depth) discard;
+	if(gl_FragCoord.z <= depth + 0.001f) discard;
 	fragColour = vec4(1,0,0,1);
 }

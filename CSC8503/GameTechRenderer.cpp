@@ -17,7 +17,7 @@ Matrix4 biasMatrix = Matrix4::Translation(Vector3(0.5f, 0.5f, 0.5f)) * Matrix4::
 
 GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world) {
 	glEnable(GL_DEPTH_TEST);
-  
+
 	debugShader = new OGLShader("debug.vert", "debug.frag");
 	shadowShader = new OGLShader("shadow.vert", "shadow.frag");
 	mOutlineShader = new OGLShader("basic.vert", "basic.frag");
@@ -188,17 +188,17 @@ void GameTechRenderer::RenderFrame() {
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	NewRenderLines();
 	NewRenderText();
 	const std::vector<UI::Icon> icons = mUi->GetIcons();
-	for ( auto& i : icons) {
+	for (auto& i : icons) {
 		RenderIcons(i);
 	}
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 }
 
 void GameTechRenderer::BuildObjectList() {
@@ -339,7 +339,7 @@ void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& pr
 	glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
 	glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
 	glUniform1i(hasInstanceMatLocation, 1);
-	OGLMesh* mesh = (OGLMesh*) rendObj->GetMesh();
+	OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
 	BindMesh(*mesh);
 	size_t layerCount = mesh->GetSubMeshCount();
 	for (size_t b = 0; b < layerCount; ++b) {
@@ -380,9 +380,9 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 		BindShader(*shader);
 		if ((*i).GetAlbedoTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
-			
+
 		}
-		
+
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
@@ -410,7 +410,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 			activeShader = shader;
 		}
-		
+
 		Matrix4 modelMatrix = (*i).GetTransform()->GetMatrix();
 		glUniformMatrix4fv(modelLocation, 1, false, (float*)&modelMatrix);
 
@@ -422,13 +422,11 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 		glUniform1i(hasVColLocation, !(*i).GetMesh()->GetColourData().empty());
 
-		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1:0);
+		glUniform1i(hasTexLocation, (OGLTexture*)(*i).GetAlbedoTexture() ? 1 : 0);
 		glUniform1i(hasInstanceMatLocation, 0);
-		
+
 
 		//Animation basic draw
-
-		
 		if ((*i).GetAnimation()) {
 			BindMesh((OGLMesh&)*(*i).GetMesh());
 			mMesh = (*i).GetMesh();
@@ -440,8 +438,6 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), (*i).GetFrameMatricesVec()[b].size(), false, (float*)(*i).GetFrameMatricesVec()[b].data());
 				DrawBoundMesh((uint32_t)b);
 			}
-			
-
 		}
 		else
 		{
@@ -527,6 +523,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
+	glClear(GL_DEPTH_BUFFER_BIT);
 	BindShader(*mOutlineShader);
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
@@ -540,7 +537,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
-		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i];
+		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
 		BindMesh(*mesh);
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
@@ -549,6 +546,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 			glBindTexture(GL_TEXTURE_2D, textureID);
 			glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
 			DrawBoundMesh((uint32_t)b);
+		}
 	}
 	glDepthMask(GL_TRUE);
 	glEnable(GL_DEPTH_TEST);
