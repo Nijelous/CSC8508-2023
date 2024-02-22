@@ -69,7 +69,7 @@ namespace InventoryBuffSystem
 	private:
 
 		std::vector<item> mItemsInRandomPool = {
-			screwdriver,
+			doorKey
 		};
 
 		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap = {
@@ -91,16 +91,19 @@ namespace InventoryBuffSystem
 			{ screwdriver, "Screwdriver" },
 			{ disguise, "Disguise" },
 			{ soundEmitter, "Sound Emitter" },
+			{ doorKey, "Door Key" },
 			{ none, "No Equipped Item" }
 		};
 
 		std::map<item, int> mItemUsageToRemoveMap = {
 			{ screwdriver, 2 },
 			{ disguise, 1 },
+			{ doorKey ,1 },
 			{ soundEmitter, 1 }
 		};
 
 		std::map<item, ItemUseType> mItemToItemUseTypeMap = {
+			{ doorKey , NeedInteractableToUse},
 			{ screwdriver, NeedInteractableToUse},
 			{ disguise, DirectUse },
 			{ soundEmitter, DirectUse },

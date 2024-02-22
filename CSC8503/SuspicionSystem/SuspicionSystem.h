@@ -26,11 +26,13 @@ namespace SuspicionSystem
 			mLocationBasedSuspicionPtr = new LocationBasedSuspicion();
 		}
 
-		void Reset()
+		void Reset(InventoryBuffSystemClass* InventoryBuffSystemClassPtr)
 		{
 			mGlobalSuspicionMetrePtr->Init();
 			mLocalSuspicionMetrePtr->Init();
 			mLocationBasedSuspicionPtr->Init();
+			mInventoryBuffSystemClassPtr = InventoryBuffSystemClassPtr;
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mLocalSuspicionMetrePtr);
 		}
 
 		void Update(float dt)

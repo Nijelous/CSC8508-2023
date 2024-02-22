@@ -182,7 +182,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	PrisonDoor* prisonDoorPtr=AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
 
 	mUpdatableObjects.push_back(prisonDoorPtr);
 
@@ -209,16 +209,16 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 	float* levelSize = new float[3];
 	levelSize = mBuilder->BuildNavMesh(mLevelLayout);
-	if(levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
+	if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
 
-	if (!isMultiplayer){
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player",prisonDoorPtr);
+	if (!isMultiplayer) {
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 	SendWallFloorInstancesToGPU();
-	LoadItems(itemPositions);	
+	LoadItems(itemPositions);
 
 	mAnimation->PreloadMatTextures(*mRenderer);
 
@@ -230,13 +230,13 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
-	mSuspicionSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	if (mTempPlayer)
 	{
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 	}
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {

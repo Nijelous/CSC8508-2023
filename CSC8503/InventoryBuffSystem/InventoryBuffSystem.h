@@ -20,6 +20,7 @@ namespace InventoryBuffSystem
         {
             mPlayerBuffsPtr->Init();
             mPlayerInventoryPtr->Init();
+            mPlayerInventoryPtr->Attach(mPlayerBuffsPtr);
         };
 
         void Update(float dt)
