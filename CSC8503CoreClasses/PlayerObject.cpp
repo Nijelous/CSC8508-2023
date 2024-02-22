@@ -106,6 +106,18 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
+void NCL::CSC8503::PlayerObject::OnPlayerUseItem() {
+
+	if (mActiveItemSlot == 0) {
+		mFirstInventorySlotUsageCount++;
+	}
+	else {
+		mSecondInventorySlotUsageCount++;
+	}
+	int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+}
+
 void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 	bool isRaycastTriggered = false;
 	NCL::CSC8503::InteractType interactType;
@@ -151,6 +163,10 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 				if (interactablePtr != nullptr)
 				{
 					interactablePtr->Interact(interactType);
+					if (interactType == ItemUse) {
+						OnPlayerUseItem();
+					}
+
 					return;
 				}
 
@@ -175,20 +191,17 @@ void PlayerObject::ControlInventory() {
 		mActiveItemSlot = (mActiveItemSlot > 0)
 		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
-		if (mActiveItemSlot == 0) {
-			mFirstInventorySlotUsageCount++;
-		}
-		else {
-			mSecondInventorySlotUsageCount++;
-		}
+	PlayerInventory::item equippedItem = GetEquippedItem();
 
-		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
+
+		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
+		if (equippedItemUseType == DirectUse) {
+			OnPlayerUseItem();
+		}
 	}
 
 	//Handle Equipped Item Log
-	PlayerInventory::item equippedItem = GetEquippedItem();
 	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
 	Debug::Print(itemName, Vector2(10, 80));
 }
@@ -274,7 +287,7 @@ void PlayerObject::EnforceMaxSpeeds() {
 }
 
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
-	
+
 	if (isItemRemoved) {
 		ResetEquippedItemUsageCount(invSlot);
 	}
