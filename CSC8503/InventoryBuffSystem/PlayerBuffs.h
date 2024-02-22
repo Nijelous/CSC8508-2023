@@ -12,7 +12,7 @@ namespace InventoryBuffSystem {
 	{
 		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved,
 		playerMakesSound, silentSprintApplied, silentSprintRemoved, speedApplied,
-		speedRemoved
+		speedRemoved, stunApplied, stunRemoved
 	};
 
 	class PlayerBuffsObserver
@@ -26,7 +26,8 @@ namespace InventoryBuffSystem {
 		enum buff
 		{
 			Null, disguiseBuff, slow, makeSound, slowEveryoneElse,
-			everyoneElseMakesSound, silentSprint, speed
+			everyoneElseMakesSound, silentSprint, speed,
+			stun
 		};
 		PlayerBuffs() {
 			Init();
@@ -41,7 +42,7 @@ namespace InventoryBuffSystem {
 		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
 		void Update(float dt);
 
-		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
 		void Attach(PlayerBuffsObserver* observer);
 		void Detach(PlayerBuffsObserver* observer);
@@ -50,19 +51,19 @@ namespace InventoryBuffSystem {
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{
-			silentSprint, speed
+			stun
 		};
 
 		std::map<buff, float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}
+			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}, {stun,3}
 		};
 
 		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
 			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied},
 			{makeSound, playerMakesSound}, {silentSprint, silentSprintApplied},
-			{speed, speedApplied}
+			{speed, speedApplied}, {stun, stunApplied}
 		};
 
 		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
@@ -73,7 +74,8 @@ namespace InventoryBuffSystem {
 		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
 			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved},
-			{silentSprint, silentSprintRemoved}, {speed, speedRemoved}
+			{silentSprint, silentSprintRemoved}, {speed, speedRemoved},
+			{stun, stunRemoved}
 		};
 
 		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap

@@ -26,6 +26,14 @@ namespace NCL::CSC8503 {
 		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
 		~GameObject();
 
+		enum GameObjectState {
+			Stand,
+			Walk,
+			Sprint,
+			Happy,
+			Crouch
+		};
+
 		void SetBoundingVolume(CollisionVolume* vol) {
 			mBoundingVolume = vol;
 		}
@@ -146,6 +154,10 @@ namespace NCL::CSC8503 {
 			mCollisionLayer = collisionLayer;
 		}
 
+		GameObjectState GetGameOjbectState() {
+			return mObjectState;
+		}
+
 	protected:
 		Transform			mTransform;
 
@@ -165,6 +177,8 @@ namespace NCL::CSC8503 {
 
 		CollisionLayer mCollisionLayer;
 		bool mIsPlayer;
+
+		GameObjectState mObjectState;
 	};
 }
 

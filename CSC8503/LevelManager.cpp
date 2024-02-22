@@ -53,6 +53,11 @@ LevelManager::LevelManager() {
 	
 	InitialiseAssets();
 	InitialiseIcons();
+
+	mItemTextureMap = {
+	{PlayerInventory::item::none, mInventorySlotTex},
+	{PlayerInventory::item::screwdriver, mStunTex}
+	};
 }
 
 LevelManager::~LevelManager() {
@@ -221,7 +226,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 10.f;
+	mTimer = 60.f;
 
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
@@ -413,9 +418,11 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon& mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(0, mInventoryIcon1);
 
-	UI::Icon mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	UI::Icon& mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(1, mInventoryIcon2);
 
 	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
 	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
@@ -707,6 +714,11 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
+void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
+	Texture& itemTex = *mItemTextureMap[equippedItem];
+	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
 GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
 		if (mHelipad->GetCollidingWithPlayer()) {
@@ -766,7 +778,11 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	return guard;
 }
 
-void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
+	return mInventoryBuffSystemClassPtr;
+}
+
+void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent)
 	{
 	case soundEmitterUsed:

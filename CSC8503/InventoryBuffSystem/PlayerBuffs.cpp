@@ -66,9 +66,8 @@ void PlayerBuffs::Update(float dt){
 	}
 }
 
-void InventoryBuffSystem::PlayerBuffs::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo){
-	switch (invEvent)
-	{
+void InventoryBuffSystem::PlayerBuffs::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemove){
+	switch (invEvent) {
 	case disguiseItemUsed:
 		ApplyBuffToPlayer(PlayerBuffs::disguiseBuff, playerNo);
 	default:

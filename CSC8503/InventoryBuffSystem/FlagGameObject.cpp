@@ -47,7 +47,7 @@ void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 }
 
 
-void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) {
+void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent) {
 	case InventoryBuffSystem::flagDropped:
 		Reset();

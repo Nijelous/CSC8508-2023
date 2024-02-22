@@ -40,11 +40,8 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
 {
 		for (auto& obj : UpdatableObjects) {
-			//Animation List
-			
 			if (obj->GetAnimationObject()) {
 				AnimationObject* animObj = obj->GetAnimationObject();
-				mAnimationList.emplace_back(animObj);
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
@@ -76,9 +73,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 				
 				frameMatricesVec.clear();
-				
-				
-				
 
 			}
 
@@ -91,8 +85,8 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 void AnimationSystem::UpdateCurrentFrames(float dt)
 {
-	for ( auto& a : mAnimationList) {
-		a->Update(dt);
+	for ( auto& animList : mAnimationList) {
+		animList->Update(dt);
 	}
 }
 
@@ -100,56 +94,59 @@ void AnimationSystem::UpdateCurrentFrames(float dt)
 void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
 {
 	
-	for (auto& a : mGuardList) {
+	for (auto& obj : mGuardList) {
 
-		GuardObject::GuardState GuardState = a->GetGuardState();
+		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 		
-		if (mGuardState != GuardState) {
-			mGuardState =(AnimationState) GuardState;
-			a->GetAnimationObject()->ReSetCurrentFrame();
+		if (mGuardState != mObjectState) {
+			mGuardState =(AnimationState)mObjectState;
+			obj->GetAnimationObject()->ReSetCurrentFrame();
 
-		}
-			switch (GuardState)
+			switch (mObjectState)
 			{
-			case GuardObject::GuardState::Stand:
-				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
-				
+			case GameObject::GameObjectState::Stand:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
+
 				break;
-			case GuardObject::GuardState::Walk:
-				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
-				
+			case GameObject::GameObjectState::Walk:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
+
 				break;
-			case GuardObject::GuardState::Sprint:
-				a->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
-				
+			case GameObject::GameObjectState::Sprint:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
+
 				break;
 			}
+
+		}
+			
 	}
 
-	for (auto& a : mPlayerList) {
+	for (auto& obj : mPlayerList) {
 
-		PlayerObject::PlayerState PlayerState = a->GetPlayerState();
+		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 
-		if (mPlayerState != PlayerState) {
-			mPlayerState = (AnimationState)PlayerState;
-			a->GetAnimationObject()->ReSetCurrentFrame();
+		if (mPlayerState != mObjectState) {
+			mPlayerState = (AnimationState)mObjectState;
+			obj->GetAnimationObject()->ReSetCurrentFrame();
 
+			switch (mObjectState)
+			{
+			case GameObject::GameObjectState::Stand:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
+
+				break;
+			case GameObject::GameObjectState::Walk:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
+
+				break;
+			case GameObject::GameObjectState::Sprint:
+				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
+
+				break;
+			}
 		}
-		switch (PlayerState)
-		{
-		case PlayerObject::PlayerState::Stand:
-			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
-
-			break;
-		case PlayerObject::PlayerState::Walk:
-			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
-
-			break;
-		case PlayerObject::PlayerState::Sprint:
-			a->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
-
-			break;
-		}
+		
 	}
 	
 }
@@ -193,11 +190,16 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
 
 void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects) {
 	for (auto& obj : UpdatableObjects) {
+		
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
+			AnimationObject* animObj = obj->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
 		}
 	}
 }

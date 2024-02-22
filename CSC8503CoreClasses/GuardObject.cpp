@@ -16,7 +16,6 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mHasCaughtPlayer = false;
 	mPlayerHasItems = true;
 	BehaviourTree();
-	mGuardState = Stand;
 }
 
 GuardObject::~GuardObject() {
@@ -116,7 +115,7 @@ BehaviourAction* GuardObject::Patrol() {
 		if (state == Initialise) {
 			state = Ongoing;
 			mNextNode = mCurrentNode + 1;
-			mGuardState = Walk;
+			mObjectState = Walk;
 			if (mCurrentNode == mNodes.size() - 1) {
 				mNextNode = 0;
 			}
@@ -158,7 +157,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 	BehaviourAction* ChasePlayer = new BehaviourAction("Chase Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
-			mGuardState = Sprint;
+			mObjectState = Sprint;
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {

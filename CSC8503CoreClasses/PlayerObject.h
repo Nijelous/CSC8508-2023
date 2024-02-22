@@ -21,7 +21,8 @@ namespace NCL {
 			enum PlayerSpeedState {
 				Default,
 				SpedUp,
-				SlowedDown
+				SlowedDown,
+				Stunned
 			};
 
 			PlayerObject(GameWorld* world, const std::string& objName = "",
@@ -30,18 +31,19 @@ namespace NCL {
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
+
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
 			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
-			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
 			PlayerInventory::item GetEquippedItem();
 
 			void ClosePrisonDoor();
 
-			PlayerState GetPlayerState() { return mPlayerState; };
+			PlayerState GetPlayerState() { return mObjectState; };
 
 		protected:
 			bool mIsCrouched;
@@ -60,7 +62,7 @@ namespace NCL {
 
 			int mPlayerPoints;
 
-			PlayerState mPlayerState;
+			PlayerState mObjectState;
 			PlayerSpeedState mPlayerSpeedState;
 			PrisonDoor* mPrisonDoorPtr;
 
@@ -77,6 +79,8 @@ namespace NCL {
 			void AttachCameraToPlayer(GameWorld* world);
 
 			virtual void MatchCameraRotation(float yawValue);
+
+			void ResetEquippedItemUsageCount(int inventorySlot);
 
 			void StopSliding();
 
@@ -96,6 +100,7 @@ namespace NCL {
 			void	ChangeToSlowedSpeeds();
 			void	ChangeToDefaultSpeeds();
 			void	ChangeToSpedUpSpeeds();
+			void	ChangeToStunned();
 			void	UseItemForInteractable(Interactable* interactable);
 
 			void	EnforceMaxSpeeds();
