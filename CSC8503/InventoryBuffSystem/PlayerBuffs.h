@@ -32,7 +32,7 @@ namespace InventoryBuffSystem {
 		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
 		void Update(float dt);
 
-		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo) override;
+		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
 		void Attach(PlayerBuffsObserver* observer);
 		void Detach(PlayerBuffsObserver* observer);

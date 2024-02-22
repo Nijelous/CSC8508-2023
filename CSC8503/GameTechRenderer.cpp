@@ -191,9 +191,9 @@ void GameTechRenderer::RenderFrame() {
 	
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UI::Icon> icons = mUi->GetIcons();
+	const std::vector<UI::Icon*>& icons = mUi->GetIcons();
 	for ( auto& i : icons) {
-		RenderIcons(i);
+		RenderIcons(*i);
 	}
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
