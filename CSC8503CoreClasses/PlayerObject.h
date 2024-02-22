@@ -71,6 +71,8 @@ namespace NCL {
 			SuspicionSystem::SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			virtual void MovePlayer(float dt);
+
+			virtual void OnPlayerUseItem();
 			
 			void RayCastFromPlayer(GameWorld* world);
 
