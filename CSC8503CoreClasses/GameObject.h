@@ -66,6 +66,15 @@ namespace NCL::CSC8503 {
 			mHasPhysics = !mHasPhysics;
 		}
 
+		void SetActive(bool isActive){
+			mIsRendered = isActive;
+			mHasPhysics = isActive;
+		}
+
+		bool IsActive() {
+			return mIsRendered && mHasPhysics;
+		}
+
 		Transform& GetTransform() {
 			return mTransform;
 		}

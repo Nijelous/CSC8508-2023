@@ -22,6 +22,7 @@ FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClas
 }
 
 FlagGameObject::~FlagGameObject() {
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);
 }
 
 void FlagGameObject::GetFlag(int playerNo) {
