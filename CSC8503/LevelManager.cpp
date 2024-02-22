@@ -22,6 +22,7 @@
 #include <filesystem>
 
 #include <irrKlang.h>
+#include <fmod.hpp>
 
 using namespace NCL::CSC8503;
 using namespace irrklang;
@@ -50,7 +51,7 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
-
+	
 	SoundManager* a = new SoundManager();
 	
 	InitialiseAssets();
