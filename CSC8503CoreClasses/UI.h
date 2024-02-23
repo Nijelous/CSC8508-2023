@@ -39,7 +39,6 @@ namespace NCL {
 			void SetEquippedItemIcon(int slotNum, Icon& icon);
 
 		protected:
-			Vector2 mPos;
 			Icon mIcon;
 
 			Icon* mFirstEquippedItem;

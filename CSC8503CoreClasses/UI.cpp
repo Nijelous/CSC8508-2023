@@ -61,7 +61,6 @@ void UI::DeleteIcon(Icon icon) {
 	}
 }
 
-
 void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
 	positions.reserve(positions.size() + 6);
 	texCoords.reserve(positions.size() + 6);

@@ -142,10 +142,10 @@ namespace NCL {
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
 
-			//icons
 			UI* mUi;
 			Texture* mInventorySlotTex;
 
+			//powerup
 			Texture* mHighlightAwardTex;
 			Texture* mLightOffTex;
 			Texture* mMakingNoiseTex;

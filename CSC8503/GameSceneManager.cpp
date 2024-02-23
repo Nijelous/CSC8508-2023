@@ -7,13 +7,10 @@
 #include "RenderObject.h"
 #include "AnimationObject.h"
 
-#include <irrKlang.h>
-
 #include "SinglePlayerStates.h"
 
 using namespace NCL;
 using namespace CSC8503;
-using namespace irrklang;
 
 namespace {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
