@@ -62,6 +62,7 @@ namespace NCL {
 			vector<GuardObject*> mGuardList;
 			vector<PlayerObject*> mPlayerList;
 			vector<GLuint>  mMatTextures;
+			vector<GLuint>  mAnimTexID;
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;

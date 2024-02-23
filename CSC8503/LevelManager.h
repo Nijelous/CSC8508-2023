@@ -159,7 +159,6 @@ namespace NCL {
 
 			// shaders
 			Shader* mBasicShader;
-			Shader* mSoldierShader;
 
 			// animation 
 			Mesh* mGuardMesh;
