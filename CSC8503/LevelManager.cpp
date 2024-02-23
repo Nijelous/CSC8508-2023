@@ -257,9 +257,10 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 				obj->UpdateObject(dt);
 			}
 		}
-		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
-		if (mTempPlayer)
+		if (mTempPlayer) 
 			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+
+		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
 		mTimer -= dt;
 	}
 
