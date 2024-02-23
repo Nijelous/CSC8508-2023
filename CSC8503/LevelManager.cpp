@@ -21,6 +21,8 @@
 #include "SoundManager.h"
 #include <filesystem>
 
+#include <fmod.hpp>
+
 using namespace NCL::CSC8503;
 
 LevelManager* LevelManager::instance = nullptr;
@@ -48,8 +50,7 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
-
-	SoundManager* a = new SoundManager();
+	
 	
 	InitialiseAssets();
 	InitialiseIcons();
@@ -329,12 +330,6 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("PlayerWalk", mGuardAnimationWalk));
 	mPreAnimationList.insert(std::make_pair("PlayerSprint", mGuardAnimationSprint));
 
-	
-
-
-	
-	
-
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
 	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
@@ -346,7 +341,7 @@ void LevelManager::InitialiseAssets() {
 	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
 
 	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
-	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionPointer.png");
+	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
 void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition) {
@@ -435,7 +430,7 @@ void LevelManager::InitialiseIcons() {
 	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
 
 	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(93, 86), 5, 5, mSuspensionIndicatorTex);
+	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
 
 	mRenderer->SetUIObject(mUi);
 }
