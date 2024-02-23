@@ -18,6 +18,7 @@ FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClas
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mPoints = pointsWorth;
 }
 
@@ -51,6 +52,16 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	switch (invEvent) {
 	case InventoryBuffSystem::flagDropped:
 		Reset();
+	default:
+		break;
+	}
+}
+
+void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
+	switch (buffEvent) {
+	case PlayerBuffs::flagSight:
+
+		break;
 	default:
 		break;
 	}

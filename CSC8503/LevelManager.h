@@ -73,6 +73,8 @@ namespace NCL {
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
+
+			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -156,6 +158,8 @@ namespace NCL {
 
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
+
+			FlagGameObject* mMainFlag;
 
 			// shaders
 			Shader* mBasicShader;
