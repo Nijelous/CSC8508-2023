@@ -798,7 +798,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 
 SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR)
 {
-	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR);
+	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR, position);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
