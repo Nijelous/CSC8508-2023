@@ -33,11 +33,18 @@ namespace NCL {
 			}
 		};
 
+		enum GameStates {
+			MenuState,
+			LevelState,
+			PauseState
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -198,6 +205,8 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
+
+			GameStates mGameState;
 		};
 	}
 }
