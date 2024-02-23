@@ -4,13 +4,10 @@
 
 using namespace NCL::CSC8503;
 
-namespace {
-	constexpr int VENT_TP_X_OFFSET = 5;
-}
-
 Vent::Vent() {
 	mIsOpen = false;
 	mConnectedVent = nullptr;
+	mInteractable = true;
 }
 
 void Vent::ConnectVent(Vent* vent) {
@@ -18,7 +15,7 @@ void Vent::ConnectVent(Vent* vent) {
 	mConnectedVent = vent;
 }
 
-void NCL::CSC8503::Vent::HandleItemUse() {
+void Vent::HandleItemUse() {
 	if (!mIsOpen) {
 		auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
 		PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
@@ -33,27 +30,30 @@ void NCL::CSC8503::Vent::HandleItemUse() {
 	}
 }
 
-void NCL::CSC8503::Vent::HandlePlayerUse() {
+void Vent::HandlePlayerUse() {
 	if (mIsOpen) {
 		auto* localPlayer = (GameObject*)(LevelManager::GetLevelManager()->GetTempPlayer());
 		Transform& playerTransform = localPlayer->GetTransform();
 		const Vector3& playerPos = localPlayer->GetTransform().GetPosition();
 
 		const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
-		const Vector3 newPlayerPos = Vector3(teleportPos.x + VENT_TP_X_OFFSET, playerPos.y, teleportPos.z);
+		const Quaternion& teleportOrient = mConnectedVent->GetTransform().GetOrientation();
+		const Vector3 newPlayerPos = teleportPos + (teleportOrient * Vector3(5, 0, 0));
 
 		playerTransform.SetPosition(newPlayerPos);
+		playerTransform.SetOrientation(teleportOrient);
+		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().SetYaw(mTransform.GetOrientation().ToEuler().y);
 		mIsOpen = false;
 	}
 }
 
-void Vent::Interact(NCL::CSC8503::InteractType interactType) {
+void Vent::Interact(InteractType interactType) {
 
 	switch (interactType) {
-	case NCL::CSC8503::Use:
+	case Use:
 		HandlePlayerUse();
 		break;
-	case NCL::CSC8503::ItemUse:
+	case ItemUse:
 		HandleItemUse();
 		break;
 	default:
