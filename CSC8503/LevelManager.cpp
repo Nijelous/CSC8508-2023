@@ -223,9 +223,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions);
 
-	mAnimation->PreloadMatTextures(*mRenderer);
-
-	mAnimation->SetGameObjectLists(mUpdatableObjects);
+	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
 
@@ -318,7 +316,9 @@ void LevelManager::InitialiseAssets() {
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
 	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
-
+	//preLoadtexID   
+	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);//I use Guard mesh to player
+	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);// I use rigMesh to guard   @(0v0)@
 
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));

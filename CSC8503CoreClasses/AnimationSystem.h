@@ -34,13 +34,13 @@ namespace NCL {
 
 			void UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList);
 
-			void PreloadMatTextures(GameTechRenderer& renderer);
+			void PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& matTextures);
 
 			void SetGuardAnimationState(AnimationState animationState) {
 				mGuardState = animationState;
 			}
 
-			void SetGameObjectLists(vector<GameObject*> UpdatableObjects);
+			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mRigTexture, vector<GLuint>& mGuardTextures);
 
 			AnimationState GetGuardAnimationState() {
 				return mGuardState;
@@ -61,8 +61,7 @@ namespace NCL {
 			vector<AnimationObject*> mAnimationList;
 			vector<GuardObject*> mGuardList;
 			vector<PlayerObject*> mPlayerList;
-			vector<GLuint>  mMatTextures;
-			vector<GLuint>  mAnimTexID;
+	
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
