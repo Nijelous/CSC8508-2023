@@ -1,19 +1,38 @@
-//#include "SoundManager.h"
-//#include "Vector3.h"
-//
-//using namespace NCL::CSC8503;
-//using namespace NCL::Maths;
-//
-//SoundManager::SoundManager() {
-//	mSoundEngine = createIrrKlangDevice();
-//	//mSoundMap = { { Walk, AddWalkSound}, {Sprint, AddSprintSound}};
-//}
-//
-//SoundManager::~SoundManager() {
-//	DeleteSounds();
-//	mSoundEngine->drop();
-//}
-//
+#include "SoundManager.h"
+#include "Vector3.h"
+
+#include <fmod.hpp>
+using namespace NCL::CSC8503;
+using namespace NCL::Maths;
+
+SoundManager::SoundManager() {
+	FMOD_RESULT result;
+	FMOD::Sound* sound;
+	FMOD::Channel* channel;
+	result = FMOD::System_Create(&system);
+
+	if (result != FMOD_OK) {
+		return;
+	}
+
+	result = system->init(512, FMOD_INIT_NORMAL, 0);
+
+	if (result != FMOD_OK) {
+		return;
+	}
+
+	system->createSound("", FMOD_DEFAULT, 0, &sound);
+
+	system->playSound(sound, 0, false, &channel);
+
+	channel->setPaused(true);
+}
+
+SoundManager::~SoundManager() {
+	system->close();
+	system->release();
+}
+
 //ISound* SoundManager::AddWalkSound() {
 //	ISound* walk = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
 //	mSounds.emplace_back(walk);
