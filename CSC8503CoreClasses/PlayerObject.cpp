@@ -570,7 +570,7 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 		break;
 	case InventoryBuffSystem::stunItemUsed:
 		//TODO(erendgrmnc): handle multiplayer
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::stun, playerNo);
+		//mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::stun, playerNo);
 		//TODO(erendgrnc): stun guards only in singleplayer
 		LevelManager::GetLevelManager()->AddBuffToGuards(PlayerBuffs::stun);
 		break;
