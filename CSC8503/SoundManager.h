@@ -1,35 +1,34 @@
-#pragma once
-#include <irrKlang.h>
-#include "Vector3.h"
-
-using namespace irrklang;
-
-namespace NCL{
-	using namespace Maths;
-	namespace CSC8503 {
-		class SoundManager {
-		public:
-			SoundManager();
-			~SoundManager();
-
-			enum Sounds {
-				FootStep,
-				PickupSound,
-			};
-
-			vec3df ConvertToVec3df(Vector3 soundPos);
-			
-			//void UpdateSound(ISound* sound, Vector3 soundPos, bool isPaused);
-			
-			void UpdateSound(int sound, Vector3 position, bool isPaused);
-
-			ISound* mFootStep;
-
-			ISound* mPickupSound;
-
-		protected:
-			//ISound* footStep;
-			ISoundEngine* mSoundEngine;
-		};
-	}
-}
+//#pragma once
+//#include "Vector3.h"
+//
+//
+//namespace NCL{
+//	using namespace Maths;
+//	namespace CSC8503 {
+//		class SoundManager {
+//		public:
+//			SoundManager();
+//			~SoundManager();
+//
+//			vec3df ConvertToVec3df(Vector3 soundPos);
+//			
+//			ISound* AddWalkSound();
+//
+//			ISound* AddSprintSound();
+//
+//			void PlayOneTimeSound(Vector3 position);
+//
+//			void SetSoundToBePaused(ISound* sound, bool isPaused);
+//
+//			void SetSoundPosition(ISound* sound, Vector3 pos);
+//
+//			void DeleteSounds();
+//
+//		protected:
+//			//ISound* mFootStep;
+//			//std::map<Sounds, ISound*(SoundManager::*)()> mSoundMap;
+//			std::vector<ISound*> mSounds;
+//			ISoundEngine* mSoundEngine;
+//		};
+//	}
+//}
