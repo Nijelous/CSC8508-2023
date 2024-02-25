@@ -130,8 +130,7 @@ void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
 }
 
 void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
-	switch (removedBuff)
-	{
+	switch (removedBuff) {
 	case PlayerBuffs::stun:
 		mIsStunned = false;
 		break;
