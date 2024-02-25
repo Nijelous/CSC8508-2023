@@ -7,6 +7,7 @@
 #include "map";
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
+#include "../LevelManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -18,7 +19,6 @@ FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClas
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mPoints = pointsWorth;
 }
 
@@ -59,9 +59,11 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 
 void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
 	switch (buffEvent) {
-	case PlayerBuffs::flagSight:
-
+	case BuffEvent::flagSightApplied:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
 		break;
+	case BuffEvent::flagSightRemoved:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
 	default:
 		break;
 	}

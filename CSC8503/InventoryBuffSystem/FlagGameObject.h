@@ -31,7 +31,6 @@ namespace NCL {
 
             std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
-            PlayerBuffs* mPlayerBuffsClassPtr;
             int mPoints;
         };
     }

@@ -233,6 +233,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	if (mTempPlayer)
 	{
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
@@ -380,7 +381,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
 
 
 	}
@@ -608,6 +609,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	
 	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
