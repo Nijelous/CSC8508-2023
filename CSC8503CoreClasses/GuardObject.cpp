@@ -115,13 +115,14 @@ void GuardObject::GrabPlayer() {
 }
 
 void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
-	switch (buffToApply)
-	{
+	float buffDuration = LevelManager::GetLevelManager()->GetInventoryBuffSystem()->GetPlayerBuffsPtr()->GetBuffDuration(buffToApply);
+
+	switch (buffToApply) {
 	case PlayerBuffs::stun:
 		mIsStunned = true;
 		//TODO(erendgrmnc): if we want to add duration when the guard already has the status, handle it here.
 		if (!mAppliedBuffs.contains(buffToApply)) {
-			mAppliedBuffs.insert({ PlayerBuffs::buff::stun, 10.f });
+			mAppliedBuffs.insert({ PlayerBuffs::buff::stun,  buffDuration });
 		}
 		break;
 	default:;
