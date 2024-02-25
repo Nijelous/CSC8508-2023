@@ -4,14 +4,13 @@
 #include <vector>
 #include "../NCLCoreClasses/Vector3.h"
 #include "../NCLCoreClasses/Vector2.h"
+#include <limits>
 
 using namespace NCL::Maths;
 
 namespace SuspicionSystem
 {
     const float MAX_NEARBY_DISTANCE = 5;
-    const float DT_UNTIL_LOCATION_RECOVERY = 5;
-
     struct CantorPair{
 
         CantorPair(){
@@ -19,20 +18,40 @@ namespace SuspicionSystem
         }
 
         CantorPair(Vector3 inPos){
-            mValue = ((inPos.x + inPos.y) * (inPos.x + inPos.y + 1)) / 2 + inPos.y;
+            Vector3 shiftedPos;
+            shiftedPos.x = int(int(inPos.x) > 0 ? int(inPos.x) * 2 : int(inPos.x) * -2 + 1);
+            shiftedPos.z = int(int(inPos.z) > 0 ? int(inPos.z) * 2 : int(inPos.z) * -2 + 1);
+
+            mValue = (shiftedPos.x + shiftedPos.z) * 
+                     (shiftedPos.x + shiftedPos.z + 1) / 2 + shiftedPos.z;
         };
 
         bool operator<(const CantorPair& other) const {
             return mValue < other.mValue;
+        }   
+
+        int operator*() const {
+            return mValue;
+        }
+
+        operator int() const {
+            return mValue;
+        }
+
+        CantorPair& operator=(int value) {
+            mValue = value;
+            return *this;
         }
         
         static Vector3 InverseCantorPair(CantorPair inPair){
-            int w = static_cast<int>((std::sqrt(8 * inPair.mValue + 1) - 1) / 2);
+            int w = int((sqrt(8 * inPair + 1) - 1) / 2);
             int t = (w * w + w) / 2;
-
+            Vector3 shiftedPos;
+            shiftedPos.z = inPair - t;
+            shiftedPos.x = w - shiftedPos.z;
             Vector3 outPos;
-            outPos.y = inPair.mValue - t;
-            outPos.x = w - outPos.y;
+            outPos.x = (int(shiftedPos.x) % 2 == 0 ? shiftedPos.x / 2 : -(shiftedPos.x / 2) );
+            outPos.z = (int(shiftedPos.z) % 2 == 0 ? shiftedPos.z / 2 : -(shiftedPos.z / 2) );
             return outPos;
         }
 
@@ -71,14 +90,14 @@ namespace SuspicionSystem
 
     private:
 
-        std::map<instantLocationSusCause, float>  mInstantLocationSusCauseSeverityMap =
+        std::map<const instantLocationSusCause, const float>  mInstantLocationSusCauseSeverityMap =
         {
             {singleSoundEmitted, 2}
         };
 
-        std::map<activeLocationSusCause, float>  activeLocationSusCauseSeverityMap =
+        std::map<const activeLocationSusCause, const float>  activeLocationSusCauseSeverityMap =
         {
-            {continouousSound, 3}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
+            {continouousSound, 5}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
         };
 
         std::map<CantorPair, float> mLocationSusAmountMap;
@@ -87,7 +106,7 @@ namespace SuspicionSystem
         bool AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
         bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
 
-        bool IsNearbySusLocation(CantorPair pairedLocation, CantorPair& nearbyPairedLocation);
+        bool IsNearbySusLocation(CantorPair pairedLocation, CantorPair& nearbyPairedLocation) const;
 
         void ChangeSusLocationSusAmount(CantorPair pairedLocation, float amount);
         void AddNewLocation(CantorPair pairedLocation, float initSusAmount = 0.0f);
