@@ -17,7 +17,7 @@ Scene::~Scene(){
 }
 
 void Scene::UpdateGame(float dt){
-    LevelManager::GetLevelManager()->Update(dt, true, false);
+    LevelManager::GetLevelManager()->Update(dt, false, false);
 }
 
 LevelManager* NCL::CSC8503::Scene::GetLevelManager()
