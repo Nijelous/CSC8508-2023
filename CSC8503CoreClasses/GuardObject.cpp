@@ -5,6 +5,7 @@
 #include "PhysicsObject.h"
 #include "BehaviourSelector.h"
 #include "PlayerObject.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -15,6 +16,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mCanSeePlayer = false;
 	mHasCaughtPlayer = false;
 	mPlayerHasItems = true;
+	mIsStunned = false;
 	BehaviourTree();
 }
 
@@ -23,8 +25,14 @@ GuardObject::~GuardObject() {
 }
 
 void GuardObject::UpdateObject(float dt) {
-	RaycastToPlayer();
-	ExecuteBT();
+	if (!mIsStunned) {
+		RaycastToPlayer();
+		ExecuteBT();
+	}
+	else {
+		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
+	}
+	HandleAppliedBuffs(dt);
 }
 
 void GuardObject::RaycastToPlayer() {
@@ -67,10 +75,27 @@ float GuardObject::AngleFromFocalPoint(Vector3 direction) {
 	return angle;
 }
 
+void GuardObject::HandleAppliedBuffs(float dt) {
+	std::vector<PlayerBuffs::buff> buffsToRemove;
+
+	for (auto& appliedBuff : mAppliedBuffs) {
+		if (appliedBuff.second <= 0.f) {
+			RemoveBuffFromGuard(appliedBuff.first);
+			buffsToRemove.push_back(appliedBuff.first);
+		}
+		else {
+			appliedBuff.second -= dt;
+		}
+	}
+
+	for (auto& toBeRemovedBuff : buffsToRemove) {
+		mAppliedBuffs.erase(toBeRemovedBuff);
+	}
+}
+
 void GuardObject::MoveTowardFocalPoint(Vector3 direction) {
 	Vector3 dirNorm = direction.Normalised();
 	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
-
 }
 
 void GuardObject::LookTowardFocalPoint(Vector3 direction) {
@@ -87,6 +112,31 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 void GuardObject::GrabPlayer() {
 	Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
 	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+}
+
+void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
+	switch (buffToApply)
+	{
+	case PlayerBuffs::stun:
+		mIsStunned = true;
+		//TODO(erendgrmnc): if we want to add duration when the guard already has the status, handle it here.
+		if (!mAppliedBuffs.contains(buffToApply)) {
+			mAppliedBuffs.insert({ PlayerBuffs::buff::stun, 10.f });
+		}
+		break;
+	default:;
+	}
+}
+
+void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
+	switch (removedBuff)
+	{
+	case PlayerBuffs::stun:
+		mIsStunned = false;
+		break;
+	default:
+		break;
+	}
 }
 
 void GuardObject::BehaviourTree() {
@@ -126,7 +176,7 @@ BehaviourAction* GuardObject::Patrol() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
-				
+
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				LookTowardFocalPoint(direction);
@@ -144,11 +194,11 @@ BehaviourAction* GuardObject::Patrol() {
 			}
 			else if (mCanSeePlayer == true) {
 				return Failure;
-				
+
 			}
 		}
 		return state;
-	}
+		}
 	);
 	return Patrol;
 }
@@ -161,7 +211,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
-				
+
 				int GuardCatchingDistanceSquared = 25;
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
@@ -186,7 +236,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 			}
 		}
 		return state;
-	}
+		}
 	);
 	return ChasePlayer;
 }
@@ -219,7 +269,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 			}
 		}
 		return state;
-	}
+		}
 	);
 	return ConfiscateItems;
 }
@@ -240,9 +290,9 @@ BehaviourAction* GuardObject::SendToPrison() {
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			
+
 		}
-	}
+		}
 	);
 	return SendToPrison;
 }

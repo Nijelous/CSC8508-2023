@@ -61,7 +61,7 @@ void NetworkPlayer::UpdateObject(float dt){
     if (mIsLocalPlayer){
         AttachCameraToPlayer(game->GetLevelManager()->GetGameWorld());
         mCameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
-        RayCastFromPlayer(mGameWorld);
+        RayCastFromPlayer(mGameWorld, dt);
         if (mInventoryBuffSystemClassPtr != nullptr)
             ControlInventory();
     }
