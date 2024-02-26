@@ -31,6 +31,9 @@ void PlayerInventory::Init() {
 }
 
 void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
+	if (IsInventoryFull(playerNo))
+		return;
+
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == none)
@@ -105,6 +108,13 @@ bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(const item& item, co
 	}
 
 	return false;
+}
+
+bool PlayerInventory::IsInventoryFull(const int& playerNo){
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+		if (mPlayerInventory[playerNo][invSlot] == none)
+			return false;
+	return true;
 }
 
 ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inItem) {

@@ -113,7 +113,9 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
 	if (mCooldown == 0)
 	{
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
-		ActivatePickup(0);
+		if (mIsBuff ||
+			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0))
+			ActivatePickup(0);
 	}
 }
 

@@ -348,6 +348,10 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerNo, mActiveItemSlot, itemUseCount);
 	}
 
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerNo,mActiveItemSlot);
+	}
+
 	//Handle Equipped Item Log
 	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
 	Debug::Print(itemName, Vector2(10, 80));
