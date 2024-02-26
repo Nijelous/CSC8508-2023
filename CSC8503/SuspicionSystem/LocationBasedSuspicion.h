@@ -2,11 +2,61 @@
 #include "SuspicionMetre.h"
 #include <cmath>
 #include <vector>
+#include "../NCLCoreClasses/Vector3.h"
+#include "../NCLCoreClasses/Vector2.h"
+#include <limits>
+
+using namespace NCL::Maths;
 
 namespace SuspicionSystem
 {
     const float MAX_NEARBY_DISTANCE = 5;
-    const float DT_UNTIL_LOCATION_RECOVERY = 5;
+    struct CantorPair{
+
+        CantorPair(){
+            mValue = 0;
+        }
+
+        CantorPair(Vector3 inPos){
+            Vector3 shiftedPos;
+            shiftedPos.x = int(int(inPos.x) > 0 ? int(inPos.x) * 2 : int(inPos.x) * -2 + 1);
+            shiftedPos.z = int(int(inPos.z) > 0 ? int(inPos.z) * 2 : int(inPos.z) * -2 + 1);
+
+            mValue = (shiftedPos.x + shiftedPos.z) * 
+                     (shiftedPos.x + shiftedPos.z + 1) / 2 + shiftedPos.z;
+        };
+
+        bool operator<(const CantorPair& other) const {
+            return mValue < other.mValue;
+        }   
+
+        int operator*() const {
+            return mValue;
+        }
+
+        operator int() const {
+            return mValue;
+        }
+
+        CantorPair& operator=(int value) {
+            mValue = value;
+            return *this;
+        }
+        
+        static Vector3 InverseCantorPair(CantorPair inPair){
+            int w = int((sqrt(8 * inPair + 1) - 1) / 2);
+            int t = (w * w + w) / 2;
+            Vector3 shiftedPos;
+            shiftedPos.z = inPair - t;
+            shiftedPos.x = w - shiftedPos.z;
+            Vector3 outPos;
+            outPos.x = (int(shiftedPos.x) % 2 == 0 ? shiftedPos.x / 2 : -(shiftedPos.x / 2) );
+            outPos.z = (int(shiftedPos.z) % 2 == 0 ? shiftedPos.z / 2 : -(shiftedPos.z / 2) );
+            return outPos;
+        }
+
+        int mValue;
+    };
 
     class LocationBasedSuspicion :
         public SuspicionMetre
@@ -24,47 +74,45 @@ namespace SuspicionSystem
 
         void Init();
 
-        void AddInstantLocalSusCause(instantLocationSusCause inCause, float locationX, float locationZ);
+        void AddInstantLocalSusCause(instantLocationSusCause inCause, Vector3 pos);
 
-        bool AddActiveLocationSusCause(activeLocationSusCause inCause, float locationX, float locationZ);
-        bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, float locationX, float locationZ);
+        bool AddActiveLocationSusCause(activeLocationSusCause inCause, Vector3 pos);
+        bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, Vector3 pos);
 
         void Update(float dt);
 
-        int GetLocationSusAmount(float locationX, float locationZ);
+        int GetLocationSusAmount(Vector3 pos);
 
-        SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(float locationX, float locationZ)
+        SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(Vector3 pos)
         {
-            return SuspicionMetre::GetSusBreakpoint(GetLocationSusAmount(locationX, locationZ));
+            return SuspicionMetre::GetSusBreakpoint(GetLocationSusAmount(pos));
         }
 
     private:
 
-        std::map<instantLocationSusCause, float>  mInstantLocationSusCauseSeverityMap =
+        std::map<const instantLocationSusCause, const float>  mInstantLocationSusCauseSeverityMap =
         {
             {singleSoundEmitted, 2}
         };
 
-        std::map<activeLocationSusCause, float>  activeLocationSusCauseSeverityMap =
+        std::map<const activeLocationSusCause, const float>  activeLocationSusCauseSeverityMap =
         {
-            {continouousSound, 3}, {cameraLOS, 3}, {susPlayerNearby,2},
+            {continouousSound, 5}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
         };
 
-        std::map<int, float> mLocationSusAmountMap;
-        std::map<int, float> mLocationRecoveryCDMap;
-        std::map<int, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
+        std::map<CantorPair, float> mLocationSusAmountMap;
+        std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
 
-        bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, int pairedLocation);
+        bool AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
+        bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
 
-        bool IsNearbySusLocation(int pairedLocation, int& nearbyPairedLocation);
+        bool IsNearbySusLocation(CantorPair pairedLocation, CantorPair& nearbyPairedLocation) const;
 
-        void ChangeSusLocationSusAmount(int pairedLocation, float amount);
-        void AddNewLocation(int pairedLocation, float initSusAmount = 0.0f);
+        void ChangeSusLocationSusAmount(CantorPair pairedLocation, float amount);
+        void AddNewLocation(CantorPair pairedLocation, float initSusAmount = 0.0f);
 
-        bool IsActiveLocationsSusCause(activeLocationSusCause inCause, int pairedLocation);
+        bool IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
 
-        float CalculateDistance(int x1, int x2, int y1, int y2);
-        int CantorPair(int x, int y);
-        void InverseCantorPair(int z, int& x, int& y);
+        float Calculate2DDistance(Vector3 inPos1, Vector3 inPos2) const;
     };
 }

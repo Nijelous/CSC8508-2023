@@ -50,6 +50,8 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
+
+	mGameState = MenuState;
 	
 	
 	InitialiseAssets();
@@ -59,9 +61,10 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
+	{PlayerInventory::item::doorKey,  mStunTex},
 	{PlayerInventory::item::flag , mStunTex},
-	{PlayerInventory::item::screwdriver, mStunTex},
-	{PlayerInventory::item::doorKey, mStunTex}
+    {PlayerInventory::item::stunItem, mStunTex},
+    {PlayerInventory::item::screwdriver, mStunTex}
 	};
 }
 
@@ -188,7 +191,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
-
 	mUpdatableObjects.push_back(prisonDoorPtr);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -223,17 +225,19 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 	SendWallFloorInstancesToGPU();
-	LoadItems(itemPositions);
+	LoadItems(itemPositions, isMultiplayer);
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
 
-	mTimer = 60.f;
+	mTimer = 60.f * 15;
 
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
 	if (mTempPlayer)
 	{
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
@@ -252,20 +256,26 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
+		mGameState = LevelState;
 		if ((mUpdatableObjects.size() > 0)) {
 			for (GameObject* obj : mUpdatableObjects) {
 				obj->UpdateObject(dt);
 			}
 		}
-		if (mTempPlayer) 
+		if (mTempPlayer)
 			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 
 		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
 		mTimer -= dt;
 	}
+	else
+		mGameState = MenuState;
 
-	if (isPaused)
+
+	if (isPaused) {
 		mRenderer->Render();
+		mGameState = PauseState;
+	}
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
@@ -384,19 +394,19 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
-
-
+		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		addedGuard->SetIsSensed(true);
+		mGuardObjects.push_back(addedGuard);
 	}
 }
 
-void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
+void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const bool& isMultiplayer) {
 	for (int i = 0; i < itemPositions.size(); i++) {
 		if (i == itemPositions.size() / 2) {
-			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
-			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
 		}
 	}
 }
@@ -613,6 +623,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	
 	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
@@ -638,9 +649,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 
 }
 
-PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr)
+PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr,const bool& isMultiplayer)
 {
-	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr);
+	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr,isMultiplayer);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
@@ -744,6 +755,16 @@ bool LevelManager::CheckGameLost() {
 	return false;
 }
 
+std::vector<GuardObject*>& LevelManager::GetGuardObjects() {
+	return mGuardObjects;
+}
+
+void LevelManager::AddBuffToGuards(PlayerBuffs::buff buffToApply) {
+	for(const auto& guard : mGuardObjects) {
+		guard->ApplyBuffToGuard(buffToApply);
+	}
+}
+
 void LevelManager::AddUpdateableGameObject(GameObject& object){
 	mUpdatableObjects.push_back(&object);
 }
@@ -775,7 +796,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetPlayer(mTempPlayer);
 	guard->SetGameWorld(mWorld);
-	guard->SetPrisonPosition(prisonPosition + Vector3(15,0,0));
+	guard->SetPrisonPosition(prisonPosition);
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
 
@@ -803,7 +824,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 
 SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR)
 {
-	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR);
+	SoundEmitter* soundEmitterObjectPtr = new SoundEmitter(5, locationBasedSuspicionPTR, position);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);
@@ -827,4 +848,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	mUpdatableObjects.push_back(soundEmitterObjectPtr);
 
 	return soundEmitterObjectPtr;
+}
+
+FlagGameObject* LevelManager::GetMainFlag() {
+	return mMainFlag;
 }

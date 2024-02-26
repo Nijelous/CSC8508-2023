@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed
+		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed
 	};
 
 	class PlayerInventoryObserver
@@ -34,9 +34,9 @@ namespace InventoryBuffSystem
 	{
 	public:
 
-		enum item
+		const enum item
 		{
-			none, disguise, soundEmitter, flag, screwdriver, doorKey
+			none, disguise, soundEmitter, flag, screwdriver, doorKey, stunItem
 		};
 
 		PlayerInventory()
@@ -45,13 +45,14 @@ namespace InventoryBuffSystem
 		}
 
 		void Init();
-		void AddItemToPlayer(item inItem, int playerNo);
-		void DropItemFromPlayer(item inItem, int playerNo);
-		void DropItemFromPlayer(int playerNo, int invSlot);
-		void UseItemInPlayerSlot(int itemSlot, int playerNo, int itemUseCount);
-		bool ItemInPlayerInventory(item inItem, int playerNo);
-		bool HandleOnItemUsed(item item, int playerNo, int invSlot, int itemUseCount);
-		ItemUseType GetItemUseType(item inItem);
+		void AddItemToPlayer(const item &inItem, const int &playerNo);
+		void DropItemFromPlayer(const item &inItem, const int &playerNo);
+		void DropItemFromPlayer(const int &playerNo, const int &invSlot);
+		void UseItemInPlayerSlot(const int &itemSlot, const int &playerNo, const int &itemUseCount);
+		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
+		bool HandleOnItemUsed(const item &item, const int &playerNo, const int &invSlot, const int &itemUseCount);
+		bool IsInventoryFull(const int& playerNo);
+		ItemUseType GetItemUseType(const item &inItem);
 
 
 		void Attach(PlayerInventoryObserver* observer);
@@ -60,53 +61,69 @@ namespace InventoryBuffSystem
 
 		std::string& GetItemName(item item);
 
-		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
-		PlayerInventory::item GetItemInInventorySlot(int itemSlot, int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
+		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool);
+		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, bool isSinglePlayer = true)
+		{
+			if(isSinglePlayer)
+				return GetRandomItemFromPool(seed, &mItemsInSingleplayerRandomPool);
+			else
+				return GetRandomItemFromPool(seed, &mItemsInMultiplayerRandomPool);
+		};
+
+		PlayerInventory::item GetItemInInventorySlot(const int itemSlot, const int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
 	
-		void SetPlayerAbleToUseItem(item inItem, int playerNo, bool isAbleToUseKey) {
+		void SetPlayerAbleToUseItem(const item& inItem, const int& playerNo, const bool& isAbleToUseKey) {
 			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
 		};
 	private:
 
-		std::vector<item> mItemsInRandomPool = {
+		std::vector<item> mItemsInSingleplayerRandomPool = {
 			doorKey
 		};
 
-		std::map<item, InventoryEvent > mOnItemAddedInventoryEventMap = {
+		std::vector<item> mItemsInMultiplayerRandomPool = {
+			doorKey
+		};
+
+		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {
 
 		};
 
-		std::map<item, InventoryEvent > mOnItemDroppedInventoryEventMap = {
+		std::map<const item, const InventoryEvent > mOnItemDroppedInventoryEventMap = {
 			{flag,flagDropped}
 		};
 
-		std::map<item, InventoryEvent > mOnItemUsedInventoryEventMap = {
+		std::map<const item, const InventoryEvent > mOnItemUsedInventoryEventMap = {
 			{disguise, disguiseItemUsed},
 			{soundEmitter, soundEmitterUsed},
 			{screwdriver, screwdriverUsed },
-			{doorKey,doorKeyUsed}
+			{doorKey,doorKeyUsed},
+			{stunItem, stunItemUsed}
 		};
 
-		std::map<item, std::string> mItemNameMap = {
+		std::map<const item, std::string> mItemNameMap = {
 			{ screwdriver, "Screwdriver" },
 			{ disguise, "Disguise" },
 			{ soundEmitter, "Sound Emitter" },
 			{ doorKey, "Door Key" },
+			{ stunItem, "Stun Item"},
 			{ none, "No Equipped Item" }
 		};
 
-		std::map<item, int> mItemUsageToRemoveMap = {
+		std::map<const item, const int> mItemUsageToRemoveMap = {
 			{ screwdriver, 2 },
 			{ disguise, 1 },
-			{ doorKey ,1 },
-			{ soundEmitter, 1 }
+			{ doorKey , 3 },
+			{ soundEmitter, 1 },
+			{ stunItem, 1}
 		};
 
-		std::map<item, ItemUseType> mItemToItemUseTypeMap = {
+		std::map<const item, const ItemUseType> mItemToItemUseTypeMap = {
 			{ doorKey , NeedInteractableToUse},
 			{ screwdriver, NeedInteractableToUse},
 			{ disguise, DirectUse },
 			{ soundEmitter, DirectUse },
+			{ stunItem, DirectUse},
 			{ none, DirectUse }
 		};
 

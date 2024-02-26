@@ -9,14 +9,12 @@
 using namespace NCL;
 using namespace CSC8503;
 
-SoundEmitter::SoundEmitter(float initCooldown, LocationBasedSuspicion* locationBasedSuspicionPTR) {
+SoundEmitter::SoundEmitter(float initCooldown, LocationBasedSuspicion* locationBasedSuspicionPTR, const Vector3& position ) {
 
 	mCooldown = initCooldown;
 	mLocationBasedSuspicionPTR = locationBasedSuspicionPTR;
 
-	NCL::Maths::Vector3 pos = GetTransform().GetPosition();
-
-	mLocationBasedSuspicionPTR->AddActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos.x,pos.z);
+	mLocationBasedSuspicionPTR->AddActiveLocationSusCause(LocationBasedSuspicion::continouousSound, position);
 }
 
 SoundEmitter::~SoundEmitter() {
@@ -28,7 +26,7 @@ void SoundEmitter::UpdateObject(float dt) {
 	if (mCooldown <= 0 && this->IsActive())
 	{
 		NCL::Maths::Vector3 pos = GetTransform().GetPosition();
-		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos.x, pos.z);
+		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos);
 		this->SetActive(false);
 	}
 }

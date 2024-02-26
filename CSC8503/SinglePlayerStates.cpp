@@ -11,6 +11,14 @@ PushdownState::PushdownResult Pause::OnUpdate(float dt, PushdownState** newState
 		*newState = new PlayingLevel(mGameSceneManager);
 		return PushdownResult::Push;
 	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
+		*newState = new MainMenu(mGameSceneManager);
+		return PushdownResult::Push;
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)) {
+		*newState = new InitialisingLevel(mGameSceneManager);
+		return PushdownResult::Push;
+	}
 	return PushdownResult::NoChange;
 }
 
@@ -30,6 +38,7 @@ PushdownState::PushdownResult Defeat::OnUpdate(float dt, PushdownState** newStat
 
 void Defeat::OnAwake() {
 	mGameSceneManager->SetDefeat();
+	LevelManager::GetLevelManager()->ClearLevel();
 }
 
 // Victory Screen
@@ -44,6 +53,7 @@ PushdownState::PushdownResult Victory::OnUpdate(float dt, PushdownState** newSta
 
 void Victory::OnAwake() {
 	mGameSceneManager->SetVictory();
+	LevelManager::GetLevelManager()->ClearLevel();
 }
 
 // mid level
@@ -76,6 +86,7 @@ PushdownState::PushdownResult InitialisingLevel::OnUpdate(float dt, PushdownStat
 }
 
 void InitialisingLevel::OnAwake() {
+	LevelManager::GetLevelManager()->ClearLevel();
 	mGameSceneManager->SetInitLevel();
 	mGameSceneManager->CreateLevel();
 }
@@ -92,4 +103,5 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 
 void MainMenu::OnAwake() {
 	mGameSceneManager->SetMainMenu();
+	LevelManager::GetLevelManager()->ClearLevel();
 }

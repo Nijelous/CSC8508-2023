@@ -23,7 +23,7 @@ DebugNetworkedGame::DebugNetworkedGame() {
     mThisServer = nullptr;
     mThisClient = nullptr;
 
-    mGameState = GameStates::MainMenuState;
+    mGameState = GameSceneState::MainMenuState;
     
     NetworkBase::Initialise();
     mTimeToNextPacket = 0.0f;
@@ -130,7 +130,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
-        mGameState = GameStates::InitialisingLevelState;
+        mGameState = GameSceneState::InitialisingLevelState;
         StartLevel();
     }
 }

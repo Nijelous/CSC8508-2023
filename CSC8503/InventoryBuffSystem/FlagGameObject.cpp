@@ -7,6 +7,7 @@
 #include "map";
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
+#include "../LevelManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -27,22 +28,22 @@ FlagGameObject::~FlagGameObject() {
 
 void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
-	
-	SetIsRendered(false);
-	SetHasPhysics(false);
+
+	this->SetActive(false);
 }
 
 void FlagGameObject::Reset() {
-	if (!this->IsRendered())
-		this->SetIsRendered(true);
+	if (!this->IsActive())
+	{
+		this->SetActive(true);
+	}
 }
 
 void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 {
 	if (this->IsRendered()) {
 		GetFlag(playerId);
-		SetIsRendered(false);
-		SetHasPhysics(false);
+		this->SetActive(false);
 	}
 }
 
@@ -56,8 +57,21 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
+void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
+	switch (buffEvent) {
+	case BuffEvent::flagSightApplied:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
+		break;
+	case BuffEvent::flagSightRemoved:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
+	default:
+		break;
+	}
+}
+
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if (otherObject->GetCollisionLayer() & Player) {
+	if ((otherObject->GetCollisionLayer() & Player) &&
+		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		plObj->AddPlayerPoints(mPoints);
 		GetFlag(0);

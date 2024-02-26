@@ -3,6 +3,7 @@
 uniform mat4 modelMatrix 	= mat4(1.0f);
 uniform mat4 viewMatrix 	= mat4(1.0f);
 uniform mat4 projMatrix 	= mat4(1.0f);
+uniform bool hasAnim;
 uniform mat4 joints[128];
 
 layout(location = 0) in vec3 position;
@@ -29,7 +30,8 @@ void main(void)
 		skelPos += joints[jointIndex] * localPos * jointWeight;
 		}
 	OUT.texCoord = texCoord;
-	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
+	if(hasAnim)	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
+	else gl_Position = mvp * localPos;
 }
 
 
