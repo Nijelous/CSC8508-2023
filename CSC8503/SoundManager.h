@@ -1,31 +1,43 @@
 #pragma once
 #include "Vector3.h"
-
+#include "../FMODCoreAPI/includes/fmod.hpp"
+#include "../CSC8503CoreClasses/GameObject.h"
+#include "../CSC8503CoreClasses/GameWorld.h"
+#include "../CSC8503CoreClasses/PlayerObject.h"
 
 namespace NCL{
 	using namespace Maths;
 	namespace CSC8503 {
 		class SoundManager {
 		public:
-			SoundManager();
+			SoundManager(GameWorld* GameWorld);
 			~SoundManager();
-
-			/*vec3df ConvertToVec3df(Vector3 soundPos);
 			
-			ISound* AddWalkSound();
+			FMOD::Channel* AddWalkSound(Vector3 soundPos);
 
-			ISound* AddSprintSound();
+			//void UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos);
+			void UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPos);
 
-			void PlayOneTimeSound(Vector3 position);
+			void SetListenerAttributes();
 
-			void SetSoundToBePaused(ISound* sound, bool isPaused);
+			FMOD_VECTOR ConvertVector(Vector3 vector);
 
-			void SetSoundPosition(ISound* sound, Vector3 pos);
+			FMOD_VECTOR GetUpVector(Vector3 forward, Vector3 right);
 
-			void DeleteSounds();*/
+			//void PlayOneTimeSound(Vector3 position);
+
+			//void SetSoundToBePaused(ISound* sound, bool isPaused);
+
+			//void SetSoundPosition(ISound* sound, Vector3 pos);
+
+			//void DeleteSounds();
 
 		protected:
+			GameWorld* mGameWorld;
 			FMOD::System* system = NULL;
+			FMOD::Sound* footStepSound;
+			FMOD_RESULT result;
+			FMOD::Channel* channel = nullptr;
 			//ISound* mFootStep;
 			//std::map<Sounds, ISound*(SoundManager::*)()> mSoundMap;
 			/*std::vector<ISound*> mSounds;
