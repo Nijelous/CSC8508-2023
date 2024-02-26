@@ -279,6 +279,8 @@ BehaviourAction* GuardObject::SendToPrison() {
 		if (state == Initialise) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(mPrisonPosition);
+				mPlayer->GetPhysicsObject()->ClearForces();
+				mPlayer->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
 				mPlayer->ClosePrisonDoor();
 				mHasCaughtPlayer = false;
 				return Success;
