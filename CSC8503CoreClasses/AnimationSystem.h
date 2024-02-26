@@ -15,12 +15,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class AnimationSystem {
 		public:
-			enum AnimationState {
-                Stand,
-                Walk,
-                Sprint,
-                Happy
-            };
+
 			AnimationSystem(GameWorld& g);
 			~AnimationSystem();
 
@@ -36,23 +31,9 @@ namespace NCL {
 
 			void PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& matTextures);
 
-			void SetGuardAnimationState(AnimationState animationState) {
-				mGuardState = animationState;
-			}
 
 			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mRigTexture, vector<GLuint>& mGuardTextures);
 
-			AnimationState GetGuardAnimationState() {
-				return mGuardState;
-			}
-
-			void SetPlayerAnimationState(AnimationState animationState) {
-				mPlayerState = animationState;
-			}
-
-			AnimationState GetPlayerAnimationState() {
-				return mPlayerState;
-			}
 
 		protected:
 
@@ -67,8 +48,8 @@ namespace NCL {
 			MeshAnimation* mAnim;
 			Texture* mAnimTexture = nullptr;	
 
-			AnimationState mGuardState;
-			AnimationState mPlayerState;
+			GameObject::GameObjectState mGuardState;
+			GameObject::GameObjectState mPlayerState;
 		};
 	}
 }

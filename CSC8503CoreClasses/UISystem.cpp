@@ -83,7 +83,9 @@ void UISystem::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int ve
 	texCoords.emplace_back(Vector2(1, 0));
 }
 
+
 void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
+
 
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
