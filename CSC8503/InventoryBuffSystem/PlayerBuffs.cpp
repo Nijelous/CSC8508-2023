@@ -86,7 +86,7 @@ void InventoryBuffSystem::PlayerBuffs::Detach(PlayerBuffsObserver* observer){
 void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo){
 	std::list<PlayerBuffsObserver*>::iterator iterator = mBuffsObserverList.begin();
 	while (iterator != mBuffsObserverList.end()) {
-		//(*iterator)->UpdatePlayerBuffsObserver(buffEvent, playerNo);
+		(*iterator)->UpdatePlayerBuffsObserver(buffEvent, playerNo);
 		++iterator;
 	}
 }
