@@ -13,6 +13,8 @@
 using namespace NCL::CSC8503;
 
 namespace {
+	constexpr float STOPPING_SPEED = 3.f;
+
 	constexpr float CHAR_STANDING_HEIGHT = 1.4f;
 	constexpr float CHAR_CROUCH_HEIGHT = .7f;
 	constexpr float CROUCH_OFFSET = 1;
@@ -600,7 +602,7 @@ void NCL::CSC8503::PlayerObject::ResetEquippedItemUsageCount(int inventorySlot) 
 }
 
 void PlayerObject::StopSliding() {
-	if ((mPhysicsObject->GetLinearVelocity().Length() < 1) && (mPhysicsObject->GetForce() == Vector3(0, 0, 0))) {
+	if ((mPhysicsObject->GetLinearVelocity().Length() < STOPPING_SPEED) && (mPhysicsObject->GetForce() == Vector3(0, 0, 0))) {
 		float fallingSpeed = mPhysicsObject->GetLinearVelocity().y;
 		mPhysicsObject->SetLinearVelocity(Vector3(0, fallingSpeed, 0));
 	}

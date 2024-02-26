@@ -50,6 +50,8 @@ LevelManager::LevelManager() {
 		mLevelList.push_back(newLevel);
 	}
 	mActiveLevel = -1;
+
+	mGameState = MenuState;
 	
 	
 	InitialiseAssets();
@@ -253,20 +255,26 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
+		mGameState = LevelState;
 		if ((mUpdatableObjects.size() > 0)) {
 			for (GameObject* obj : mUpdatableObjects) {
 				obj->UpdateObject(dt);
 			}
 		}
-		if (mTempPlayer) 
+		if (mTempPlayer)
 			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 
 		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
 		mTimer -= dt;
 	}
+	else
+		mGameState = MenuState;
 
-	if (isPaused)
+
+	if (isPaused) {
 		mRenderer->Render();
+		mGameState = PauseState;
+	}
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
