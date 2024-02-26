@@ -11,7 +11,7 @@ void PlayerBuffs::Init(){
 	mBuffsObserverList.clear();
 }
 
-void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){
+void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
@@ -21,7 +21,7 @@ void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){
 	}
 }
 
-void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo){
+void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	auto foundBuff = mActiveBuffDurationMap[playerNo].find(inBuff);
 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
