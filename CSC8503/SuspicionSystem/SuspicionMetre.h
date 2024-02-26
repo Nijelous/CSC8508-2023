@@ -6,15 +6,16 @@ namespace SuspicionSystem
 	class SuspicionMetre
 	{
 	public:
-		enum SusBreakpoint
+		const enum SusBreakpoint
 		{
 			low, mid, high
 		};
 
-		SusBreakpoint GetSusBreakpoint(float inSusMetre);
+		SusBreakpoint GetSusBreakpoint(const float &inSusMetre);
 	private:
-		std::map<float, SusBreakpoint> mSusBreakpointMap = { { 66 , high} ,
-															{ 33 , mid} ,
-															{ 0 , low} };
+		const std::map<const float, const SusBreakpoint> mSusBreakpointMap = 
+		{ { 66 , high} ,
+		  { 33 , mid} ,
+	      { 0  , low} };
 	};
 }

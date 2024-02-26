@@ -12,7 +12,7 @@ namespace InventoryBuffSystem {
 	{
 		Null, disguiseBuffApplied, disguiseBuffRemoved, slowApplied, slowRemoved,
 		playerMakesSound, silentSprintApplied, silentSprintRemoved, speedApplied,
-		speedRemoved, stunApplied, stunRemoved
+		speedRemoved, stunApplied, stunRemoved, flagSightApplied, flagSightRemoved
 	};
 
 	class PlayerBuffsObserver
@@ -23,23 +23,22 @@ namespace InventoryBuffSystem {
 	class PlayerBuffs : public PlayerInventoryObserver
 	{
 	public:
-		enum buff
+		const enum buff
 		{
 			Null, disguiseBuff, slow, makeSound, slowEveryoneElse,
 			everyoneElseMakesSound, silentSprint, speed,
-			stun
+			stun, flagSight
 		};
 		PlayerBuffs() {
 			Init();
 		};
 
 		~PlayerBuffs() {
-			
+
 		};
 		void Init();
-		void ApplyBuffToPlayer(buff inBuff, int playerNo);
-		void RemoveBuffFromPlayer(buff inBuff, int playerNo);
-		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
+		void ApplyBuffToPlayer(const buff& inBuff, const int& playerNo);
+		void RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo);
 		void Update(float dt);
 
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
@@ -48,37 +47,47 @@ namespace InventoryBuffSystem {
 		void Detach(PlayerBuffsObserver* observer);
 		void Notify(BuffEvent buffEvent, int playerNo);
 
+		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool);
+		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed, bool isSingleplayer=true)
+		{
+			if (isSingleplayer)
+				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
+			else
+				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
+		}
+
+		float GetBuffDuration(PlayerBuffs::buff inBuff);
 	private:
-		std::vector<buff> mBuffsInRandomPool = 
+		std::vector< buff> mBuffsInSinglePlayerRandomPool =
 		{
-			speed, silentSprint, slow,
+			speed, silentSprint, slow, flagSight
 		};
 
-		std::map<buff, float> mBuffInitDurationMap =
+		std::map<const buff, const float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}, {stun,3}
+			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}, {stun,3}, {flagSight, 5}
 		};
 
-		std::map<buff, BuffEvent> mOnBuffAppliedBuffEventMap =
+		std::map<const buff, const BuffEvent> mOnBuffAppliedBuffEventMap =
 		{
 			{disguiseBuff, disguiseBuffApplied}, {slow,slowApplied},
 			{makeSound, playerMakesSound}, {silentSprint, silentSprintApplied},
-			{speed, speedApplied}, {stun, stunApplied}
+			{speed, speedApplied}, {stun, stunApplied}, {flagSight, flagSightApplied}
 		};
 
-		std::map < buff, BuffEvent> mOnBuffTickBuffEventMap =
+		std::map <const buff, const BuffEvent> mOnBuffTickBuffEventMap =
 		{
 
 		};
 
-		std::map < buff, BuffEvent> mOnBuffRemovedBuffEventMap =
+		std::map <const buff, const BuffEvent> mOnBuffRemovedBuffEventMap =
 		{
 			{disguiseBuff, disguiseBuffRemoved}, {slow, slowRemoved},
 			{silentSprint, silentSprintRemoved}, {speed, speedRemoved},
-			{stun, stunRemoved}
+			{stun, stunRemoved}, {flagSight, flagSightRemoved}
 		};
 
-		std::map<buff, std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap
+		std::map<const buff, const std::function<void(int playerNo)>> mOnBuffAppliedFunctionMap
 		{
 			{slowEveryoneElse,[this](int playerNo)
 				{

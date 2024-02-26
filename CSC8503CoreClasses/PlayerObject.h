@@ -11,9 +11,10 @@ namespace NCL {
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 			enum PlayerState {
-				Stand,
+				Idle,
 				Walk,
 				Sprint,
+				IdleCrouch,
 				Crouch,
 				Happy
 			};
@@ -74,7 +75,7 @@ namespace NCL {
 
 			virtual void OnPlayerUseItem();
 			
-			void RayCastFromPlayer(GameWorld* world);
+			void RayCastFromPlayer(GameWorld* world, float dt);
 
 			void ControlInventory();
 
