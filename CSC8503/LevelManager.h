@@ -33,11 +33,18 @@ namespace NCL {
 			}
 		};
 
+		enum GameStates {
+			MenuState,
+			LevelState,
+			PauseState
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -73,6 +80,12 @@ namespace NCL {
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
+
+			std::vector<GuardObject*>& GetGuardObjects();
+
+			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
+
+			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -157,6 +170,8 @@ namespace NCL {
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
 
+			FlagGameObject* mMainFlag;
+
 			// shaders
 			Shader* mBasicShader;
 
@@ -170,6 +185,9 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 			Shader* mAnimationShader2;
+
+			vector<GLuint>  mGuardTextures;
+			vector<GLuint> mPlayerTextures;
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
@@ -190,6 +208,7 @@ namespace NCL {
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			std::vector<GuardObject*> mGuardObjects;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
@@ -198,6 +217,8 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
+
+			GameStates mGameState;
 		};
 	}
 }

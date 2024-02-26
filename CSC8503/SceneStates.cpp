@@ -14,17 +14,17 @@ void MainMenuSceneState::OnAwake() {
 
 PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
-		*newState = new SingleplayerState(mScene);
+		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}
 	
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
-		*newState = new ServerState(mScene);
+		*newState = new ServerState();
 		return PushdownResult::Push;
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM3)) {
-		*newState = new ClientState(mScene);
+		*newState = new ClientState();
 		return PushdownResult::Push;
 	}
 
@@ -36,8 +36,8 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 }
 
 PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState(mScene);
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE) && LevelManager::GetLevelManager()->GetGameState() == MenuState) {
+		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -50,7 +50,7 @@ void SingleplayerState::OnAwake() {
 
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState(mScene);
+		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -64,7 +64,7 @@ void ServerState::OnAwake(){
 
 PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		*newState = new MainMenuSceneState(mScene);
+		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;

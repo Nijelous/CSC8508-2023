@@ -1,12 +1,11 @@
 #include "GameObject.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
-#include "RenderObject.h"
-#include "NetworkObject.h"
 #include "PlayerObject.h"
 #include "CapsuleVolume.h"
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
+#include "../CSC8503/LevelManager.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -88,12 +87,17 @@ PlayerObject::~PlayerObject() {
 
 
 void PlayerObject::UpdateObject(float dt) {
-	if (mPlayerSpeedState != Stunned)
+	if (mPlayerSpeedState != Stunned) {
 		MovePlayer(dt);
-	RayCastFromPlayer(mGameWorld);
+		RayCastFromPlayer(mGameWorld, dt);
+		if (mInventoryBuffSystemClassPtr != nullptr)
+			ControlInventory();
+		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
+			mInteractHeldDt = 0;
+		}
+	}
+
 	//temp if
-	if (mInventoryBuffSystemClassPtr != nullptr)
-		ControlInventory();
 	AttachCameraToPlayer(mGameWorld);
 
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
@@ -103,11 +107,6 @@ void PlayerObject::UpdateObject(float dt) {
 		EnforceSpedUpMaxSpeeds();
 	else
 		EnforceMaxSpeeds();
-
-	if (Window::GetKeyboard()->KeyHeld(KeyCodes::E))
-		mInteractHeldDt += dt;
-	else
-		mInteractHeldDt = 0;
 
 	if (DEBUG_MODE)
 	{
@@ -127,7 +126,6 @@ void PlayerObject::UpdateObject(float dt) {
 			Debug::Print("Stunned", Vector2(45, 80));
 			break;
 		}
-			
 	}
 }
 
@@ -157,7 +155,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
+		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
@@ -239,7 +237,7 @@ void NCL::CSC8503::PlayerObject::OnPlayerUseItem() {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerNo, mActiveItemSlot, itemUseCount);
 }
 
-void PlayerObject::RayCastFromPlayer(GameWorld* world) {
+void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 	bool isRaycastTriggered = false;
 	NCL::CSC8503::InteractType interactType;
 
@@ -247,11 +245,14 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
 		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::Use;
+		mInteractHeldDt = 0;
 	}
-	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E) && mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT)
-	{
-		isRaycastTriggered = true;
-		interactType = NCL::CSC8503::InteractType::LongUse;
+	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
+		mInteractHeldDt += dt;
+		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT) {
+			isRaycastTriggered = true;
+			interactType = NCL::CSC8503::InteractType::LongUse;
+		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		isRaycastTriggered = true;
@@ -286,8 +287,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world) {
 
 				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType))
-				{
+				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
 					interactablePtr->Interact(interactType);
 					if (interactType == ItemUse) {
 						OnPlayerUseItem();
@@ -567,6 +567,12 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 	case InventoryBuffSystem::soundEmitterUsed:
 		break;
 	case InventoryBuffSystem::screwdriverUsed:
+		break;
+	case InventoryBuffSystem::stunItemUsed:
+		//TODO(erendgrmnc): handle multiplayer
+		//mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::stun, playerNo);
+		//TODO(erendgrnc): stun guards only in singleplayer
+		LevelManager::GetLevelManager()->AddBuffToGuards(PlayerBuffs::stun);
 		break;
 	default:
 		break;

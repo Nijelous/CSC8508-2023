@@ -90,3 +90,7 @@ void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo)
 		++iterator;
 	}
 }
+
+float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
+	return mBuffInitDurationMap[inBuff];
+}
