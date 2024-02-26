@@ -67,7 +67,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mObjectState = Walk;
+	mObjectState = GameObject::Walk;
 	mPlayerSpeedState = Default;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
@@ -161,7 +161,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-		mObjectState = Stand;
+		mObjectState = GameObject::Stand;
 		break;
 	default:
 		break;
@@ -215,7 +215,7 @@ void PlayerObject::MovePlayer(float dt) {
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
-			mObjectState = Stand;
+			mObjectState = GameObject::Stand;
 		}
 	}
 	else
@@ -406,7 +406,7 @@ void PlayerObject::StartWalking() {
 			else
 				mMovementSpeed = WALK_ACCELERATING_SPEED;
 		
-		mObjectState = Walk;
+		mObjectState = GameObject::Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -432,7 +432,7 @@ void PlayerObject::StartSprinting() {
 		else
 			mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mObjectState = Sprint;
+		mObjectState = GameObject::Sprint;
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -452,7 +452,7 @@ void PlayerObject::StartCrouching() {
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 		}
 
-		mObjectState = Crouch;
+		mObjectState = GameObject::Crouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
 
@@ -514,7 +514,7 @@ void PlayerObject::ChangeToDefaultSpeeds(){
 	mSprintSpeed = DEFAULT_SPRINT_SPEED;
 
 	mPlayerSpeedState = Default;
-	mObjectState = Stand;
+	mObjectState = GameObject::Stand;
 }
 
 void PlayerObject::ChangeToSlowedSpeeds(){
@@ -523,7 +523,7 @@ void PlayerObject::ChangeToSlowedSpeeds(){
 	mSprintSpeed = SLOWED_SPRINT_SPEED;
 
 	mPlayerSpeedState = SlowedDown;
-	mObjectState = Stand;
+	mObjectState = GameObject::Stand;
 }
 
 void PlayerObject::ChangeToSpedUpSpeeds(){
@@ -532,7 +532,7 @@ void PlayerObject::ChangeToSpedUpSpeeds(){
 	mSprintSpeed = SPED_UP_SPRINT_SPEED;
 
 	mPlayerSpeedState = SpedUp;
-	mObjectState = Stand;
+	mObjectState = GameObject::Stand;
 }
 
 void PlayerObject::ChangeToStunned(){
@@ -549,7 +549,7 @@ void PlayerObject::ChangeToStunned(){
 
 	mPhysicsObject->SetLinearVelocity(Vector3(0,0,0));
 	mPlayerSpeedState = Stunned;
-	mObjectState = Stand;
+	mObjectState = GameObject::Stand;
 }
 
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {

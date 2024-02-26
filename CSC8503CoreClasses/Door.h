@@ -16,6 +16,7 @@ namespace NCL {
 			virtual void Close();
 			virtual void InitStateMachine();
 			virtual void CountDownTimer(float dt);
+			
 		protected:
 			const float initDoorTimer = 10.0f;
 			StateMachine* mStateMachine;

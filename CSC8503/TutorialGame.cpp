@@ -12,7 +12,7 @@
 #include "PlayerObject.h"
 #include "LevelManager.h"
 
-#include "UI.h"
+#include "UISystem.h"
 
 using namespace NCL;
 using namespace CSC8503;

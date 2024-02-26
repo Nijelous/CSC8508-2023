@@ -142,7 +142,7 @@ namespace NCL {
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
 
-			UI* mUi;
+			UISystem* mUi;
 			Texture* mInventorySlotTex;
 
 			//powerup

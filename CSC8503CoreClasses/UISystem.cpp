@@ -1,4 +1,4 @@
-#include "UI.h"
+#include "UISystem.h"
 #include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
 
 
@@ -11,59 +11,59 @@ namespace {
 	constexpr int SECOND_ITEM_SLOT = 1;
 }
 
-UI::UI() {
+UISystem::UISystem() {
 }
 
-UI::~UI() {
+UISystem::~UISystem() {
 
-}
-
-
-UI::Icon& UI::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
-	Icon* icon = new Icon();
-	icon->position = Pos;
-	icon->length = horiSize;
-	icon->height = vertSize;
-	icon->texture = tex;
-	icon->isAppear = isShown;
-	icons.emplace_back(icon);
-	return *icon;
-}
-
-UI::Icon& NCL::CSC8503::UI::AddIcon(Icon* icon, bool isShown) {
-	icons.emplace_back(icon);
-	return *icon;
 }
 
 
-void UI::SetIconPosition(Vector2 newPos, Icon icon) {
+UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
+	Icon* mIcon = new Icon();
+	mIcon->position = Pos;
+	mIcon->length = horiSize;
+	mIcon->height = vertSize;
+	mIcon->texture = tex;
+	mIcon->isAppear = isShown;
+	mIconsVec.emplace_back(mIcon);
+	return mIcon;
+}
+
+UISystem::Icon* UISystem::AddIcon(Icon* icon, bool isShown) {
+	mIconsVec.emplace_back(icon);
+	return icon;
+}
+
+
+void UISystem::SetIconPosition(Vector2 newPos, Icon& icon) {
 	icon.position = newPos;
 }
 
-void UI::SetIconTransparency(bool isShown, Icon icon) {
+void UISystem::SetIconTransparency(bool isShown, Icon& icon) {
 	icon.isAppear = isShown;
 }
 
-std::vector<UI::Icon*>& UI::GetIcons() {
-	return icons;
+std::vector<UISystem::Icon*>& UISystem::GetIcons() {
+	return mIconsVec;
 }
 
-void UI::DeleteIcon(Icon icon) {
-	if (icons.size() <= 0) {
+void UISystem::DeleteIcon(Icon icon) {
+	if (mIconsVec.size() <= 0) {
 		return;
 	}
 	int j = 0;
-	for (auto& i : icons) {
+	for (auto& i : mIconsVec) {
 		if (i->position == icon.position) {
-			icons.erase(icons.begin() + j);
+			mIconsVec.erase(mIconsVec.begin() + j);
 		}
 		j++;
 	}
 }
 
-void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
+void UISystem::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
 	positions.reserve(positions.size() + 6);
-	texCoords.reserve(positions.size() + 6);
+	texCoords.reserve(texCoords.size() + 6);
 
 	positions.emplace_back(Vector3(iconPos.x, iconPos.y + vertSize, 0));
 	positions.emplace_back(Vector3(iconPos.x, iconPos.y, 0));
@@ -83,8 +83,8 @@ void UI::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize
 	texCoords.emplace_back(Vector2(1, 0));
 }
 
-void NCL::CSC8503::UI::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
-	return;
+void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
+
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
 		mFirstEquippedItem->texture = &texture;
@@ -97,7 +97,7 @@ void NCL::CSC8503::UI::ChangeEquipmentSlotTexture(int slotNum, Texture& texture)
 	}
 }
 
-void NCL::CSC8503::UI::SetEquippedItemIcon(int slotNum, Icon& icon) {
+void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 	switch (slotNum) {
 		case FIRST_ITEM_SLOT:
 			mFirstEquippedItem = &icon;
