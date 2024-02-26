@@ -28,22 +28,22 @@ FlagGameObject::~FlagGameObject() {
 
 void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
-	
-	SetIsRendered(false);
-	SetHasPhysics(false);
+
+	this->SetActive(false);
 }
 
 void FlagGameObject::Reset() {
-	if (!this->IsRendered())
-		this->SetIsRendered(true);
+	if (!this->IsActive())
+	{
+		this->SetActive(true);
+	}
 }
 
 void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 {
 	if (this->IsRendered()) {
 		GetFlag(playerId);
-		SetIsRendered(false);
-		SetHasPhysics(false);
+		this->SetActive(false);
 	}
 }
 
