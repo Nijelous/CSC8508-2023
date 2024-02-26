@@ -12,9 +12,8 @@ namespace NCL {
 
 		class PlayerObject;
 		class GuardObject;
-		class LevelManager;
 
-		enum GameStates {
+		enum GameSceneState {
 			MainMenuState,
 			InitialisingLevelState,
 			PlayingLevelState,
@@ -57,8 +56,9 @@ namespace NCL {
 			void DisplayMainMenu();
 			void DisplayVictory();
 			void DisplayDefeat();
+			void DisplayPauseScreen();
 			
-			GameStates mGameState;
+			GameSceneState mGameState;
 			PushdownMachine* mPushdownMachine;
 
 		private:
