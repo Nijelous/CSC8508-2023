@@ -164,6 +164,7 @@ LevelManager* LevelManager::GetLevelManager() {
 	if (instance == nullptr) {
 		instance = new LevelManager();
 	}
+
 	return instance;
 }
 
