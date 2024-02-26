@@ -58,7 +58,7 @@ FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 void SoundManager::UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPos) {
 	//FMOD::Channel* channel = nullptr;
 	SetListenerAttributes();
-	switch (state) {
+	/*switch (state) {
 	case PlayerObject::PlayerState::Stand:
 		if (channel) {
 			channel->setPaused(true);
@@ -87,7 +87,7 @@ void SoundManager::UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPo
 		break;
 	case PlayerObject::PlayerState::Happy:
 		break;
-	}
+	}*/
 	/*switch (state) {
 	case GameObject::GameObjectState::Stand:
 		if (channel) {
