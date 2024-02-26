@@ -37,8 +37,8 @@ namespace InventoryBuffSystem {
 			
 		};
 		void Init();
-		void ApplyBuffToPlayer(buff inBuff, int playerNo);
-		void RemoveBuffFromPlayer(buff inBuff, int playerNo);
+		void ApplyBuffToPlayer(const buff &inBuff, const int &playerNo);
+		void RemoveBuffFromPlayer(const buff &inBuff, const int &playerNo);
 		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
 		void Update(float dt);
 

@@ -29,7 +29,7 @@ void PlayerInventory::Init() {
 	mInventoryObserverList.clear();
 }
 
-void PlayerInventory::AddItemToPlayer(item inItem, int playerNo) {
+void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == none)
@@ -46,7 +46,7 @@ void PlayerInventory::AddItemToPlayer(item inItem, int playerNo) {
 	}
 }
 
-void PlayerInventory::DropItemFromPlayer(item inItem, int playerNo) {
+void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
@@ -61,7 +61,7 @@ void PlayerInventory::DropItemFromPlayer(item inItem, int playerNo) {
 	}
 }
 
-void PlayerInventory::DropItemFromPlayer(int playerNo, int invSlot) {
+void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot) {
 	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]], playerNo, invSlot);
@@ -70,7 +70,7 @@ void PlayerInventory::DropItemFromPlayer(int playerNo, int invSlot) {
 	mPlayerInventory[playerNo][invSlot] = none;
 }
 
-void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot, int itemUseCount) {
+void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot, const int& itemUseCount) {
 	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
 		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo))
 	{
@@ -81,7 +81,7 @@ void PlayerInventory::UseItemInPlayerSlot(int playerNo, int invSlot, int itemUse
 	}
 }
 
-bool PlayerInventory::ItemInPlayerInventory(item inItem, int playerNo) {
+bool PlayerInventory::ItemInPlayerInventory(const item& inItem, const int& playerNo) {
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
@@ -93,7 +93,7 @@ bool PlayerInventory::ItemInPlayerInventory(item inItem, int playerNo) {
 	return false;
 }
 
-bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(item item, int playerNo, int invSlot, int itemUseCount) {
+bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(const item& item, const int& playerNo, const int& invSlot, const int& itemUseCount) {
 
 	int maxUsage = mItemUsageToRemoveMap[item];
 
@@ -106,7 +106,7 @@ bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(item item, int playe
 	return false;
 }
 
-ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(item inItem) {
+ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inItem) {
 	return mItemToItemUseTypeMap[inItem];
 }
 
