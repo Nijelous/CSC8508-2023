@@ -74,7 +74,7 @@ namespace NCL {
 
 			virtual void OnPlayerUseItem();
 			
-			void RayCastFromPlayer(GameWorld* world);
+			void RayCastFromPlayer(GameWorld* world, float dt);
 
 			void ControlInventory();
 

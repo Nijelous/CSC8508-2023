@@ -59,7 +59,10 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
-	{PlayerInventory::item::flag , mStunTex}
+	{PlayerInventory::item::doorKey,  mStunTex},
+	{PlayerInventory::item::flag , mStunTex},
+    {PlayerInventory::item::stunItem, mStunTex},
+    {PlayerInventory::item::screwdriver, mStunTex}
 	};
 }
 
@@ -226,7 +229,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 60.f;
+	mTimer = 60.f * 15;
 
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
@@ -381,9 +384,9 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
-
-
+		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		addedGuard->SetIsSensed(true);
+		mGuardObjects.push_back(addedGuard);
 	}
 }
 
@@ -734,6 +737,16 @@ bool LevelManager::CheckGameLost() {
 	if (mTimer <= 0.f)
 		return true;
 	return false;
+}
+
+std::vector<GuardObject*>& LevelManager::GetGuardObjects() {
+	return mGuardObjects;
+}
+
+void LevelManager::AddBuffToGuards(PlayerBuffs::buff buffToApply) {
+	for(const auto& guard : mGuardObjects) {
+		guard->ApplyBuffToGuard(buffToApply);
+	}
 }
 
 void LevelManager::AddUpdateableGameObject(GameObject& object){

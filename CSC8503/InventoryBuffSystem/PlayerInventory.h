@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed
+		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed
 	};
 
 	class PlayerInventoryObserver
@@ -36,7 +36,7 @@ namespace InventoryBuffSystem
 
 		const enum item
 		{
-			none, disguise, soundEmitter, flag, screwdriver, doorKey
+			none, disguise, soundEmitter, flag, screwdriver, doorKey, stunItem
 		};
 
 		PlayerInventory()
@@ -96,7 +96,8 @@ namespace InventoryBuffSystem
 			{disguise, disguiseItemUsed},
 			{soundEmitter, soundEmitterUsed},
 			{screwdriver, screwdriverUsed },
-			{doorKey,doorKeyUsed}
+			{doorKey,doorKeyUsed},
+			{stunItem, stunItemUsed}
 		};
 
 		std::map<const item, std::string> mItemNameMap = {
@@ -104,14 +105,16 @@ namespace InventoryBuffSystem
 			{ disguise, "Disguise" },
 			{ soundEmitter, "Sound Emitter" },
 			{ doorKey, "Door Key" },
+			{ stunItem, "Stun Item"},
 			{ none, "No Equipped Item" }
 		};
 
 		std::map<const item, const int> mItemUsageToRemoveMap = {
 			{ screwdriver, 2 },
 			{ disguise, 1 },
-			{ doorKey ,1 },
-			{ soundEmitter, 1 }
+			{ doorKey , 3 },
+			{ soundEmitter, 1 },
+			{ stunItem, 1}
 		};
 
 		std::map<const item, const ItemUseType> mItemToItemUseTypeMap = {
@@ -119,6 +122,7 @@ namespace InventoryBuffSystem
 			{ screwdriver, NeedInteractableToUse},
 			{ disguise, DirectUse },
 			{ soundEmitter, DirectUse },
+			{ stunItem, DirectUse},
 			{ none, DirectUse }
 		};
 

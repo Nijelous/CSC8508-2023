@@ -22,7 +22,8 @@ void PlayerInventory::Init() {
 			{soundEmitter,[](int playerno) { return true; }},
 			{flag ,[](int playerno) { return false; }},
 			{screwdriver, [](int playerno) { return true; }},
-			{doorKey ,[this](int playerno) { return PlayerAbleToUseItem[doorKey][playerno]; }},
+			{doorKey ,[this](int playerno) { return true; }},
+			{ stunItem, [this](int playerno) { return true; }}
 		}
 	};
 
