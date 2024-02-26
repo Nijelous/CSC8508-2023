@@ -8,8 +8,7 @@
 #define TEXTUREDIR  "../Assets/Textures/"
 #define SOUNDSDIR	"../Assets/Sounds/"
 
-AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g)
-{
+AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g){
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
@@ -18,32 +17,23 @@ AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g)
 	
 }
 
-AnimationSystem::~AnimationSystem()
-{
+AnimationSystem::~AnimationSystem(){
 }
 
-void AnimationSystem::Clear()
-{
+void AnimationSystem::Clear(){
 	mAnimationList.clear();
 	mGuardList.clear();
 	mPlayerList.clear();
-	for (auto& texID : mAnimTexID) {
-		glDeleteTextures(1, &texID);
-	}
-	mAnimTexID.clear();
-	
 }
 
-void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std::map<std::string,MeshAnimation*> preAnimationList)
-{
+void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std::map<std::string,MeshAnimation*> preAnimationList){
 	UpdateCurrentFrames(dt);
 	UpdateAnimations(preAnimationList);
 	UpdateAllAnimationObjects(dt, UpdatableObjects);
 	
 }
 
-void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects)
-{
+void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects){
 		for (auto& obj : UpdatableObjects) {
 			if (obj->GetAnimationObject()) {
 				AnimationObject* animObj = obj->GetAnimationObject();
@@ -88,16 +78,14 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 	
 }
 
-void AnimationSystem::UpdateCurrentFrames(float dt)
-{
+void AnimationSystem::UpdateCurrentFrames(float dt){
 	for ( auto& animList : mAnimationList) {
 		animList->Update(dt);
 	}
 }
 
 
-void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList)
-{
+void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList){
 	
 	for (auto& obj : mGuardList) {
 
@@ -156,53 +144,39 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 	
 }
 
-void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer)
-{
-	gameWorld.OperateOnContents(
-		[&](GameObject* o) {
-
-			if (o->GetAnimationObject()) {
-				for (int i = 0; i < o->GetRenderObject()->GetMesh()->GetSubMeshCount(); ++i) {
-					const MeshMaterialEntry* matEntry = o->GetAnimationObject()->GetMaterial()->GetMaterialForLayer(i);
-					const string* filename = nullptr;
-					matEntry->GetEntry("Diffuse", &filename);
-					GLuint texID = 0;
-
-					if (filename) {
-						string path = *filename;  
-						std::cout << path << std::endl;
-						mAnimTexture = renderer.LoadTexture(path.c_str());
-						texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
-						std::cout << texID << endl;
-						NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
-					}
-					mAnimTexID.emplace_back(texID);
-					mMatTextures.emplace_back(texID);
-					if (mMatTextures.size() == o->GetRenderObject()->GetMesh()->GetSubMeshCount()) {
-						o->GetRenderObject()->SetMatTextures(mMatTextures);	
-						mMatTextures.clear();
-					}
-
-				}
+void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& mMatTextures){
 	
-			}
-
+	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
+		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
+		const string* filename = nullptr;
+		matEntry->GetEntry("Diffuse", &filename);
+		GLuint texID = 0;
+	
+		if (filename) {
+			string path = *filename;  
+			std::cout << path << std::endl;
+			mAnimTexture = renderer.LoadTexture(path.c_str());
+			texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
+			std::cout << texID << endl;
+			NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
 		}
-	);
+		mMatTextures.emplace_back(texID);
+	}	
 }
 
-void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects) {
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mPlayerTexture, vector<GLuint>& mGuardTextures) {
 	for (auto& obj : UpdatableObjects) {
-		
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
 			AnimationObject* animObj = obj->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
+			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
+			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
 		}
 	}
 }

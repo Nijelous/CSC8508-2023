@@ -8,7 +8,7 @@ using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
-        class FlagGameObject : public Item {
+        class FlagGameObject : public Item, public PlayerBuffsObserver{
         public:
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
             ~FlagGameObject();
@@ -27,9 +27,10 @@ namespace NCL {
             }
             
         protected:
+            void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
+
             std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
-
             int mPoints;
         };
     }

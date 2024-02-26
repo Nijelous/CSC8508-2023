@@ -73,6 +73,12 @@ namespace NCL {
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
+
+			std::vector<GuardObject*>& GetGuardObjects();
+
+			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
+
+			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -157,6 +163,8 @@ namespace NCL {
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
 
+			FlagGameObject* mMainFlag;
+
 			// shaders
 			Shader* mBasicShader;
 
@@ -170,6 +178,9 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 			Shader* mAnimationShader2;
+
+			vector<GLuint>  mGuardTextures;
+			vector<GLuint> mPlayerTextures;
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
@@ -190,6 +201,7 @@ namespace NCL {
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			std::vector<GuardObject*> mGuardObjects;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;

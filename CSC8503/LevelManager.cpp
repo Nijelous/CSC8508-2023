@@ -59,7 +59,10 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
-	{PlayerInventory::item::flag , mStunTex}
+	{PlayerInventory::item::doorKey,  mStunTex},
+	{PlayerInventory::item::flag , mStunTex},
+    {PlayerInventory::item::stunItem, mStunTex},
+    {PlayerInventory::item::screwdriver, mStunTex}
 	};
 }
 
@@ -186,7 +189,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
-
 	mUpdatableObjects.push_back(prisonDoorPtr);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -223,17 +225,16 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions);
 
-	mAnimation->PreloadMatTextures(*mRenderer);
-
-	mAnimation->SetGameObjectLists(mUpdatableObjects);
+	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
 
-	mTimer = 60.f;
+	mTimer = 60.f * 15;
 
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	if (mTempPlayer)
 	{
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
@@ -319,7 +320,9 @@ void LevelManager::InitialiseAssets() {
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
 	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
-
+	//preLoadtexID   
+	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);//I use Guard mesh to player
+	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);// I use rigMesh to guard   @(0v0)@
 
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
@@ -381,16 +384,16 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
-
-
+		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		addedGuard->SetIsSensed(true);
+		mGuardObjects.push_back(addedGuard);
 	}
 }
 
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
 		if (i == itemPositions.size() / 2) {
-			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
 			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
@@ -609,6 +612,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	
 	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
@@ -735,6 +739,16 @@ bool LevelManager::CheckGameLost() {
 	return false;
 }
 
+std::vector<GuardObject*>& LevelManager::GetGuardObjects() {
+	return mGuardObjects;
+}
+
+void LevelManager::AddBuffToGuards(PlayerBuffs::buff buffToApply) {
+	for(const auto& guard : mGuardObjects) {
+		guard->ApplyBuffToGuard(buffToApply);
+	}
+}
+
 void LevelManager::AddUpdateableGameObject(GameObject& object){
 	mUpdatableObjects.push_back(&object);
 }
@@ -818,4 +832,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	mUpdatableObjects.push_back(soundEmitterObjectPtr);
 
 	return soundEmitterObjectPtr;
+}
+
+FlagGameObject* LevelManager::GetMainFlag() {
+	return mMainFlag;
 }

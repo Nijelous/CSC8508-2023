@@ -4,8 +4,9 @@
 #include "BehaviourSequence.h"
 #include "BehaviourAction.h"
 #include <string>
+#include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
 using namespace std;
-
+using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
@@ -15,9 +16,9 @@ namespace NCL {
             GuardObject(const std::string& name = "");
             ~GuardObject();
 
-
-
-            virtual void UpdateObject(float dt) override;
+            void UpdateObject(float dt) override;
+            void ApplyBuffToGuard(PlayerBuffs::buff buffToApply);
+            void RemoveBuffFromGuard(PlayerBuffs::buff removedBuff);
 
             void SetPlayer(PlayerObject* newPlayer) {
                 mPlayer = newPlayer;
@@ -44,6 +45,7 @@ namespace NCL {
             void RaycastToPlayer();
             Vector3 GuardForwardVector();
             float AngleFromFocalPoint(Vector3 direction);
+            void HandleAppliedBuffs(float dt);
 
             GameObject* mSightedObject;
             PlayerObject* mPlayer;
@@ -56,6 +58,7 @@ namespace NCL {
             bool mCanSeePlayer;
             bool mHasCaughtPlayer;
             bool mPlayerHasItems;
+            bool mIsStunned;
 
             void BehaviourTree();
             void ExecuteBT();
@@ -73,6 +76,8 @@ namespace NCL {
 
             BehaviourSequence* mRootSequence;
             BehaviourState mState = Ongoing;
+
+            std::map<PlayerBuffs::buff, float> mAppliedBuffs;
 
         };
     }
