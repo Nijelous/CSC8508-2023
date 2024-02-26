@@ -14,6 +14,7 @@ using namespace SuspicionSystem;
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+	constexpr float INIT_TIMER_VALUE = 10;
 	namespace CSC8503 {
 		class PlayerObject;
 		class GuardObject;

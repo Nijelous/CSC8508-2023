@@ -160,6 +160,8 @@ void LevelManager::ClearLevel() {
 	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
 	mAnimation->Clear();
+	mInventoryBuffSystemClassPtr->Reset();
+	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
@@ -181,8 +183,6 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
-	mWorld->ClearAndErase();
-	mPhysics->Clear();
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
@@ -231,10 +231,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 60.f * 15;
+	mTimer = INIT_TIMER_VALUE;
 
 	//Temp fix for crash problem
-	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
