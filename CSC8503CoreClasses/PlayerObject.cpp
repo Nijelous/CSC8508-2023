@@ -159,7 +159,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-		mObjectState = Stand;
+		mObjectState = Idle;
 		break;
 	default:
 		break;
@@ -208,19 +208,26 @@ void PlayerObject::MovePlayer(float dt) {
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
 
 	if (isIdle){
-		if(mObjectState!=Stand && mSuspicionSystemClassPtr!=nullptr ){
+		if(mObjectState != Idle && mSuspicionSystemClassPtr != nullptr ) {
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
-			mObjectState = Stand;
 		}
+		if (mIsCrouched)
+			mObjectState = IdleCrouch;
+		else
+			mObjectState = Idle;
 	}
-	else
-	{
+	else {
 		ActivateSprint(isSprinting);
+		if (mIsCrouched)
+			mObjectState = Crouch;
 	}
+
 	ToggleCrouch(isCrouching);
+
+	std::cout << mObjectState << std::endl;
 
 	StopSliding();
 }
@@ -351,21 +358,34 @@ void PlayerObject::ControlInventory() {
 	Debug::Print(itemName, Vector2(10, 80));
 }
 
-void PlayerObject::ToggleCrouch(bool isCrouching) {
-	if (isCrouching && mObjectState == Crouch)
-	{
+void PlayerObject::ToggleCrouch(bool crouchToggled) {
+	if (crouchToggled && mObjectState == Crouch) {
 		//Crouch -> Walk
 		StartWalking();
 		if(mSuspicionSystemClassPtr != nullptr)
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
-	else if (isCrouching && mObjectState == Walk)
-	{
+	else if (crouchToggled && mObjectState == Walk) {
 		//Walk -> Crouch
 		StartCrouching(); 
 		if (mSuspicionSystemClassPtr != nullptr)
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+	}
+	else if (crouchToggled && mObjectState == IdleCrouch) {
+		//Crouch -> Idle
+		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
+		mIsCrouched = false;
+		if (mSuspicionSystemClassPtr != nullptr)
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
+	}
+	else if (crouchToggled && mObjectState == Idle) {
+		//Idle -> Crouch
+		StartCrouching();
+		if (mSuspicionSystemClassPtr != nullptr)
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 	}
 }
@@ -376,24 +396,15 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 		StartSprinting();
 
 	}
-	else if (!mIsCrouched)
-	{
+	else if (!mIsCrouched) {
 		//Sprint->Walk
 		StartWalking();
-
-	}
-	else if (mIsCrouched)
-	{
-		//Sprint->Crouch
-		StartCrouching();
-
 	}
 }
 
 void PlayerObject::StartWalking() {
 	if (!(mObjectState == Walk)) {
-		if (mSuspicionSystemClassPtr != nullptr)
-		{
+		if (mSuspicionSystemClassPtr != nullptr) {
 			if (mObjectState == Sprint)
 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerNo);
@@ -416,8 +427,7 @@ void PlayerObject::StartWalking() {
 
 void PlayerObject::StartSprinting() {
 	if (!(mObjectState == Sprint)) {
-		if (mSuspicionSystemClassPtr != nullptr)
-		{
+		if (mSuspicionSystemClassPtr != nullptr) {
 			if (mObjectState==Walk)
 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
@@ -451,8 +461,10 @@ void PlayerObject::StartCrouching() {
 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerNo);
 		}
-
-		mObjectState = Crouch;
+		if (mObjectState == Walk)
+			mObjectState = Crouch;
+		if (mObjectState == Idle)
+			mObjectState = IdleCrouch;
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
 
@@ -514,7 +526,7 @@ void PlayerObject::ChangeToDefaultSpeeds(){
 	mSprintSpeed = DEFAULT_SPRINT_SPEED;
 
 	mPlayerSpeedState = Default;
-	mObjectState = Stand;
+	mObjectState = Idle;
 }
 
 void PlayerObject::ChangeToSlowedSpeeds(){
@@ -523,7 +535,7 @@ void PlayerObject::ChangeToSlowedSpeeds(){
 	mSprintSpeed = SLOWED_SPRINT_SPEED;
 
 	mPlayerSpeedState = SlowedDown;
-	mObjectState = Stand;
+	mObjectState = Idle;
 }
 
 void PlayerObject::ChangeToSpedUpSpeeds(){
@@ -532,7 +544,7 @@ void PlayerObject::ChangeToSpedUpSpeeds(){
 	mSprintSpeed = SPED_UP_SPRINT_SPEED;
 
 	mPlayerSpeedState = SpedUp;
-	mObjectState = Stand;
+	mObjectState = Idle;
 }
 
 void PlayerObject::ChangeToStunned(){
@@ -549,7 +561,7 @@ void PlayerObject::ChangeToStunned(){
 
 	mPhysicsObject->SetLinearVelocity(Vector3(0,0,0));
 	mPlayerSpeedState = Stunned;
-	mObjectState = Stand;
+	mObjectState = Idle;
 }
 
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
