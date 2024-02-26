@@ -70,7 +70,8 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 }
 
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if (otherObject->GetCollisionLayer() & Player) {
+	if ((otherObject->GetCollisionLayer() & Player) &&
+		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		plObj->AddPlayerPoints(mPoints);
 		GetFlag(0);

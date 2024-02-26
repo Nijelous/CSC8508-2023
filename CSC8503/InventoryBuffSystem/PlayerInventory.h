@@ -51,6 +51,7 @@ namespace InventoryBuffSystem
 		void UseItemInPlayerSlot(const int &itemSlot, const int &playerNo, const int &itemUseCount);
 		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
 		bool HandleOnItemUsed(const item &item, const int &playerNo, const int &invSlot, const int &itemUseCount);
+		bool IsInventoryFull(const int& playerNo);
 		ItemUseType GetItemUseType(const item &inItem);
 
 

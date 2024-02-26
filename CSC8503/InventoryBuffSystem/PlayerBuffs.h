@@ -55,6 +55,8 @@ namespace InventoryBuffSystem {
 			else
 				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
 		}
+		float GetBuffDuration(buff inBuff);
+		
 	private:
 		std::vector< buff> mBuffsInSinglePlayerRandomPool =
 		{
