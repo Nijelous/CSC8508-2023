@@ -2,8 +2,8 @@
 
 using namespace SuspicionSystem;
 
-SuspicionMetre::SusBreakpoint SuspicionMetre::GetSusBreakpoint(float inSusMetre){
-	std::map<float, SusBreakpoint>::iterator mapIt = mSusBreakpointMap.begin();
+SuspicionMetre::SusBreakpoint SuspicionMetre::GetSusBreakpoint(const float& inSusMetre){
+	auto mapIt = mSusBreakpointMap.begin();
 
 	while (mapIt->first > inSusMetre)
 		mapIt++;
