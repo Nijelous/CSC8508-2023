@@ -220,7 +220,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 	SendWallFloorInstancesToGPU();
-	LoadItems(itemPositions);
+	LoadItems(itemPositions, isMultiplayer);
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
@@ -387,13 +387,13 @@ void LevelManager::LoadGuards(int guardCount) {
 	}
 }
 
-void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
+void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const bool& isMultiplayer) {
 	for (int i = 0; i < itemPositions.size(); i++) {
 		if (i == itemPositions.size() / 2) {
 			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
-			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
 		}
 	}
 }
@@ -635,9 +635,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 
 }
 
-PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr)
+PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr,const bool& isMultiplayer)
 {
-	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr);
+	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr,isMultiplayer);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
 	SphereVolume* volume = new SphereVolume(0.75f);

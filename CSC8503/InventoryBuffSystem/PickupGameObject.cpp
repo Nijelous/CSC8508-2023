@@ -13,6 +13,7 @@ using namespace InventoryBuffSystem;
 
 PickupGameObject::PickupGameObject(
 	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	bool isMultiplayer,
 	unsigned int randomSeed,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
 	float initCooldown) {
@@ -23,6 +24,7 @@ PickupGameObject::PickupGameObject(
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mRandomSeed = randomSeed;
+	mIsMultiplayer = isMultiplayer;
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
 		{

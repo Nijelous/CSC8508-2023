@@ -130,9 +130,9 @@ std::string& InventoryBuffSystem::PlayerInventory::GetItemName(item item) {
 	return mItemNameMap[item];
 }
 
-PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed) {
+PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool) {
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::shuffle(mItemsInRandomPool.begin(), mItemsInRandomPool.end(), gen);
-	return mItemsInRandomPool[0];
+	std::shuffle((*randomItemPool).begin(), (*randomItemPool).end(), gen);
+	return (*randomItemPool)[0];
 }

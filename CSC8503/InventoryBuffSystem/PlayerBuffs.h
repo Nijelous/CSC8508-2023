@@ -34,12 +34,11 @@ namespace InventoryBuffSystem {
 		};
 
 		~PlayerBuffs() {
-			
+
 		};
 		void Init();
-		void ApplyBuffToPlayer(const buff &inBuff, const int &playerNo);
-		void RemoveBuffFromPlayer(const buff &inBuff, const int &playerNo);
-		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed);
+		void ApplyBuffToPlayer(const buff& inBuff, const int& playerNo);
+		void RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo);
 		void Update(float dt);
 
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
@@ -48,8 +47,16 @@ namespace InventoryBuffSystem {
 		void Detach(PlayerBuffsObserver* observer);
 		void Notify(BuffEvent buffEvent, int playerNo);
 
+		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool);
+		PlayerBuffs::buff GetRandomBuffFromPool(unsigned int seed, bool isSingleplayer=true)
+		{
+			if (isSingleplayer)
+				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
+			else
+				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
+		}
 	private:
-		std::vector< buff> mBuffsInRandomPool =
+		std::vector< buff> mBuffsInSinglePlayerRandomPool =
 		{
 			speed, silentSprint, slow, flagSight
 		};
