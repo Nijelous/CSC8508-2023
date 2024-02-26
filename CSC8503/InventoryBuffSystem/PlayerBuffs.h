@@ -48,6 +48,8 @@ namespace InventoryBuffSystem {
 		void Detach(PlayerBuffsObserver* observer);
 		void Notify(BuffEvent buffEvent, int playerNo);
 
+		float GetBuffDuration(PlayerBuffs::buff inBuff);
+
 	private:
 		std::vector<buff> mBuffsInRandomPool = 
 		{

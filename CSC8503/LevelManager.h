@@ -74,6 +74,10 @@ namespace NCL {
 
 			bool CheckGameLost();
 
+			std::vector<GuardObject*>& GetGuardObjects();
+
+			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
+
 			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
@@ -197,6 +201,7 @@ namespace NCL {
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			std::vector<GuardObject*> mGuardObjects;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
