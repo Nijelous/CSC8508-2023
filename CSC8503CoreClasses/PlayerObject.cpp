@@ -232,7 +232,7 @@ void PlayerObject::MovePlayer(float dt) {
 
 	ToggleCrouch(isCrouching);
 
-	std::cout << mObjectState << std::endl;
+	//std::cout << mObjectState << std::endl;
 
 	StopSliding();
 }
