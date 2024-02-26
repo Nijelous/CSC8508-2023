@@ -78,6 +78,7 @@ namespace NCL {
 
 			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
 
+			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -162,9 +163,10 @@ namespace NCL {
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
 
+			FlagGameObject* mMainFlag;
+
 			// shaders
 			Shader* mBasicShader;
-			Shader* mSoldierShader;
 
 			// animation 
 			Mesh* mGuardMesh;
@@ -176,6 +178,9 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 			Shader* mAnimationShader2;
+
+			vector<GLuint>  mGuardTextures;
+			vector<GLuint> mPlayerTextures;
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
