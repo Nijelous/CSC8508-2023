@@ -43,7 +43,7 @@ void GameSceneManager::UpdateGame(float dt) {
 	}
 
 	if (!(mGameState == PauseScreenState))
-		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
+		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
 	else
 		DisplayPauseScreen();
 
@@ -55,7 +55,7 @@ void GameSceneManager::UpdateGame(float dt) {
 	if (mGameState == DefeatScreenState)
 		DisplayDefeat();
 
-	LevelManager::GetLevelManager()->Update(dt, mGameState == PlayingLevelState, mGameState == PauseScreenState);
+	mLevelManager->Update(dt, mGameState == PlayingLevelState, mGameState == PauseScreenState);
 }
 
 void GameSceneManager::InitInGameMenuManager() {
