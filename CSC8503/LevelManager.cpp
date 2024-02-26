@@ -186,7 +186,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
-
 	mUpdatableObjects.push_back(prisonDoorPtr);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -234,6 +233,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	//Temp fix for crash problem
 	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	if (mTempPlayer)
 	{
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
@@ -381,7 +381,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
-		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard")->SetIsSensed(true);
+		AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
 
 
 	}
@@ -390,7 +390,7 @@ void LevelManager::LoadGuards(int guardCount) {
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions) {
 	for (int i = 0; i < itemPositions.size(); i++) {
 		if (i == itemPositions.size() / 2) {
-			AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
 		}
 		else {
 			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
@@ -609,6 +609,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+	
 	flag->SetPoints(40);
 
 	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
@@ -818,4 +819,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	mUpdatableObjects.push_back(soundEmitterObjectPtr);
 
 	return soundEmitterObjectPtr;
+}
+
+FlagGameObject* LevelManager::GetMainFlag() {
+	return mMainFlag;
 }
