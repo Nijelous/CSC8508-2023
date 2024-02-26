@@ -394,7 +394,7 @@ void LevelManager::LoadGuards(int guardCount) {
 void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const bool& isMultiplayer) {
 	for (int i = 0; i < itemPositions.size(); i++) {
 		if (i == itemPositions.size() / 2) {
-			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr);
 		}
 		else {
 			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
@@ -611,8 +611,8 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	return newDoor;
 }
 
-FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr) {
-	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr);
+FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr) {
+	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 	
 	flag->SetPoints(40);
 

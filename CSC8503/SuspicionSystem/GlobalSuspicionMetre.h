@@ -11,7 +11,7 @@ namespace SuspicionSystem
         virtual void UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint) = 0;
     };
 
-    const int DT_UNTIL_GlOBAL_RECOVERY = 8;
+    const int DT_UNTIL_GlOBAL_RECOVERY = 15;
 
     class GlobalSuspicionMetre :
         public SuspicionMetre
@@ -33,6 +33,8 @@ namespace SuspicionSystem
         void AddContinuousGlobalSusCause(const continuousGlobalSusCause &inCause);
         void RemoveContinuousGlobalSusCause(const continuousGlobalSusCause &inCause);
 
+        void SetMinGlobalSusMetre(const instantGlobalSusCause& inCause);
+
         float GetGlobalSusMeter()
         {
             return mGlobalSusMeter;
@@ -50,12 +52,12 @@ namespace SuspicionSystem
     private:
         std::map<const instantGlobalSusCause, const float>  mInstantCauseSusSeverityMap =
         {
-            {alarmTriggered,3}, {flagCaptured, 2}
+            {alarmTriggered,3}, {flagCaptured, 60}
         };
 
         std::map<const continuousGlobalSusCause, const float>  mContinuousCauseSusSeverityMap =
         {
-            {passiveRecovery, -1}
+            {passiveRecovery, -0.01f}
         };
 
         float mGlobalSusMeter;
@@ -64,7 +66,7 @@ namespace SuspicionSystem
         std::list<GlobalSuspicionObserver*> mGlobalSuspicionObserverList;
 
         void ChangePlayerGlobalSusMetre(const float amount);
-        void SetPlayerGlobalSusMetre(const float amount);
+        void SetMinGlobalSusMetre(const float amount);
     };
 }
 
