@@ -5,13 +5,12 @@ using namespace SuspicionSystem;
 
 void LocationBasedSuspicion::Init(){
 	mLocationSusAmountMap.clear();
-	mLocationRecoveryCDMap.clear();
 	mActiveLocationSusCauseMap.clear();
 }
 
-void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inCause, float locationX, float locationZ){
-	int pairedLocation = CantorPair(locationX,locationZ);
-	int nearbyPairedLocation;
+void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inCause, Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 
 	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
 	{
@@ -22,10 +21,9 @@ void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inC
 	ChangeSusLocationSusAmount(nearbyPairedLocation, mInstantLocationSusCauseSeverityMap[inCause]);
 }
 
-bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause inCause, float locationX, float locationZ){
-	int pairedLocation = CantorPair(locationX, locationZ);
-	int nearbyPairedLocation;
-
+bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause inCause, Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
 	{
 		AddNewLocation(pairedLocation);
@@ -37,62 +35,82 @@ bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause in
 	if (!IsActiveLocationsSusCause(inCause, nearbyPairedLocation))
 	{
 		mActiveLocationSusCauseMap[nearbyPairedLocation].push_back(inCause);
+
+		if (activeLocationSusCauseSeverityMap[inCause] > 0)
+			RemoveActiveLocationSusCause(passiveRecovery, nearbyPairedLocation);
+
 		return true;
 	}
 
 	return true;
 }
 
-bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause inCause, float locationX, float locationZ){
-	int pairedLocation = CantorPair(locationX, locationZ);
-	int nearbyPairedLocation;
-
+bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause inCause, Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 	if (IsNearbySusLocation(pairedLocation, nearbyPairedLocation) &&
 		IsActiveLocationsSusCause(inCause, nearbyPairedLocation))
 	{
-		mActiveLocationSusCauseMap[nearbyPairedLocation].clear();
-		mActiveLocationSusCauseMap.erase(nearbyPairedLocation);
+		mActiveLocationSusCauseMap[nearbyPairedLocation].erase
+		(std::remove(mActiveLocationSusCauseMap[nearbyPairedLocation].begin(),
+			mActiveLocationSusCauseMap[nearbyPairedLocation].end(), inCause));
+
+		if (mActiveLocationSusCauseMap[nearbyPairedLocation].empty() &&
+			mLocationSusAmountMap[nearbyPairedLocation] >= 0)
+			AddActiveLocationSusCause(passiveRecovery, nearbyPairedLocation);
 		return true;
 	}
 
 	return false;
 }
 
-bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause inCause, int pairedLocation){
-	int x, z;
-	InverseCantorPair(pairedLocation, x, z);
-	return RemoveActiveLocationSusCause(passiveRecovery, (float)x, float(z));
+bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation)
+{
+	Vector3 outPos = CantorPair::InverseCantorPair(pairedLocation);
+	return AddActiveLocationSusCause(inCause, outPos);
+}
+
+bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation){
+	Vector3 outPos = CantorPair::InverseCantorPair(pairedLocation);
+	return RemoveActiveLocationSusCause(inCause, outPos);
 }
 
 void LocationBasedSuspicion::Update(float dt){
-	for (auto entry = mActiveLocationSusCauseMap.begin(); entry != mActiveLocationSusCauseMap.end(); ++entry)
-	{
+	if (mActiveLocationSusCauseMap.empty())
+		return;
+
+	std::vector<CantorPair*> locationsToClear;
+
+	for (auto entry = mActiveLocationSusCauseMap.begin(); entry != mActiveLocationSusCauseMap.end(); ++entry){
 		std::vector<activeLocationSusCause> vector = entry->second;
 		auto pairedLocation = entry->first;
+		float tempSusAmount = 0;
 
-		for (int i = 0; i < vector.size(); i++)
-		{
-			ChangeSusLocationSusAmount(pairedLocation, vector[i] * dt);
+		for (int i = 0; i < vector.size(); i++){
+			tempSusAmount += activeLocationSusCauseSeverityMap[vector[i]];
 		}
 
-		if (mLocationRecoveryCDMap[pairedLocation] == DT_UNTIL_LOCATION_RECOVERY)
-		{
-			RemoveActiveLocationSusCause(passiveRecovery, pairedLocation);
-		}
+		ChangeSusLocationSusAmount(pairedLocation, tempSusAmount * dt);
 
-		mLocationRecoveryCDMap[pairedLocation] -= dt;
-		mLocationRecoveryCDMap[pairedLocation] = std::max(mLocationRecoveryCDMap[pairedLocation], 0.0f);
-
-		if (mLocationRecoveryCDMap[pairedLocation] == 0)
+		if (mLocationSusAmountMap[pairedLocation] <= 0 &&
+			mActiveLocationSusCauseMap[pairedLocation].size() <= 1)
 		{
-			RemoveActiveLocationSusCause(passiveRecovery, pairedLocation);
+			locationsToClear.push_back(&pairedLocation);
 		}
 	}
+
+	for (CantorPair* thisLocation : locationsToClear)
+	{
+		mLocationSusAmountMap.erase(*thisLocation);
+		mActiveLocationSusCauseMap[*thisLocation].clear();
+		mActiveLocationSusCauseMap.erase(*thisLocation);
+	}
+	locationsToClear.clear();
 }
 
-int LocationBasedSuspicion::GetLocationSusAmount(float locationX, float locationZ){
-	int pairedLocation = CantorPair(locationX, locationZ);
-	int nearbyPairedLocation;
+int LocationBasedSuspicion::GetLocationSusAmount(Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 
 	if (IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
 	{
@@ -102,22 +120,21 @@ int LocationBasedSuspicion::GetLocationSusAmount(float locationX, float location
 	return -1;
 }
 
-bool LocationBasedSuspicion::IsNearbySusLocation(int pairedLocation, int& nearbyPairedLocation){
+bool LocationBasedSuspicion::IsNearbySusLocation(CantorPair pairedLocation, CantorPair& nearbyPairedLocation) const{
+	nearbyPairedLocation = pairedLocation;
 	if (mLocationSusAmountMap.find(pairedLocation) != mLocationSusAmountMap.end())
 	{
-		nearbyPairedLocation = pairedLocation;
 		return true;
 	}
 
-	int x1, x2, y1, y2;
-
-	InverseCantorPair(pairedLocation,x1,y1);
+	Vector3 pos1 = CantorPair::InverseCantorPair(pairedLocation);
+	Vector3 pos2;
 
 	for (const auto& mapEntry : mLocationSusAmountMap) {
 
-		InverseCantorPair(mapEntry.first, x2, y2);
+		pos2 = CantorPair::InverseCantorPair(mapEntry.first);
 
-		if(CalculateDistance(x1, x2, y1, y2) <= MAX_NEARBY_DISTANCE)
+		if(Calculate2DDistance(pos1, pos2) <= MAX_NEARBY_DISTANCE)
 		{
 			nearbyPairedLocation = mapEntry.first;
 			return true;
@@ -127,7 +144,7 @@ bool LocationBasedSuspicion::IsNearbySusLocation(int pairedLocation, int& nearby
 	return false;
 }
 
-void LocationBasedSuspicion::ChangeSusLocationSusAmount(int pairedLocation, float amount){
+void LocationBasedSuspicion::ChangeSusLocationSusAmount(CantorPair pairedLocation, float amount){
 	mLocationSusAmountMap[pairedLocation] += amount;
 	mLocationSusAmountMap[pairedLocation] = std::clamp
 	(
@@ -136,20 +153,18 @@ void LocationBasedSuspicion::ChangeSusLocationSusAmount(int pairedLocation, floa
 		100.0f
 	);
 
-	if (amount < 0)
-		mLocationRecoveryCDMap[pairedLocation] = DT_UNTIL_LOCATION_RECOVERY;
+	float temp = mLocationSusAmountMap[pairedLocation];
+
 }
 
-void LocationBasedSuspicion::AddNewLocation(int pairedLocation, float initSusAmount){
+void LocationBasedSuspicion::AddNewLocation(CantorPair pairedLocation, float initSusAmount){
 	if (initSusAmount <= 0)
 		return;
 
 	mLocationSusAmountMap[pairedLocation] = initSusAmount;
-	mLocationRecoveryCDMap[pairedLocation] = 0;
-	mActiveLocationSusCauseMap[pairedLocation] = {};
 }
 
-bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause inCause, int pairedLocation){
+bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation) {
 	auto foundCause = std::find(mActiveLocationSusCauseMap[pairedLocation].begin(),
 		mActiveLocationSusCauseMap[pairedLocation].end(), inCause);
 
@@ -162,21 +177,10 @@ bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause in
 	return false;
 }
 
-float LocationBasedSuspicion::CalculateDistance(int x1,int x2,int y1,int y2){
-	return std::sqrt(std::pow(x2 - x1, 2)
-		+ std::pow(y2 - y1, 2));
+float LocationBasedSuspicion::Calculate2DDistance(Vector3 inPos1, Vector3 inPos2) const{
+	Vector2 outVector(inPos1.x - inPos2.x, inPos1.z - inPos2.z);
+	return outVector.Length();
 }
 
-int LocationBasedSuspicion::CantorPair(int x, int y){
-	return ((x + y) * (x + y + 1)) / 2 + y;
-}
-
-void LocationBasedSuspicion::InverseCantorPair(int z, int& x, int& y) {
-	int w = static_cast<int>((std::sqrt(8 * z + 1) - 1) / 2);
-	int t = (w * w + w) / 2;
-
-	y = z - t;
-	x = w - y;
-}
 
 

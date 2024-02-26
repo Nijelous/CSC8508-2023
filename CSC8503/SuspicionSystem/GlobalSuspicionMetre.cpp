@@ -8,11 +8,11 @@ void SuspicionSystem::GlobalSuspicionMetre::Init(){
     mGlobalRecoveryCooldown = 0;
 }
 
-void GlobalSuspicionMetre::AddInstantGlobalSusCause(instantGlobalSusCause inCause){
+void GlobalSuspicionMetre::AddInstantGlobalSusCause(const instantGlobalSusCause &inCause){
     ChangePlayerGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
 }
 
-void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause inCause){
+void GlobalSuspicionMetre::AddContinuousGlobalSusCause(const continuousGlobalSusCause &inCause){
     auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
     if (foundCause == mContinuousGlobalSusCauseVector.end())
@@ -21,7 +21,7 @@ void GlobalSuspicionMetre::AddContinuousGlobalSusCause(continuousGlobalSusCause 
     }
 }
 
-void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause){
+void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(const continuousGlobalSusCause &inCause){
     auto foundCause = std::find(mContinuousGlobalSusCauseVector.begin(), mContinuousGlobalSusCauseVector.end(), inCause);
 
     if (foundCause != mContinuousGlobalSusCauseVector.end())
@@ -38,7 +38,7 @@ void GlobalSuspicionMetre::Detach(GlobalSuspicionObserver* observer) {
     mGlobalSuspicionObserverList.remove(observer);
 }
 
-void GlobalSuspicionMetre::Notify(SuspicionMetre::SusBreakpoint susBreakpoint) {
+void GlobalSuspicionMetre::Notify(const SuspicionMetre::SusBreakpoint susBreakpoint) {
     std::list<GlobalSuspicionObserver*>::iterator iterator = mGlobalSuspicionObserverList.begin();
     while (iterator != mGlobalSuspicionObserverList.end()) {
         (*iterator)->UpdateGlobalSuspicionObserver(susBreakpoint);

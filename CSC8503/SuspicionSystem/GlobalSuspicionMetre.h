@@ -28,10 +28,10 @@ namespace SuspicionSystem
         };
 
         void Init();
-        void AddInstantGlobalSusCause(instantGlobalSusCause inCause);
+        void AddInstantGlobalSusCause(const instantGlobalSusCause &inCause);
 
-        void AddContinuousGlobalSusCause(continuousGlobalSusCause inCause);
-        void RemoveContinuousGlobalSusCause(continuousGlobalSusCause inCause);
+        void AddContinuousGlobalSusCause(const continuousGlobalSusCause &inCause);
+        void RemoveContinuousGlobalSusCause(const continuousGlobalSusCause &inCause);
 
         float GetGlobalSusMeter()
         {
@@ -44,16 +44,16 @@ namespace SuspicionSystem
 
         void Attach(GlobalSuspicionObserver* observer);
         void Detach(GlobalSuspicionObserver* observer);
-        void Notify(SuspicionMetre::SusBreakpoint susBreakpoint);
+        void Notify(const SuspicionMetre::SusBreakpoint susBreakpoint);
 
         void Update(float dt);
     private:
-        std::map<instantGlobalSusCause, float>  mInstantCauseSusSeverityMap =
+        std::map<const instantGlobalSusCause, const float>  mInstantCauseSusSeverityMap =
         {
             {alarmTriggered,3}, {flagCaptured, 2}
         };
 
-        std::map<continuousGlobalSusCause, float>  mContinuousCauseSusSeverityMap =
+        std::map<const continuousGlobalSusCause, const float>  mContinuousCauseSusSeverityMap =
         {
             {passiveRecovery, -1}
         };
@@ -63,7 +63,7 @@ namespace SuspicionSystem
         std::vector<continuousGlobalSusCause> mContinuousGlobalSusCauseVector;
         std::list<GlobalSuspicionObserver*> mGlobalSuspicionObserverList;
 
-        void ChangePlayerGlobalSusMetre(float amount);
+        void ChangePlayerGlobalSusMetre(const float amount);
     };
 }
 
