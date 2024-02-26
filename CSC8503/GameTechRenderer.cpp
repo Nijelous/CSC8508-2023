@@ -535,8 +535,8 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glUniform2f(glGetUniformLocation(mOutlineShader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
-
-		glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim"), mOutlinedObjects[i]->GetAnimation() ? 1 : 0);
+		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
+		glUniform1i(location, mOutlinedObjects[i]->GetAnimation() ? 1 : 0);
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
 		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
