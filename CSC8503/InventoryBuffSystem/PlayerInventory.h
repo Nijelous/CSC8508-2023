@@ -76,10 +76,7 @@ namespace InventoryBuffSystem
 			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
 		};
 	private:
-		std::vector<item> mItemsInRandomPool = {
-			soundEmitter,
-			stunItem 
-		};
+
 		std::vector<item> mItemsInSingleplayerRandomPool = {
 			doorKey
 		};
