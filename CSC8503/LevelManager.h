@@ -175,6 +175,9 @@ namespace NCL {
 			Shader* mAnimationShader;
 			Shader* mAnimationShader2;
 
+			vector<GLuint>  mGuardTextures;
+			vector<GLuint> mPlayerTextures;
+
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
 			MeshAnimation* mGuardAnimationStand;
