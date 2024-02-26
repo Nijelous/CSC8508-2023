@@ -46,6 +46,17 @@ void GlobalSuspicionMetre::Notify(const SuspicionMetre::SusBreakpoint susBreakpo
     }
 }
 
+/*
+void GlobalSuspicionMetre::UpdateInventoryObserver(InventoryBuffSystem::InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved){
+    switch (invEvent){
+    case InventoryBuffSystem::flagAdded:
+        SetPlayerGlobalSusMetre(flagCaptured);
+        break;
+    default:
+        break;
+    }
+}
+*/
 void GlobalSuspicionMetre::Update(float dt){
 
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
@@ -69,6 +80,17 @@ void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount){
     mGlobalSusMeter = std::clamp(mGlobalSusMeter,
         0.0f,
         100.0f);
+    if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
+        Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
+    if (amount < 0)
+        mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
+}
+
+void GlobalSuspicionMetre::SetPlayerGlobalSusMetre(const float amount){
+    SuspicionMetre::SusBreakpoint tempBreakpoint = SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter);
+    mGlobalSusMeter = std::clamp(mGlobalSusMeter,
+        mGlobalSusMeter,
+        amount);
     if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
         Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
     if (amount < 0)

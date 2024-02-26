@@ -64,6 +64,7 @@ namespace SuspicionSystem
         std::list<GlobalSuspicionObserver*> mGlobalSuspicionObserverList;
 
         void ChangePlayerGlobalSusMetre(const float amount);
+        void SetPlayerGlobalSusMetre(const float amount);
     };
 }
 
