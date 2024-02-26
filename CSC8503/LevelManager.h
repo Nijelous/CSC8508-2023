@@ -73,6 +73,8 @@ namespace NCL {
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
+
+			FlagGameObject* GetMainFlag();
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -157,6 +159,8 @@ namespace NCL {
 			Texture* mSuspensionBarTex;
 			Texture* mSuspensionIndicatorTex;
 
+			FlagGameObject* mMainFlag;
+
 			// shaders
 			Shader* mBasicShader;
 
@@ -170,6 +174,9 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 			Shader* mAnimationShader2;
+
+			vector<GLuint>  mGuardTextures;
+			vector<GLuint> mPlayerTextures;
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;

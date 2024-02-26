@@ -7,6 +7,7 @@
 #include "map";
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
+#include "../LevelManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -51,6 +52,18 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	switch (invEvent) {
 	case InventoryBuffSystem::flagDropped:
 		Reset();
+	default:
+		break;
+	}
+}
+
+void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
+	switch (buffEvent) {
+	case BuffEvent::flagSightApplied:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
+		break;
+	case BuffEvent::flagSightRemoved:
+		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
 	default:
 		break;
 	}

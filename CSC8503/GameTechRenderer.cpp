@@ -20,7 +20,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	debugShader = new OGLShader("debug.vert", "debug.frag");
 	shadowShader = new OGLShader("shadow.vert", "shadow.frag");
-	mOutlineShader = new OGLShader("basic.vert", "basic.frag");
+	mOutlineShader = new OGLShader("outline.vert", "outline.frag");
 	iconShader = new OGLShader("UI.vert", "UI.frag");
 
 	glGenTextures(1, &shadowTex);
@@ -535,6 +535,8 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glUniform2f(glGetUniformLocation(mOutlineShader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
+		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
+		glUniform1i(location, mOutlinedObjects[i]->GetAnimation() ? 1 : 0);
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
 		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
@@ -542,9 +544,12 @@ void GameTechRenderer::DrawOutlinedObjects() {
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
-			glBindTexture(GL_TEXTURE_2D, textureID);
-			glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
+			if (mOutlinedObjects[i]->GetAnimation()) {
+				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
+				glBindTexture(GL_TEXTURE_2D, textureID);
+				glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
+			}
+			
 			DrawBoundMesh((uint32_t)b);
 		}
 	}
