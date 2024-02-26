@@ -32,30 +32,30 @@ namespace SuspicionSystem
 
         void Init();
 
-        void AddInstantLocalSusCause(const instantLocalSusCause inCause, int playerNo);
+        void AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo);
 
-        bool AddActiveLocalSusCause(activeLocalSusCause inCause, int playerNo);
-        bool RemoveActiveLocalSusCause(activeLocalSusCause inCause, int playerNo);
+        bool AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
+        bool RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
 
-        virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
+        virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent,int playerNo) override;
 
-        float GetLocalSusMetreValue(int playerNo) {
+        float GetLocalSusMetreValue(const int &playerNo) {
             return mPlayerMeters[playerNo];
         }
 
-        SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(int playerNo) {
+        SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(const int playerNo) {
             return SuspicionMetre::GetSusBreakpoint(mPlayerMeters[playerNo]);
         }
 
         void Update(float dt);
 
     private:
-        std::map<instantLocalSusCause, float>  mInstantLocalSusCauseSeverityMap =
+        std::map<const instantLocalSusCause, const float>  mInstantLocalSusCauseSeverityMap =
         {
             {soundEmitted, 2}, {flagCapture, 40}
         };
 
-        std::map<activeLocalSusCause, float>  mActiveLocalSusCauseSeverityMap =
+        std::map<const activeLocalSusCause, const float>  mActiveLocalSusCauseSeverityMap =
         {
             {guardsLOS, 3}, {cameraLOS, 3}, {disguiseBuff, -20}, {playerWalk,3}, {playerSprint,9}, {passiveRecovery,-10}
         };
@@ -66,7 +66,7 @@ namespace SuspicionSystem
 
         std::vector<activeLocalSusCause> mActiveLocalSusCauseVector[NCL::CSC8503::MAX_PLAYERS];
 
-        void ChangePlayerLocalSusMetre(int playerNo, float ammount);
+        void ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount);
     };
 }
 

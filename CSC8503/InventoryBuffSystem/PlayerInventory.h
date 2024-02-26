@@ -60,7 +60,15 @@ namespace InventoryBuffSystem
 
 		std::string& GetItemName(item item);
 
-		PlayerInventory::item GetRandomItemFromPool(unsigned int seed);
+		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool);
+		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, bool isSinglePlayer = true)
+		{
+			if(isSinglePlayer)
+				return GetRandomItemFromPool(seed, &mItemsInSingleplayerRandomPool);
+			else
+				return GetRandomItemFromPool(seed, &mItemsInMultiplayerRandomPool);
+		};
+
 		PlayerInventory::item GetItemInInventorySlot(const int itemSlot, const int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
 	
 		void SetPlayerAbleToUseItem(const item& inItem, const int& playerNo, const bool& isAbleToUseKey) {
@@ -68,8 +76,12 @@ namespace InventoryBuffSystem
 		};
 	private:
 
-		std::vector<item> mItemsInRandomPool = {
-			stunItem
+		std::vector<item> mItemsInSingleplayerRandomPool = {
+			doorKey
+		};
+
+		std::vector<item> mItemsInMultiplayerRandomPool = {
+			doorKey
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {

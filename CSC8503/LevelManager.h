@@ -102,7 +102,7 @@ namespace NCL {
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions);
+			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
@@ -118,7 +118,7 @@ namespace NCL {
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
