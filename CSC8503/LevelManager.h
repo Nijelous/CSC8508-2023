@@ -33,11 +33,18 @@ namespace NCL {
 			}
 		};
 
+		enum GameStates {
+			MenuState,
+			LevelState,
+			PauseState
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -95,7 +102,7 @@ namespace NCL {
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions);
+			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
@@ -111,7 +118,7 @@ namespace NCL {
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
@@ -210,6 +217,8 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
+
+			GameStates mGameState;
 		};
 	}
 }

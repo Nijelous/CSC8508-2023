@@ -11,9 +11,10 @@ namespace NCL {
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 			enum PlayerState {
-				Stand,
+				Idle,
 				Walk,
 				Sprint,
+				IdleCrouch,
 				Crouch,
 				Happy
 			};

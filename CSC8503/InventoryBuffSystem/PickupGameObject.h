@@ -16,6 +16,7 @@ namespace NCL {
             PickupGameObject() {};
             PickupGameObject(
                 InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+                bool isMultiplayer,
                 unsigned int randomSeed = 10,
                 std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
                 float initCooldown = 2.0f);
@@ -41,6 +42,7 @@ namespace NCL {
             unsigned int mRandomSeed;
 
             bool mIsBuff;
+            bool mIsMultiplayer;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
             PlayerInventory::item mCurrentItem;
             PlayerBuffs::buff mCurrentBuff;

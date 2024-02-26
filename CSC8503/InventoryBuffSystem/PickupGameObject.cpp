@@ -13,6 +13,7 @@ using namespace InventoryBuffSystem;
 
 PickupGameObject::PickupGameObject(
 	InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	bool isMultiplayer,
 	unsigned int randomSeed,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap,
 	float initCooldown) {
@@ -23,6 +24,7 @@ PickupGameObject::PickupGameObject(
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mRandomSeed = randomSeed;
+	mIsMultiplayer = isMultiplayer;
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
 		{
@@ -93,9 +95,9 @@ void PickupGameObject::ChangeToRandomPickup(){
 	std::bernoulli_distribution d(0.5);
 	mIsBuff = d(gen);
 	if (mIsBuff)
-		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(mRandomSeed);
+		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(mRandomSeed, !mIsMultiplayer);
 	else
-		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed);
+		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed, !mIsMultiplayer);
 }
 
 void PickupGameObject::ActivatePickup(int playerNo){
@@ -111,7 +113,9 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
 	if (mCooldown == 0)
 	{
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
-		ActivatePickup(0);
+		if (mIsBuff ||
+			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0))
+			ActivatePickup(0);
 	}
 }
 
