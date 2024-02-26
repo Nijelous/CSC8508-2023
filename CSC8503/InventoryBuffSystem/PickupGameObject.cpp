@@ -95,9 +95,9 @@ void PickupGameObject::ChangeToRandomPickup(){
 	std::bernoulli_distribution d(0.5);
 	mIsBuff = d(gen);
 	if (mIsBuff)
-		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(mRandomSeed);
+		mCurrentBuff = mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->GetRandomBuffFromPool(mRandomSeed, !mIsMultiplayer);
 	else
-		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed);
+		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed, !mIsMultiplayer);
 }
 
 void PickupGameObject::ActivatePickup(int playerNo){
