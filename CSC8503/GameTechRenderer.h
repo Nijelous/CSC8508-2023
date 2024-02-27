@@ -51,11 +51,14 @@ namespace NCL {
 
 			enum UBOBlockNames {
 				cam,
+				staticData,
 				MAX
 			};
+
 			void InitUBOBlocks();
 			void GenUBOBuffers();
 			void GenCamMatricesUBOS();
+			void GenStaticDataUBO();
 			void FillCamMatricesUBOs();
 
 

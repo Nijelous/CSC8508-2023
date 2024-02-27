@@ -163,8 +163,8 @@ void GameTechRenderer::GenUBOBuffers() {
 void GameTechRenderer::GenCamMatricesUBOS() {
 	glGenBuffers(1, &uBOBlocks[cam]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);
-	glBufferData(GL_UNIFORM_BUFFER, 64 * sizeof(float), NULL, GL_STATIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, cam, uBOBlocks[cam], 0, 64 * sizeof(float));
+	glBufferData(GL_UNIFORM_BUFFER, 68 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBindBufferRange(GL_UNIFORM_BUFFER, cam, uBOBlocks[cam], 0, 68 * sizeof(float));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -173,13 +173,23 @@ void GameTechRenderer::FillCamMatricesUBOs() {
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
 	Matrix4 invProjView = (projMatrix * viewMatrix).Inverse();
 	Matrix4 orthProj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
+	Vector3 cameraPos = gameWorld.GetMainCamera().GetPosition();
 	mFrameFrustum = mFrameFrustum.FromViewProjMatrix(projMatrix * viewMatrix);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);	
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), (float*)&projMatrix);
 	glBufferSubData(GL_UNIFORM_BUFFER, 16 * sizeof(float), 16 * sizeof(float), (float*)&viewMatrix);
 	glBufferSubData(GL_UNIFORM_BUFFER, 32 * sizeof(float), 16 * sizeof(float), (float*)&invProjView);
 	glBufferSubData(GL_UNIFORM_BUFFER, 48 * sizeof(float), 16 * sizeof(float), (float*)&orthProj);
+	glBufferSubData(GL_UNIFORM_BUFFER, 64 * sizeof(float), 3 * sizeof(float), (float*)&cameraPos);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::GenStaticDataUBO() {
+	glGenBuffers(1, &uBOBlocks[staticData]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[staticData]);
+	glBufferData(GL_UNIFORM_BUFFER, 18 * sizeof(float), NULL, GL_STATIC_DRAW);
+	//glBufferSubData(GL_UNIFORM_)
+	//glBindBufferRange(GL_UNIFORM_BUFFER, staticData, uBOBlocks[staticData], 0, 16 * sizeof(float));
 }
 
 
@@ -509,7 +519,6 @@ void GameTechRenderer::CombineBuffers() {
 
 void GameTechRenderer::DrawOutlinedObjects() {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -533,8 +542,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
-			}
-			
+			}			
 			DrawBoundMesh((uint32_t)b);
 		}
 	}

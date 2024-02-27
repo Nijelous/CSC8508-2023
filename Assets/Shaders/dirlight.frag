@@ -1,16 +1,22 @@
-#version 400 core
+#version 420 core
 
 uniform mat4 modelMatrix 	= mat4(1.0f);
 uniform sampler2D 	depthTex;
 uniform sampler2D normTex;
 
 uniform vec2 pixelSize;
-uniform vec3 cameraPos;
 uniform vec3 lightDirection;
 uniform vec3 lightPos;
 uniform float lightRadius;
 uniform vec4	lightColour;
-uniform mat4 inverseProjView;
+
+layout(std140, binding = 0) uniform CamBlock{
+	mat4 projMatrix;
+	mat4 viewMatrix;
+	mat4 invProjView;
+	mat4 orthViewProj;
+	vec3 camPos;
+} camData;
 
 out vec4 diffuseOutput;
 out vec4 specularOutput;
@@ -20,7 +26,7 @@ void main(void)
 	vec2 texCoord = vec2(gl_FragCoord.xy * pixelSize);
 	float depth = texture(depthTex, texCoord.xy).r;
 	vec3 ndcPos = vec3(texCoord, depth) * 2.0 - 1.0;
-	vec4 invClipPos = inverseProjView * vec4(ndcPos, 1.0);
+	vec4 invClipPos = camData.invProjView * vec4(ndcPos, 1.0);
 	vec3 worldPos = invClipPos.xyz / invClipPos.w;
 
 	float dist = length(lightPos - worldPos);
@@ -31,7 +37,7 @@ void main(void)
 
 	vec3 normal = normalize(texture(normTex, texCoord.xy).xyz * 2.0 - 1.0);
 	vec3 incident = normalize(-lightDirection);
-	vec3 viewDir = normalize(cameraPos - worldPos);
+	vec3 viewDir = normalize(camData.camPos - worldPos);
 	vec3 halfDir = normalize(incident + viewDir);
 
 	float lambert = clamp(dot(incident, normal), 0.0, 1.0);

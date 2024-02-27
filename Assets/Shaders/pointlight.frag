@@ -4,7 +4,6 @@ uniform sampler2D 	depthTex;
 uniform sampler2D normTex;
 
 uniform vec2 pixelSize;
-uniform vec3 cameraPos;
 
 uniform vec3	lightPos;
 uniform float	lightRadius;
@@ -15,6 +14,7 @@ layout(std140, binding = 0) uniform CamBlock{
 	mat4 viewMatrix;
 	mat4 invProjView;
 	mat4 orthViewProj;
+	vec3 camPos;
 } camData;
 
 out vec4 diffuseOutput;
@@ -35,7 +35,7 @@ void main(void)
 
 	vec3 normal = normalize(texture(normTex, texCoord.xy).xyz * 2.0 - 1.0);
 	vec3 incident = normalize(lightPos - worldPos);
-	vec3 viewDir = normalize(cameraPos - worldPos);
+	vec3 viewDir = normalize(camData.camPos - worldPos);
 	vec3 halfDir = normalize(incident + viewDir);
 
 	float lambert = clamp(dot(incident, normal), 0.0, 1.0);

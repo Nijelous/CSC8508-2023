@@ -1,6 +1,6 @@
 #version 420 core
 
-uniform mat4 projMatrix 	= mat4(1.0f);
+uniform mat4 modelMatrix;
 uniform bool hasAnim;
 uniform mat4 joints[128];
 
