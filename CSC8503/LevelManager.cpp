@@ -38,7 +38,7 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
-
+	mDtSinceLastFixedUpdate = 0;
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
 		Room* newRoom = new Room(entry.path().string());
@@ -282,9 +282,17 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
-		mInventoryBuffSystemClassPtr->Update(dt);
-		mSuspicionSystemClassPtr->Update(dt);
+		mDtSinceLastFixedUpdate += dt;
+		if (mDtSinceLastFixedUpdate >= TIME_UNTIL_FIXED_UPDATE) {
+			FixedUpdate(mDtSinceLastFixedUpdate);
+			mDtSinceLastFixedUpdate = 0;
+		}
 	}
+}
+
+void LevelManager::FixedUpdate(float dt){
+	mInventoryBuffSystemClassPtr->Update(dt);
+	mSuspicionSystemClassPtr->Update(dt);
 }
 
 void LevelManager::InitialiseAssets() {
