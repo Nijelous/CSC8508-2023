@@ -37,10 +37,6 @@ namespace NCL{
 			FMOD::Sound* footStepSound;
 			FMOD_RESULT result;
 			FMOD::Channel* channel = nullptr;
-			//ISound* mFootStep;
-			//std::map<Sounds, ISound*(SoundManager::*)()> mSoundMap;
-			/*std::vector<ISound*> mSounds;
-			ISoundEngine* mSoundEngine;*/
 		};
 	}
 }

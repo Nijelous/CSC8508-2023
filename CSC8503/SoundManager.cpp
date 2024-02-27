@@ -21,8 +21,6 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	//system->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &sound);
-
 	result = system->createSound("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &footStepSound);
 
 	if (result != FMOD_OK) {
@@ -55,6 +53,7 @@ FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 }
 
 void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
+	FMOD_VECTOR pos = ConvertVector(soundPos);
 	//FMOD::Channel* channel = nullptr;
 	SetListenerAttributes();
 	switch (state) {
@@ -65,6 +64,7 @@ void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 sound
 		break;
 	case GameObject::GameObjectState::Walk:
 		if (channel) {
+			channel->set3DAttributes(&pos, nullptr);
 			channel->setPaused(false);
 		}
 		else {
@@ -73,6 +73,7 @@ void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 sound
 		break;
 	case GameObject::GameObjectState::Sprint:
 		if (channel) {
+			channel->set3DAttributes(&pos, nullptr);
 			channel->setPaused(false);
 		}
 		else {
@@ -103,34 +104,7 @@ void SoundManager::SetListenerAttributes() {
 
 	system->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
 }
-//
-//ISound* SoundManager::AddSprintSound() {
-//	ISound* run = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
-//	mSounds.emplace_back(run);
-//	return run;
-//}
-//
-//void SoundManager::PlayOneTimeSound(Vector3 position) {
-//	ISound* oneTimeSound = mSoundEngine->play3D("soundFile.mp3", ConvertToVec3df(position));
-//	mSounds.emplace_back(oneTimeSound);
-//}
-//
-//void SoundManager::SetSoundToBePaused(ISound* sound, bool isPaused) {
-//	sound->setIsPaused(isPaused);
-//}
-//
-//void SoundManager::SetSoundPosition(ISound* sound, Vector3 pos) {
-//	sound->setPosition(ConvertToVec3df(pos));
-//}
-//
-//void SoundManager::DeleteSounds() {
-//	for (int i = 0; i < mSounds.size(); i++) {
-//		if (mSounds[i]) {
-//			mSounds[i]->drop();
-//		}
-//	}
-//}
-//
+
 FMOD_VECTOR SoundManager::ConvertVector(Vector3 vector) {
 	FMOD_VECTOR position = { vector.x, vector.y, vector.z };
 	return position;
