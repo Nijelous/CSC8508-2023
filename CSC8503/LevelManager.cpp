@@ -17,6 +17,7 @@
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
+#include "PointGameObject.h"
 #include "UISystem.h"
 #include "SoundManager.h"
 #include <filesystem>
@@ -414,6 +415,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const bo
 		}
 		else {
 			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
+			//AddPointObjectToWorld(itemPositions[i]);
 		}
 	}
 }
@@ -682,6 +684,34 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	mUpdatableObjects.push_back(pickup);
 
 	return pickup;
+}
+
+PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, int pointsWorth, float initCooldown)
+{
+	PointGameObject* pointObject = new PointGameObject(pointsWorth, initCooldown);
+
+	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
+	SphereVolume* volume = new SphereVolume(0.75f);
+	pointObject->SetBoundingVolume((CollisionVolume*)volume);
+	pointObject->GetTransform()
+		.SetScale(size * 2)
+		.SetPosition(position);
+
+	pointObject->SetRenderObject(new RenderObject(&pointObject->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	pointObject->SetPhysicsObject(new PhysicsObject(&pointObject->GetTransform(), pointObject->GetBoundingVolume()));
+
+	pointObject->SetCollisionLayer(Collectable);
+
+	pointObject->GetPhysicsObject()->SetInverseMass(0);
+	pointObject->GetPhysicsObject()->InitSphereInertia(false);
+
+	pointObject->GetRenderObject()->SetColour(Vector4(0.0f, 0.4f, 0.2f, 1));
+
+	mWorld->AddGameObject(pointObject);
+
+	mUpdatableObjects.push_back(pointObject);
+
+	return pointObject;
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {

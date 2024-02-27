@@ -31,29 +31,29 @@ PickupGameObject::PickupGameObject(
 			this->Waiting(dt);
 		}
 	);
-	State* GoUnderState = new State([&](float dt) -> void
+	State* InnactiveState = new State([&](float dt) -> void
 		{
-			this->GoUnder(dt);
+			this->Deactivate(dt);
 		}
 	);
-	State* GoOverState = new State([&](float dt) -> void
+	State* ActiveState = new State([&](float dt) -> void
 		{
-			this->GoOver(dt);
+			this->Activate(dt);
 		}
 	);
 
 	mStateMachine->AddState(WaitingState);
-	mStateMachine->AddState(GoUnderState);
-	mStateMachine->AddState(GoOverState);
+	mStateMachine->AddState(InnactiveState);
+	mStateMachine->AddState(ActiveState);
 
-	mStateMachine->AddTransition(new StateTransition(WaitingState, GoUnderState,
+	mStateMachine->AddTransition(new StateTransition(WaitingState, InnactiveState,
 		[&]() -> bool
 		{
 			return this->mCooldown == INT_MAX;
 		}
 	));
 
-	mStateMachine->AddTransition(new StateTransition(GoUnderState, WaitingState,
+	mStateMachine->AddTransition(new StateTransition(InnactiveState, WaitingState,
 		[&]() -> bool
 		{
 			return this->mCooldown <= this->mInitCooldown;
@@ -65,14 +65,14 @@ PickupGameObject::PickupGameObject(
 	if (mInitCooldown == -1)
 		return;
 
-	mStateMachine->AddTransition(new StateTransition(WaitingState, GoOverState,
+	mStateMachine->AddTransition(new StateTransition(WaitingState, ActiveState,
 		[&]() -> bool
 		{
 			return this->mCooldown <= 0.2f && this->mCooldown > 0;
 		}
 	));
 
-	mStateMachine->AddTransition(new StateTransition(GoOverState, WaitingState,
+	mStateMachine->AddTransition(new StateTransition(ActiveState, WaitingState,
 		[&]() -> bool
 		{
 			return this->mCooldown == 0;
@@ -119,12 +119,12 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
 	}
 }
 
-void PickupGameObject::GoOver(float dt) {
+void PickupGameObject::Activate(float dt) {
 	SetActive(true);
 	mCooldown = 0;
 }
 
-void PickupGameObject::GoUnder(float dt) {
+void PickupGameObject::Deactivate(float dt) {
 	SetActive(false);
 	mCooldown = mInitCooldown;
 	ChangeToRandomPickup();
