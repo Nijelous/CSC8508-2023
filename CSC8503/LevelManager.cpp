@@ -152,6 +152,8 @@ LevelManager::~LevelManager() {
 
 	delete mInventoryBuffSystemClassPtr;
 	delete mSuspicionSystemClassPtr;
+
+	delete mSoundManager;
 }
 
 void LevelManager::ClearLevel() {
