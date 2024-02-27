@@ -23,6 +23,8 @@ DebugNetworkedGame::DebugNetworkedGame() {
     mThisServer = nullptr;
     mThisClient = nullptr;
 
+    mClientSideLastFullID = 0;
+    mServerSideLastFullID = 0;
     mGameState = GameSceneState::MainMenuState;
     
     NetworkBase::Initialise();
@@ -244,7 +246,7 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame){
         //NetworkPlayer struct. 
         int playerState = o->GetLatestNetworkState().stateID;
         GamePacket* newPacket = nullptr;
-        if (o->WritePacket(&newPacket, deltaFrame, playerState)){
+        if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)){
             mThisServer->SendGlobalPacket(*newPacket);
             delete newPacket;
         }
@@ -285,6 +287,10 @@ int DebugNetworkedGame::GetPlayerPeerID(int peerId){
         }
     }
     return -1;
+}
+
+const int DebugNetworkedGame::GetClientLastFullID() const {
+    return mClientSideLastFullID;
 }
 
 void DebugNetworkedGame::SendStartGameStatusPacket(){
@@ -382,6 +388,7 @@ void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
             mNetworkObjects[i]->ReadPacket(*fullPacket);
         }
     }
+    mClientSideLastFullID = fullPacket->fullState.stateID;
 }
 
 void DebugNetworkedGame::HandleDeltaPacket(DeltaPacket* deltaPacket){
@@ -397,6 +404,7 @@ void DebugNetworkedGame::HandleClientPlayerInputPacket(ClientPlayerInputPacket* 
     auto* playerToHandle = mServerPlayers[playerIndex];
 
     playerToHandle->SetPlayerInput(clientPlayerInputPacket->playerInputs);
+    mServerSideLastFullID = clientPlayerInputPacket->lastId;
 }
 
 void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet){

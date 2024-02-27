@@ -82,6 +82,8 @@ namespace NCL {
 
 			void ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem);
 
+			void DropEquippedIconTexture(int itemSlot);
+
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
@@ -178,6 +180,9 @@ namespace NCL {
 			Texture* mSuspensionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
+			//item icon
+			Texture* mFlagIconTex;
+			Texture* mKeyIconTex;
 
 			// shaders
 			Shader* mBasicShader;

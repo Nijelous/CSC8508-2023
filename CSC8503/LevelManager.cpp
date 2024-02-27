@@ -64,8 +64,8 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
-	{PlayerInventory::item::doorKey,  mStunTex},
-	{PlayerInventory::item::flag , mStunTex},
+	{PlayerInventory::item::doorKey,  mKeyIconTex},
+	{PlayerInventory::item::flag , mFlagIconTex},
     {PlayerInventory::item::stunItem, mStunTex},
     {PlayerInventory::item::screwdriver, mStunTex}
 	};
@@ -367,6 +367,11 @@ void LevelManager::InitialiseAssets() {
 	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
 	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
+	mKeyIconTex = mRenderer->LoadTexture("key.png");
+	mFlagIconTex = mRenderer->LoadTexture("flag.png");
+
+	
 
 	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
@@ -741,7 +746,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
+void LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
 	if (mItemTextureMap[equippedItem] == nullptr) {
 		std::cout << "Can not find Icon texture" << std::endl;
 		return;
@@ -750,6 +755,14 @@ void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerI
 	
 	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
 }
+
+void LevelManager::DropEquippedIconTexture(int itemSlot) {
+
+	Texture& itemTex = *mInventorySlotTex;
+
+	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
 
 GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
