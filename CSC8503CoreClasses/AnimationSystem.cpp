@@ -90,6 +90,7 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 		
+		
 		if (mGuardState != mObjectState) {
 			mGuardState =(GameObject::GameObjectState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
@@ -117,7 +118,7 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 	for (auto& obj : mPlayerList) {
 
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
-
+		std::cout << mObjectState << std::endl;
 		if (mPlayerState != mObjectState) {
 			mPlayerState = (GameObject::GameObjectState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
