@@ -81,6 +81,8 @@ namespace NCL {
 
 			void ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem);
 
+			void DropEquippedIconTexture(int itemSlot);
+
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();

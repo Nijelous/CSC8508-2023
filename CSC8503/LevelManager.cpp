@@ -734,7 +734,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetCollisionLayer(Player);
 }
 
-void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
+void LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
 	if (mItemTextureMap[equippedItem] == nullptr) {
 		std::cout << "Can not find Icon texture" << std::endl;
 		return;
@@ -743,6 +743,14 @@ void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerI
 	
 	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
 }
+
+void LevelManager::DropEquippedIconTexture(int itemSlot) {
+
+	Texture& itemTex = *mInventorySlotTex;
+
+	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
 
 GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
