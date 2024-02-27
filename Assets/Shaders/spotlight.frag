@@ -16,16 +16,20 @@ layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
 	mat4 invProjView;
-	mat4 orthViewProj;
 	vec3 camPos;
 } camData;
+
+layout(std140, binding = 1) uniform StaticBlock{
+	mat4 orthProj;
+	vec2 pixelSize;
+} staticData;
 
 out vec4 diffuseOutput;
 out vec4 specularOutput;
 
 void main(void)
 {
-	vec2 texCoord = vec2(gl_FragCoord.xy * pixelSize);
+	vec2 texCoord = vec2(gl_FragCoord.xy * staticData.pixelSize);
 	float depth = texture(depthTex, texCoord.xy).r;
 	vec3 ndcPos = vec3(texCoord, depth) * 2.0 - 1.0;
 	vec4 invClipPos = camData.invProjView * vec4(ndcPos, 1.0);

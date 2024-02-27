@@ -6,8 +6,8 @@ uniform mat4 modelMatrix;
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
-	mat4 invProjView;
-	mat4 orthViewProj;
+	mat4 invProjMatrix;
+	vec3 camPos;
 } camData;
 
 in  vec3 position;

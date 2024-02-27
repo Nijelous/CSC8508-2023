@@ -4,9 +4,6 @@ uniform vec4 		objectColour;
 uniform sampler2D 	mainTex;
 uniform sampler2D   normTex;
 uniform sampler2DShadow shadowTex;
-
-uniform vec3	cameraPos;
-
 uniform bool hasTexture;
 
 in Vertex

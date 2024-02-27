@@ -9,7 +9,7 @@ layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
 	mat4 invProjView;
-	mat4 orthViewProj;
+	vec3 camPos;
 } camData;
 
 uniform float lightRadius = 1.0f;
