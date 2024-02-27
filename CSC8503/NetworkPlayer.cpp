@@ -108,7 +108,7 @@ void NetworkPlayer::MovePlayer(float dt){
         const Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
         mPlayerInputs.fwdAxis = fwdAxis;
         mPlayerInputs.rightAxis = rightAxis;
-        game->GetClient()->WriteAndSendClientInputPacket(0, mPlayerInputs);
+        game->GetClient()->WriteAndSendClientInputPacket(game->GetClientLastFullID(), mPlayerInputs);
     }
     else{
         HandleMovement(dt, mPlayerInputs);
