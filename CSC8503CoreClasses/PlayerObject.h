@@ -10,14 +10,6 @@ namespace NCL {
 		class Interactable;
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
-			enum PlayerState {
-				Idle,
-				Walk,
-				Sprint,
-				IdleCrouch,
-				Crouch,
-				Happy
-			};
 
 			enum PlayerSpeedState {
 				Default,
@@ -46,7 +38,7 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-			GameObjectState GetPlayerState() { return mObjectState; };
+		
 
 		protected:
 			bool mIsCrouched;
@@ -65,7 +57,6 @@ namespace NCL {
 
 			int mPlayerPoints;
 
-			GameObjectState mObjectState;
 			PlayerSpeedState mPlayerSpeedState;
 			PrisonDoor* mPrisonDoorPtr;
 

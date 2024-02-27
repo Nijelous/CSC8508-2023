@@ -55,6 +55,7 @@ void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
 		{
+			LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 			if (mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
 			{
 				Notify(mOnItemDroppedInventoryEventMap[inItem], playerNo, invSlot);
@@ -66,6 +67,8 @@ void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo
 }
 
 void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot) {
+
+	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]], playerNo, invSlot);

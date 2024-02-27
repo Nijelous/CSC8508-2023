@@ -45,7 +45,7 @@ int main(){
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
     bool isFullScreen = !isNetworkTestActive;
 
-    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, isFullScreen);
+    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
 
     if (!w->HasInitialised()) {
         return -1;
