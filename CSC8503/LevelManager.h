@@ -14,6 +14,8 @@ using namespace SuspicionSystem;
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.25f;
+	constexpr float INIT_TIMER_VALUE = 1000;
 	namespace CSC8503 {
 		class PlayerObject;
 		class GuardObject;
@@ -33,11 +35,18 @@ namespace NCL {
 			}
 		};
 
+		enum GameStates {
+			MenuState,
+			LevelState,
+			PauseState
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -61,6 +70,8 @@ namespace NCL {
 			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
 
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
+
+			void FixedUpdate(float dt);
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
@@ -95,7 +106,7 @@ namespace NCL {
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions);
+			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
@@ -111,7 +122,7 @@ namespace NCL {
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
-			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
@@ -148,7 +159,7 @@ namespace NCL {
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
 
-			UI* mUi;
+			UISystem* mUi;
 			Texture* mInventorySlotTex;
 
 			//powerup
@@ -210,6 +221,8 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
+			float mDtSinceLastFixedUpdate;
+			GameStates mGameState;
 		};
 	}
 }

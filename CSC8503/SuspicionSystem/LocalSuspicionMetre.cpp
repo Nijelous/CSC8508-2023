@@ -14,11 +14,11 @@ void LocalSuspicionMetre::Init(){
     }
 }
 
-void LocalSuspicionMetre::AddInstantLocalSusCause(instantLocalSusCause inCause, int playerNo){
+void LocalSuspicionMetre::AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo){
     ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
 };
 
-bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, int playerNo){
+bool LocalSuspicionMetre::AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already in the activeSusCauses vector of that player
@@ -31,7 +31,7 @@ bool LocalSuspicionMetre::AddActiveLocalSusCause(activeLocalSusCause inCause, in
     return false;
 };
 
-bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause, int playerNo){
+bool LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already int the activeSusCauses vector of that player
@@ -44,7 +44,7 @@ bool LocalSuspicionMetre::RemoveActiveLocalSusCause(activeLocalSusCause inCause,
     return false;
 }
 
-void LocalSuspicionMetre::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
+void LocalSuspicionMetre::UpdatePlayerBuffsObserver(const BuffEvent buffEvent, const int playerNo){
     switch (buffEvent)
     {
     case disguiseBuffApplied:
@@ -84,7 +84,7 @@ void LocalSuspicionMetre::Update(float dt) {
 
 }
 
-void LocalSuspicionMetre::ChangePlayerLocalSusMetre(int playerNo, float ammount){
+void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){
     mPlayerMeters[playerNo] += ammount;
     mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo],
         mGlobalSusMeterPTR->GetGlobalSusMeter(),

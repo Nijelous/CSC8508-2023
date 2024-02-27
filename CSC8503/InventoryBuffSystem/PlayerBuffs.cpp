@@ -11,7 +11,7 @@ void PlayerBuffs::Init(){
 	mBuffsObserverList.clear();
 }
 
-void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){
+void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
@@ -21,7 +21,7 @@ void PlayerBuffs::ApplyBuffToPlayer(buff inBuff, int playerNo){
 	}
 }
 
-void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo){
+void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	auto foundBuff = mActiveBuffDurationMap[playerNo].find(inBuff);
 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
@@ -31,11 +31,11 @@ void PlayerBuffs::RemoveBuffFromPlayer(buff inBuff, int playerNo){
 	}
 };
 
-PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed){
+PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool){
 	std::random_device rd;
 	std::mt19937 gen(rd());
-	std::shuffle(mBuffsInRandomPool.begin(), mBuffsInRandomPool.end(), gen);
-	return mBuffsInRandomPool[0];
+	std::shuffle((*randomBuffPool).begin(), (*randomBuffPool).end(), gen);
+	return (*randomBuffPool)[0];
 }
 
 void PlayerBuffs::Update(float dt){
@@ -76,6 +76,7 @@ void InventoryBuffSystem::PlayerBuffs::UpdateInventoryObserver(InventoryEvent in
 }
 
 void InventoryBuffSystem::PlayerBuffs::Attach(PlayerBuffsObserver* observer){
+
 	mBuffsObserverList.push_back(observer);
 }
 
@@ -84,7 +85,9 @@ void InventoryBuffSystem::PlayerBuffs::Detach(PlayerBuffsObserver* observer){
 }
 
 void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo){
+
 	std::list<PlayerBuffsObserver*>::iterator iterator = mBuffsObserverList.begin();
+	
 	while (iterator != mBuffsObserverList.end()) {
 		(*iterator)->UpdatePlayerBuffsObserver(buffEvent, playerNo);
 		++iterator;

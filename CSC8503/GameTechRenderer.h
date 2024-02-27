@@ -14,7 +14,7 @@
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 
-#include "UI.h"
+#include "UISystem.h"
 
 
 
@@ -43,7 +43,7 @@ namespace NCL {
 				mWallFloorTile = wallFloorTile;
 			}
 
-			void SetUIObject(UI* ui) {
+			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}
 
@@ -62,7 +62,7 @@ namespace NCL {
 			void NewRenderLines();
 			void NewRenderText();
 
-			void RenderIcons(UI::Icon icon);
+			void RenderIcons(UISystem::Icon icon);
 			
 
 			void RenderFrame()	override;
@@ -169,7 +169,7 @@ namespace NCL {
 
 			Frustum mFrameFrustum;
 
-			UI* mUi;
+			UISystem* mUi;
 		};
 	}
 }

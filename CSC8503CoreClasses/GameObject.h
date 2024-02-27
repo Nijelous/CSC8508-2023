@@ -27,11 +27,12 @@ namespace NCL::CSC8503 {
 		~GameObject();
 
 		enum GameObjectState {
-			Stand,
+			Idle,
 			Walk,
 			Sprint,
-			Happy,
-			Crouch
+			IdleCrouch,
+			Crouch,
+			Happy
 		};
 
 		void SetBoundingVolume(CollisionVolume* vol) {

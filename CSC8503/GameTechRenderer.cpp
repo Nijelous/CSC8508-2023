@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "UI.h"
+#include "UISystem.h"
 #include "Mesh.h"
 
 using namespace NCL;
@@ -201,7 +201,7 @@ void GameTechRenderer::RenderFrame() {
 
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UI::Icon*>& icons = mUi->GetIcons();
+	const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
 	for ( auto& i : icons) {
 		RenderIcons(*i);
 	}
@@ -660,7 +660,7 @@ void GameTechRenderer::NewRenderLines() {
 	glBindVertexArray(0);
 }
 
-void GameTechRenderer::RenderIcons(UI::Icon i) {
+void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	BindShader(*iconShader);
 
