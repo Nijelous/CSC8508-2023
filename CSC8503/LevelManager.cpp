@@ -224,7 +224,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
-	SendWallFloorInstancesToGPU();
+	//SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions, isMultiplayer);
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
@@ -304,12 +304,16 @@ void LevelManager::InitialiseAssets() {
 	mEnemyMesh = mRenderer->LoadMesh("Keeper.msh");
 	mBonusMesh = mRenderer->LoadMesh("apple.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("capsule.msh");
+	mStraightWallMesh = mRenderer->LoadMesh("Walls/StraightWallCoridoor.msh");
+	mCornerWallMesh = mRenderer->LoadMesh("Walls/CornerWallCoridoor.msh");
 
 	mBasicTex = mRenderer->LoadTexture("checkerboard.png");
 	mKeeperAlbedo = mRenderer->LoadTexture("fleshy_albedo.png");
 	mKeeperNormal = mRenderer->LoadTexture("fleshy_normal.png");
 	mFloorAlbedo = mRenderer->LoadTexture("panel_albedo.png");
 	mFloorNormal = mRenderer->LoadTexture("panel_normal.png");
+	mWallTex = mRenderer->LoadTexture("corridor_wall_c.tga");
+	mWallNormal = mRenderer->LoadTexture("corridor_wall_n.tga");
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
 	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
@@ -365,14 +369,19 @@ void LevelManager::InitialiseAssets() {
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
-void LevelManager::LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition) {
+void LevelManager::LoadMap(const std::map<Transform, TileType>& tileMap, const Vector3& startPosition) {
 	for (auto const& [key, val] : tileMap) {
+		Transform offsetKey = Transform();
+		offsetKey.SetPosition(key.GetPosition() + startPosition).SetOrientation(key.GetOrientation());
 		switch (val) {
 		case Wall:
-			AddWallToWorld(key + startPosition);
+			AddWallToWorld(offsetKey);
 			break;
 		case Floor:
-			AddFloorToWorld(key + startPosition);
+			AddFloorToWorld(offsetKey);
+			break;
+		case CornerWall:
+			AddCornerWallToWorld(offsetKey);
 			break;
 		}
 	}
@@ -457,17 +466,18 @@ void LevelManager::InitialiseIcons() {
 	mRenderer->SetUIObject(mUi);
 }
 
-GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
+GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
 	GameObject* wall = new GameObject(StaticObj, "Wall");
 
-	Vector3 wallSize = Vector3(5, 5, 5);
-	AABBVolume* volume = new AABBVolume(wallSize);
+	Vector3 wallSize = Vector3(1.5f, 1.5f, 1.5f);
+	AABBVolume* volume = new AABBVolume(wallSize + Vector3(0, 3, 0), Vector3(0, 4.5f, 0));
 	wall->SetBoundingVolume((CollisionVolume*)volume);
 	wall->GetTransform()
 		.SetScale(wallSize * 2)
-		.SetPosition(position);
+		.SetPosition(transform.GetPosition())
+		.SetOrientation(transform.GetOrientation());
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mStraightWallMesh, mWallTex, mWallNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -476,26 +486,55 @@ GameObject* LevelManager::AddWallToWorld(const Vector3& position) {
 
 	wall->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
-	wall->GetRenderObject()->SetIsInstanced(true);
+	wall->GetRenderObject()->SetIsInstanced(false);
 
 	mWorld->AddGameObject(wall);
 
 	mLevelLayout.push_back(wall);
 
-	mLevelMatrices.push_back(wall->GetTransform().GetMatrix());
+	return wall;
+}
+
+GameObject* LevelManager::AddCornerWallToWorld(const Transform& transform) {
+	GameObject* wall = new GameObject(StaticObj, "Wall");
+
+	Vector3 wallSize = Vector3(1.5f, 1.5f, 1.5f);
+	Vector3 offset = Matrix4::Rotation(transform.GetOrientation().ToEuler().y, Vector3(0, 1, 0)) * Vector3(1.5f, 4.5f, 1.5f);
+	AABBVolume* volume = new AABBVolume(wallSize + Vector3(1.5f, 3, 1.5f), offset);
+	wall->SetBoundingVolume((CollisionVolume*)volume);
+	wall->GetTransform()
+		.SetScale(wallSize * 2)
+		.SetPosition(transform.GetPosition())
+		.SetOrientation(transform.GetOrientation());
+
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCornerWallMesh, mWallTex, mWallNormal, mBasicShader,
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
+	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
+
+	wall->GetPhysicsObject()->SetInverseMass(0);
+	wall->GetPhysicsObject()->InitCubeInertia();
+
+	wall->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
+
+	wall->GetRenderObject()->SetIsInstanced(false);
+
+	mWorld->AddGameObject(wall);
+
+	mLevelLayout.push_back(wall);
 
 	return wall;
 }
 
-GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
+GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	GameObject* floor = new GameObject(StaticObj, "Floor");
 
-	Vector3 wallSize = Vector3(5, 0.5f, 5);
+	Vector3 wallSize = Vector3(4.5f, 0.5f, 4.5f);
 	AABBVolume* volume = new AABBVolume(wallSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
 		.SetScale(wallSize * 2)
-		.SetPosition(position);
+		.SetPosition(transform.GetPosition())
+		.SetOrientation(transform.GetOrientation());
 
 	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
@@ -506,11 +545,11 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 
 	floor->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
-	floor->GetRenderObject()->SetIsInstanced(true);
+	floor->GetRenderObject()->SetIsInstanced(false);
 
 	mWorld->AddGameObject(floor);
 
-	if(position.y < 0) mLevelLayout.push_back(floor);
+	//if(position.y < 0) mLevelLayout.push_back(floor);
 
 	mLevelMatrices.push_back(floor->GetTransform().GetMatrix());
 
@@ -520,7 +559,7 @@ GameObject* LevelManager::AddFloorToWorld(const Vector3& position) {
 Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	Helipad* helipad = new Helipad();
 
-	Vector3 wallSize = Vector3(15, 0.5f, 15);
+	Vector3 wallSize = Vector3(13.5f, 0.5f, 13.5f);
 	AABBVolume* volume = new AABBVolume(wallSize);
 	helipad->SetBoundingVolume((CollisionVolume*)volume);
 	helipad->GetTransform()
@@ -573,7 +612,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent) {
 
 InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset) {
 	InteractableDoor* newDoor = new InteractableDoor();
-	Vector3 size = Vector3(0.5f, 4.5f, 5);
+	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
 	OBBVolume* volume = new OBBVolume(size);
 
 	newDoor->SetBoundingVolume((CollisionVolume*)volume);
@@ -782,13 +821,13 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	float meshSize = PLAYER_MESH_SIZE;
 	float inverseMass = PLAYER_INVERSE_MASS;
 
-	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.3f, 1.0f, Vector3(0, 2.0f, 0));
 	guard->SetBoundingVolume((CollisionVolume*)volume);
 
 	int currentNode = 1;
 	guard->GetTransform()
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
-		.SetPosition(nodes[currentNode] + Vector3(20,0,20));
+		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));

@@ -36,6 +36,10 @@ namespace NCL {
 				mMatrix = matrix;
 			}
 			void UpdateMatrix();
+
+			inline bool operator<(const Transform& rhs) const { return this->GetPosition().x == rhs.GetPosition().x ? 
+				(this->GetPosition().y == rhs.GetPosition().y ? this->GetPosition().z < rhs.GetPosition().z : this->GetPosition().y < rhs.GetPosition().y) 
+				: this->GetPosition().x < rhs.GetPosition().x; }
 		protected:
 			Matrix4		mMatrix;
 			Quaternion	orientation;

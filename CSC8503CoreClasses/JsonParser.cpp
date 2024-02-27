@@ -112,7 +112,9 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 
 	case TileMap:
 	{
-		Vector3 key = Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]);
+		Transform key = Transform();
+		key.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+			.SetOrientation(Quaternion(keyValuePairs[3]["x"], keyValuePairs[3]["w"], keyValuePairs[3]["z"], keyValuePairs[3]["y"]));
 		TileType value = (TileType)keyValuePairs[1]["type"];
 		if (level) level->mTileMap[key] = value;
 		else room->mTileMap[key] = value;
