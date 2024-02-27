@@ -80,19 +80,19 @@ namespace NCL {
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
 			void LoadDefRendShaders();
-			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
-			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void FillGBuffer();
+			void DrawLightVolumes();
 			void CombineBuffers();
 			void DrawOutlinedObjects();
 			void LoadSkybox();
 
-			void DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void DrawWallsFloorsInstanced();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
 			void SetUIiconBufferSizes(size_t newVertCount);
-			void BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix);
+			void BindCommonLightDataToShader(OGLShader* shader);
 			void BindSpecificLightDataToShader(Light* l);			
 			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
 			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
@@ -101,16 +101,17 @@ namespace NCL {
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
 
-			OGLShader*  debugShader;
-			OGLShader*  skyboxShader;
+			OGLShader*  mDebugLineShader;
+			OGLShader* mDebugTextShader;
+			OGLShader*  mSkyboxShader;
 			OGLShader* mOutlineShader;
-			OGLShader*  iconShader;
+			OGLShader*  mIconShader;
 
 			OGLMesh*	skyboxMesh;
 			GLuint		skyboxTex;
 
 			//shadow mapping things
-			OGLShader*	shadowShader;
+			OGLShader*	mShadowShader;
 			GLuint		shadowTex;
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;

@@ -31,7 +31,7 @@ using namespace CSC8503;
 #include <sstream>
 
 int main(){
-    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 800, 600, false);
+    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1080, 720, false);
 
     if (!w->HasInitialised()) {
         return -1;
@@ -41,7 +41,7 @@ int main(){
     
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
-    bool isNetworkTestActive = true;
+    bool isNetworkTestActive = false;
     w->ShowOSPointer(isNetworkTestActive);
     w->LockMouseToWindow(!isNetworkTestActive);
 

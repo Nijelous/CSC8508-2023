@@ -18,10 +18,11 @@ Matrix4 biasMatrix = Matrix4::Translation(Vector3(0.5f, 0.5f, 0.5f)) * Matrix4::
 GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world) {
 	glEnable(GL_DEPTH_TEST);
 
-	debugShader = new OGLShader("debug.vert", "debug.frag");
-	shadowShader = new OGLShader("shadow.vert", "shadow.frag");
+	mDebugLineShader = new OGLShader("DebugLines.vert", "debug.frag");
+	mDebugTextShader = new OGLShader("DebugText.vert", "debug.frag");
+	mShadowShader = new OGLShader("shadow.vert", "shadow.frag");
 	mOutlineShader = new OGLShader("outline.vert", "outline.frag");
-	iconShader = new OGLShader("UI.vert", "UI.frag");
+	mIconShader = new OGLShader("UI.vert", "UI.frag");
 
 	glGenTextures(1, &shadowTex);
 	glBindTexture(GL_TEXTURE_2D, shadowTex);
@@ -44,7 +45,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	glClearColor(1, 1, 1, 1);
 
 	//Skybox!
-	skyboxShader = new OGLShader("skybox.vert", "skybox.frag");
+	mSkyboxShader = new OGLShader("skybox.vert", "skybox.frag");
 	skyboxMesh = new OGLMesh();
 	skyboxMesh->SetVertexPositions({ Vector3(-1, 1,-1), Vector3(-1,-1,-1) , Vector3(1,-1,-1) , Vector3(1,1,-1) });
 	skyboxMesh->SetVertexIndices({ 0,1,2,2,3,0 });
@@ -244,8 +245,8 @@ void GameTechRenderer::RenderShadowMap() {
 
 	glCullFace(GL_FRONT);
 
-	BindShader(*shadowShader);
-	int mvpLocation = glGetUniformLocation(shadowShader->GetProgramID(), "mvpMatrix");
+	BindShader(*mShadowShader);
+	int mvpLocation = glGetUniformLocation(mShadowShader->GetProgramID(), "mvpMatrix");
 	PointLight* pl = (PointLight*)mLights[0];
 	Matrix4 shadowViewMatrix = Matrix4::BuildViewMatrix(pl->GetPosition(), Vector3(0, 0, 0), Vector3(0, 1, 0));
 	Matrix4 shadowProjMatrix = Matrix4::Perspective(100.0f, 500.0f, 1, 45.0f);
@@ -286,12 +287,9 @@ void GameTechRenderer::RenderSkybox() {
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
 
-	BindShader(*skyboxShader);
+	BindShader(*mSkyboxShader);
 
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->GetProgramID(), "projMatrix"), 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(skyboxShader->GetProgramID(), "viewMatrix"), 1, false, (float*)&viewMatrix);
-
-	glUniform1i(glGetUniformLocation(skyboxShader->GetProgramID(), "cubeTex"), 0);
+	glUniform1i(glGetUniformLocation(mSkyboxShader->GetProgramID(), "cubeTex"), 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
 
@@ -306,14 +304,12 @@ void GameTechRenderer::RenderSkybox() {
 }
 
 void GameTechRenderer::RenderCamera() {
-	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
-	FillGBuffer(viewMatrix, projMatrix);
-	DrawLightVolumes(viewMatrix, projMatrix);
+	FillGBuffer();
+	DrawLightVolumes();
 	CombineBuffers();
 }
 
-void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix) {
+void GameTechRenderer::DrawWallsFloorsInstanced() {
 
 	RenderObject* rendObj = mWallFloorTile->GetRenderObject();
 	OGLShader* shader = (OGLShader*)rendObj->GetShader();
@@ -327,8 +323,6 @@ void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& pr
 		BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
 	}
 
-	int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
-	int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
 	int shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
 	int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
 	int hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
@@ -339,9 +333,6 @@ void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& pr
 
 	Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
 	glUniform3fv(cameraLocation, 1, &camPos.x);
-
-	glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
 	glUniform1i(shadowTexLocation, 1);
 
 	Vector4 colour = rendObj->GetColour();
@@ -359,7 +350,7 @@ void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& pr
 
 }
 
-void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
+void GameTechRenderer::FillGBuffer() {
 	glBindFramebuffer(GL_FRAMEBUFFER, mGBufferFBO);
 	glEnable(GL_STENCIL_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -367,12 +358,10 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	if (mWallFloorTile) {
-		DrawWallsFloorsInstanced(viewMatrix, projMatrix);
+		DrawWallsFloorsInstanced();
 	}
 
 	OGLShader* activeShader = nullptr;
-	int projLocation = 0;
-	int viewLocation = 0;
 	int modelLocation = 0;
 	int colourLocation = 0;
 	int hasVColLocation = 0;
@@ -400,8 +389,6 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
 		}
 		if (activeShader != shader) {
-			projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
-			viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
 			modelLocation = glGetUniformLocation(shader->GetProgramID(), "modelMatrix");
 			shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
 			colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
@@ -412,9 +399,6 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 			Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
 			glUniform3fv(cameraLocation, 1, &camPos.x);
-
-			glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
-			glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
 			int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
 			glUniform1i(shadowTexLocation, 1);
 
@@ -464,11 +448,11 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GameTechRenderer::DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix) {
+void GameTechRenderer::DrawLightVolumes() {
 	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
-	BindCommonLightDataToShader((OGLShader*)mPointLightShader, viewMatrix, projMatrix);
-	BindCommonLightDataToShader((OGLShader*)mSpotLightShader, viewMatrix, projMatrix);
-	BindCommonLightDataToShader((OGLShader*)mDirLightShader, viewMatrix, projMatrix);
+	BindCommonLightDataToShader((OGLShader*)mPointLightShader);
+	BindCommonLightDataToShader((OGLShader*)mSpotLightShader);
+	BindCommonLightDataToShader((OGLShader*)mDirLightShader);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_ALWAYS);
@@ -488,7 +472,7 @@ void GameTechRenderer::DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix) {
+void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader) {
 	BindShader(*shader);
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -503,11 +487,6 @@ void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader, Matrix4& v
 	Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
 	glUniform3fv(glGetUniformLocation(shader->GetProgramID(), "cameraPos"), 1, &camPos.x);
 	glUniform2f(glGetUniformLocation(shader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
-
-	Matrix4 invProjView = (projMatrix * viewMatrix).Inverse();
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "inverseProjView"), 1, false, (float*)&invProjView);
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "projMatrix"), 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "viewMatrix"), 1, false, (float*)&viewMatrix);
 }
 
 void GameTechRenderer::CombineBuffers() {
@@ -535,13 +514,9 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glDepthMask(GL_FALSE);
 	glClear(GL_DEPTH_BUFFER_BIT);
 	BindShader(*mOutlineShader);
-	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
 	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
-	glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "projMatrix"), 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "viewMatrix"), 1, false, (float*)&viewMatrix);
 	glUniform2f(glGetUniformLocation(mOutlineShader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
@@ -632,18 +607,9 @@ void GameTechRenderer::NewRenderLines() {
 	if (lines.empty()) {
 		return;
 	}
-
-	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
-
-	Matrix4 viewProj = projMatrix * viewMatrix;
-
-	BindShader(*debugShader);
-	int matSlot = glGetUniformLocation(debugShader->GetProgramID(), "viewProjMatrix");
-	GLuint texSlot = glGetUniformLocation(debugShader->GetProgramID(), "useTexture");
+	BindShader(*mDebugLineShader);
+	GLuint texSlot = glGetUniformLocation(mDebugLineShader->GetProgramID(), "useTexture");
 	glUniform1i(texSlot, 0);
-
-	glUniformMatrix4fv(matSlot, 1, false, (float*)viewProj.array);
 
 	debugLineData.clear();
 
@@ -662,7 +628,7 @@ void GameTechRenderer::NewRenderLines() {
 
 void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
-	BindShader(*iconShader);
+	BindShader(*mIconShader);
 
 	int iconVertCount = 6;
 
@@ -676,17 +642,8 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
 
-	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
+	bool texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "isOn");
 	glUniform1i(texSlot, i.isAppear);
-
-	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	//0.02, 0, 0, 0
-	//0, 0.02, 0, 0
-	//0, 0, -1, 0;
-	//-1, 1, 0, 1
-
-	int matSlot = glGetUniformLocation(iconShader->GetProgramID(), "viewProjMatrix");
-	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
 
 	SetUIiconBufferSizes(iconVertCount);
 
@@ -708,7 +665,7 @@ void GameTechRenderer::NewRenderText() {
 		return;
 	}
 
-	BindShader(*debugShader);
+	BindShader(*mDebugTextShader);
 
 	OGLTexture* t = (OGLTexture*)Debug::GetDebugFont()->GetTexture();
 
@@ -720,7 +677,7 @@ void GameTechRenderer::NewRenderText() {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		BindTextureToShader(*t, "mainTex", 0);
 	}
-	GLuint texSlot = glGetUniformLocation(debugShader->GetProgramID(), "useTexture");
+	GLuint texSlot = glGetUniformLocation(mDebugTextShader->GetProgramID(), "useTexture");
 	glUniform1i(texSlot, 1);
 
 	debugTextPos.clear();

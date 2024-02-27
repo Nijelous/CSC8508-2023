@@ -402,7 +402,6 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 void LevelManager::LoadGuards(int guardCount) {
 	for (int i = 0; i < guardCount; i++) {
 		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
-		addedGuard->SetIsSensed(true);
 		mGuardObjects.push_back(addedGuard);
 	}
 }
