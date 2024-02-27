@@ -38,7 +38,7 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
-
+	mDtSinceLastFixedUpdate = 0;
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
 		Room* newRoom = new Room(entry.path().string());
@@ -160,6 +160,8 @@ void LevelManager::ClearLevel() {
 	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
 	mAnimation->Clear();
+	mInventoryBuffSystemClassPtr->Reset();
+	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
@@ -181,8 +183,6 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
-	mWorld->ClearAndErase();
-	mPhysics->Clear();
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
@@ -231,10 +231,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 60.f * 15;
+	mTimer = INIT_TIMER_VALUE;
 
 	//Temp fix for crash problem
-	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
@@ -283,9 +282,17 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
-		mInventoryBuffSystemClassPtr->Update(dt);
-		mSuspicionSystemClassPtr->Update(dt);
+		mDtSinceLastFixedUpdate += dt;
+		if (mDtSinceLastFixedUpdate >= TIME_UNTIL_FIXED_UPDATE) {
+			FixedUpdate(mDtSinceLastFixedUpdate);
+			mDtSinceLastFixedUpdate = 0;
+		}
 	}
+}
+
+void LevelManager::FixedUpdate(float dt){
+	mInventoryBuffSystemClassPtr->Update(dt);
+	mSuspicionSystemClassPtr->Update(dt);
 }
 
 void LevelManager::InitialiseAssets() {

@@ -22,6 +22,8 @@ namespace NCL{
             
             bool GetIsServer() const;
 
+            const int GetClientLastFullID() const;
+
             void StartAsServer();
             void StartAsClient(char a, char b, char c, char d);
 
@@ -75,6 +77,9 @@ namespace NCL{
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
+
+            int mClientSideLastFullID;
+            int mServerSideLastFullID;
 
         private:
         };
