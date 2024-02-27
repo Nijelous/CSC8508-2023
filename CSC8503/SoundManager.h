@@ -15,8 +15,7 @@ namespace NCL{
 			
 			FMOD::Channel* AddWalkSound(Vector3 soundPos);
 
-			//void UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos);
-			void UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPos);
+			void UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos);
 
 			void SetListenerAttributes();
 

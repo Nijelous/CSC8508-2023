@@ -7,7 +7,7 @@ using namespace NCL::Maths;
 SoundManager::SoundManager(GameWorld* GameWorld) {
 	mGameWorld = GameWorld;
 	//FMOD_RESULT result;
-	FMOD::Sound* sound;
+	//FMOD::Sound* sound;
 	//FMOD::Channel* channel;
 	result = FMOD::System_Create(&system);
 
@@ -54,42 +54,11 @@ FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 	return footStepChannel;
 }
 
-//void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
-void SoundManager::UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPos) {
+void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
 	//FMOD::Channel* channel = nullptr;
 	SetListenerAttributes();
-	/*switch (state) {
-	case PlayerObject::PlayerState::Stand:
-		if (channel) {
-			channel->setPaused(true);
-		}
-		break;
-	case PlayerObject::PlayerState::Walk:
-		if (channel) {
-			channel->setPaused(false);
-		}
-		else {
-			channel = AddWalkSound(soundPos);
-		}
-		break;
-	case PlayerObject::PlayerState::Sprint:
-		if (channel) {
-			channel->setPaused(false);
-		}
-		else {
-			channel = AddWalkSound(soundPos);
-		}
-		break;
-	case PlayerObject::PlayerState::Crouch:
-		if (channel) {
-			channel->setPaused(true);
-		}
-		break;
-	case PlayerObject::PlayerState::Happy:
-		break;
-	}*/
-	/*switch (state) {
-	case GameObject::GameObjectState::Stand:
+	switch (state) {
+	case GameObject::GameObjectState::Idle:
 		if (channel) {
 			channel->setPaused(true);
 		}
@@ -110,6 +79,11 @@ void SoundManager::UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPo
 			channel = AddWalkSound(soundPos);
 		}
 		break;
+	case GameObject::GameObjectState::IdleCrouch:
+		if (channel) {
+			channel->setPaused(true);
+		}
+		break;
 	case GameObject::GameObjectState::Crouch:
 		if (channel) {
 			channel->setPaused(true);
@@ -117,7 +91,7 @@ void SoundManager::UpdateSounds(PlayerObject::PlayerState state, Vector3 soundPo
 		break;
 	case GameObject::GameObjectState::Happy:
 		break;
-	}*/
+	}
 }
 
 void SoundManager::SetListenerAttributes() {
