@@ -570,8 +570,7 @@ GuardObject* TutorialGame::AddGuardToWorld(const Vector3& position, const std::s
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 	
 
-	guard->SetPlayer(tempPlayer);
-	guard->SetGameWorld(world);
+
 
 	world->AddGameObject(guard);
 	mGameObjects.push_back(guard);

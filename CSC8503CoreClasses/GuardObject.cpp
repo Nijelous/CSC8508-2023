@@ -6,6 +6,8 @@
 #include "BehaviourSelector.h"
 #include "PlayerObject.h"
 #include "../CSC8503/LevelManager.h"
+#include "../Detour/Include/DetourNavMeshQuery.h"
+#include "RecastBuilder.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -26,6 +28,7 @@ GuardObject::~GuardObject() {
 
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
+		QueryNavmesh();
 		RaycastToPlayer();
 		ExecuteBT();
 	}
@@ -42,7 +45,7 @@ void GuardObject::RaycastToPlayer() {
 	if (ang > 2) {
 		RayCollision closestCollision;
 		Ray r = Ray(this->GetTransform().GetPosition(), dir);
-		if (mWorld->Raycast(r, closestCollision, true, this)) {
+		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this)) {
 			mSightedObject = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 			if (mSightedObject == mPlayer) {
@@ -114,6 +117,46 @@ void GuardObject::GrabPlayer() {
 	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 }
 
+void GuardObject::QueryNavmesh() {
+	float* startPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
+	float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
+	float* halfExt = new float[3] {3, 5, 3};
+	dtQueryFilter* filter = new dtQueryFilter();
+	dtPolyRef* startRef = new dtPolyRef();
+	dtPolyRef* endRef = new dtPolyRef();
+	float* nearestPoint1 = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(startPos, halfExt, filter, startRef, nearestPoint1);
+	float* nearestPoint2 = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(endPos, halfExt, filter, endRef, nearestPoint2);
+	int* pathCount = new int;
+	dtPolyRef* path = new dtPolyRef[1000];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findPath(*startRef, *endRef, startPos, endPos, filter, path, pathCount, 1000);
+	float* firstPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
+	for (int i = 0; i < *pathCount; i++) {
+		bool* isPosOverPoly = new bool;
+		float* closestPos = new float[3];
+		LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->closestPointOnPoly(path[i], firstPos, closestPos, isPosOverPoly);
+		Debug::DrawLine(Vector3(firstPos[0], firstPos[1], firstPos[2]), Vector3(closestPos[0], closestPos[1], closestPos[2]));
+		firstPos[0] = closestPos[0];
+		firstPos[1] = closestPos[1];
+		firstPos[2] = closestPos[2];
+		delete isPosOverPoly;
+		delete[] closestPos;
+	}
+	delete[] startPos;
+	delete[] endPos;
+	delete[] halfExt;
+	delete filter;
+	delete startRef;
+	delete endRef;
+	delete[] nearestPoint1;
+	delete[] nearestPoint2;
+	delete pathCount;
+	delete[] path;
+	delete[] firstPos;
+	//delete[] closestPos;
+}
+
 void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
 	float buffDuration = LevelManager::GetLevelManager()->GetInventoryBuffSystem()->GetPlayerBuffsPtr()->GetBuffDuration(buffToApply);
 
@@ -140,7 +183,6 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 }
 
 void GuardObject::BehaviourTree() {
-
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
@@ -278,7 +320,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 	BehaviourAction* SendToPrison = new BehaviourAction("Send to Prison", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
-				mPlayer->GetTransform().SetPosition(mPrisonPosition);
+				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
 				mPlayer->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
 				mPlayer->ClosePrisonDoor();

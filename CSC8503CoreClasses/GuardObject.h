@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObject.h"
-#include "GameWorld.h"
 #include "BehaviourSequence.h"
 #include "BehaviourAction.h"
 #include <string>
@@ -24,14 +23,6 @@ namespace NCL {
                 mPlayer = newPlayer;
             }
 
-            void SetGameWorld(GameWorld* newWorld) {
-                mWorld = newWorld;
-            }
-
-            void SetPrisonPosition(Vector3 prisonPosition) {
-                mPrisonPosition = prisonPosition;
-            }
-
             void SetPatrolNodes(vector<Vector3> nodes) {
                 mNodes = nodes;
             }
@@ -39,7 +30,6 @@ namespace NCL {
             void SetCurrentNode(int node) {
                 mCurrentNode = node;
             }
-
 
         protected:
             void RaycastToPlayer();
@@ -49,8 +39,7 @@ namespace NCL {
 
             GameObject* mSightedObject;
             PlayerObject* mPlayer;
-            const GameWorld* mWorld;
-            Vector3 mPrisonPosition;
+
             vector<Vector3> mNodes;
             int mCurrentNode;
             int mNextNode;
@@ -65,6 +54,7 @@ namespace NCL {
             void MoveTowardFocalPoint(Vector3 direction);
             void LookTowardFocalPoint(Vector3 direction);
             void GrabPlayer();
+            void QueryNavmesh();
 
             float mConfiscateItemsTime;
             int mGuardSpeedMultiplier;
