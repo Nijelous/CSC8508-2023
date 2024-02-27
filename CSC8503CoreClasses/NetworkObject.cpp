@@ -70,6 +70,11 @@ ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
 	this->playerID = playerID;
 }
 
+ClientUsePowerupPacket::ClientUsePowerupPacket(int playerID, int powerUpID) {
+	this->playerID = playerID;
+	this->powerUpID = powerUpID;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
