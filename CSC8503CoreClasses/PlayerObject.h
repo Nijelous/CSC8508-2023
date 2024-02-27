@@ -32,7 +32,9 @@ namespace NCL {
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
-
+			int GetPlayerID() const {
+				return mPlayerID;
+			}
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
 			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
@@ -55,7 +57,7 @@ namespace NCL {
 			int mCrouchSpeed;
 			int mActiveItemSlot;
 
-			int mPlayerNo;
+			int mPlayerID;
 			float mInteractHeldDt;
 			bool mHasSilentSprintBuff;
 			int mFirstInventorySlotUsageCount;

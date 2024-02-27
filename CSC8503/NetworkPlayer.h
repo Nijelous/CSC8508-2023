@@ -42,10 +42,6 @@ namespace NCL {
 			void UpdateObject(float dt) override;
 			void MovePlayer(float dt) override;
 
-			int GetPlayerNum() const {
-				return playerNum;
-			}
-
 		protected:
 			bool mIsClientInputReceived = false;
 			bool mIsLocalPlayer = false;
@@ -54,7 +50,6 @@ namespace NCL {
 			float mCameraYaw = 0.f;
 			
 			DebugNetworkedGame* game;
-			int playerNum;
 
 			PlayerInputs mPlayerInputs;
 			
