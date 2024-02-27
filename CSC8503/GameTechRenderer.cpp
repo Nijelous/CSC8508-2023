@@ -151,7 +151,7 @@ void GameTechRenderer::LoadDefRendShaders() {
 }
 
 void GameTechRenderer::InitUBOBlocks() {
-	for (int i = 0; i < MAX; i++) {
+	for (int i = 0; i < MAX_UBO; i++) {
 		uBOBlocks[i] = i;
 	}
 }
@@ -159,13 +159,14 @@ void GameTechRenderer::InitUBOBlocks() {
 void GameTechRenderer::GenUBOBuffers() {
 	GenCamMatricesUBOS();
 	GenStaticDataUBO();
+	GenLightDataUBO();
 }
 
 void GameTechRenderer::GenCamMatricesUBOS() {
-	glGenBuffers(1, &uBOBlocks[cam]);
-	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);
+	glGenBuffers(1, &uBOBlocks[camUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[camUBO]);
 	glBufferData(GL_UNIFORM_BUFFER, 51 * sizeof(float), NULL, GL_STATIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, cam, uBOBlocks[cam], 0, 51 * sizeof(float));
+	glBindBufferRange(GL_UNIFORM_BUFFER, camUBO, uBOBlocks[camUBO], 0, 51 * sizeof(float));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -176,7 +177,7 @@ void GameTechRenderer::FillCamMatricesUBOs() {
 	
 	Vector3 cameraPos = gameWorld.GetMainCamera().GetPosition();
 	mFrameFrustum = mFrameFrustum.FromViewProjMatrix(projMatrix * viewMatrix);
-	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);	
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[camUBO]);	
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), (float*)&projMatrix);
 	glBufferSubData(GL_UNIFORM_BUFFER, 16 * sizeof(float), 16 * sizeof(float), (float*)&viewMatrix);
 	glBufferSubData(GL_UNIFORM_BUFFER, 32 * sizeof(float), 16 * sizeof(float), (float*)&invProjView);
@@ -187,13 +188,75 @@ void GameTechRenderer::FillCamMatricesUBOs() {
 void GameTechRenderer::GenStaticDataUBO() {
 	Matrix4 orthProj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	Vector2 pixelSize(1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
-	glGenBuffers(1, &uBOBlocks[staticData]);
-	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[staticData]);
+	glGenBuffers(1, &uBOBlocks[staticDataUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[staticDataUBO]);
 	glBufferData(GL_UNIFORM_BUFFER, 18 * sizeof(float), NULL, GL_STATIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, staticData, uBOBlocks[staticData], 0, 16 * sizeof(float));
+	glBindBufferRange(GL_UNIFORM_BUFFER, staticDataUBO, uBOBlocks[staticDataUBO], 0, 18 * sizeof(float));
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), (float*)&orthProj);
 	glBufferSubData(GL_UNIFORM_BUFFER, 16 * sizeof(float), 2 * sizeof(float), (float*)&pixelSize);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);	
+}
+
+
+
+void GameTechRenderer::GenLightDataUBO() {
+	glGenBuffers(1, &uBOBlocks[lightsUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 12 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+	
+}
+
+void GameTechRenderer::FillLightUBO() {
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS * 12 * sizeof(float));
+	for (int i = 0; i < mLights.size(); i++) {
+		LightData ld;
+		Light::Type type = mLights[i]->GetType();
+		DirectionLight* dLight = (DirectionLight*)mLights[i];
+		PointLight* pLight = (PointLight*)mLights[i];
+		SpotLight* sLight = (SpotLight*)mLights[i];
+
+		switch (type) {
+		case Light::Direction:
+			ld.lightDirection = dLight->GetDirectionAddress();
+			ld.lightRadius = dLight->GetRadiusAddress();
+			ld.lightPos = dLight->GetCentreAddress();
+			ld.lightColour = dLight->GetColourAddress();
+			SendLightDataToGPU(i, ld);
+			break;
+
+		case Light::Type::Point:
+			ld.lightRadius = pLight->GetRadiusAddress();
+			ld.lightPos = pLight->GetPositionAddress();
+			ld.lightColour = pLight->GetColourAddress();
+			SendLightDataToGPU(i, ld);
+			break;
+
+		case Light::Type::Spot:
+			ld.lightDirection = sLight->GetDirectionAddress();
+			ld.lightRadius = sLight->GetRadiusAddress();
+			ld.lightPos = sLight->GetPositionAddress();
+			ld.minDotProd = sLight->GetDimProdMinAddress();
+			ld.lightColour = sLight->GetColourAddress();
+			ld.dimDotProd = sLight->GetDimProdMinAddress();
+			SendLightDataToGPU(i, ld);
+			break;
+
+		default:
+			break;
+		}
+	}
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::SendLightDataToGPU(int index, LightData& ld) {
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12, 3 * sizeof(float), ld.lightDirection);
+	glBufferSubData(GL_UNIFORM_BUFFER, (sizeof(float) * index * 12) + (3 * sizeof(float)), sizeof(float), ld.lightRadius);
+	glBufferSubData(GL_UNIFORM_BUFFER, (sizeof(float) * index * 12) + (4 * sizeof(float)), 3 * sizeof(float), ld.lightPos);
+	glBufferSubData(GL_UNIFORM_BUFFER, (sizeof(float) * index * 12) + (7 * sizeof(float)), sizeof(float), ld.minDotProd);
+	glBufferSubData(GL_UNIFORM_BUFFER, (sizeof(float) * index * 12) + (8 * sizeof(float)), 3 * sizeof(float), ld.lightColour);
+	glBufferSubData(GL_UNIFORM_BUFFER, (sizeof(float) * index * 12) + (11 * sizeof(float)), sizeof(float), ld.dimDotProd);
 }
 
 
@@ -473,7 +536,7 @@ void GameTechRenderer::DrawLightVolumes() {
 	glDepthMask(GL_FALSE);
 
 	for (int i = 0; i < mLights.size(); i++) {
-		BindSpecificLightDataToShader(mLights[i]);
+		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * 12 * sizeof(float), 12 * sizeof(float));
 		BindMesh(*mSphereMesh);
 		DrawBoundMesh();
 	}
@@ -497,10 +560,6 @@ void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader) {
 	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "depthTex"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
-
-	Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
-	glUniform3fv(glGetUniformLocation(shader->GetProgramID(), "cameraPos"), 1, &camPos.x);
-	glUniform2f(glGetUniformLocation(shader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 }
 
 void GameTechRenderer::CombineBuffers() {
@@ -834,8 +893,9 @@ void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 }
 
 void GameTechRenderer::AddLight(Light* lightPtr) {
-
+	if (mLights.size() >= MAX_POSSIBLE_LIGHTS) return;
 	mLights.push_back(lightPtr);
+
 }
 
 void GameTechRenderer::ClearLights() {
@@ -844,73 +904,4 @@ void GameTechRenderer::ClearLights() {
 	}
 	mLights.clear();
 }
-
-void GameTechRenderer::BindSpecificLightDataToShader(Light* l)
-{
-	Light::Type type = l->GetType();
-	if (type == Light::Point) {
-		SendPointLightDataToShader((OGLShader*)mPointLightShader, (PointLight*)l);
-	}
-	else if (type == Light::Spot) {
-		SendSpotLightDataToShader((OGLShader*)mSpotLightShader, (SpotLight*)l);
-	}
-	else if (type == Light::Direction) {
-		SendDirLightDataToShader((OGLShader*)mDirLightShader, (DirectionLight*)l);
-	}
-}
-
-void GameTechRenderer::SendPointLightDataToShader(OGLShader* shader, PointLight* l) {
-	BindShader(*shader);
-	int lightPosLocation = 0;
-	int lightColourLocation = 0;
-	int lightRadiusLocation = 0;
-
-	lightPosLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
-	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
-	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
-	glUniform3fv(lightPosLocation, 1, l->GetPositionAddress());
-	glUniform4fv(lightColourLocation, 1, l->GetColourAddress());
-	glUniform1f(lightRadiusLocation, l->GetRadius());
-}
-
-void GameTechRenderer::SendDirLightDataToShader(OGLShader* shader, DirectionLight* l) {
-	BindShader(*shader);
-	int lightColourLocation = 0;
-	int dirLightDirectionLocation = 0;
-	int lightRadiusLocation = 0;
-	int dirCentreLocation = 0;
-
-	dirCentreLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
-	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
-	dirLightDirectionLocation = glGetUniformLocation(shader->GetProgramID(), "lightDirection");
-	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
-	glUniform3fv(dirLightDirectionLocation, 1, l->GetDirectionAddress());
-	glUniform4fv(lightColourLocation, 1, l->GetColourAddress());
-	glUniform1f(lightRadiusLocation, l->GetRadius());
-	glUniform3fv(dirCentreLocation, 1, l->GetCentreAddress());
-}
-
-void GameTechRenderer::SendSpotLightDataToShader(OGLShader* shader, SpotLight* l) {
-	BindShader(*shader);
-	int lightPosLocation = 0;
-	int lightColourLocation = 0;
-	int lightRadiusLocation = 0;
-	int spotLightDirLocation = 0;
-	int minDotProdLocation = 0;
-	int dimDotProdLocation = 0;
-
-	lightPosLocation = glGetUniformLocation(shader->GetProgramID(), "lightPos");
-	lightColourLocation = glGetUniformLocation(shader->GetProgramID(), "lightColour");
-	lightRadiusLocation = glGetUniformLocation(shader->GetProgramID(), "lightRadius");
-	spotLightDirLocation = glGetUniformLocation(shader->GetProgramID(), "spotlightDir");
-	minDotProdLocation = glGetUniformLocation(shader->GetProgramID(), "minDotProd");
-	dimDotProdLocation = glGetUniformLocation(shader->GetProgramID(), "dimDotProd");
-	glUniform3fv(lightPosLocation, 1, l->GetPositionAddress());
-	glUniform4fv(lightColourLocation, 1, l->GetColourAddress());
-	glUniform1f(lightRadiusLocation, l->GetRadius());
-	glUniform3fv(spotLightDirLocation, 1, l->GetDirectionAddress());
-	glUniform1f(minDotProdLocation, l->GetDotProdMin());
-	glUniform1f(dimDotProdLocation, l->GetDimProdMin());
-}
-
 

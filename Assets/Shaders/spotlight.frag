@@ -3,15 +3,6 @@
 uniform sampler2D 	depthTex;
 uniform sampler2D normTex;
 
-uniform vec2 pixelSize;
-
-uniform vec3	lightPos;
-uniform float	lightRadius;
-uniform vec4	lightColour;
-uniform vec3	spotlightDir;
-uniform float minDotProd;
-uniform float dimDotProd;
-
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
@@ -24,6 +15,15 @@ layout(std140, binding = 1) uniform StaticBlock{
 	vec2 pixelSize;
 } staticData;
 
+layout(std140, binding = 2) uniform LightBlock {
+	vec3 lightDirection;
+	float lightRadius;
+	vec3 lightPos;
+	float minDotProd;
+	vec3 lightColour;
+	float dimDotProd;
+} lightData;
+
 out vec4 diffuseOutput;
 out vec4 specularOutput;
 
@@ -34,13 +34,13 @@ void main(void)
 	vec3 ndcPos = vec3(texCoord, depth) * 2.0 - 1.0;
 	vec4 invClipPos = camData.invProjView * vec4(ndcPos, 1.0);
 	vec3 worldPos = invClipPos.xyz / invClipPos.w;
-	vec3 incident = normalize(lightPos - worldPos);
-	float fragDotProd = dot(-spotlightDir, incident);
+	vec3 incident = normalize(lightData.lightPos - worldPos);
+	float fragDotProd = dot(-lightData.lightDirection, incident);
 
-	if(fragDotProd < minDotProd) {discard;}	
+	if(fragDotProd < lightData.minDotProd) {discard;}	
 
-	float dist = length(lightPos - worldPos);
-	float atten = 1.0 - clamp(dist / lightRadius, 0.0, 1.0);
+	float dist = length(lightData.lightPos - worldPos);
+	float atten = 1.0 - clamp(dist / lightData.lightRadius, 0.0, 1.0);
 
 	if(atten == 0.0) { discard; }
 
@@ -52,10 +52,10 @@ void main(void)
 	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
 	specFactor = pow(specFactor, 60.0);
 
-	float ringDiff = dimDotProd - minDotProd;
-	float edgeDimFactor = clamp((fragDotProd - minDotProd) / ringDiff, 0.0, 1.0);
+	float ringDiff = lightData.dimDotProd - lightData.minDotProd;
+	float edgeDimFactor = clamp((fragDotProd - lightData.minDotProd) / ringDiff, 0.0, 1.0);
 
-	vec3 attenuated = lightColour.xyz * atten * edgeDimFactor;
+	vec3 attenuated = lightData.lightColour * atten * edgeDimFactor;
 
 	diffuseOutput = vec4(attenuated * lambert, 1.0);
 

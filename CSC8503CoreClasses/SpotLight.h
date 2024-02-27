@@ -40,8 +40,23 @@ public:
 		return mDimProdMin; 
 	}
 
+	const float* GetDotProdMinAddress() const {
+		const float* address = &mDotProdMin;
+		return address;
+	}
+
+	const float* GetDimProdMinAddress() const {
+		const float* address = &mDimProdMin;
+		return address;
+	}
+
 	const float* GetDirectionAddress() const {
 		const float* address = &mDirection.x;
+		return address;
+	}
+
+	const float* GetRadiusAddress() const {
+		const float* address = &mRadius;
 		return address;
 	}
 

@@ -397,6 +397,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 			mRenderer->AddLight(newDL);
 		}
 	}
+	mRenderer->FillLightUBO();
 }
 
 void LevelManager::LoadGuards(int guardCount) {

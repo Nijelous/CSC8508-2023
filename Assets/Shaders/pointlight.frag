@@ -3,10 +3,6 @@
 uniform sampler2D 	depthTex;
 uniform sampler2D normTex;
 
-uniform vec3	lightPos;
-uniform float	lightRadius;
-uniform vec4	lightColour;
-
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
@@ -19,6 +15,15 @@ layout(std140, binding = 1) uniform StaticBlock{
 	vec2 pixelSize;
 } staticData;
 
+layout(std140, binding = 2) uniform LightBlock {
+	vec3 lightDirection;
+	float lightRadius;
+	vec3 lightPos;
+	float minDotProd;
+	vec3 lightColour;
+	float dimDotProd;
+} lightData;
+
 out vec4 diffuseOutput;
 out vec4 specularOutput;
 
@@ -30,20 +35,20 @@ void main(void)
 	vec4 invClipPos = camData.invProjView * vec4(ndcPos, 1.0);
 	vec3 worldPos = invClipPos.xyz / invClipPos.w;
 
-	float dist = length(lightPos - worldPos);
-	float atten = 1.0 - clamp(dist / lightRadius, 0.0, 1.0);
+	float dist = length(lightData.lightPos - worldPos);
+	float atten = 1.0 - clamp(dist / lightData.lightRadius, 0.0, 1.0);
 
 	if(atten == 0.0) { discard; }
 
 	vec3 normal = normalize(texture(normTex, texCoord.xy).xyz * 2.0 - 1.0);
-	vec3 incident = normalize(lightPos - worldPos);
+	vec3 incident = normalize(lightData.lightPos - worldPos);
 	vec3 viewDir = normalize(camData.camPos - worldPos);
 	vec3 halfDir = normalize(incident + viewDir);
 
 	float lambert = clamp(dot(incident, normal), 0.0, 1.0);
 	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
 	specFactor = pow(specFactor, 60.0);
-	vec3 attenuated = lightColour.xyz * atten;
+	vec3 attenuated = lightData.lightColour * atten;
 	diffuseOutput = vec4(attenuated * lambert, 1.0);
 
 	specularOutput = vec4(attenuated * specFactor * 0.33, 1.0);

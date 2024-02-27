@@ -12,12 +12,17 @@ layout(std140, binding = 0) uniform CamBlock{
 	vec3 camPos;
 } camData;
 
-uniform float lightRadius = 1.0f;
-uniform vec3 lightPos;
-uniform vec4 lightColour;
+layout(std140, binding = 2) uniform LightBlock {
+	vec3 lightDirection;
+	float lightRadius;
+	vec3 lightPos;
+	float minDotProd;
+	vec3 lightColour;
+	float dimDotProd;
+} lightData;
 
 void main() {
-	vec3 scale = vec3(lightRadius, lightRadius, lightRadius);
-	vec3 worldPos = (position * scale) + lightPos;
+	vec3 scale = vec3(lightData.lightRadius, lightData.lightRadius, lightData.lightRadius);
+	vec3 worldPos = (position * scale) + lightData.lightPos;
 	gl_Position = (camData.projMatrix * camData.viewMatrix) * vec4(worldPos, 1.0);
 }

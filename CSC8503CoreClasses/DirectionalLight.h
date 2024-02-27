@@ -42,6 +42,11 @@ public:
 		return address;
 	}
 
+	const float* GetRadiusAddress() const {
+		const float* address = &mRadius;
+		return address;
+	}
+
 protected:
 	Vector3 mDirection;
 	float mRadius;

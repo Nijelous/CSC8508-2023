@@ -27,6 +27,9 @@ namespace NCL {
 
 		class GameTechRenderer : public OGLRenderer	{
 		public:
+
+			const short MAX_POSSIBLE_LIGHTS = 100;
+
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 
@@ -39,28 +42,40 @@ namespace NCL {
 
 			void AddLight(Light* light);
 			void ClearLights();
+			void FillLightUBO();
 			void SetWallFloorObject(GameObject* wallFloorTile) {
 				mWallFloorTile = wallFloorTile;
 			}
 
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
-			}
+			}		
 
 		protected:
 
+			struct LightData {
+				const float* lightDirection = nullptr;
+				const float* lightRadius = nullptr;
+				const float* lightPos = nullptr;
+				const float* minDotProd = nullptr;
+				const float* lightColour = nullptr;
+				const float* dimDotProd = nullptr;
+			};
+
 			enum UBOBlockNames {
-				cam,
-				staticData,
-				MAX
+				camUBO,
+				staticDataUBO,
+				lightsUBO,
+				MAX_UBO
 			};
 
 			void InitUBOBlocks();
 			void GenUBOBuffers();
 			void GenCamMatricesUBOS();
-			void GenStaticDataUBO();
 			void FillCamMatricesUBOs();
-
+			void GenStaticDataUBO();
+			void GenLightDataUBO();
+			void SendLightDataToGPU(int index, LightData& ld);
 
 			void NewRenderLines();
 			void NewRenderText();
@@ -96,10 +111,6 @@ namespace NCL {
 
 			void SetUIiconBufferSizes(size_t newVertCount);
 			void BindCommonLightDataToShader(OGLShader* shader);
-			void BindSpecificLightDataToShader(Light* l);			
-			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
-			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
-			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
 
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
@@ -153,7 +164,7 @@ namespace NCL {
 			MeshMaterial* mMaterial;
 			vector<GLuint*>  mMatTextures;
 
-			GLuint uBOBlocks[MAX];
+			GLuint uBOBlocks[MAX_UBO];
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;
