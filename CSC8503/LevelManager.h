@@ -177,6 +177,9 @@ namespace NCL {
 			Texture* mSuspensionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
+			//item icon
+			Texture* mFlagIconTex;
+			Texture* mKeyIconTex;
 
 			// shaders
 			Shader* mBasicShader;

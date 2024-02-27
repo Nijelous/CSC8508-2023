@@ -61,8 +61,8 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
-	{PlayerInventory::item::doorKey,  mStunTex},
-	{PlayerInventory::item::flag , mStunTex},
+	{PlayerInventory::item::doorKey,  mKeyIconTex},
+	{PlayerInventory::item::flag , mFlagIconTex},
     {PlayerInventory::item::stunItem, mStunTex},
     {PlayerInventory::item::screwdriver, mStunTex}
 	};
@@ -360,6 +360,11 @@ void LevelManager::InitialiseAssets() {
 	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
 	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
+	mKeyIconTex = mRenderer->LoadTexture("key.png");
+	mFlagIconTex = mRenderer->LoadTexture("flag.png");
+
+	
 
 	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
