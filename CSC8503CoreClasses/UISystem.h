@@ -9,10 +9,10 @@ namespace NCL {
 	using namespace Rendering;
 
 	namespace CSC8503 {
-		class UI {
+		class UISystem {
 		public:
-			UI();
-			~UI();
+			UISystem();
+			~UISystem();
 
 			struct Icon {
 				Vector2 position;
@@ -21,14 +21,16 @@ namespace NCL {
 				Texture* texture;
 				bool isAppear;
 			};
-			Icon& AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
-			Icon& AddIcon(Icon* icon, bool isShown = true);
+			Icon* AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
+			Icon* AddIcon(Icon* icon, bool isShown = true);
 
 			std::vector<Icon*>& GetIcons();
 
-			void SetIconPosition(Vector2 newPos, Icon icon);
+			void UpdateIcon();
 
-			void SetIconTransparency(bool isShown, Icon icon);
+			void SetIconPosition(Vector2 newPos, Icon& icon);
+
+			void SetIconTransparency(bool isShown, Icon& icon);
 
 			void DeleteIcon(Icon icon);
 
@@ -44,7 +46,7 @@ namespace NCL {
 			Icon* mFirstEquippedItem;
 			Icon* mSecondEquippedItem;
 
-			std::vector<UI::Icon*> icons;
+			std::vector<Icon*> mIconsVec;
 		};
 	}
 }

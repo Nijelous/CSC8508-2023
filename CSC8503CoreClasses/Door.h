@@ -21,6 +21,7 @@ namespace NCL {
 			StateMachine* mStateMachine;
 			float mTimer;
 			bool mIsOpen;
+
 		};
 	}
 }

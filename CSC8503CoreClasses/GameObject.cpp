@@ -21,7 +21,7 @@ GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectN
 	mAnimationObject = nullptr;
 	mCollisionLayer = collisionLayer;
 	
-	mObjectState = Stand;
+	mObjectState = Idle;
 
 	mIsPlayer = false;
 }

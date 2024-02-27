@@ -17,7 +17,8 @@
 #include "InventoryBuffSystem/PickupGameObject.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
-#include "UI.h"
+#include "UISystem.h"
+
 #include <filesystem>
 
 //#include <fmod.hpp>
@@ -33,10 +34,11 @@ LevelManager::LevelManager() {
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 	mAnimation = new AnimationSystem(*mWorld);
-	mUi = new UI();
+	mUi = new UISystem();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
+	mDtSinceLastFixedUpdate = 0;
 
 	mSoundManager = new SoundManager(mWorld);
 
@@ -161,6 +163,8 @@ void LevelManager::ClearLevel() {
 	mLevelLayout.clear();
 	mRenderer->SetWallFloorObject(nullptr);
 	mAnimation->Clear();
+	mInventoryBuffSystemClassPtr->Reset();
+	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
 }
 
@@ -182,8 +186,6 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
-	mWorld->ClearAndErase();
-	mPhysics->Clear();
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
@@ -232,10 +234,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	delete[] levelSize;
 
-	mTimer = 60.f * 15;
+	mTimer = INIT_TIMER_VALUE;
 
 	//Temp fix for crash problem
-	mInventoryBuffSystemClassPtr->Reset();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
@@ -288,9 +289,17 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
-		mInventoryBuffSystemClassPtr->Update(dt);
-		mSuspicionSystemClassPtr->Update(dt);
+		mDtSinceLastFixedUpdate += dt;
+		if (mDtSinceLastFixedUpdate >= TIME_UNTIL_FIXED_UPDATE) {
+			FixedUpdate(mDtSinceLastFixedUpdate);
+			mDtSinceLastFixedUpdate = 0;
+		}
 	}
+}
+
+void LevelManager::FixedUpdate(float dt){
+	mInventoryBuffSystemClassPtr->Update(dt);
+	mSuspicionSystemClassPtr->Update(dt);
 }
 
 void LevelManager::InitialiseAssets() {
@@ -334,9 +343,10 @@ void LevelManager::InitialiseAssets() {
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
 	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
-	//preLoadtexID   
-	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);//I use Guard mesh to player
-	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);// I use rigMesh to guard   @(0v0)@
+	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
+
+	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);
+	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);
 
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
@@ -433,22 +443,23 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
-	UI::Icon& mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
-	mUi->SetEquippedItemIcon(0, mInventoryIcon1);
+	UISystem::Icon* mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(0, *mInventoryIcon1);
 
-	UI::Icon& mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
-	mUi->SetEquippedItemIcon(1, mInventoryIcon2);
+	UISystem::Icon* mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
+	mUi->SetEquippedItemIcon(1, *mInventoryIcon2);
 
-	UI::Icon mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
-	UI::Icon mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UI::Icon mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UI::Icon mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UI::Icon mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
-	UI::Icon mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UI::Icon mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	UISystem::Icon* mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
+	UISystem::Icon* mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UISystem::Icon* mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UISystem::Icon* mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UISystem::Icon* mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
+	UISystem::Icon* mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+				  
+	UISystem::Icon* mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
+	UISystem::Icon* mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
 
-	UI::Icon mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UI::Icon mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
 
 	mRenderer->SetUIObject(mUi);
 }
@@ -731,7 +742,12 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 }
 
 void NCL::CSC8503::LevelManager::ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem) {
+	if (mItemTextureMap[equippedItem] == nullptr) {
+		std::cout << "Can not find Icon texture" << std::endl;
+		return;
+	}
 	Texture& itemTex = *mItemTextureMap[equippedItem];
+	
 	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
 }
 

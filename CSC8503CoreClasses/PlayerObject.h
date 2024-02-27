@@ -44,7 +44,7 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-			PlayerState GetPlayerState() { return mObjectState; };
+			GameObjectState GetPlayerState() { return mObjectState; };
 
 		protected:
 			bool mIsCrouched;
@@ -63,7 +63,7 @@ namespace NCL {
 
 			int mPlayerPoints;
 
-			PlayerState mObjectState;
+			GameObjectState mObjectState;
 			PlayerSpeedState mPlayerSpeedState;
 			PrisonDoor* mPrisonDoorPtr;
 
