@@ -43,29 +43,6 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 
 	glClearColor(1, 1, 1, 1);
 
-	//Set up the light properties
-	Vector4 lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	float lightRadius = 35.0f;
-	Vector3 dir = Vector3(0, -1, 0);
-	for (int i = 0; i < 5; i++) {
-		for (int j = 0; j < 5; j++) {
-			Vector3 lightPosition = Vector3(-30 + 30.0f * i, -5.0f, -30 + 60.0f * j);
-			if (j % 2 == 0)
-			{
-				PointLight* pointL = new PointLight(lightPosition, lightColour, lightRadius);
-				//AddLight(pointL);
-			}
-			else
-			{
-				SpotLight* spotL = new SpotLight(dir, lightPosition, lightColour, lightRadius, 40, 2);
-				//AddLight(spotL);
-			}
-		}
-	}
-
-	DirectionLight* dLight = new DirectionLight({ 0.2,-0.7,0.3 }, { 0.1,0.1,0.1,1 }, 200, { 0,50,0 });
-	//AddLight(dLight);
-
 	//Skybox!
 	skyboxShader = new OGLShader("skybox.vert", "skybox.frag");
 	skyboxMesh = new OGLMesh();
@@ -84,6 +61,8 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	LoadSkybox();
 	SetUpFBOs();
 	LoadDefRendShaders();
+	InitUBOBlocks();
+	GenUBOBuffers();
 	mSphereMesh = (OGLMesh*)LoadMesh("sphere.msh");
 
 	glGenVertexArrays(1, &lineVAO);
@@ -170,21 +149,52 @@ void GameTechRenderer::LoadDefRendShaders() {
 	mCombineShader = LoadShader("combine.vert", "combine.frag");
 }
 
-void GameTechRenderer::RenderFrame() {
+void GameTechRenderer::InitUBOBlocks() {
+	for (int i = 0; i < MAX; i++) {
+		uBOBlocks[i] = i;
+	}
+}
+
+void GameTechRenderer::GenUBOBuffers() {
+	GenCamMatricesUBOS();
+}
+
+void GameTechRenderer::GenCamMatricesUBOS() {
+	glGenBuffers(1, &uBOBlocks[cam]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);
+	glBufferData(GL_UNIFORM_BUFFER, 64 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBindBufferRange(GL_UNIFORM_BUFFER, cam, uBOBlocks[cam], 0, 64 * sizeof(float));
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::FillCamMatricesUBOs() {
 	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
 	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
+	Matrix4 invProjView = (projMatrix * viewMatrix).Inverse();
+	Matrix4 orthProj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	mFrameFrustum = mFrameFrustum.FromViewProjMatrix(projMatrix * viewMatrix);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[cam]);	
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * sizeof(float), (float*)&projMatrix);
+	glBufferSubData(GL_UNIFORM_BUFFER, 16 * sizeof(float), 16 * sizeof(float), (float*)&viewMatrix);
+	glBufferSubData(GL_UNIFORM_BUFFER, 32 * sizeof(float), 16 * sizeof(float), (float*)&invProjView);
+	glBufferSubData(GL_UNIFORM_BUFFER, 48 * sizeof(float), 16 * sizeof(float), (float*)&orthProj);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+
+void GameTechRenderer::RenderFrame() {
+	
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(1, 1, 1, 1);
 	BuildObjectList();
 	SortObjectList();
-
+	FillCamMatricesUBOs();
 	RenderCamera();
 	RenderSkybox();
 	DrawOutlinedObjects();
-	glDisable(GL_CULL_FACE); //Todo - text indices are going the wrong way...
+	glDisable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -710,11 +720,6 @@ void GameTechRenderer::NewRenderText() {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		BindTextureToShader(*t, "mainTex", 0);
 	}
-	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-
-	int matSlot = glGetUniformLocation(debugShader->GetProgramID(), "viewProjMatrix");
-	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
-
 	GLuint texSlot = glGetUniformLocation(debugShader->GetProgramID(), "useTexture");
 	glUniform1i(texSlot, 1);
 

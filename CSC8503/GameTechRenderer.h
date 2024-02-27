@@ -48,6 +48,17 @@ namespace NCL {
 			}
 
 		protected:
+
+			enum UBOBlockNames {
+				cam,
+				MAX
+			};
+			void InitUBOBlocks();
+			void GenUBOBuffers();
+			void GenCamMatricesUBOS();
+			void FillCamMatricesUBOs();
+
+
 			void NewRenderLines();
 			void NewRenderText();
 
@@ -138,6 +149,7 @@ namespace NCL {
 			MeshMaterial* mMaterial;
 			vector<GLuint*>  mMatTextures;
 
+			GLuint uBOBlocks[MAX];
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;
