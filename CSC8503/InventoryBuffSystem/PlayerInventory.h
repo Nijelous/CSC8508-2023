@@ -46,13 +46,15 @@ namespace InventoryBuffSystem
 
 		void Init();
 		void AddItemToPlayer(const item &inItem, const int &playerNo);
+		int RemoveItemFromPlayer(const item& inItem, const int& playerNo);
+		void RemoveItemFromPlayer(const int& playerNo, const int& invSlot);
 		void DropItemFromPlayer(const item &inItem, const int &playerNo);
 		void DropItemFromPlayer(const int &playerNo, const int &invSlot);
-		void UseItemInPlayerSlot(const int &itemSlot, const int &playerNo, const int &itemUseCount);
+		void UseItemInPlayerSlot(const int& playerNo, const int& invSlot);
 		void OnItemEquipped(const int playerID, const int localPlayerID, const int slot, const item equippedItem);
 		void ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem);
+		bool HandleItemRemoval(const item& item, const int& playerNo, const int& invSlot);
 		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
-		bool HandleOnItemUsed(const item &item, const int &playerNo, const int &invSlot, const int &itemUseCount);
 		bool IsInventoryFull(const int& playerNo);
 		ItemUseType GetItemUseType(const item &inItem);
 
@@ -62,6 +64,7 @@ namespace InventoryBuffSystem
 		void Notify(InventoryEvent invEvent, int playerNo, int invSLot, bool isItemRemoved = false);
 
 		std::string& GetItemName(item item);
+		int GetItemUsesLeft(const int& playerNo, const int& invSlot);
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool);
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, bool isSinglePlayer = true)
@@ -72,8 +75,10 @@ namespace InventoryBuffSystem
 				return GetRandomItemFromPool(seed, &mItemsInMultiplayerRandomPool);
 		};
 
-		PlayerInventory::item GetItemInInventorySlot(const int itemSlot, const int playerNo) { return mPlayerInventory[playerNo][itemSlot];  };
-	
+		PlayerInventory::item GetItemInInventorySlot(const int playerNo, const int itemSlot) { return mPlayerInventory[playerNo][itemSlot];  };
+		
+		int GetItemUsageCount(const int itemSlot, const int playerNo) { return mItemUseCount[playerNo][itemSlot]; };
+
 		void SetPlayerAbleToUseItem(const item& inItem, const int& playerNo, const bool& isAbleToUseKey) {
 			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
 		};
@@ -132,9 +137,17 @@ namespace InventoryBuffSystem
 		std::map<item, std::function<bool(int playerNo)>> mItemPreconditionsMet;
 
 		item mPlayerInventory[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
+		int mItemUseCount[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		std::map < item ,bool[NCL::CSC8503::MAX_PLAYERS]> PlayerAbleToUseItem;
 		void CreateItemPickup(item inItem, Vector3 Position) {}
+
+		void IncreaseUsageCount(const int& playerNo, const int& invSlot) {
+			mItemUseCount[playerNo][invSlot]++;
+		}
+		void ResetItemUsageCount(const int& playerNo, const int& invSlot) {
+			mItemUseCount[playerNo][invSlot]=0;
+		}
 	};
 
 

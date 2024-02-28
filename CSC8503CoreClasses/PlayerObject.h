@@ -52,8 +52,6 @@ namespace NCL {
 			int mPlayerID;
 			float mInteractHeldDt;
 			bool mHasSilentSprintBuff;
-			int mFirstInventorySlotUsageCount;
-			int mSecondInventorySlotUsageCount;
 
 			int mPlayerPoints;
 
@@ -65,8 +63,6 @@ namespace NCL {
 			SuspicionSystem::SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			virtual void MovePlayer(float dt);
-
-			virtual void OnPlayerUseItem();
 			
 			virtual void RayCastFromPlayer(GameWorld* world, float dt);
 
@@ -75,8 +71,6 @@ namespace NCL {
 			void AttachCameraToPlayer(GameWorld* world);
 
 			virtual void MatchCameraRotation(float yawValue);
-
-			void ResetEquippedItemUsageCount(int inventorySlot);
 
 			void StopSliding();
 
