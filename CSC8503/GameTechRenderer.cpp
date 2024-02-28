@@ -202,15 +202,17 @@ void GameTechRenderer::GenStaticDataUBO() {
 void GameTechRenderer::GenLightDataUBO() {
 	glGenBuffers(1, &uBOBlocks[lightsUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 12 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 256 * sizeof(float), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 }
 
 void GameTechRenderer::FillLightUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS *12 * sizeof(float));
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS *256 * sizeof(float));
+	LightData lightData[100];
 	for (int i = 0; i < mLights.size(); i++) {
+		
 		LightData ld;
 		Light::Type type = mLights[i]->GetType();
 		DirectionLight* dLight = (DirectionLight*)mLights[i];
@@ -219,48 +221,36 @@ void GameTechRenderer::FillLightUBO() {
 
 		switch (type) {
 		case Light::Direction:
-			ld.lightDirection = dLight->GetDirectionAddress();
-			ld.lightRadius = dLight->GetRadiusAddress();
-			ld.lightPos = dLight->GetCentreAddress();
-			ld.lightColour = dLight->GetColourAddress();
-			SendLightDataToGPU(i, ld);
+			ld.lightDirection = dLight->GetDirection();
+			ld.lightRadius = dLight->GetRadius();
+			ld.lightPos = dLight->GetCentre();
+			ld.lightColour = dLight->GetColour();
+			lightData[i] = ld;
 			break;
 
 		case Light::Type::Point:
-			ld.lightRadius = pLight->GetRadiusAddress();
-			ld.lightPos = pLight->GetPositionAddress();
-			ld.lightColour = pLight->GetColourAddress();
-			SendLightDataToGPU(i, ld);
+			ld.lightRadius = pLight->GetRadius();
+			ld.lightPos = pLight->GetPosition();
+			ld.lightColour = pLight->GetColour();
+			lightData[i] = ld;
 			break;
 
 		case Light::Type::Spot:
-			ld.lightDirection = sLight->GetDirectionAddress();
-			ld.lightRadius = sLight->GetRadiusAddress();
-			ld.lightPos = sLight->GetPositionAddress();
-			ld.minDotProd = sLight->GetDimProdMinAddress();
-			ld.lightColour = sLight->GetColourAddress();
-			ld.dimDotProd = sLight->GetDimProdMinAddress();
-			SendLightDataToGPU(i, ld);
+			ld.lightDirection = sLight->GetDirection();
+			ld.lightRadius = sLight->GetRadius();
+			ld.lightPos = sLight->GetPosition();
+			ld.minDotProd = sLight->GetDimProdMin();
+			ld.lightColour = sLight->GetColour();
+			ld.dimDotProd = sLight->GetDimProdMin();
+			lightData[i] = ld;
 			break;
 
 		default:
 			break;
 		}
 	}
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(lightData[0]) * mLights.size(), &lightData[0]);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
-}
-
-void GameTechRenderer::SendLightDataToGPU(int index, LightData& ld) {
-	float zero = 0.0f;
-	Vector3 emptyVec = { 0,0,0 };
-
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12, 3 * sizeof(float), ld.lightDirection ? ld.lightDirection : &emptyVec.x);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 3, sizeof(float), ld.minDotProd ? ld.minDotProd : &zero);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 4, 3 * sizeof(float), ld.lightPos ? ld.lightPos : &emptyVec.x);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 7, sizeof(float), ld.dimDotProd ? ld.dimDotProd : &zero);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 8, 3 * sizeof(float), ld.lightColour ? ld.lightColour : &emptyVec.x);	
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 11, sizeof(float), ld.lightRadius ? ld.lightRadius : &zero);
-
 }
 
 
@@ -539,16 +529,16 @@ void GameTechRenderer::DrawLightVolumes() {
 	glDepthFunc(GL_ALWAYS);
 	glDepthMask(GL_FALSE);
 
-	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[camUBO]);
 	for (int i = 0; i < mLights.size(); i++) {
+		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * 64 * sizeof(float), sizeof(float));
 		if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
 		if (mLights[i]->GetType() == Light::Direction) BindShader(*((OGLShader*)(mDirLightShader)));
 		if (mLights[i]->GetType() == Light::Spot)BindShader(*((OGLShader*)(mSpotLightShader)));
-		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * 12 * sizeof(float), 12 * sizeof(float));
+		
 		BindMesh(*mSphereMesh);
 		DrawBoundMesh();
 	}
-	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LEQUAL);

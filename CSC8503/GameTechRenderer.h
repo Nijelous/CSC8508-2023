@@ -28,7 +28,7 @@ namespace NCL {
 		class GameTechRenderer : public OGLRenderer	{
 		public:
 
-			const short MAX_POSSIBLE_LIGHTS = 100;
+			const short MAX_POSSIBLE_LIGHTS = 25;
 
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
@@ -54,15 +54,26 @@ namespace NCL {
 		protected:
 
 			struct LightData {
-				//vec3 size, aligned as vec4s
-				const float* lightDirection = nullptr;
-				const float* lightPos = nullptr;
-				const float* lightColour = nullptr;
-				//float size
-				const float* minDotProd = nullptr;				
-				const float* dimDotProd = nullptr;
-				const float* lightRadius = nullptr;
-							
+				Vector3 lightDirection = { 0,0,0 };
+				float minDotProd = 0.0f;
+				Vector3 lightPos = { 0,0,0 };
+				float dimDotProd = 0.0f;
+				Vector3 lightColour = { 0,0,0 };
+				float lightRadius = 0.0f;
+				Vector4 padding1 = { 0,0,0,0 };
+				Vector4 padding2= { 0,0,0,0 };
+				Vector4 padding3 = { 0,0,0,0 };
+				Vector4 padding4 = { 0,0,0,0 };
+				Vector4 padding5 = { 0,0,0,0 };
+				Vector4 padding6 = { 0,0,0,0 };
+				Vector4 padding7 = { 0,0,0,0 };
+				Vector4 padding8 = { 0,0,0,0 };
+				Vector4 padding9 = { 0,0,0,0 };
+				Vector4 padding10 = { 0,0,0,0 };
+				Vector4 padding11 = { 0,0,0,0 };
+				Vector4 padding12 = { 0,0,0,0 };
+				Vector4 padding13 = { 0,0,0,0 };
+
 			};
 
 			enum UBOBlockNames {
@@ -78,7 +89,6 @@ namespace NCL {
 			void FillCamMatricesUBOs();
 			void GenStaticDataUBO();
 			void GenLightDataUBO();
-			void SendLightDataToGPU(int index, LightData& ld);
 
 			void NewRenderLines();
 			void NewRenderText();
