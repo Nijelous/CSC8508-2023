@@ -20,6 +20,9 @@ namespace NCL {
             void SetCurrentScene(Scenes scene);
 			
             bool GetIsForceQuit();
+            bool IsInSingleplayer() const;
+            const bool IsServer() const;
+            const bool IsClient() const;
             void SetIsForceQuit(bool isForceQuit);
 
             PushdownMachine* GetScenePushdownMachine();
@@ -27,12 +30,13 @@ namespace NCL {
             static SceneManager* GetSceneManager();
         protected:
             bool isForceQuit = false;
-
+            bool mIsInSingleplayer;
             SceneManager();
             ~SceneManager();
 
             static SceneManager* instance;
-			
+
+            Scenes mCurrentSceneType;
             Scene* currentScene = nullptr;
             PushdownMachine* pushdownMachine = nullptr;
 
