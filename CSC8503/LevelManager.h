@@ -83,6 +83,8 @@ namespace NCL {
 
 			void DropEquippedIconTexture(int itemSlot);
 
+			void ResetEquippedIconTexture();
+
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();

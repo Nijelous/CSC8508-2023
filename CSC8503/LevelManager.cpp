@@ -226,6 +226,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions, isMultiplayer);
+	ResetEquippedIconTexture();
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
@@ -447,13 +448,13 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(1, *mInventoryIcon2);
 
-	UISystem::Icon* mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
-	UISystem::Icon* mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UISystem::Icon* mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UISystem::Icon* mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UISystem::Icon* mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
+	UISystem::Icon* mdisguiseBuffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
+	UISystem::Icon* mslowIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
+	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
+	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(23, 84), 4.5, 7, mSlowDownTex, false);
 	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UISystem::Icon* mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	UISystem::Icon* mFlagSightIcon = mUi->AddIcon(Vector2(18, 92), 4.5, 7, mSwapPositionTex, false);
 				  
 	UISystem::Icon* mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
 	UISystem::Icon* mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
@@ -754,6 +755,14 @@ void LevelManager::DropEquippedIconTexture(int itemSlot) {
 	Texture& itemTex = *mInventorySlotTex;
 
 	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
+void LevelManager::ResetEquippedIconTexture() {
+
+	Texture& itemTex = *mInventorySlotTex;
+
+	mUi->ChangeEquipmentSlotTexture(0, itemTex);
+	mUi->ChangeEquipmentSlotTexture(1, itemTex);
 }
 
 
