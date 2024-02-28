@@ -68,7 +68,7 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mObjectState = GameObject::Walk;
+	mObjectState = Walk;
 	mPlayerSpeedState = Default;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
@@ -161,7 +161,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
 
-		mObjectState = GameObject::Idle;
+		mObjectState = Idle;
 
 		break;
 	default:
@@ -219,14 +219,14 @@ void PlayerObject::MovePlayer(float dt) {
 
 		}
 		if (mIsCrouched)
-			mObjectState = GameObject::IdleCrouch;
+			mObjectState = IdleCrouch;
 		else
-			mObjectState = GameObject::Idle;
+			mObjectState = Idle;
 	}
 	else {
 		ActivateSprint(isSprinting);
 		if (mIsCrouched)
-			mObjectState = GameObject::Crouch;
+			mObjectState = Crouch;
 	}
 
 	ToggleCrouch(isCrouching);
@@ -425,7 +425,7 @@ void PlayerObject::StartWalking() {
 			else
 				mMovementSpeed = WALK_ACCELERATING_SPEED;
 		
-		mObjectState = GameObject::Walk;
+		mObjectState = Walk;
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -436,7 +436,7 @@ void PlayerObject::StartWalking() {
 void PlayerObject::StartSprinting() {
 	if (!(mObjectState == Sprint)) {
 		if (mSuspicionSystemClassPtr != nullptr) {
-			if (mObjectState==Walk)
+			if (mObjectState== Walk)
 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 
@@ -450,7 +450,7 @@ void PlayerObject::StartSprinting() {
 		else
 			mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mObjectState = GameObject::Sprint;
+		mObjectState = Sprint;
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -470,10 +470,10 @@ void PlayerObject::StartCrouching() {
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 		}
 
-		if (mObjectState == GameObject::Walk)
-			mObjectState = GameObject::Crouch;
-		if (mObjectState == GameObject::Idle)
-			mObjectState = GameObject::IdleCrouch;
+		if (mObjectState == Walk)
+			mObjectState = Crouch;
+		if (mObjectState == Idle)
+			mObjectState = IdleCrouch;
 
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
@@ -537,7 +537,7 @@ void PlayerObject::ChangeToDefaultSpeeds(){
 
 	mPlayerSpeedState = Default;
 
-	mObjectState = GameObject::Idle;
+	mObjectState = Idle;
 
 }
 
@@ -548,7 +548,7 @@ void PlayerObject::ChangeToSlowedSpeeds(){
 
 	mPlayerSpeedState = SlowedDown;
 
-	mObjectState = GameObject::Idle;
+	mObjectState = Idle;
 
 }
 
@@ -559,7 +559,7 @@ void PlayerObject::ChangeToSpedUpSpeeds(){
 
 	mPlayerSpeedState = SpedUp;
 
-	mObjectState = GameObject::Idle;
+	mObjectState = Idle;
 
 }
 
@@ -578,7 +578,7 @@ void PlayerObject::ChangeToStunned(){
 	mPhysicsObject->SetLinearVelocity(Vector3(0,0,0));
 	mPlayerSpeedState = Stunned;
 
-	mObjectState = GameObject::Idle;
+	mObjectState = Idle;
 
 }
 
