@@ -92,8 +92,9 @@ namespace NCL::CSC8503 {
 		int playerID;
 		int slotId;
 		int equippedItem;
+		int usageCount;
 
-		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem);
+		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
 	};
 
 	class NetworkObject	{

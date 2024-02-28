@@ -84,14 +84,14 @@ ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int f
 	this->playerID = playerID;
 }
 
-ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem) {
+ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount) {
 	type = BasicNetworkMessages::ClientSyncItemSlot;
 	size = sizeof(ClientSyncItemSlotPacket);
-
 
 	this->playerID = playerID;
 	this->slotId = slotId;
 	this->equippedItem = equippedItem;
+	this->usageCount = usageCount;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
