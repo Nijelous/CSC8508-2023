@@ -48,7 +48,7 @@ namespace {
 	constexpr float SPED_UP_WALK_ACCELERATING_SPEED = 1500.0f;
 	constexpr float SPED_UP_SPRINT_ACCELERATING_SPEED = 3000.0f;
 
-	constexpr float TIME_UNTIL_LONG_INTERACT = 2.5f;
+	constexpr float TIME_UNTIL_LONG_INTERACT = 1.5f;
 
 	constexpr bool DEBUG_MODE = true;
 }
