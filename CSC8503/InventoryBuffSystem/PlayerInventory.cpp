@@ -12,8 +12,7 @@ namespace {
 	
 }
 
-namespace NCL::CSC8503
-{
+namespace NCL::CSC8503 {
 	class DebugNetworkedGame;
 }
 

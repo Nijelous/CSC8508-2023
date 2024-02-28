@@ -445,6 +445,8 @@ void DebugNetworkedGame::SetItemsLeftToZero(){
 }
 
 void DebugNetworkedGame::HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const {
-    int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
-    mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, static_cast<PlayerInventory::item>(packet->equippedItem), packet->usageCount);
+	const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* inventorySystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr();
+    const PlayerInventory::item equippedItem =  static_cast<PlayerInventory::item>(packet->equippedItem);
+	inventorySystem->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, equippedItem, packet->usageCount);
 }

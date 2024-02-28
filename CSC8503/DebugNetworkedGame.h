@@ -4,8 +4,7 @@
 #include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
-namespace NCL::CSC8503
-{
+namespace NCL::CSC8503 {
 	struct ClientSyncItemSlotPacket;
 }
 
