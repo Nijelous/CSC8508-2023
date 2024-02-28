@@ -99,7 +99,7 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 }
 
 bool GuardObject::CheckPolyDistance() {
-	if (mDist < 36) {
+	if (mDist < MIN_DIST_TO_NEXT_POS) {
 		return true;
 	}
 	else {

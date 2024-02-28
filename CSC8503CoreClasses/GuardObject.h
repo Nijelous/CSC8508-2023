@@ -11,6 +11,7 @@ using namespace InventoryBuffSystem;
 namespace NCL {
     namespace CSC8503 {
         class PlayerObject;
+        constexpr int MIN_DIST_TO_NEXT_POS = 36;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
