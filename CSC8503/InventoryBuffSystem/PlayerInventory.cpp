@@ -18,9 +18,9 @@ void PlayerInventory::Init() {
 	{
 		{
 			{none ,[](int playerno) { return false; }},
+			{flag ,[](int playerno) { return false; }},
 			{disguise,[](int playerno) { return true; }},
 			{soundEmitter,[](int playerno) { return true; }},
-			{flag ,[](int playerno) { return false; }},
 			{screwdriver, [](int playerno) { return true; }},
 			{doorKey ,[this](int playerno) { return true; }},
 			{ stunItem, [this](int playerno) { return true; }}
@@ -50,42 +50,66 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 	}
 }
 
-void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
+int PlayerInventory::RemoveItemFromPlayer(const item& inItem, const int& playerNo){
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
 		{
+			ResetItemUsageCount(playerNo, invSlot);
 			LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
-			if (mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
-			{
-				Notify(mOnItemDroppedInventoryEventMap[inItem], playerNo, invSlot);
-			}
-
 			mPlayerInventory[playerNo][invSlot] = none;
+
+			return invSlot;
 		}
 	}
+	return 0;
+}
+
+void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
+	ResetItemUsageCount(playerNo, invSlot);
+	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
+	mPlayerInventory[playerNo][invSlot] = none;
+}
+
+void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
+	int invSlot = RemoveItemFromPlayer(inItem, playerNo);
+	if (mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
+	{
+		Notify(mOnItemDroppedInventoryEventMap[inItem], playerNo, invSlot);
+	}
+	//Extra drop logic
 }
 
 void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot) {
-
-	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
+	RemoveItemFromPlayer(playerNo, invSlot);
 	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]], playerNo, invSlot);
 	}
-
-	mPlayerInventory[playerNo][invSlot] = none;
+	//Extra drop logic
 }
 
-void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot, const int& itemUseCount) {
+void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot) {
 	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
 		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo))
 	{
 		PlayerInventory::item usedItem = mPlayerInventory[playerNo][invSlot];
-		bool isItemRemoved = HandleOnItemUsed(usedItem, playerNo, invSlot, itemUseCount);
+		IncreaseUsageCount(playerNo, invSlot);
+		bool isItemRemoved = HandleItemRemoval(usedItem, playerNo, invSlot);
 		Notify(mOnItemUsedInventoryEventMap[usedItem], (playerNo), invSlot, isItemRemoved);
-		
 	}
+}
+
+bool InventoryBuffSystem::PlayerInventory::HandleItemRemoval(const item& item, const int& playerNo, const int& invSlot) {
+
+	int maxUsage = mItemUsageToRemoveMap[item];
+
+	if (mItemUseCount[playerNo][invSlot] >= maxUsage) {
+		RemoveItemFromPlayer(playerNo, invSlot);
+		return true;
+	}
+
+	return false;
 }
 
 bool PlayerInventory::ItemInPlayerInventory(const item& inItem, const int& playerNo) {
@@ -95,19 +119,6 @@ bool PlayerInventory::ItemInPlayerInventory(const item& inItem, const int& playe
 		{
 			return true;
 		}
-	}
-
-	return false;
-}
-
-bool InventoryBuffSystem::PlayerInventory::HandleOnItemUsed(const item& item, const int& playerNo, const int& invSlot, const int& itemUseCount) {
-
-	int maxUsage = mItemUsageToRemoveMap[item];
-
-	if (itemUseCount >= maxUsage) {
-		mPlayerInventory[playerNo][invSlot] = item::none;
-		LevelManager::GetLevelManager()->ChangeEquippedIconTexture(invSlot, item::none);
-		return true;
 	}
 
 	return false;
@@ -142,6 +153,12 @@ void InventoryBuffSystem::PlayerInventory::Notify(const InventoryEvent invEvent,
 
 std::string& InventoryBuffSystem::PlayerInventory::GetItemName(item item) {
 	return mItemNameMap[item];
+}
+
+int PlayerInventory::GetItemUsesLeft(const int& itemSlot, const int& playerNo)
+{
+	return mItemUsageToRemoveMap[GetItemInInventorySlot(playerNo, itemSlot)]
+		- mItemUseCount[playerNo][itemSlot];
 }
 
 PlayerInventory::item PlayerInventory::GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool) {
