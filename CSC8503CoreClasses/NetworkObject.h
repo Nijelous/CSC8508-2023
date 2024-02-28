@@ -73,6 +73,13 @@ namespace NCL::CSC8503 {
 		ClientUseItemPacket(int objectID, int playerID);
 	};
 
+	struct ClientUsePowerupPacket : public GamePacket {
+		int playerID;
+		int powerUpID;
+
+		ClientUsePowerupPacket(int playerID, int powerUpID);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
