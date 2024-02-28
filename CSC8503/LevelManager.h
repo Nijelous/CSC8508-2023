@@ -183,8 +183,8 @@ namespace NCL {
 			Texture* mStunTex;
 			Texture* mSwapPositionTex;
 
-			Texture* mSuspensionBarTex;
-			Texture* mSuspensionIndicatorTex;
+			Texture* mSuspisionBarTex;
+			Texture* mSuspisionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
 			//item icon

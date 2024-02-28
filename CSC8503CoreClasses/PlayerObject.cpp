@@ -9,6 +9,7 @@
 
 #include "Window.h"
 #include "GameWorld.h"
+#include "UISystem.h"
 
 
 using namespace NCL::CSC8503;
@@ -138,30 +139,37 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	switch (buffEvent) {
 	case slowApplied:
 		ChangeToSlowedSpeeds();
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, true);
 		break;
 	case slowRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
 		break;
 	case speedApplied:
 		ChangeToSpedUpSpeeds();
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, true);
 		break;
 	case speedRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
 		break;
 	case stunApplied:
 		ChangeToStunned();
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, true);
 		break;
 	case stunRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, false);
 		break;
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, true);
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, false);
 		mObjectState = Idle;
 
 		break;

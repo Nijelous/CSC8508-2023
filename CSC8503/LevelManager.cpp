@@ -121,8 +121,8 @@ LevelManager::~LevelManager() {
 	delete mStunTex;
 	delete mSwapPositionTex;
 
-	delete mSuspensionBarTex;
-	delete mSuspensionIndicatorTex;
+	delete mSuspisionBarTex;
+	delete mSuspisionIndicatorTex;
 
 	delete mAnimationShader;
 
@@ -166,6 +166,7 @@ void LevelManager::ClearLevel() {
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
+	ResetEquippedIconTexture();
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -232,7 +233,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	//SendWallFloorInstancesToGPU();
 
-	ResetEquippedIconTexture();
+
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
@@ -380,8 +381,8 @@ void LevelManager::InitialiseAssets() {
 
 	
 
-	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
-	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
+	mSuspisionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
+	mSuspisionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition) {
@@ -474,18 +475,34 @@ void LevelManager::InitialiseIcons() {
 	mUi->SetEquippedItemIcon(1, *mInventoryIcon2);
 
 	UISystem::Icon* mdisguiseBuffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UISystem::Icon* mslowIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(23, 84), 4.5, 7, mSlowDownTex, false);
+	mUi->SetEquippedItemIcon(2, *mdisguiseBuffIcon);
+
+	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mSilentRunTex, false);
+	mUi->SetEquippedItemIcon(3, *mSilentSprintIcon);
+
+	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSlowDownTex, false);
+	mUi->SetEquippedItemIcon(4, *mSlowIcon);
+
 	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
+	mUi->SetEquippedItemIcon(5, *mStunIcon);
+
+	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mStunTex, false);
+	mUi->SetEquippedItemIcon(6, *mSpeedIcon);
+
 	UISystem::Icon* mFlagSightIcon = mUi->AddIcon(Vector2(18, 92), 4.5, 7, mSwapPositionTex, false);
+	mUi->SetEquippedItemIcon(7, *mFlagSightIcon);
 				  
-	UISystem::Icon* mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UISystem::Icon* mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspisionBarTex);
+	mUi->SetEquippedItemIcon(8, *mSuspisionBarIcon);
+
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspisionIndicatorTex);
+	mUi->SetEquippedItemIcon(9, *mSuspisionIndicatorIcon);
 
 
 	mRenderer->SetUIObject(mUi);
+
+	
+	
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
@@ -753,6 +770,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
 	mTempPlayer->SetIsRendered(false);
+	mTempPlayer->SetUIObject(mUi);
 	return mTempPlayer;
 }
 
@@ -818,6 +836,15 @@ void LevelManager::ResetEquippedIconTexture() {
 
 	mUi->ChangeEquipmentSlotTexture(0, itemTex);
 	mUi->ChangeEquipmentSlotTexture(1, itemTex);
+	mUi->ChangeBuffSlotTransparency(2, false);
+	mUi->ChangeBuffSlotTransparency(3, false);
+	mUi->ChangeBuffSlotTransparency(4, false);
+	mUi->ChangeBuffSlotTransparency(5, false);
+	mUi->ChangeBuffSlotTransparency(6, false);
+	mUi->ChangeBuffSlotTransparency(7, false);
+	mUi->ChangeBuffSlotTransparency(8, false);
+	mUi->ChangeBuffSlotTransparency(9, false);
+
 }
 
 

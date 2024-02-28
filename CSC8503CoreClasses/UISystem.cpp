@@ -7,11 +7,12 @@ using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
 namespace {
-	constexpr  int FIRST_ITEM_SLOT = 0;
-	constexpr int SECOND_ITEM_SLOT = 1;
+
+
 }
 
 UISystem::UISystem() {
+
 }
 
 UISystem::~UISystem() {
@@ -25,7 +26,7 @@ UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Textu
 	mIcon->length = horiSize;
 	mIcon->height = vertSize;
 	mIcon->texture = tex;
-	mIcon->isAppear = isShown;
+	mIcon->transparency = isShown;
 	mIconsVec.emplace_back(mIcon);
 	return mIcon;
 }
@@ -40,9 +41,6 @@ void UISystem::SetIconPosition(Vector2 newPos, Icon& icon) {
 	icon.position = newPos;
 }
 
-void UISystem::SetIconTransparency(bool isShown, Icon& icon) {
-	icon.isAppear = isShown;
-}
 
 std::vector<UISystem::Icon*>& UISystem::GetIcons() {
 	return mIconsVec;
@@ -90,6 +88,7 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
 		mFirstEquippedItem->texture = &texture;
+
 		break;
 	case SECOND_ITEM_SLOT:
 		mSecondEquippedItem->texture = &texture;
@@ -99,14 +98,73 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 	}
 }
 
+void UISystem::ChangeBuffSlotTransparency(int slotNum, bool isShown){
+	switch (slotNum)
+	{
+	case DISGUISE_BUFF_SLOT:
+		mdisguiseBuffIcon->transparency = isShown;
+		break;
+	case SILENT_BUFF_SLOT:
+		mSilentSprintIcon->transparency = isShown;
+		break;
+	case SLOW_BUFF_SLOT:
+		mSlowIcon->transparency = isShown;
+		break;
+	case STUN_BUFF_SLOT:
+		mStunIcon->transparency = isShown;
+		break;
+	case SPEED_BUFF_SLOT:
+		mSpeedIcon->transparency = isShown;
+		break;
+	case FLAGSIGHT_BUFF_SLOT:
+		mFlagSightIcon->transparency = isShown;
+		break;
+	case SUSPISION_BAR_SLOT:
+		mSuspensionBarIcon->transparency = isShown;
+		break;
+	case SUSPISION_INDICATOR_SLOT:
+		mSuspensionIndicatorIcon->transparency = isShown;
+		break;
+
+	default:
+		break;
+	}
+
+}
+
 void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 	switch (slotNum) {
 		case FIRST_ITEM_SLOT:
 			mFirstEquippedItem = &icon;
-		break;
+			break;
 		case SECOND_ITEM_SLOT:
 			mSecondEquippedItem = &icon;
 			break;
+		case DISGUISE_BUFF_SLOT:
+			mdisguiseBuffIcon = &icon;
+			break;
+		case SILENT_BUFF_SLOT:
+			mSilentSprintIcon = &icon;
+			break;
+		case SLOW_BUFF_SLOT:
+			mSlowIcon = &icon;
+			break;
+		case STUN_BUFF_SLOT:
+			mStunIcon = &icon;
+			break;
+		case SPEED_BUFF_SLOT:
+			mSpeedIcon = &icon;
+			break;
+		case FLAGSIGHT_BUFF_SLOT:
+			mFlagSightIcon = &icon;
+			break;
+		case SUSPISION_BAR_SLOT:
+			mSuspensionBarIcon = &icon;
+			break;
+		case SUSPISION_INDICATOR_SLOT:
+			mSuspensionIndicatorIcon = &icon;
+			break;
+
 	default:
 		break;
 	}

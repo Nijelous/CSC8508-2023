@@ -39,7 +39,9 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-		
+			void SetUIObject(UISystem* ui) {
+				mUi = ui;
+			}
 
 		protected:
 			bool mIsCrouched;
@@ -101,7 +103,11 @@ namespace NCL {
 			void	UseItemForInteractable(Interactable* interactable);
 
 			void	EnforceMaxSpeeds();
+
+			UISystem* mUi;
+			
 		private:
+
 		};
 	}
 }

@@ -667,7 +667,7 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
 
 	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
-	glUniform1i(texSlot, i.isAppear);
+	glUniform1i(texSlot, i.transparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	//0.02, 0, 0, 0
