@@ -4,6 +4,7 @@
 #include "BehaviourAction.h"
 #include <string>
 #include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
+#include "../Detour/Include/DetourNavMeshQuery.h"
 using namespace std;
 using namespace InventoryBuffSystem;
 
@@ -51,11 +52,15 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
-            void MoveTowardFocalPoint(Vector3 direction);
+            void MoveTowardFocalPoint(Vector3 direction, float* endPos);
             void LookTowardFocalPoint(Vector3 direction);
             void GrabPlayer();
-            void QueryNavmesh();
+            float* QueryNavmesh(float* endPos);
 
+            bool CheckPolyDistance();
+
+            float mDist;
+            float* mNextPoly = new float[3];
             float mConfiscateItemsTime;
             int mGuardSpeedMultiplier;
 

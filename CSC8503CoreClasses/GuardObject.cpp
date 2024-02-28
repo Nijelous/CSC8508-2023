@@ -20,15 +20,17 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mPlayerHasItems = true;
 	mIsStunned = false;
 	BehaviourTree();
+	mDist = 0;
+	mNextPoly = 0;
 }
 
 GuardObject::~GuardObject() {
 	delete mRootSequence;
+	delete[] mNextPoly;
 }
 
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
-		QueryNavmesh();
 		RaycastToPlayer();
 		ExecuteBT();
 	}
@@ -96,8 +98,22 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 	}
 }
 
-void GuardObject::MoveTowardFocalPoint(Vector3 direction) {
-	Vector3 dirNorm = direction.Normalised();
+bool GuardObject::CheckPolyDistance() {
+	if (mDist < 36) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void GuardObject::MoveTowardFocalPoint(Vector3 direction, float* endPos) {
+	if (CheckPolyDistance() == true) {
+		mNextPoly = QueryNavmesh(endPos);
+	}
+	Vector3 dir = Vector3(mNextPoly[0], mNextPoly[1], mNextPoly[2]) - this->GetTransform().GetPosition();
+	Vector3 dirNorm = dir.Normalised();
+	mDist = dir.Length();
 	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
 }
 
@@ -117,17 +133,16 @@ void GuardObject::GrabPlayer() {
 	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 }
 
-void GuardObject::QueryNavmesh() {
+float* GuardObject::QueryNavmesh(float* endPos) {
 	float* startPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
-	float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 	float* halfExt = new float[3] {3, 5, 3};
 	dtQueryFilter* filter = new dtQueryFilter();
 	dtPolyRef* startRef = new dtPolyRef();
 	dtPolyRef* endRef = new dtPolyRef();
 	float* nearestPoint1 = new float[3];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(startPos, halfExt, filter, startRef, nearestPoint1);
-	float* nearestPoint2 = new float[3];
-	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(endPos, halfExt, filter, endRef, nearestPoint2);
+	//float* nearestPoint2 = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(endPos, halfExt, filter, endRef, nearestPoint1);
 	int* pathCount = new int;
 	dtPolyRef* path = new dtPolyRef[1000];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findPath(*startRef, *endRef, startPos, endPos, filter, path, pathCount, 1000);
@@ -144,17 +159,27 @@ void GuardObject::QueryNavmesh() {
 		delete[] closestPos;
 	}
 	delete[] startPos;
-	delete[] endPos;
 	delete[] halfExt;
 	delete filter;
 	delete startRef;
 	delete endRef;
 	delete[] nearestPoint1;
-	delete[] nearestPoint2;
-	delete pathCount;
-	delete[] path;
+	//delete[] nearestPoint2;
+	
+
+	bool* isPosOverPoly = new bool;
+	float* closestPos = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->closestPointOnPoly(path[1], firstPos, closestPos, isPosOverPoly);
+	delete isPosOverPoly;
 	delete[] firstPos;
-	//delete[] closestPos;
+	delete[] path;
+	if (*pathCount <= 1) {
+		delete pathCount;
+		return endPos;
+	}
+	delete pathCount;
+	delete[] endPos;
+	return closestPos;
 }
 
 void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
@@ -222,7 +247,8 @@ BehaviourAction* GuardObject::Patrol() {
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				LookTowardFocalPoint(direction);
-				MoveTowardFocalPoint(direction);
+				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
+				MoveTowardFocalPoint(direction, endPos);
 				float dist = direction.LengthSquared();
 				if (dist < 36) {
 					mCurrentNode = mNextNode;
@@ -267,7 +293,8 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					return Failure;
 				}
 				else {
-					MoveTowardFocalPoint(direction);
+					float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
+					MoveTowardFocalPoint(direction, endPos);
 				}
 			}
 			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
