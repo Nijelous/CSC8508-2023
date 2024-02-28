@@ -16,7 +16,7 @@ namespace NCL {
 			Room(std::string roomPath);
 			~Room();
 			RoomType GetType() const { return mType; }
-			std::map<Transform, TileType> GetTileMap() const { return mTileMap; }
+			std::unordered_map<Transform, TileType> GetTileMap() const { return mTileMap; }
 			std::vector<Light*> GetLights() const { return mLights; }
 			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
 			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
@@ -25,7 +25,7 @@ namespace NCL {
 		protected:
 			std::string mRoomName;
 			RoomType mType;
-			std::map<Transform, TileType> mTileMap;
+			std::unordered_map<Transform, TileType> mTileMap;
 			std::vector<Light*> mLights;
 			std::vector<Transform> mCCTVTransforms;
 			std::vector<Vector3> mItemPositions;

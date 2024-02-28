@@ -369,7 +369,7 @@ void LevelManager::InitialiseAssets() {
 	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
-void LevelManager::LoadMap(const std::map<Transform, TileType>& tileMap, const Vector3& startPosition) {
+void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition) {
 	for (auto const& [key, val] : tileMap) {
 		Transform offsetKey = Transform();
 		offsetKey.SetPosition(key.GetPosition() + startPosition).SetOrientation(key.GetOrientation());

@@ -100,7 +100,7 @@ namespace NCL {
 
 			void InitialiseIcons();
 
-			void LoadMap(const std::map<Transform, TileType>& tileMap, const Vector3& startPosition);
+			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 

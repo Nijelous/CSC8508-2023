@@ -166,3 +166,19 @@ namespace NCL::Maths {
 		}
 	};
 }
+
+template <>
+struct std::hash<NCL::Maths::Vector3>
+{
+	std::size_t operator()(const NCL::Maths::Vector3& key) const {
+		size_t seed = 0;
+		hashCombine(seed, std::hash<float>()(key.x));
+		hashCombine(seed, std::hash<float>()(key.y));
+		hashCombine(seed, std::hash<float>()(key.z));
+		return seed;
+	}
+private:
+	void hashCombine(size_t& seed, size_t hash) const {
+		seed ^= hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+};
