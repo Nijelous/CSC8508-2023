@@ -25,6 +25,8 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
+		constexpr int MAX_INSTANCE_MESHES = 3;
+
 		class GameTechRenderer : public OGLRenderer	{
 		public:
 			GameTechRenderer(GameWorld& world);
