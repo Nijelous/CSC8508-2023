@@ -83,6 +83,12 @@ namespace SuspicionSystem
 
         int GetLocationSusAmount(Vector3 pos);
 
+        void UpdateVec3LocationSusAmountMap();
+
+        std::map<Vector3, float>* GetVec3LocationSusAmountMapPtr() {
+            return (&mVec3LocationSusAmountMap);
+        };
+
         SuspicionMetre::SusBreakpoint GetLocalSusMetreBreakpoint(Vector3 pos)
         {
             return SuspicionMetre::GetSusBreakpoint(GetLocationSusAmount(pos));
@@ -100,6 +106,7 @@ namespace SuspicionSystem
             {continouousSound, 5}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
         };
 
+        std::map<Vector3, float> mVec3LocationSusAmountMap;
         std::map<CantorPair, float> mLocationSusAmountMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
 
