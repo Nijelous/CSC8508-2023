@@ -30,9 +30,10 @@ void PlayerInventory::Init() {
 	mInventoryObserverList.clear();
 }
 
-void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
+//Returns the inventory slot the item is in or -1 if inventory is full
+int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 	if (IsInventoryFull(playerNo))
-		return;
+		return -1;
 
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
@@ -45,9 +46,10 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 			{
 				Notify(mOnItemAddedInventoryEventMap[inItem], playerNo, invSlot);
 			}
-			return;
+			return invSlot;
 		}
 	}
+	return -1;
 }
 
 //Returns the inventory slot the item is in or -1 if it was not found
@@ -130,8 +132,24 @@ bool PlayerInventory::IsInventoryFull(const int& playerNo){
 	return true;
 }
 
+bool InventoryBuffSystem::PlayerInventory::IsInventoryEmpty(const int& playerNo){
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+		if (mPlayerInventory[playerNo][invSlot] != none)
+			return false;
+	return true;
+}
+
 ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inItem) {
 	return mItemToItemUseTypeMap[inItem];
+}
+
+void InventoryBuffSystem::PlayerInventory::TransferItemBetweenInventories(const int& givingPlayerNo, const int& givingPlayerInvSlot, const int& receivingPlayerNo){
+	if (IsInventoryFull(receivingPlayerNo) || IsInventoryEmpty(givingPlayerNo))
+		return;
+	item itemToRemove = GetItemInInventorySlot(givingPlayerNo, givingPlayerInvSlot);
+	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
+	int receivingSlot = AddItemToPlayer(itemToRemove, receivingPlayerNo);
+	SetItemUsageCount(receivingPlayerNo, receivingSlot, GetItemUsageCount(givingPlayerNo, givingPlayerInvSlot));
 }
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer) {
