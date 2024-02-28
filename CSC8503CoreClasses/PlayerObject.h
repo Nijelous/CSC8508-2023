@@ -68,9 +68,9 @@ namespace NCL {
 
 			virtual void OnPlayerUseItem();
 			
-			void RayCastFromPlayer(GameWorld* world, float dt);
+			virtual void RayCastFromPlayer(GameWorld* world, float dt);
 
-			void ControlInventory();
+			virtual void ControlInventory();
 
 			void AttachCameraToPlayer(GameWorld* world);
 

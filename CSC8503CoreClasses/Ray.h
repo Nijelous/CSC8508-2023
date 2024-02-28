@@ -21,6 +21,10 @@ namespace NCL {
 
 		class Ray {
 		public:
+			Ray() {
+				this->position = Vector3(0, 0, 0);
+				this->direction = Vector3(0, 0, 0);
+			}
 			Ray(Vector3 position, Vector3 direction) {
 				this->position  = position;
 				this->direction = direction;

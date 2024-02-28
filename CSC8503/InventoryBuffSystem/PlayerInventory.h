@@ -49,6 +49,8 @@ namespace InventoryBuffSystem
 		void DropItemFromPlayer(const item &inItem, const int &playerNo);
 		void DropItemFromPlayer(const int &playerNo, const int &invSlot);
 		void UseItemInPlayerSlot(const int &itemSlot, const int &playerNo, const int &itemUseCount);
+		void OnItemEquipped(const int playerID, const int localPlayerID, const int slot, const item equippedItem);
+		void ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem);
 		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
 		bool HandleOnItemUsed(const item &item, const int &playerNo, const int &invSlot, const int &itemUseCount);
 		bool IsInventoryFull(const int& playerNo);
