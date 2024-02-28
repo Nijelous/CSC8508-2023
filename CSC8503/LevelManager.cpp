@@ -18,10 +18,8 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "UISystem.h"
-#include "SoundManager.h"
-#include <filesystem>
 
-#include <fmod.hpp>
+#include <filesystem>
 
 using namespace NCL::CSC8503;
 
@@ -39,6 +37,9 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
 	mDtSinceLastFixedUpdate = 0;
+
+	mSoundManager = new SoundManager(mWorld);
+
 	mRoomList = std::vector<Room*>();
 	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
 		Room* newRoom = new Room(entry.path().string());
@@ -149,6 +150,8 @@ LevelManager::~LevelManager() {
 
 	delete mInventoryBuffSystemClassPtr;
 	delete mSuspicionSystemClassPtr;
+
+	delete mSoundManager;
 }
 
 void LevelManager::ClearLevel() {
@@ -276,6 +279,10 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mGameState = PauseState;
 	}
 	else {
+		if (mTempPlayer) {
+			Vector3 pos = mTempPlayer->GetTransform().GetPosition();
+			mSoundManager->UpdateSounds(mTempPlayer->GetGameOjbectState(), pos);
+		}
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);

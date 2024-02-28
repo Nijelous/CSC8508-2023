@@ -6,6 +6,7 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
+#include "SoundManager.h"
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -142,6 +143,8 @@ namespace NCL {
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
 			AnimationSystem* mAnimation;
+
+			SoundManager* mSoundManager;
 
 			vector<GameObject*> mUpdatableObjects;
 
