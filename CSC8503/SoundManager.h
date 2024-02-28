@@ -23,20 +23,12 @@ namespace NCL{
 
 			FMOD_VECTOR GetUpVector(Vector3 forward, Vector3 right);
 
-			//void PlayOneTimeSound(Vector3 position);
-
-			//void SetSoundToBePaused(ISound* sound, bool isPaused);
-
-			//void SetSoundPosition(ISound* sound, Vector3 pos);
-
-			//void DeleteSounds();
-
 		protected:
 			GameWorld* mGameWorld;
-			FMOD::System* system = NULL;
-			FMOD::Sound* footStepSound;
-			FMOD_RESULT result;
-			FMOD::Channel* channel = nullptr;
+			FMOD::System* mSystem = nullptr;
+			FMOD::Sound* mFootStepSound = nullptr;
+			FMOD_RESULT mResult;
+			FMOD::Channel* mChannel = nullptr;
 		};
 	}
 }

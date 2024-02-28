@@ -6,45 +6,39 @@ using namespace NCL::Maths;
 
 SoundManager::SoundManager(GameWorld* GameWorld) {
 	mGameWorld = GameWorld;
-	//FMOD_RESULT result;
-	//FMOD::Sound* sound;
-	//FMOD::Channel* channel;
-	result = FMOD::System_Create(&system);
+	mResult = FMOD::System_Create(&mSystem);
 
-	if (result != FMOD_OK) {
+	if (mResult != FMOD_OK) {
 		return;
 	}
 
-	result = system->init(512, FMOD_INIT_NORMAL, 0);
+	mResult = mSystem->init(512, FMOD_INIT_NORMAL, 0);
 
-	if (result != FMOD_OK) {
+	if (mResult != FMOD_OK) {
 		return;
 	}
 
-	result = system->createSound("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &footStepSound);
+	mResult = mSystem->createSound("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &mFootStepSound);
 
-	if (result != FMOD_OK) {
+	if (mResult != FMOD_OK) {
 		return;
 	}
 
 
+	//TO_DO
 	//footStepSound->setMode(FMOD_3D);
-
-	//system->playSound(sound, 0, false, &channel);
-
-	//channel->setPaused(true);
 }
 
 SoundManager::~SoundManager() {
-	footStepSound->release();
-	system->close();
-	system->release();
+	mFootStepSound->release();
+	mSystem->close();
+	mSystem->release();
 }
 
 FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 	FMOD::Channel* footStepChannel;
-	result = system->playSound(footStepSound, 0, false, &footStepChannel);
-	if (result != FMOD_OK) {
+	mResult = mSystem->playSound(mFootStepSound, 0, false, &footStepChannel);
+	if (mResult != FMOD_OK) {
 		return nullptr;
 	}
 	FMOD_VECTOR pos = ConvertVector(soundPos);
@@ -54,40 +48,39 @@ FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 
 void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
 	FMOD_VECTOR pos = ConvertVector(soundPos);
-	//FMOD::Channel* channel = nullptr;
 	SetListenerAttributes();
 	switch (state) {
 	case GameObject::GameObjectState::Idle:
-		if (channel) {
-			channel->setPaused(true);
+		if (mChannel) {
+			mChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Walk:
-		if (channel) {
-			channel->set3DAttributes(&pos, nullptr);
-			channel->setPaused(false);
+		if (mChannel) {
+			mChannel->set3DAttributes(&pos, nullptr);
+			mChannel->setPaused(false);
 		}
 		else {
-			channel = AddWalkSound(soundPos);
+			mChannel = AddWalkSound(soundPos);
 		}
 		break;
 	case GameObject::GameObjectState::Sprint:
-		if (channel) {
-			channel->set3DAttributes(&pos, nullptr);
-			channel->setPaused(false);
+		if (mChannel) {
+			mChannel->set3DAttributes(&pos, nullptr);
+			mChannel->setPaused(false);
 		}
 		else {
-			channel = AddWalkSound(soundPos);
+			mChannel = AddWalkSound(soundPos);
 		}
 		break;
 	case GameObject::GameObjectState::IdleCrouch:
-		if (channel) {
-			channel->setPaused(true);
+		if (mChannel) {
+			mChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Crouch:
-		if (channel) {
-			channel->setPaused(true);
+		if (mChannel) {
+			mChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Happy:
@@ -102,7 +95,7 @@ void SoundManager::SetListenerAttributes() {
 	FMOD_VECTOR camForward = ConvertVector(forward);
 	FMOD_VECTOR camUp = GetUpVector(forward, right);
 
-	system->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
+	mSystem->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
 }
 
 FMOD_VECTOR SoundManager::ConvertVector(Vector3 vector) {
