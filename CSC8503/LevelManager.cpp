@@ -185,6 +185,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mActiveLevel = levelID;
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
+	std::vector<Vector3> roomItemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
@@ -206,7 +207,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 					LoadLights(room->GetLights(), key);
 					LoadDoors(room->GetDoors(), key);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
-						itemPositions.push_back(room->GetItemPositions()[i] + key);
+						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
 					break;
 				}
@@ -225,7 +226,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 	SendWallFloorInstancesToGPU();
-	LoadItems(itemPositions, isMultiplayer);
+	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
@@ -412,14 +413,21 @@ void LevelManager::LoadGuards(int guardCount) {
 	}
 }
 
-void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const bool& isMultiplayer) {
+void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer) {
 	for (int i = 0; i < itemPositions.size(); i++) {
-		if (i == itemPositions.size() / 2) {
-			mMainFlag = AddFlagToWorld(itemPositions[i], mInventoryBuffSystemClassPtr);
+		AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
+	}
+	std::random_device rd;
+	std::mt19937 gen(rd());
+
+	std::uniform_int_distribution<> dis(0, roomItemPositions.size()-1);
+	int flagItem = dis(gen);
+	for (int i = 0; i < roomItemPositions.size(); i++) {
+		if (i == flagItem) {
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr);
+			continue;
 		}
-		else {
-			AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
-		}
+		AddPickupToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
 	}
 }
 
