@@ -173,15 +173,15 @@ namespace NCL {
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
+			Texture* mCrossTex;
 
-			//powerup
-			Texture* mHighlightAwardTex;
-			Texture* mLightOffTex;
-			Texture* mMakingNoiseTex;
+			//powerup Icon
+
 			Texture* mSilentRunTex;
+			Texture* mSpeedUp;
 			Texture* mSlowDownTex;
 			Texture* mStunTex;
-			Texture* mSwapPositionTex;
+
 
 			Texture* mSuspisionBarTex;
 			Texture* mSuspisionIndicatorTex;

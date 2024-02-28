@@ -368,13 +368,14 @@ void LevelManager::InitialiseAssets() {
 
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
-	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
-	mLightOffTex = mRenderer->LoadTexture("LightOff.png");
-	mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
+	//mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
+	//mLightOffTex = mRenderer->LoadTexture("LightOff.png");
+	//mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
 	mSilentRunTex = mRenderer->LoadTexture("SilentRun.png");
 	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+	//mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
 	mKeyIconTex = mRenderer->LoadTexture("key.png");
 	mFlagIconTex = mRenderer->LoadTexture("flag.png");
@@ -498,6 +499,7 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspisionIndicatorTex);
 	mUi->SetEquippedItemIcon(9, *mSuspisionIndicatorIcon);
 
+	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex);
 
 	mRenderer->SetUIObject(mUi);
 
@@ -836,6 +838,7 @@ void LevelManager::ResetEquippedIconTexture() {
 
 	mUi->ChangeEquipmentSlotTexture(0, itemTex);
 	mUi->ChangeEquipmentSlotTexture(1, itemTex);
+
 	mUi->ChangeBuffSlotTransparency(2, false);
 	mUi->ChangeBuffSlotTransparency(3, false);
 	mUi->ChangeBuffSlotTransparency(4, false);
