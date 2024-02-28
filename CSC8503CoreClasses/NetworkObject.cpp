@@ -65,6 +65,11 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	this->mouseXLook = mouseXLook;
 }
 
+ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
+	this->objectID = objectID;
+	this->playerID = playerID;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;

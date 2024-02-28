@@ -6,6 +6,7 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
+#include "SoundManager.h"
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -104,21 +105,22 @@ namespace NCL {
 
 			void InitialiseIcons();
 
-			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
+			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
+			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
 			void SendWallFloorInstancesToGPU();
 
-			GameObject* AddWallToWorld(const Vector3& position);
-			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddWallToWorld(const Transform& transform);
+			GameObject* AddCornerWallToWorld(const Transform& transform);
+			GameObject* AddFloorToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
@@ -145,6 +147,8 @@ namespace NCL {
 			PhysicsSystem* mPhysics;
 			AnimationSystem* mAnimation;
 
+			SoundManager* mSoundManager;
+
 			vector<GameObject*> mUpdatableObjects;
 
 			// meshes
@@ -155,6 +159,8 @@ namespace NCL {
 			Mesh* mCharMesh;
 			Mesh* mEnemyMesh;
 			Mesh* mBonusMesh;
+			Mesh* mStraightWallMesh;
+			Mesh* mCornerWallMesh;
 
 			// textures
 			Texture* mBasicTex;
@@ -162,6 +168,8 @@ namespace NCL {
 			Texture* mKeeperNormal;
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
+			Texture* mWallTex;
+			Texture* mWallNormal;
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;

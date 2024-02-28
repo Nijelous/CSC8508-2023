@@ -3,7 +3,8 @@ namespace NCL {
 	namespace CSC8503 {
 		enum TileType {
 			Wall,
-			Floor
+			Floor,
+			CornerWall
 		};
 		enum RoomType {
 			Medium,
