@@ -109,7 +109,7 @@ namespace NCL {
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
+			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
