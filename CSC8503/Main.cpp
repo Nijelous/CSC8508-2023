@@ -30,8 +30,22 @@ using namespace CSC8503;
 #include <thread>
 #include <sstream>
 
+namespace {
+    constexpr int NETWORK_TEST_WIDTH = 800;
+    constexpr int NETWORK_TEST_HEIGHT = 600;
+
+    constexpr int GAME_WINDOW_WIDTH = 1280;
+    constexpr int GAME_WINDOW_HEIGHT = 720;
+}
+
 int main(){
-    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1080, 720, false);
+    bool isNetworkTestActive = false;
+
+    float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
+    float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
+    bool isFullScreen = !isNetworkTestActive;
+
+    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
 
     if (!w->HasInitialised()) {
         return -1;
@@ -41,7 +55,7 @@ int main(){
     
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
-    bool isNetworkTestActive = false;
+
     w->ShowOSPointer(isNetworkTestActive);
     w->LockMouseToWindow(!isNetworkTestActive);
 

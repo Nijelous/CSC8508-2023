@@ -176,11 +176,11 @@ void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
 	if (mThisServer) { //detected a collision between players!
 		MessagePacket newPacket;
 		newPacket.messageID = COLLISION_MSG;
-		newPacket.playerID  = a->GetPlayerNum();
+		newPacket.playerID  = a->GetPlayerID();
 
 		mThisClient->SendPacket(newPacket);
 
-		newPacket.playerID = b->GetPlayerNum();
+		newPacket.playerID = b->GetPlayerID();
 		mThisClient->SendPacket(newPacket);
 	}
 }
