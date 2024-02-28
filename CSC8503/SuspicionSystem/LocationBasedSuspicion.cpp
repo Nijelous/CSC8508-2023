@@ -106,6 +106,8 @@ void LocationBasedSuspicion::Update(float dt){
 		mActiveLocationSusCauseMap.erase(*thisLocation);
 	}
 	locationsToClear.clear();
+
+	UpdateVec3LocationSusAmountMap();
 }
 
 int LocationBasedSuspicion::GetLocationSusAmount(Vector3 pos){
@@ -118,6 +120,13 @@ int LocationBasedSuspicion::GetLocationSusAmount(Vector3 pos){
 	}
 
 	return -1;
+}
+
+void LocationBasedSuspicion::UpdateVec3LocationSusAmountMap(){
+	for (auto it = mLocationSusAmountMap.begin(); it != mLocationSusAmountMap.end(); ++it)
+	{
+		mVec3LocationSusAmountMap[CantorPair::InverseCantorPair(it->first)] = it->second;
+	}
 }
 
 bool LocationBasedSuspicion::IsNearbySusLocation(CantorPair pairedLocation, CantorPair& nearbyPairedLocation) const{

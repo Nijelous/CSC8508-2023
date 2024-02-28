@@ -48,7 +48,7 @@ void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	bool writingKey = false;
 	bool writingValue = false;
 
-	std::vector<std::map<std::string, float>> keyValuePairs = std::vector<std::map<std::string, float>>();
+	std::vector<std::unordered_map<std::string, float>> keyValuePairs = std::vector<std::unordered_map<std::string, float>>();
 	for (char c : JSON) {
 		switch (c) {
 		case '"':
@@ -61,7 +61,7 @@ void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 			indents++;
 			if (indents > maxIndents) maxIndents++;
 			writingValue = false;
-			keyValuePairs.push_back(std::map<std::string, float>());
+			keyValuePairs.push_back(std::unordered_map<std::string, float>());
 			break;
 		case '}':
 			WriteValue(writingValue, &keyValuePairs, currentKey, &output, indents, maxIndents);
@@ -90,7 +90,7 @@ void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
 	WriteVariable(keyValuePairs, level, room);
 }
 
-void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string, float>>* keyValuePairs, 
+void JsonParser::WriteValue(bool writingValue, std::vector<std::unordered_map<std::string, float>>* keyValuePairs,
 	std::string key, std::string* value, int indents, int maxIndents) {
 	if (writingValue) {
 		if (keyValuePairs->size() <= maxIndents || indents < maxIndents) {
@@ -103,7 +103,7 @@ void JsonParser::WriteValue(bool writingValue, std::vector<std::map<std::string,
 	}
 }
 
-void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyValuePairs, Level* level, Room* room) {
+void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room) {
 	ParserVariables variable = level ? LEVEL_VARIABLES[keyValuePairs[0].size() - 1] : ROOM_VARIABLES[keyValuePairs[0].size() - 1];
 	switch (variable) {
 	case SetRoomType:
@@ -112,7 +112,9 @@ void JsonParser::WriteVariable(std::vector<std::map<std::string, float>>& keyVal
 
 	case TileMap:
 	{
-		Vector3 key = Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]);
+		Transform key = Transform();
+		key.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+			.SetOrientation(Quaternion(keyValuePairs[3]["x"], keyValuePairs[3]["w"], keyValuePairs[3]["z"], keyValuePairs[3]["y"]));
 		TileType value = (TileType)keyValuePairs[1]["type"];
 		if (level) level->mTileMap[key] = value;
 		else room->mTileMap[key] = value;

@@ -76,7 +76,6 @@ void InventoryBuffSystem::PlayerBuffs::UpdateInventoryObserver(InventoryEvent in
 }
 
 void InventoryBuffSystem::PlayerBuffs::Attach(PlayerBuffsObserver* observer){
-
 	mBuffsObserverList.push_back(observer);
 }
 
