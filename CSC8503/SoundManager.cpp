@@ -1,52 +1,110 @@
-//#include "SoundManager.h"
-//#include "Vector3.h"
-//
-//using namespace NCL::CSC8503;
-//using namespace NCL::Maths;
-//
-//SoundManager::SoundManager() {
-//	mSoundEngine = createIrrKlangDevice();
-//	//mSoundMap = { { Walk, AddWalkSound}, {Sprint, AddSprintSound}};
-//}
-//
-//SoundManager::~SoundManager() {
-//	DeleteSounds();
-//	mSoundEngine->drop();
-//}
-//
-//ISound* SoundManager::AddWalkSound() {
-//	ISound* walk = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
-//	mSounds.emplace_back(walk);
-//	return walk;
-//}
-//
-//ISound* SoundManager::AddSprintSound() {
-//	ISound* run = mSoundEngine->play3D("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", vec3df(0, 0, 0), true, true);
-//	mSounds.emplace_back(run);
-//	return run;
-//}
-//
-//void SoundManager::PlayOneTimeSound(Vector3 position) {
-//	ISound* oneTimeSound = mSoundEngine->play3D("soundFile.mp3", ConvertToVec3df(position));
-//	mSounds.emplace_back(oneTimeSound);
-//}
-//
-//void SoundManager::SetSoundToBePaused(ISound* sound, bool isPaused) {
-//	sound->setIsPaused(isPaused);
-//}
-//
-//void SoundManager::SetSoundPosition(ISound* sound, Vector3 pos) {
-//	sound->setPosition(ConvertToVec3df(pos));
-//}
-//
-//void SoundManager::DeleteSounds() {
-//	for (int i = 0; i < mSounds.size(); i++) {
-//		if (mSounds[i]) {
-//			mSounds[i]->drop();
-//		}
-//	}
-//}
-//
-//vec3df SoundManager::ConvertToVec3df(Vector3 soundPos) {
-//	return vec3df(soundPos.x, soundPos.y, soundPos.z);
-//}
+#include "SoundManager.h"
+#include "Vector3.h"
+
+using namespace NCL::CSC8503;
+using namespace NCL::Maths;
+
+SoundManager::SoundManager(GameWorld* GameWorld) {
+	mGameWorld = GameWorld;
+	mResult = FMOD::System_Create(&mSystem);
+
+	if (mResult != FMOD_OK) {
+		return;
+	}
+
+	mResult = mSystem->init(512, FMOD_INIT_NORMAL, 0);
+
+	if (mResult != FMOD_OK) {
+		return;
+	}
+
+	mResult = mSystem->createSound("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &mFootStepSound);
+
+	if (mResult != FMOD_OK) {
+		return;
+	}
+
+
+	//TO_DO
+	//footStepSound->setMode(FMOD_3D);
+}
+
+SoundManager::~SoundManager() {
+	mFootStepSound->release();
+	mSystem->close();
+	mSystem->release();
+}
+
+FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
+	FMOD::Channel* footStepChannel;
+	mResult = mSystem->playSound(mFootStepSound, 0, false, &footStepChannel);
+	if (mResult != FMOD_OK) {
+		return nullptr;
+	}
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	footStepChannel->set3DAttributes(&pos, nullptr);
+	return footStepChannel;
+}
+
+void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	SetListenerAttributes();
+	switch (state) {
+	case GameObject::GameObjectState::Idle:
+		if (mChannel) {
+			mChannel->setPaused(true);
+		}
+		break;
+	case GameObject::GameObjectState::Walk:
+		if (mChannel) {
+			mChannel->set3DAttributes(&pos, nullptr);
+			mChannel->setPaused(false);
+		}
+		else {
+			mChannel = AddWalkSound(soundPos);
+		}
+		break;
+	case GameObject::GameObjectState::Sprint:
+		if (mChannel) {
+			mChannel->set3DAttributes(&pos, nullptr);
+			mChannel->setPaused(false);
+		}
+		else {
+			mChannel = AddWalkSound(soundPos);
+		}
+		break;
+	case GameObject::GameObjectState::IdleCrouch:
+		if (mChannel) {
+			mChannel->setPaused(true);
+		}
+		break;
+	case GameObject::GameObjectState::Crouch:
+		if (mChannel) {
+			mChannel->setPaused(true);
+		}
+		break;
+	case GameObject::GameObjectState::Happy:
+		break;
+	}
+}
+
+void SoundManager::SetListenerAttributes() {
+	FMOD_VECTOR camPos = ConvertVector(mGameWorld->GetMainCamera().GetPosition());
+	Vector3 forward = mGameWorld->GetMainCamera().GetForwardVector();
+	Vector3 right = mGameWorld->GetMainCamera().GetRightVector();
+	FMOD_VECTOR camForward = ConvertVector(forward);
+	FMOD_VECTOR camUp = GetUpVector(forward, right);
+
+	mSystem->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
+}
+
+FMOD_VECTOR SoundManager::ConvertVector(Vector3 vector) {
+	FMOD_VECTOR position = { vector.x, vector.y, vector.z };
+	return position;
+}
+
+FMOD_VECTOR SoundManager::GetUpVector(Vector3 forward, Vector3 right) {
+	Vector3 up = Vector3::Cross(forward, right);
+	FMOD_VECTOR upVector = { up.x, up.y, up.z };
+	return upVector;
+}

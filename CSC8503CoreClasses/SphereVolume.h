@@ -5,14 +5,16 @@ namespace NCL {
 	class SphereVolume : CollisionVolume
 	{
 	public:
-		SphereVolume(float sphereRadius = 1.0f) {
+		SphereVolume(float sphereRadius = 1.0f, const Maths::Vector3& offset = Maths::Vector3(0, 0, 0)) {
 			type	= VolumeType::Sphere;
 			radius	= sphereRadius;
+			this->offset = offset;
 			applyPhysics = true;
 		}
-		SphereVolume(float sphereRadius, bool applyPhysics) {
+		SphereVolume(float sphereRadius, bool applyPhysics, const Maths::Vector3& offset = Maths::Vector3(0, 0, 0)) {
 			type = VolumeType::Sphere;
 			radius = sphereRadius;
+			this->offset = offset;
 			this->applyPhysics = applyPhysics;
 		}
 		~SphereVolume() {}
@@ -21,8 +23,13 @@ namespace NCL {
 			return radius;
 		}
 
+		Maths::Vector3 GetOffset() const {
+			return offset;
+		}
+
 	protected:
 		float	radius;
+		Maths::Vector3 offset;
 	};
 }
 

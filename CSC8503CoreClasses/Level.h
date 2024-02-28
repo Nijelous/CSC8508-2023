@@ -13,8 +13,8 @@ namespace NCL {
 		public:
 			Level(std::string levelPath);
 			~Level();
-			const std::map<Vector3, TileType>& GetTileMap() { return mTileMap; }
-			const std::map<Vector3, Room*>& GetRooms() { return mRoomList; }
+			const std::unordered_map<Transform, TileType>& GetTileMap() { return mTileMap; }
+			const std::unordered_map<Vector3, Room*>& GetRooms() { return mRoomList; }
 			std::vector<std::vector<Vector3>> GetGuardPaths() const { return mGuardPaths; }
 			int GetGuardCount() const { return mGuardCount; }
 			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
@@ -32,8 +32,8 @@ namespace NCL {
 			friend class JsonParser;
 		protected:
 			std::string mLevelName;
-			std::map<Vector3, TileType> mTileMap;
-			std::map<Vector3, Room*> mRoomList;
+			std::unordered_map<Transform, TileType> mTileMap;
+			std::unordered_map<Vector3, Room*> mRoomList;
 			std::vector<std::vector<Vector3>> mGuardPaths;
 			int mGuardCount;
 			std::vector<Transform> mCCTVTransforms;
