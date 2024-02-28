@@ -103,7 +103,7 @@ namespace NCL {
 
 			void InitialiseIcons();
 
-			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
+			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
@@ -116,8 +116,9 @@ namespace NCL {
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
 			void SendWallFloorInstancesToGPU();
 
-			GameObject* AddWallToWorld(const Vector3& position);
-			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddWallToWorld(const Transform& transform);
+			GameObject* AddCornerWallToWorld(const Transform& transform);
+			GameObject* AddFloorToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
@@ -156,6 +157,8 @@ namespace NCL {
 			Mesh* mCharMesh;
 			Mesh* mEnemyMesh;
 			Mesh* mBonusMesh;
+			Mesh* mStraightWallMesh;
+			Mesh* mCornerWallMesh;
 
 			// textures
 			Texture* mBasicTex;
@@ -163,6 +166,8 @@ namespace NCL {
 			Texture* mKeeperNormal;
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
+			Texture* mWallTex;
+			Texture* mWallNormal;
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;

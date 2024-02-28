@@ -36,6 +36,14 @@ namespace NCL {
 				mMatrix = matrix;
 			}
 			void UpdateMatrix();
+
+			inline bool operator<(const Transform& rhs) const { return this->GetPosition().x == rhs.GetPosition().x ? 
+				(this->GetPosition().y == rhs.GetPosition().y ? this->GetPosition().z < rhs.GetPosition().z : this->GetPosition().y < rhs.GetPosition().y) 
+				: this->GetPosition().x < rhs.GetPosition().x; }
+
+			inline bool	operator==(const Transform& rhs)const { return (this->GetPosition() == rhs.GetPosition() && 
+				this->GetOrientation() == rhs.GetOrientation() &&
+				this->GetScale() == rhs.GetScale()) ? true : false; };
 		protected:
 			Matrix4		mMatrix;
 			Quaternion	orientation;
@@ -46,3 +54,18 @@ namespace NCL {
 	}
 }
 
+template <>
+struct std::hash<NCL::CSC8503::Transform>
+{
+	std::size_t operator()(const NCL::CSC8503::Transform& key) const {
+		size_t seed = 0;
+		hashCombine(seed, std::hash<NCL::Maths::Vector3>()(key.GetPosition()));
+		hashCombine(seed, std::hash<NCL::Maths::Quaternion>()(key.GetOrientation()));
+		hashCombine(seed, std::hash<NCL::Maths::Vector3>()(key.GetScale()));
+		return seed;
+	}
+private:
+	void hashCombine(size_t& seed, size_t hash) const {
+		seed ^= hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+};
