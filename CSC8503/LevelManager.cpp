@@ -226,7 +226,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 	SendWallFloorInstancesToGPU();
 	LoadItems(itemPositions, isMultiplayer);
-
+	mRenderer->FillLightUBO();
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
@@ -396,8 +396,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 			DirectionLight* newDL = new DirectionLight(dl->GetDirection(), dl->GetColour(), dl->GetRadius(), dl->GetCentre());
 			mRenderer->AddLight(newDL);
 		}
-	}
-	mRenderer->FillLightUBO();
+	}	
 }
 
 void LevelManager::LoadGuards(int guardCount) {

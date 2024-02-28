@@ -14,11 +14,11 @@ layout(std140, binding = 0) uniform CamBlock{
 
 layout(std140, binding = 2) uniform LightBlock {
 	vec3 lightDirection;
-	float lightRadius;
 	vec3 lightPos;
-	float minDotProd;
 	vec3 lightColour;
+	float minDotProd;	
 	float dimDotProd;
+	float lightRadius;	
 } lightData;
 
 void main() {

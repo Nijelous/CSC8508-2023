@@ -54,12 +54,15 @@ namespace NCL {
 		protected:
 
 			struct LightData {
+				//vec3 size, aligned as vec4s
 				const float* lightDirection = nullptr;
-				const float* lightRadius = nullptr;
 				const float* lightPos = nullptr;
-				const float* minDotProd = nullptr;
 				const float* lightColour = nullptr;
+				//float size
+				const float* minDotProd = nullptr;				
 				const float* dimDotProd = nullptr;
+				const float* lightRadius = nullptr;
+							
 			};
 
 			enum UBOBlockNames {
