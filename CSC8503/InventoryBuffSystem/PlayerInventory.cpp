@@ -50,18 +50,17 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 	}
 }
 
+//Returns the inventory slot the item is in or -1 if it was not found
 int PlayerInventory::RemoveItemFromPlayer(const item& inItem, const int& playerNo){
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
 		{
-			LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
-			mPlayerInventory[playerNo][invSlot] = none;
-
+			RemoveItemFromPlayer(playerNo, invSlot);
 			return invSlot;
 		}
 	}
-	return 0;
+	return -1;
 }
 
 void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
@@ -72,7 +71,8 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 
 void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
 	int invSlot = RemoveItemFromPlayer(inItem, playerNo);
-	if (mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
+	if (invSlot!=-1 &&
+		mOnItemDroppedInventoryEventMap.find(inItem) != mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[inItem], playerNo, invSlot);
 	}
