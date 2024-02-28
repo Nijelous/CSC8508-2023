@@ -43,6 +43,13 @@ namespace NCL {
 			PauseState
 		};
 
+		enum PolyFlags {
+			FloorFlag = 1,
+			ClosedDoorFlag = 2,
+			LockedDoorFlag = 4,
+			MAX_FLAGS = 8
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
@@ -121,6 +128,9 @@ namespace NCL {
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+
+			void LoadDoorsInNavGrid();
+
 			void SendWallFloorInstancesToGPU();
 
 			GameObject* AddWallToWorld(const Transform& transform);

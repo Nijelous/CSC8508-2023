@@ -33,6 +33,7 @@ namespace NCL {
 			~RecastBuilder();
 			float* BuildNavMesh(std::vector<GameObject*> objects);
 			dtNavMeshQuery* GetNavMeshQuery() const { return mNavMeshQuery; }
+			dtNavMesh* GetNavMesh() const { return mNavMesh; }
 		protected:
 			bool InitialiseConfig(const float* bmin, const float* bmax);
 			bool RasterizeInputPolygon(float* verts, const int vertCount, const unsigned int* tris, const int trisCount);
