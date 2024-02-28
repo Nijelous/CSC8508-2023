@@ -50,7 +50,7 @@ namespace InventoryBuffSystem
 		void RemoveItemFromPlayer(const int& playerNo, const int& invSlot);
 		void DropItemFromPlayer(const item &inItem, const int &playerNo);
 		void DropItemFromPlayer(const int &playerNo, const int &invSlot);
-		void UseItemInPlayerSlot(const int &itemSlot, const int &playerNo);
+		void UseItemInPlayerSlot(const int& playerNo, const int& invSlot);
 		bool HandleItemRemoval(const item& item, const int& playerNo, const int& invSlot);
 		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
 		bool IsInventoryFull(const int& playerNo);
@@ -62,7 +62,7 @@ namespace InventoryBuffSystem
 		void Notify(InventoryEvent invEvent, int playerNo, int invSLot, bool isItemRemoved = false);
 
 		std::string& GetItemName(item item);
-		int GetItemUsesLeft(const int& itemSlot, const int& playerNo);
+		int GetItemUsesLeft(const int& playerNo, const int& invSlot);
 
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, std::vector<item>* randomItemPool);
 		PlayerInventory::item GetRandomItemFromPool(unsigned int seed, bool isSinglePlayer = true)

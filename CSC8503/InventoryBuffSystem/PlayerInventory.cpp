@@ -55,7 +55,6 @@ int PlayerInventory::RemoveItemFromPlayer(const item& inItem, const int& playerN
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
 		{
-			ResetItemUsageCount(playerNo, invSlot);
 			LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 			mPlayerInventory[playerNo][invSlot] = none;
 
@@ -155,7 +154,7 @@ std::string& InventoryBuffSystem::PlayerInventory::GetItemName(item item) {
 	return mItemNameMap[item];
 }
 
-int PlayerInventory::GetItemUsesLeft(const int& itemSlot, const int& playerNo)
+int PlayerInventory::GetItemUsesLeft(const int& playerNo, const int& itemSlot)
 {
 	return mItemUsageToRemoveMap[GetItemInInventorySlot(playerNo, itemSlot)]
 		- mItemUseCount[playerNo][itemSlot];

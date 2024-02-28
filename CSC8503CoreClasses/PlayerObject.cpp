@@ -302,22 +302,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 	}
 }
 
-void PlayerObject::UseItemForInteractable(Interactable* interactable)
-{
-
-	/*
-	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
-	
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
-		*interactableRelatedItem ==
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerID))
-	{
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->SetPlayerAbleToUseItem(*interactableRelatedItem,mPlayerID,true);
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot, mPlayerID);
-	}
-	*/
-};
-
 void PlayerObject::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
