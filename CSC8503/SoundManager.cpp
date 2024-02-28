@@ -37,8 +37,9 @@ SoundManager::~SoundManager() {
 
 FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 	FMOD::Channel* footStepChannel;
-	mResult = mSystem->playSound(mFootStepSound, 0, false, &footStepChannel);
+	mResult = mSystem->playSound(mFootStepSound, 0, true, &footStepChannel);
 	if (mResult != FMOD_OK) {
+		std::cout << "Add walk sound error" << std::endl;
 		return nullptr;
 	}
 	FMOD_VECTOR pos = ConvertVector(soundPos);
@@ -46,41 +47,51 @@ FMOD::Channel* SoundManager::AddWalkSound(Vector3 soundPos) {
 	return footStepChannel;
 }
 
-void SoundManager::UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos) {
+void SoundManager::UpdateSounds(vector<GameObject*> objects) {
+	for (GameObject* obj : objects) {
+		Vector3 soundPos = obj->GetTransform().GetPosition();
+		GameObject::GameObjectState state = obj->GetGameOjbectState();
+		if (PlayerObject* playerObj = dynamic_cast<PlayerObject*>(obj)) {
+			UpdateFootstepSounds(state, soundPos);
+		}
+		else if (GuardObject* guardObj = dynamic_cast<GuardObject*>(obj)) {
+			UpdateFootstepSounds(state, soundPos);
+		}
+	}
+}
+
+void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos) {
+	FMOD::Channel* footStepChannel = AddWalkSound(soundPos);
+
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	SetListenerAttributes();
+
 	switch (state) {
 	case GameObject::GameObjectState::Idle:
-		if (mChannel) {
-			mChannel->setPaused(true);
+		if (footStepChannel) {
+			footStepChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Walk:
-		if (mChannel) {
-			mChannel->set3DAttributes(&pos, nullptr);
-			mChannel->setPaused(false);
-		}
-		else {
-			mChannel = AddWalkSound(soundPos);
+		if (footStepChannel) {
+			footStepChannel->set3DAttributes(&pos, nullptr);
+			footStepChannel->setPaused(false);
 		}
 		break;
 	case GameObject::GameObjectState::Sprint:
-		if (mChannel) {
-			mChannel->set3DAttributes(&pos, nullptr);
-			mChannel->setPaused(false);
-		}
-		else {
-			mChannel = AddWalkSound(soundPos);
+		if (footStepChannel) {
+			footStepChannel->set3DAttributes(&pos, nullptr);
+			footStepChannel->setPaused(false);
 		}
 		break;
 	case GameObject::GameObjectState::IdleCrouch:
-		if (mChannel) {
-			mChannel->setPaused(true);
+		if (footStepChannel) {
+			footStepChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Crouch:
-		if (mChannel) {
-			mChannel->setPaused(true);
+		if (footStepChannel) {
+			footStepChannel->setPaused(true);
 		}
 		break;
 	case GameObject::GameObjectState::Happy:

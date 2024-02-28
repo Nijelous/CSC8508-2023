@@ -2,6 +2,7 @@
 #include "Vector3.h"
 #include "../FMODCoreAPI/includes/fmod.hpp"
 #include "../CSC8503CoreClasses/GameObject.h"
+#include "../CSC8503CoreClasses/GuardObject.h"
 #include "../CSC8503CoreClasses/GameWorld.h"
 #include "../CSC8503CoreClasses/PlayerObject.h"
 
@@ -15,7 +16,9 @@ namespace NCL{
 			
 			FMOD::Channel* AddWalkSound(Vector3 soundPos);
 
-			void UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos);
+			void UpdateSounds(vector<GameObject*> object);
+
+			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos);
 
 			void SetListenerAttributes();
 

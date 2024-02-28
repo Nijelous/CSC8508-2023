@@ -281,14 +281,11 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mGameState = PauseState;
 	}
 	else {
-		if (mTempPlayer) {
-			Vector3 pos = mTempPlayer->GetTransform().GetPosition();
-			mSoundManager->UpdateSounds(mTempPlayer->GetGameOjbectState(), pos);
-		}
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
+		mSoundManager->UpdateSounds(mUpdatableObjects);
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 		mDtSinceLastFixedUpdate += dt;
