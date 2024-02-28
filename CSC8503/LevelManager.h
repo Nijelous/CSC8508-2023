@@ -65,6 +65,8 @@ namespace NCL {
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
 
+			RecastBuilder* GetBuilder() { return mBuilder; }
+
 			InventoryBuffSystemClass* GetInventoryBuffSystem();
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;

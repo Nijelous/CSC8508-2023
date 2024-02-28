@@ -926,8 +926,6 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetCollisionLayer(Npc);
 
 	guard->SetPlayer(mTempPlayer);
-	guard->SetGameWorld(mWorld);
-	guard->SetPrisonPosition(prisonPosition);
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
 
