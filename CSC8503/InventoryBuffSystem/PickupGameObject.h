@@ -30,8 +30,8 @@ namespace NCL {
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
         protected:
-            void GoOver(float dt); //go over the surface
-            void GoUnder(float dt); // go under the surface
+            void Activate(float dt); //go over the surface
+            void Deactivate(float dt); // go under the surface
             void Waiting(float dt); // wait to go over
 
             StateMachine* mStateMachine;

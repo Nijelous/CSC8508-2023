@@ -101,6 +101,8 @@ set(Level_Objects
     "Vent.h"
     "Vent.cpp"
     "Interactable.h"
+    "PointGameObject.h"
+    "PointGameObject.cpp"
 )
 source_group("Level\\Level Objects" FILES ${Level_Objects})
 

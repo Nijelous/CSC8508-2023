@@ -26,6 +26,7 @@ namespace NCL {
 		class PickupGameObject;
 		class SoundEmitter;
 		class InteractableDoor;
+		class PointGameObject;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -127,6 +128,8 @@ namespace NCL {
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
+
+			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
