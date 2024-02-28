@@ -1,16 +1,17 @@
 #pragma once
 #include "GameObject.h"
-#include "GameWorld.h"
 #include "BehaviourSequence.h"
 #include "BehaviourAction.h"
 #include <string>
 #include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
+#include "../Detour/Include/DetourNavMeshQuery.h"
 using namespace std;
 using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
         class PlayerObject;
+        constexpr int MIN_DIST_TO_NEXT_POS = 36;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -24,14 +25,6 @@ namespace NCL {
                 mPlayer = newPlayer;
             }
 
-            void SetGameWorld(GameWorld* newWorld) {
-                mWorld = newWorld;
-            }
-
-            void SetPrisonPosition(Vector3 prisonPosition) {
-                mPrisonPosition = prisonPosition;
-            }
-
             void SetPatrolNodes(vector<Vector3> nodes) {
                 mNodes = nodes;
             }
@@ -39,7 +32,6 @@ namespace NCL {
             void SetCurrentNode(int node) {
                 mCurrentNode = node;
             }
-
 
         protected:
             void RaycastToPlayer();
@@ -49,8 +41,7 @@ namespace NCL {
 
             GameObject* mSightedObject;
             PlayerObject* mPlayer;
-            const GameWorld* mWorld;
-            Vector3 mPrisonPosition;
+
             vector<Vector3> mNodes;
             int mCurrentNode;
             int mNextNode;
@@ -62,10 +53,15 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
-            void MoveTowardFocalPoint(Vector3 direction);
+            void MoveTowardFocalPoint(Vector3 direction, float* endPos);
             void LookTowardFocalPoint(Vector3 direction);
             void GrabPlayer();
+            float* QueryNavmesh(float* endPos);
 
+            bool CheckPolyDistance();
+
+            float mDist;
+            float* mNextPoly = new float[3];
             float mConfiscateItemsTime;
             int mGuardSpeedMultiplier;
 

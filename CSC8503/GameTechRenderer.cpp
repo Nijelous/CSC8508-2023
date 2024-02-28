@@ -304,49 +304,50 @@ void GameTechRenderer::RenderCamera() {
 }
 
 void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix) {
+	for (int i = 0; i < MAX_INSTANCE_MESHES; i++) {
+		if (!mInstanceTiles[i]) continue;
+		RenderObject* rendObj = mInstanceTiles[i]->GetRenderObject();
+		OGLShader* shader = (OGLShader*)rendObj->GetShader();
+		BindShader(*shader);
+		if (rendObj->GetAlbedoTexture()) {
+			BindTextureToShader(*(OGLTexture*)rendObj->GetAlbedoTexture(), "mainTex", 0);
 
-	RenderObject* rendObj = mWallFloorTile->GetRenderObject();
-	OGLShader* shader = (OGLShader*)rendObj->GetShader();
-	BindShader(*shader);
-	if (rendObj->GetAlbedoTexture()) {
-		BindTextureToShader(*(OGLTexture*)rendObj->GetAlbedoTexture(), "mainTex", 0);
+		}
 
+		if (rendObj->GetNormalTexture()) {
+			BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
+		}
+
+		int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
+		int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
+		int shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
+		int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
+		int hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
+		int hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
+		int cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
+		int hasInstanceMatLocation = glGetUniformLocation(shader->GetProgramID(), "hasInstanceMatrix");
+		int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
+
+		Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
+		glUniform3fv(cameraLocation, 1, &camPos.x);
+
+		glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
+		glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
+		glUniform1i(shadowTexLocation, 1);
+
+		Vector4 colour = rendObj->GetColour();
+		glUniform4fv(colourLocation, 1, &colour.x);
+		glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
+		glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
+		glUniform1i(hasInstanceMatLocation, 1);
+		OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
+		BindMesh(*mesh);
+		size_t layerCount = mesh->GetSubMeshCount();
+		for (size_t b = 0; b < layerCount; ++b) {
+
+			DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
+		}
 	}
-
-	if (rendObj->GetNormalTexture()) {
-		BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
-	}
-
-	int projLocation = glGetUniformLocation(shader->GetProgramID(), "projMatrix");
-	int viewLocation = glGetUniformLocation(shader->GetProgramID(), "viewMatrix");
-	int shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
-	int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
-	int hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
-	int hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
-	int cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
-	int hasInstanceMatLocation = glGetUniformLocation(shader->GetProgramID(), "hasInstanceMatrix");
-	int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
-
-	Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
-	glUniform3fv(cameraLocation, 1, &camPos.x);
-
-	glUniformMatrix4fv(projLocation, 1, false, (float*)&projMatrix);
-	glUniformMatrix4fv(viewLocation, 1, false, (float*)&viewMatrix);
-	glUniform1i(shadowTexLocation, 1);
-
-	Vector4 colour = rendObj->GetColour();
-	glUniform4fv(colourLocation, 1, &colour.x);
-	glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
-	glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
-	glUniform1i(hasInstanceMatLocation, 1);
-	OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
-	BindMesh(*mesh);
-	size_t layerCount = mesh->GetSubMeshCount();
-	for (size_t b = 0; b < layerCount; ++b) {
-
-		DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
-	}
-
 }
 
 void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
@@ -356,9 +357,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
-	if (mWallFloorTile) {
-		DrawWallsFloorsInstanced(viewMatrix, projMatrix);
-	}
+	if(!mInstanceTiles.empty()) DrawWallsFloorsInstanced(viewMatrix, projMatrix);
 
 	OGLShader* activeShader = nullptr;
 	int projLocation = 0;
