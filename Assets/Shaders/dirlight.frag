@@ -23,10 +23,10 @@ layout(std140, binding = 1) uniform StaticBlock {
 
 layout(std140, binding = 2) uniform LightBlock {	
 	vec3 lightDirection;
-	vec3 lightPos;
-	vec3 lightColour;
 	float minDotProd;	
+	vec3 lightPos;
 	float dimDotProd;
+	vec3 lightColour;	
 	float lightRadius;		
 } lightData;
 

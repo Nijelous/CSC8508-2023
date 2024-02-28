@@ -202,14 +202,14 @@ void GameTechRenderer::GenStaticDataUBO() {
 void GameTechRenderer::GenLightDataUBO() {
 	glGenBuffers(1, &uBOBlocks[lightsUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 15 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 12 * sizeof(float), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 }
 
 void GameTechRenderer::FillLightUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS * 15 * sizeof(float));
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS *12 * sizeof(float));
 	for (int i = 0; i < mLights.size(); i++) {
 		LightData ld;
 		Light::Type type = mLights[i]->GetType();
@@ -253,12 +253,13 @@ void GameTechRenderer::FillLightUBO() {
 void GameTechRenderer::SendLightDataToGPU(int index, LightData& ld) {
 	float zero = 0.0f;
 	Vector3 emptyVec = { 0,0,0 };
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15, 3 * sizeof(float), ld.lightDirection ? ld.lightDirection : &emptyVec.x);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15 + 4, 3 * sizeof(float), ld.lightPos ? ld.lightPos : &emptyVec.x);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15 + 8, 3 * sizeof(float), ld.lightColour ? ld.lightColour : &emptyVec.x);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15 + 12, sizeof(float), ld.minDotProd ? ld.minDotProd : &zero);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15 + 13, sizeof(float), ld.dimDotProd ? ld.dimDotProd : &zero);
-	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 15 + 14, sizeof(float), ld.lightRadius ? ld.lightRadius : &zero);
+
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12, 3 * sizeof(float), ld.lightDirection ? ld.lightDirection : &emptyVec.x);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 3, sizeof(float), ld.minDotProd ? ld.minDotProd : &zero);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 4, 3 * sizeof(float), ld.lightPos ? ld.lightPos : &emptyVec.x);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 7, sizeof(float), ld.dimDotProd ? ld.dimDotProd : &zero);
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 8, 3 * sizeof(float), ld.lightColour ? ld.lightColour : &emptyVec.x);	
+	glBufferSubData(GL_UNIFORM_BUFFER, sizeof(float) * index * 12 + sizeof(float) * 11, sizeof(float), ld.lightRadius ? ld.lightRadius : &zero);
 
 }
 
@@ -539,19 +540,14 @@ void GameTechRenderer::DrawLightVolumes() {
 	glDepthMask(GL_FALSE);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[camUBO]);
-	//for (int i = 0; i < 2; i++) {
-		/*if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
-		if(mLights[i]->GetType() == Light::Direction) BindShader(*((OGLShader*)(mDirLightShader)));
-		if(mLights[i]->GetType() == Light::Spot)BindShader(*((OGLShader*)(mSpotLightShader)));*/
-	BindShader(*((OGLShader*)(mPointLightShader)));
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, 15 * sizeof(float));
-	BindMesh(*mSphereMesh);
-	DrawBoundMesh();
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 15 * sizeof(float), 15 * sizeof(float));
-	DrawBoundMesh();
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 30 * sizeof(float), 15 * sizeof(float));
-	DrawBoundMesh();
-	//}
+	for (int i = 0; i < mLights.size(); i++) {
+		if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
+		if (mLights[i]->GetType() == Light::Direction) BindShader(*((OGLShader*)(mDirLightShader)));
+		if (mLights[i]->GetType() == Light::Spot)BindShader(*((OGLShader*)(mSpotLightShader)));
+		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * 12 * sizeof(float), 12 * sizeof(float));
+		BindMesh(*mSphereMesh);
+		DrawBoundMesh();
+	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glCullFace(GL_BACK);
