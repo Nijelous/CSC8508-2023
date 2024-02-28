@@ -25,6 +25,8 @@ namespace NCL {
 			bool UpdateClient();
 
 			void WriteAndSendClientInputPacket(int lastId, const PlayerInputs& playerInputs);
+
+			void WriteAndSendClientUseItemPacket(int playerID, int objectID);
 		protected:
 			int mPeerId;
 			

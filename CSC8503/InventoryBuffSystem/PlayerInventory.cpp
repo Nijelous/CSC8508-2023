@@ -1,6 +1,20 @@
 #include "PlayerInventory.h"
+
+#include "GameServer.h"
 #include "Level.h"
+#include "NetworkObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
+
+namespace {
+	constexpr int DEFAULT_ITEM_USAGE_COUNT = 0;
+	
+}
+
+namespace NCL::CSC8503 {
+	class DebugNetworkedGame;
+}
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
@@ -39,12 +53,26 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 		if (mPlayerInventory[playerNo][invSlot] == none)
 		{
 			mPlayerInventory[playerNo][invSlot] = inItem;
-			LevelManager::GetLevelManager()->ChangeEquippedIconTexture(invSlot, inItem);
 
-			if (mOnItemAddedInventoryEventMap.find(inItem) != mOnItemAddedInventoryEventMap.end())
-			{
+			int localPlayerId = 0;
+
+			if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+				DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+				auto* localPlayer = game->GetLocalPlayer();
+				localPlayerId = localPlayer->GetPlayerID();
+
+				//if it's server, inform clients
+				if (game->GetIsServer()) {
+					game->SendClinentSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
+				}
+			}
+
+			OnItemEquipped(playerNo, localPlayerId, invSlot, inItem);
+
+			if (mOnItemAddedInventoryEventMap.find(inItem) != mOnItemAddedInventoryEventMap.end()) {
 				Notify(mOnItemAddedInventoryEventMap[inItem], playerNo, invSlot);
 			}
+
 			return;
 		}
 	}
@@ -67,6 +95,22 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 	ResetItemUsageCount(playerNo, invSlot);
 	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	mPlayerInventory[playerNo][invSlot] = none;
+
+	int localPlayerId = 0;
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		const auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
+
+		const bool isServer = game->GetIsServer();
+		if (isServer) {
+			game->SendClinentSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+		}
+	}
+
+	if (localPlayerId == playerNo) {
+		LevelManager::GetLevelManager()->ChangeEquippedIconTexture(invSlot, item::none);
+	}
 }
 
 void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
@@ -90,20 +134,49 @@ void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot
 
 void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot) {
 	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
-		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo))
-	{
+		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo)) {
 		PlayerInventory::item usedItem = mPlayerInventory[playerNo][invSlot];
 		IncreaseUsageCount(playerNo, invSlot);
 		bool isItemRemoved = HandleItemRemoval(usedItem, playerNo, invSlot);
+		std::cout << "Player(" + std::to_string(playerNo) + ") used: " + GetItemName(usedItem) << '\n';
+
+		int localPlayerId = 0;
+
+		if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+			auto* localPlayer = game->GetLocalPlayer();
+			localPlayerId = localPlayer->GetPlayerID();
+
+			//if it's server, inform clients
+			if (game->GetIsServer()) {
+				int usageCount = mItemUseCount[playerNo][invSlot];
+				game->SendClinentSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
+			}
+		}
+
 		Notify(mOnItemUsedInventoryEventMap[usedItem], (playerNo), invSlot, isItemRemoved);
 	}
+}
+
+void PlayerInventory::OnItemEquipped(const int playerID, const int localPlayerID, const int slot, const item equippedItem) {
+	if (localPlayerID == playerID) {
+		LevelManager::GetLevelManager()->ChangeEquippedIconTexture(slot, equippedItem);
+	}
+}
+
+
+void PlayerInventory::ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem, int usageCount) {
+	mPlayerInventory[playerID][slotId] = equippedItem;
+	mItemUseCount[playerID][slotId] = usageCount;
+	OnItemEquipped(playerID, localPlayerID, slotId, equippedItem);
 }
 
 bool InventoryBuffSystem::PlayerInventory::HandleItemRemoval(const item& item, const int& playerNo, const int& invSlot) {
 
 	int maxUsage = mItemUsageToRemoveMap[item];
+	const int currentItemUseCount = mItemUseCount[playerNo][invSlot];
 
-	if (mItemUseCount[playerNo][invSlot] >= maxUsage) {
+	if (currentItemUseCount >= maxUsage) {
 		RemoveItemFromPlayer(playerNo, invSlot);
 		return true;
 	}
@@ -123,7 +196,7 @@ bool PlayerInventory::ItemInPlayerInventory(const item& inItem, const int& playe
 	return false;
 }
 
-bool PlayerInventory::IsInventoryFull(const int& playerNo){
+bool PlayerInventory::IsInventoryFull(const int& playerNo) {
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 		if (mPlayerInventory[playerNo][invSlot] == none)
 			return false;
