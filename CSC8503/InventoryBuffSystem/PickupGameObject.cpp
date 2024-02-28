@@ -6,6 +6,9 @@
 #include "Vector3.h"
 #include "random"
 #include "InventoryBuffSystem.h"
+#include "PlayerObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -89,7 +92,7 @@ void PickupGameObject::UpdateObject(float dt) {
 	mStateMachine->Update(dt);
 }
 
-void PickupGameObject::ChangeToRandomPickup(){
+void PickupGameObject::ChangeToRandomPickup() {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::bernoulli_distribution d(0.5);
@@ -100,7 +103,7 @@ void PickupGameObject::ChangeToRandomPickup(){
 		mCurrentItem = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetRandomItemFromPool(mRandomSeed, !mIsMultiplayer);
 }
 
-void PickupGameObject::ActivatePickup(int playerNo){
+void PickupGameObject::ActivatePickup(int playerNo) {
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 	else
@@ -109,13 +112,21 @@ void PickupGameObject::ActivatePickup(int playerNo){
 	mCooldown = INT_MAX;
 }
 
-void PickupGameObject::OnCollisionBegin(GameObject* otherObject){
-	if (mCooldown == 0)
-	{
+void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
+	//Simulate only in server
+	auto* sceneManager = SceneManager::GetSceneManager();
+	if (!sceneManager->IsServer()) {
+		return;
+	}
+	if (mCooldown == 0){
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
-		if (mIsBuff ||
-			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0))
-			ActivatePickup(0);
+		//TODO(erendgrmnc): add player id here for multiplayer.
+		PlayerObject* playerObj = static_cast<PlayerObject*>(otherObject);
+		const int playerID = playerObj->GetPlayerID();
+		if (playerObj && mIsBuff ||
+			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID)) {
+			ActivatePickup(playerID);
+		}
 	}
 }
 
@@ -130,7 +141,7 @@ void PickupGameObject::GoUnder(float dt) {
 	ChangeToRandomPickup();
 }
 
-void PickupGameObject::Waiting(float dt){
+void PickupGameObject::Waiting(float dt) {
 	mCooldown = std::max(mCooldown - dt, 0.0f);
 }
 

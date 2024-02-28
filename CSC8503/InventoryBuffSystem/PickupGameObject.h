@@ -19,7 +19,7 @@ namespace NCL {
                 bool isMultiplayer,
                 unsigned int randomSeed = 10,
                 std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
-                float initCooldown = 2.0f);
+                float initCooldown = 50.0f);
             ~PickupGameObject();
 
             virtual void UpdateObject(float dt);
