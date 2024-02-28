@@ -42,7 +42,7 @@ namespace NCL{
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
-            void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem) const;
+            void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;

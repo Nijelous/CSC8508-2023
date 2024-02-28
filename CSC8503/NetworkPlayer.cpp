@@ -175,25 +175,6 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 	StopSliding();
 }
 
-void NetworkPlayer::OnPlayerUseItem()
-{
-	if (mIsLocalPlayer) {
-		PlayerObject::OnPlayerUseItem();
-	}
-	else {
-		if (mActiveItemSlot == 0) {
-			mFirstInventorySlotUsageCount++;
-		}
-		else {
-			mSecondInventorySlotUsageCount++;
-		}
-
-		//TODO(erendgrmnc): sent a packet to change slot usage counts.
-		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
-
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
-	}
-}
 
 void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 	bool isRaycastTriggered = false;
@@ -260,7 +241,7 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
 					interactablePtr->Interact(interactType);
 					if (interactType == ItemUse) {
-						OnPlayerUseItem();
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 					}
 
 					return;
@@ -292,12 +273,7 @@ void NetworkPlayer::ControlInventory() {
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
 
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
-		if (equippedItemUseType == DirectUse) {
-			OnPlayerUseItem();
-		}
-
-		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {

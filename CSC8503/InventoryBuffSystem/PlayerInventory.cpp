@@ -7,6 +7,11 @@
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
 
+namespace {
+	constexpr int DEFAULT_ITEM_USAGE_COUNT = 0;
+	
+}
+
 namespace NCL::CSC8503
 {
 	class DebugNetworkedGame;
@@ -59,7 +64,7 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 
 				//if it's server, inform clients
 				if (game->GetIsServer()) {
-					game->SendClinentSyncItemSlotPacket(playerNo, invSlot, inItem);
+					game->SendClinentSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
 				}
 			}
 
@@ -100,7 +105,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
-			game->SendClinentSyncItemSlotPacket(playerNo, invSlot, item::none);
+			game->SendClinentSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 		}
 	}
 
@@ -135,6 +140,21 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 		IncreaseUsageCount(playerNo, invSlot);
 		bool isItemRemoved = HandleItemRemoval(usedItem, playerNo, invSlot);
 		std::cout << "Player(" + std::to_string(playerNo) + ") used: " + GetItemName(usedItem) << '\n';
+
+		int localPlayerId = 0;
+
+		if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+			auto* localPlayer = game->GetLocalPlayer();
+			localPlayerId = localPlayer->GetPlayerID();
+
+			//if it's server, inform clients
+			if (game->GetIsServer()) {
+				int usageCount = mItemUseCount[playerNo][invSlot];
+				game->SendClinentSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
+			}
+		}
+
 		Notify(mOnItemUsedInventoryEventMap[usedItem], (playerNo), invSlot, isItemRemoved);
 	}
 }
@@ -146,8 +166,9 @@ void PlayerInventory::OnItemEquipped(const int playerID, const int localPlayerID
 }
 
 
-void PlayerInventory::ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem) {
+void PlayerInventory::ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem, int usageCount) {
 	mPlayerInventory[playerID][slotId] = equippedItem;
+	mItemUseCount[playerID][slotId] = usageCount;
 	OnItemEquipped(playerID, localPlayerID, slotId, equippedItem);
 }
 

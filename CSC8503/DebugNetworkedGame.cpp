@@ -204,9 +204,9 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
     }
 }
 
-void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem) const {
+void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
     PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
-    NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip);
+    NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
     mThisServer->SendGlobalPacket(packet);
 }
 
@@ -446,5 +446,5 @@ void DebugNetworkedGame::SetItemsLeftToZero(){
 
 void DebugNetworkedGame::HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const {
     int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
-    mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, static_cast<PlayerInventory::item>(packet->equippedItem));
+    mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, static_cast<PlayerInventory::item>(packet->equippedItem), packet->usageCount);
 }

@@ -58,8 +58,6 @@ namespace NCL {
 			
 			void HandleMovement(float dt, const PlayerInputs& playerInputs);
 
-			void OnPlayerUseItem() override;
-
 			void RayCastFromPlayer(GameWorld* world, float dt) override;
 
 			void ControlInventory() override;
