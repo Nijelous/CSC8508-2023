@@ -2,9 +2,11 @@
 
 #include "DebugNetworkedGame.h"
 #include "GameClient.h"
+#include "Interactable.h"
 #include "NetworkedGame.h"
 #include "NetworkObject.h"
 #include "PhysicsObject.h"
+#include "InventoryBuffSystem/Item.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -59,19 +61,23 @@ void NetworkPlayer::ResetPlayerInput() {
 void NetworkPlayer::UpdateObject(float dt) {
 	if (mPlayerSpeedState != Stunned) {
 		MovePlayer(dt);
+
+		if (game->GetIsServer()) {
+			RayCastFromPlayer(mGameWorld, dt);
+		}
+		ResetPlayerInput();
+
+		if (mInventoryBuffSystemClassPtr != nullptr)
+			ControlInventory();
+
+		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
+			mInteractHeldDt = 0;
+		}
 	}
+
 	if (mIsLocalPlayer) {
 		AttachCameraToPlayer(game->GetLevelManager()->GetGameWorld());
 		mCameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
-
-		if (mPlayerSpeedState != Stunned) {
-			RayCastFromPlayer(mGameWorld, dt);
-			if (mInventoryBuffSystemClassPtr != nullptr)
-				ControlInventory();
-			if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
-				mInteractHeldDt = 0;
-			}
-		}
 	}
 
 	if (mIsLocalPlayer || game->GetIsServer()) {
@@ -109,6 +115,17 @@ void NetworkPlayer::MovePlayer(float dt) {
 
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL))
 			mPlayerInputs.isCrouching = true;
+		if (Window::GetMouse()->ButtonDown(MouseButtons::Left))
+			mPlayerInputs.isEquippedItemUsed = true;
+		if (Window::GetKeyboard()->KeyDown(KeyCodes::E))
+			mPlayerInputs.isInteractButtonPressed = true;
+		if (Window::GetKeyboard()->KeyDown(KeyCodes::E))
+			mPlayerInputs.isHoldingInteractButton = true;
+
+		if (mPlayerInputs.isInteractButtonPressed || mPlayerInputs.isEquippedItemUsed || mPlayerInputs.isHoldingInteractButton) {
+			Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(mGameWorld->GetMainCamera());
+			mPlayerInputs.rayFromPlayer = ray;
+		}
 
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
@@ -124,7 +141,6 @@ void NetworkPlayer::MovePlayer(float dt) {
 	else {
 		HandleMovement(dt, mPlayerInputs);
 		mIsClientInputReceived = false;
-		ResetPlayerInput();
 	}
 }
 
@@ -157,4 +173,139 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 	ToggleCrouch(playerInputs.isCrouching);
 
 	StopSliding();
+}
+
+void NetworkPlayer::OnPlayerUseItem()
+{
+	if (mIsLocalPlayer) {
+		PlayerObject::OnPlayerUseItem();
+	}
+	else {
+		if (mActiveItemSlot == 0) {
+			mFirstInventorySlotUsageCount++;
+		}
+		else {
+			mSecondInventorySlotUsageCount++;
+		}
+
+		//TODO(erendgrmnc): sent a packet to change slot usage counts.
+		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
+
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+	}
+}
+
+void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
+	bool isRaycastTriggered = false;
+	NCL::CSC8503::InteractType interactType;
+
+	bool isThereAnyInputFromUser = (Window::GetKeyboard()->KeyPressed(KeyCodes::E) && mIsLocalPlayer) || (mPlayerInputs.isInteractButtonPressed && !mIsLocalPlayer);
+	bool isPlayerHoldingInteract = (mIsLocalPlayer && Window::GetKeyboard()->KeyHeld(KeyCodes::E)) || (!mIsLocalPlayer && mPlayerInputs.isHoldingInteractButton);
+
+	if (isThereAnyInputFromUser) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::Use;
+		mInteractHeldDt = 0;
+	}
+	else if (isPlayerHoldingInteract) {
+		mInteractHeldDt += dt;
+		//TODO(erendgrmnc): add config or get from entity for long interact duration.
+		if (mInteractHeldDt >= 5.f) {
+			isRaycastTriggered = true;
+			interactType = NCL::CSC8503::InteractType::LongUse;
+		}
+	}
+
+	bool isEquippedItemUsed = (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none && mIsLocalPlayer) || (mPlayerInputs.isEquippedItemUsed && GetEquippedItem() != PlayerInventory::item::none);
+
+	if (isEquippedItemUsed) {
+		isRaycastTriggered = true;
+		interactType = NCL::CSC8503::InteractType::ItemUse;
+	}
+
+	if (isRaycastTriggered) {
+		Ray ray;
+		if (!mIsLocalPlayer) {
+			ray = mPlayerInputs.rayFromPlayer;
+		}
+		else {
+			ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+		}
+		std::cout << "Ray fired" << std::endl;
+		RayCollision closestCollision;
+
+		if (world->Raycast(ray, closestCollision, true, this)) {
+			auto* objectHit = (GameObject*)closestCollision.node;
+			if (objectHit) {
+				Vector3 objPos = objectHit->GetTransform().GetPosition();
+
+				Vector3 playerPos = GetTransform().GetPosition();
+
+				float distance = (objPos - playerPos).Length();
+
+				if (distance > 10.f) {
+					std::cout << "Nothing hit in range" << std::endl;
+					return;
+				}
+
+				//Check if object is an item.
+				Item* item = dynamic_cast<Item*>(objectHit);
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
+
+				//Check if object is an interactable.
+				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
+					interactablePtr->Interact(interactType);
+					if (interactType == ItemUse) {
+						OnPlayerUseItem();
+					}
+
+					return;
+				}
+
+				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+			}
+		}
+	}
+}
+
+void NetworkPlayer::ControlInventory() {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
+		mActiveItemSlot = 0;
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2))
+		mActiveItemSlot = 1;
+
+	if (Window::GetMouse()->GetWheelMovement() > 0)
+		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
+		? mActiveItemSlot + 1 : 0;
+
+	if (Window::GetMouse()->GetWheelMovement() < 0)
+		mActiveItemSlot = (mActiveItemSlot > 0)
+		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
+
+	PlayerInventory::item equippedItem = GetEquippedItem();
+
+	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
+
+		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
+		if (equippedItemUseType == DirectUse) {
+			OnPlayerUseItem();
+		}
+
+		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
+	}
+	if (mIsLocalPlayer) {
+		//Handle Equipped Item Log
+		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+		Debug::Print(itemName, Vector2(10, 80));
+	}
 }
