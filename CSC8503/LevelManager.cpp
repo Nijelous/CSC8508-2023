@@ -667,10 +667,15 @@ InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset
 PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	PrisonDoor* newDoor = new PrisonDoor();
 
-	Vector3 size = Vector3(0.5f, 4.5f, 5);
-	OBBVolume* volume = new OBBVolume(size);
-
-	newDoor->SetBoundingVolume((CollisionVolume*)volume);
+	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
+	if (abs(door->GetTransform().GetOrientation().y) == 1 || abs(door->GetTransform().GetOrientation().w) == 1) {
+		AABBVolume* volume = new AABBVolume(size);
+		newDoor->SetBoundingVolume((CollisionVolume*)volume);
+	}
+	else {
+		AABBVolume* volume = new AABBVolume(Vector3(4.5f, 4.5f, 0.5f));
+		newDoor->SetBoundingVolume((CollisionVolume*)volume);
+	}
 
 	newDoor->GetTransform()
 		.SetPosition(door->GetTransform().GetPosition())
