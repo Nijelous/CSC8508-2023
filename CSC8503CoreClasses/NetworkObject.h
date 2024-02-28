@@ -80,6 +80,22 @@ namespace NCL::CSC8503 {
 		ClientUsePowerupPacket(int playerID, int powerUpID);
 	};
 
+	struct ClientSyncItemSlotUsagePacket : public GamePacket {
+		int playerID;
+		int firstItemUsage;
+		int secondItemUsage;
+
+		ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage);
+	};
+
+	struct ClientSyncItemSlotPacket : public GamePacket {
+		int playerID;
+		int slotId;
+		int equippedItem;
+
+		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
