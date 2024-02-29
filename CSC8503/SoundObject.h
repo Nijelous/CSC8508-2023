@@ -1,21 +1,25 @@
 #pragma once
-#include <fmod.hpp>
+#include "../FMODCoreAPI/includes/fmod.hpp"
 #include <vector>
 
+
+using namespace FMOD;
 namespace NCL {
 	namespace CSC8503 {
 		class SoundObject {
 		public:
-			SoundObject(FMOD::Channel* channel);
+			SoundObject(Channel* channel);
 			~SoundObject();
 
-			void AddChannel();
+			void AddChannel(Channel* channel);
 
-			std::vector<FMOD::Channel> GetChannels();
+			std::vector<Channel*> GetChannels();
+
+			Channel* GetChannel();
 
 		private:
-			FMOD::Channel* mChannel;
-			std::vector<FMOD::Channel> mChannels;
+			Channel* mChannel = nullptr;
+			std::vector<Channel*> mChannels;
 		};
     }
 }

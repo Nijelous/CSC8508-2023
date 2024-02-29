@@ -5,6 +5,7 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "AnimationObject.h"
+#include "SoundObject.h"
 
 #include "PlayerObject.h"
 #include "GuardObject.h"
@@ -18,6 +19,8 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "UISystem.h"
+
+#include <fmod.hpp>
 
 #include <filesystem>
 
@@ -285,7 +288,9 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
-		mSoundManager->UpdateSounds(mUpdatableObjects);
+		if (mUpdatableObjects.size()>0) {
+			mSoundManager->UpdateSounds(mUpdatableObjects);
+		}
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 		mDtSinceLastFixedUpdate += dt;
@@ -784,6 +789,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
+	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -858,6 +864,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
 	guard->SetAnimationObject(new AnimationObject(mRigAnimationStand, mRigMaterial));
+	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
