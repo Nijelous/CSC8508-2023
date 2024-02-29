@@ -59,7 +59,7 @@ namespace NCL {
 			float mCellHeight = 0.2f;
 
 			float mGuardMaxSlope = 45.0f;
-			float mGuardRadius = 1.0f;
+			float mGuardRadius = 3.0f;
 			float mGuardHeight = 3.0f;
 			float mGuardMaxClimb = 0.9f;
 

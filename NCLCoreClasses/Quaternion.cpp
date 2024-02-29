@@ -110,6 +110,11 @@ void Quaternion::CalculateW()	{
 	}
 }
 
+Vector3 Quaternion::ToVector3() const
+{
+	return Vector3(x, y, z);
+}
+
 Quaternion Quaternion::Conjugate() const
 {
 	return Quaternion(-x,-y,-z,w);

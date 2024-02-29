@@ -107,6 +107,8 @@ namespace NCL {
 			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
 
 			FlagGameObject* GetMainFlag();
+
+			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 		protected:
 			LevelManager();
 			~LevelManager();

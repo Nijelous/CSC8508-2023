@@ -475,12 +475,15 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::LoadDoorsInNavGrid() {
-	dtQueryFilter* filter = new dtQueryFilter();
-	int nVerts = 4;
-	float* verts = new float[12];
 	for (int i = 0; i < mUpdatableObjects.size(); i++) {
 		auto* door = dynamic_cast<InteractableDoor*>(mUpdatableObjects[i]);
 		if (door) {
+			float* startPos = new float[3] {door->GetTransform().GetPosition().x, door->GetTransform().GetPosition().y, door->GetTransform().GetPosition().z};
+			AABBVolume* volume = (AABBVolume*)door->GetBoundingVolume();
+			float* halfExt = new float[3] {volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z};
+			LoadDoorInNavGrid(startPos, halfExt, ClosedDoorFlag);
+			delete[] startPos;
+			delete[] halfExt;
 			continue;
 		}
 		auto* prisonDoor = dynamic_cast<PrisonDoor*>(mUpdatableObjects[i]);
@@ -488,40 +491,29 @@ void LevelManager::LoadDoorsInNavGrid() {
 			float* startPos = new float[3] {prisonDoor->GetTransform().GetPosition().x, prisonDoor->GetTransform().GetPosition().y, prisonDoor->GetTransform().GetPosition().z};
 			AABBVolume* volume = (AABBVolume*)prisonDoor->GetBoundingVolume();
 			float* halfExt = new float[3] {volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z};
-			dtPolyRef* startRef = new dtPolyRef();
-			float* nearestPoint = new float[3];
-			LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(startPos, halfExt, filter, startRef, nearestPoint);
-			dtPolyRef* resultRef = new dtPolyRef[1000];
-			dtPolyRef* resultParent = new dtPolyRef[1000];
-			float* resultCost = new float();
-			int* resultCount = new int();
-			for (int j = 0; j < 4; j++) {
-				Vector3 corner = prisonDoor->GetTransform().GetPosition() - (volume->GetHalfDimensions() * Vector3((i >= 2 ? -1 : 1), 1, (i % 2 == 1 ? -1 : 1)));
-				verts[j * 3] = corner.x;
-				verts[(j * 3) + 1] = corner.y;
-				verts[(j * 3) + 2] = corner.z;
-			}
-			mBuilder->GetNavMeshQuery()->findPolysAroundShape(*startRef, verts, nVerts, filter, resultRef, resultParent, resultCost, resultCount, 1000);
-			for (int j = 0; j < *resultCount; j++) {
-				float* closest = new float[3];
-				bool posBool = false;
-				mBuilder->GetNavMesh()->setPolyFlags(resultRef[j], ClosedDoorFlag);
-				mBuilder->GetNavMeshQuery()->closestPointOnPoly(resultRef[j], startPos, closest, &posBool);
-				std::cout << closest[0] << " " << closest[1] << " " << closest[2] << "\n";
-				delete[] closest;
-			}
+			LoadDoorInNavGrid(startPos, halfExt, ClosedDoorFlag);
 			delete[] startPos;
-			//delete startRef;
 			delete[] halfExt;
-			delete[] nearestPoint;
-			delete[] resultRef;
-			delete[] resultParent;
-			delete resultCount;
-			delete resultCost;
 		}
 	}
+}
+
+void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag) {
+	dtQueryFilter* filter = new dtQueryFilter();
+	dtPolyRef* startRef = new dtPolyRef();
+	float* nearestPoint = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(position, halfSize, filter, startRef, nearestPoint);
+	dtPolyRef* resultRef = new dtPolyRef[20];
+	dtPolyRef* resultParent = new dtPolyRef[20];
+	int* resultCount = new int();
+	mBuilder->GetNavMeshQuery()->findLocalNeighbourhood(*startRef, position, halfSize[y], filter, resultRef, resultParent, resultCount, 20);
+	mBuilder->GetNavMesh()->setPolyFlags(*startRef, flag);
+	for (int j = 0; j < *resultCount; j++) {
+		mBuilder->GetNavMesh()->setPolyFlags(resultRef[j], flag);
+	}
+	delete[] nearestPoint;
+	delete resultCount;
 	delete filter;
-	delete[] verts;
 }
 
 void LevelManager::InitialiseIcons() {
@@ -760,7 +752,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 	newDoor->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
 
-	newDoor->SetCollisionLayer(StaticObj);
+	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
 
