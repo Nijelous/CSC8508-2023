@@ -25,6 +25,8 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
+		constexpr int MAX_INSTANCE_MESHES = 3;
+
 		class GameTechRenderer : public OGLRenderer	{
 		public:
 
@@ -42,10 +44,14 @@ namespace NCL {
 
 			void AddLight(Light* light);
 			void ClearLights();
+
+			void ClearInstanceObjects() { mInstanceTiles.clear(); }
+
+			void SetInstanceObjects(GameObject* floorTile, GameObject* wallTile, GameObject* cornerWallTile) {
+				mInstanceTiles.push_back(floorTile);
+				mInstanceTiles.push_back(wallTile);
+				mInstanceTiles.push_back(cornerWallTile);
 			void FillLightUBO();
-			void SetWallFloorObject(GameObject* wallFloorTile) {
-				mWallFloorTile = wallFloorTile;
-			}
 
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
@@ -160,7 +166,7 @@ namespace NCL {
 			Shader* mCombineShader;
 			const OGLMesh* mSphereMesh;
 			OGLMesh* mQuad;
-			GameObject* mWallFloorTile;
+			std::vector<GameObject*> mInstanceTiles;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;

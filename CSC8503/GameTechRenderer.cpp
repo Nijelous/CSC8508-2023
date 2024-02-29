@@ -380,19 +380,20 @@ void GameTechRenderer::RenderCamera() {
 	CombineBuffers();
 }
 
-void GameTechRenderer::DrawWallsFloorsInstanced() {
+void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix) {
+	for (int i = 0; i < MAX_INSTANCE_MESHES; i++) {
+		if (!mInstanceTiles[i]) continue;
+		RenderObject* rendObj = mInstanceTiles[i]->GetRenderObject();
+		OGLShader* shader = (OGLShader*)rendObj->GetShader();
+		BindShader(*shader);
+		if (rendObj->GetAlbedoTexture()) {
+			BindTextureToShader(*(OGLTexture*)rendObj->GetAlbedoTexture(), "mainTex", 0);
 
-	RenderObject* rendObj = mWallFloorTile->GetRenderObject();
-	OGLShader* shader = (OGLShader*)rendObj->GetShader();
-	BindShader(*shader);
-	if (rendObj->GetAlbedoTexture()) {
-		BindTextureToShader(*(OGLTexture*)rendObj->GetAlbedoTexture(), "mainTex", 0);
+		}
 
-	}
-
-	if (rendObj->GetNormalTexture()) {
-		BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
-	}
+		if (rendObj->GetNormalTexture()) {
+			BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
+		}
 
 	int shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
 	int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
@@ -406,19 +407,19 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 	glUniform3fv(cameraLocation, 1, &camPos.x);
 	glUniform1i(shadowTexLocation, 1);
 
-	Vector4 colour = rendObj->GetColour();
-	glUniform4fv(colourLocation, 1, &colour.x);
-	glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
-	glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
-	glUniform1i(hasInstanceMatLocation, 1);
-	OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
-	BindMesh(*mesh);
-	size_t layerCount = mesh->GetSubMeshCount();
-	for (size_t b = 0; b < layerCount; ++b) {
+		Vector4 colour = rendObj->GetColour();
+		glUniform4fv(colourLocation, 1, &colour.x);
+		glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
+		glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
+		glUniform1i(hasInstanceMatLocation, 1);
+		OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
+		BindMesh(*mesh);
+		size_t layerCount = mesh->GetSubMeshCount();
+		for (size_t b = 0; b < layerCount; ++b) {
 
-		DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
+			DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
+		}
 	}
-
 }
 
 void GameTechRenderer::FillGBuffer() {
@@ -428,9 +429,7 @@ void GameTechRenderer::FillGBuffer() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
-	if (mWallFloorTile) {
-		DrawWallsFloorsInstanced();
-	}
+	if(!mInstanceTiles.empty()) DrawWallsFloorsInstanced(viewMatrix, projMatrix);
 
 	OGLShader* activeShader = nullptr;
 	int modelLocation = 0;
@@ -587,7 +586,6 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
-	glUniform2f(glGetUniformLocation(mOutlineShader->GetProgramID(), "pixelSize"), 1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
