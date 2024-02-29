@@ -188,16 +188,17 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 	case Spotlight:
 		if (keyValuePairs.size() == 1) return;
 	{
-			Matrix4 xRot = Matrix4::Rotation(keyValuePairs[4]["x"], Vector3(-1, 0, 0));
-			Matrix4 yRot = Matrix4::Rotation(keyValuePairs[4]["y"]-180, Vector3(0, 1, 0));
-			Matrix4 zRot = Matrix4::Rotation(-keyValuePairs[4]["z"], Vector3(0, 0, 1));
-			Vector3 direction = xRot * yRot * zRot * Vector3(0, 0, 1);
+			Vector3 direction = Quaternion(keyValuePairs[4]["y"], -keyValuePairs[4]["x"], -keyValuePairs[4]["z"], keyValuePairs[4]["w"]) * Vector3(0, 0, -1);
+			//direction += Vector3(0, 0, -1);
 			Light* newLight = (Light*)new SpotLight(direction,
-			Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]),
-			Vector4(keyValuePairs[3]["x"], keyValuePairs[3]["y"], keyValuePairs[3]["z"], keyValuePairs[3]["w"]),
-			keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
-		if (level) level->mLights.push_back(newLight);
-		else room->mLights.push_back(newLight);
+				Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]),
+				Vector4(keyValuePairs[3]["x"], keyValuePairs[3]["y"], keyValuePairs[3]["z"], keyValuePairs[3]["w"]),
+				keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
+			std::cout << direction << " | " << keyValuePairs[4]["y"] << " " << -keyValuePairs[4]["x"] << " " << -keyValuePairs[4]["z"] << " " << keyValuePairs[4]["w"] << " |\n " <<
+				Quaternion(keyValuePairs[4]["x"], keyValuePairs[4]["y"], keyValuePairs[4]["z"], keyValuePairs[4]["w"]).ToEuler() << " | " <<
+				keyValuePairs[4]["x"] << " " << keyValuePairs[4]["y"] << " " << keyValuePairs[4]["z"] << " " << keyValuePairs[4]["w"] << "\n\n";
+			if (level) level->mLights.push_back(newLight);
+			else room->mLights.push_back(newLight);
 	}
 		break;
 
