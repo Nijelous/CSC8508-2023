@@ -103,6 +103,7 @@ LevelManager::~LevelManager() {
 
 	delete mBasicTex;
 	delete mBasicShader;
+	delete mInstanceShader;
 	delete mKeeperAlbedo;
 	delete mKeeperNormal;
 	delete mFloorAlbedo;
@@ -333,6 +334,7 @@ void LevelManager::InitialiseAssets() {
 	mWallNormal = mRenderer->LoadTexture("corridor_wall_n.tga");
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
+	mInstanceShader = mRenderer->LoadShader("sceneInstanced.vert", "scene.frag");
 	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
 
 
@@ -505,7 +507,7 @@ GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mStraightWallMesh, mWallTex, mWallNormal, mBasicShader, 
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mStraightWallMesh, mWallTex, mWallNormal, mInstanceShader, 
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -539,7 +541,7 @@ GameObject* LevelManager::AddCornerWallToWorld(const Transform& transform) {
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
 
-	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCornerWallMesh, mWallTex, mWallNormal, mBasicShader,
+	wall->SetRenderObject(new RenderObject(&wall->GetTransform(), mCornerWallMesh, mWallTex, mWallNormal, mInstanceShader,
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	wall->SetPhysicsObject(new PhysicsObject(&wall->GetTransform(), wall->GetBoundingVolume()));
 
@@ -572,7 +574,7 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mFloorCubeMesh, mFloorAlbedo, mFloorNormal, mInstanceShader, 
 		std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 

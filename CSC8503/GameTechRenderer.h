@@ -25,12 +25,13 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		constexpr int MAX_INSTANCE_MESHES = 3;
+		constexpr short MAX_INSTANCE_MESHES = 3;
+		constexpr short MAX_POSSIBLE_LIGHTS = 64;
 
 		class GameTechRenderer : public OGLRenderer	{
 		public:
 
-			const short MAX_POSSIBLE_LIGHTS = 25;
+			
 
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
@@ -60,6 +61,9 @@ namespace NCL {
 
 		protected:
 
+			/* (Author: B Schwarz) Data sent to a UBO buffer can be accessed reliably at offsets of 256 bytes, thus this struct is padded to 256.
+			Yes, this means it is 81.25% empty data.
+			No, I am not happy about it. */
 			struct LightData {
 				Vector3 lightDirection = { 0,0,0 };
 				float minDotProd = 0.0f;
@@ -67,20 +71,7 @@ namespace NCL {
 				float dimDotProd = 0.0f;
 				Vector3 lightColour = { 0,0,0 };
 				float lightRadius = 0.0f;
-				Vector4 padding1 = { 0,0,0,0 };
-				Vector4 padding2= { 0,0,0,0 };
-				Vector4 padding3 = { 0,0,0,0 };
-				Vector4 padding4 = { 0,0,0,0 };
-				Vector4 padding5 = { 0,0,0,0 };
-				Vector4 padding6 = { 0,0,0,0 };
-				Vector4 padding7 = { 0,0,0,0 };
-				Vector4 padding8 = { 0,0,0,0 };
-				Vector4 padding9 = { 0,0,0,0 };
-				Vector4 padding10 = { 0,0,0,0 };
-				Vector4 padding11 = { 0,0,0,0 };
-				Vector4 padding12 = { 0,0,0,0 };
-				Vector4 padding13 = { 0,0,0,0 };
-
+				float padding[52] = { 0.0f };
 			};
 
 			enum UBOBlockNames {

@@ -202,15 +202,15 @@ void GameTechRenderer::GenStaticDataUBO() {
 void GameTechRenderer::GenLightDataUBO() {
 	glGenBuffers(1, &uBOBlocks[lightsUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * 256 * sizeof(float), NULL, GL_STATIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * sizeof(LightData), NULL, GL_STATIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 }
 
 void GameTechRenderer::FillLightUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
-	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS *256 * sizeof(float));
-	LightData lightData[100];
+	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS * sizeof(LightData));
+	LightData lightData[MAX_POSSIBLE_LIGHTS];
 	for (int i = 0; i < mLights.size(); i++) {
 		
 		LightData ld;
@@ -399,19 +399,15 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 	int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
 	int hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
 	int hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
-	int cameraLocation = glGetUniformLocation(shader->GetProgramID(), "cameraPos");
-	int hasInstanceMatLocation = glGetUniformLocation(shader->GetProgramID(), "hasInstanceMatrix");
 	int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
 
 	Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
-	glUniform3fv(cameraLocation, 1, &camPos.x);
 	glUniform1i(shadowTexLocation, 1);
 
 		Vector4 colour = rendObj->GetColour();
 		glUniform4fv(colourLocation, 1, &colour.x);
 		glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
 		glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
-		glUniform1i(hasInstanceMatLocation, 1);
 		OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
 		BindMesh(*mesh);
 		size_t layerCount = mesh->GetSubMeshCount();

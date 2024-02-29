@@ -205,6 +205,7 @@ namespace NCL {
 
 			// shaders
 			Shader* mBasicShader;
+			Shader* mInstanceShader;
 
 			// animation 
 			Mesh* mGuardMesh;

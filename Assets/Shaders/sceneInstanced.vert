@@ -1,6 +1,5 @@
 #version 420 core
 
-uniform mat4 modelMatrix 	= mat4(1.0f);
 uniform mat4 shadowMatrix 	= mat4(1.0f);
 
 layout(location = 0) in vec3 position;
@@ -21,6 +20,7 @@ uniform vec4 		objectColour = vec4(1,1,1,1);
 
 uniform bool hasVertexColours = false;
 
+
 out Vertex
 {
 	vec4 colour;
@@ -37,10 +37,10 @@ void main(void)
 	mat4 mvp;
 	mat3 normalMatrix;
 
-	mvp 		  = (camData.projMatrix * camData.viewMatrix * modelMatrix);
-	normalMatrix = transpose ( inverse ( mat3 ( modelMatrix )));
-	OUT.worldPos 	= ( modelMatrix * vec4 ( position ,1)). xyz ;
-
+	mvp 		  = (camData.projMatrix * camData.viewMatrix * instanceMatrix);
+	normalMatrix = transpose ( inverse ( mat3 ( instanceMatrix )));
+	OUT.worldPos 	= ( instanceMatrix * vec4 ( position ,1)). xyz ;
+	
 	vec3 wNormal = normalize ( normalMatrix * normalize ( normal ));
 	vec3 wTangent = normalize(normalMatrix * normalize(tangent.xyz));
 
