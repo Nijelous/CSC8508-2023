@@ -192,12 +192,14 @@ namespace NCL {
 			//powerup Icon
 
 			Texture* mSilentRunTex;
-			Texture* mSpeedUp;
+			Texture* mSpeedUpTex;
 			Texture* mSlowDownTex;
 			Texture* mStunTex;
 
 
-			Texture* mSuspisionBarTex;
+			Texture* mLowSuspisionBarTex;
+			Texture* mMidSuspisionBarTex;
+			Texture* mHighSuspisionBarTex;
 			Texture* mSuspisionIndicatorTex;
 
 			FlagGameObject* mMainFlag;

@@ -22,11 +22,11 @@ UISystem::~UISystem() {
 
 UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
 	Icon* mIcon = new Icon();
-	mIcon->position = Pos;
-	mIcon->length = horiSize;
-	mIcon->height = vertSize;
-	mIcon->texture = tex;
-	mIcon->transparency = isShown;
+	mIcon->mPosition = Pos;
+	mIcon->mLength = horiSize;
+	mIcon->mHeight = vertSize;
+	mIcon->mTexture = tex;
+	mIcon->mTransparency = isShown;
 	mIconsVec.emplace_back(mIcon);
 	return mIcon;
 }
@@ -38,7 +38,7 @@ UISystem::Icon* UISystem::AddIcon(Icon* icon, bool isShown) {
 
 
 void UISystem::SetIconPosition(Vector2 newPos, Icon& icon) {
-	icon.position = newPos;
+	icon.mPosition = newPos;
 }
 
 
@@ -52,7 +52,7 @@ void UISystem::DeleteIcon(Icon icon) {
 	}
 	int j = 0;
 	for (auto& i : mIconsVec) {
-		if (i->position == icon.position) {
+		if (i->mPosition == icon.mPosition) {
 			mIconsVec.erase(mIconsVec.begin() + j);
 		}
 		j++;
@@ -87,11 +87,11 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
-		mFirstEquippedItem->texture = &texture;
+		mFirstEquippedItem->mTexture = &texture;
 
 		break;
 	case SECOND_ITEM_SLOT:
-		mSecondEquippedItem->texture = &texture;
+		mSecondEquippedItem->mTexture = &texture;
 		break;
 	default:
 		break;
@@ -101,29 +101,23 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 void UISystem::ChangeBuffSlotTransparency(int slotNum, bool isShown){
 	switch (slotNum)
 	{
-	case DISGUISE_BUFF_SLOT:
-		mdisguiseBuffIcon->transparency = isShown;
-		break;
 	case SILENT_BUFF_SLOT:
-		mSilentSprintIcon->transparency = isShown;
+		mSilentSprintIcon->mTransparency = isShown;
 		break;
 	case SLOW_BUFF_SLOT:
-		mSlowIcon->transparency = isShown;
+		mSlowIcon->mTransparency = isShown;
 		break;
 	case STUN_BUFF_SLOT:
-		mStunIcon->transparency = isShown;
+		mStunIcon->mTransparency = isShown;
 		break;
 	case SPEED_BUFF_SLOT:
-		mSpeedIcon->transparency = isShown;
-		break;
-	case FLAGSIGHT_BUFF_SLOT:
-		mFlagSightIcon->transparency = isShown;
+		mSpeedIcon->mTransparency = isShown;
 		break;
 	case SUSPISION_BAR_SLOT:
-		mSuspensionBarIcon->transparency = isShown;
+		mSuspensionBarIcon->mTransparency = isShown;
 		break;
 	case SUSPISION_INDICATOR_SLOT:
-		mSuspensionIndicatorIcon->transparency = isShown;
+		mSuspensionIndicatorIcon->mTransparency = isShown;
 		break;
 
 	default:
@@ -140,8 +134,6 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 		case SECOND_ITEM_SLOT:
 			mSecondEquippedItem = &icon;
 			break;
-		case DISGUISE_BUFF_SLOT:
-			mdisguiseBuffIcon = &icon;
 			break;
 		case SILENT_BUFF_SLOT:
 			mSilentSprintIcon = &icon;
@@ -154,9 +146,6 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 			break;
 		case SPEED_BUFF_SLOT:
 			mSpeedIcon = &icon;
-			break;
-		case FLAGSIGHT_BUFF_SLOT:
-			mFlagSightIcon = &icon;
 			break;
 		case SUSPISION_BAR_SLOT:
 			mSuspensionBarIcon = &icon;

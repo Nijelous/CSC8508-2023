@@ -11,14 +11,12 @@ namespace NCL {
 	namespace CSC8503 {
 		constexpr int FIRST_ITEM_SLOT = 0;
 		constexpr int SECOND_ITEM_SLOT = 1;
-		constexpr int DISGUISE_BUFF_SLOT = 2;
-		constexpr int SILENT_BUFF_SLOT = 3;
-		constexpr int SLOW_BUFF_SLOT = 4;
-		constexpr int STUN_BUFF_SLOT = 5;
-		constexpr int SPEED_BUFF_SLOT = 6;
-		constexpr int FLAGSIGHT_BUFF_SLOT = 7;
-		constexpr int SUSPISION_BAR_SLOT = 8;
-		constexpr int SUSPISION_INDICATOR_SLOT = 9;
+		constexpr int SILENT_BUFF_SLOT = 2;
+		constexpr int SLOW_BUFF_SLOT = 3;
+		constexpr int STUN_BUFF_SLOT = 4;
+		constexpr int SPEED_BUFF_SLOT = 5;
+		constexpr int SUSPISION_BAR_SLOT = 6;
+		constexpr int SUSPISION_INDICATOR_SLOT = 7;
 
 
 		class UISystem {
@@ -27,11 +25,16 @@ namespace NCL {
 			~UISystem();
 
 			struct Icon {
-				Vector2 position;
-				int length;
-				int height;
-				Texture* texture;
-				bool transparency;
+				Vector2 mPosition;
+				int mLength;
+				int mHeight;
+				Texture* mTexture;
+				bool mTransparency;
+				void SetIconSize(float length, float height) {
+					mLength = length;
+					mHeight = height;
+					
+				}
 			};
 			Icon* AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
 			Icon* AddIcon(Icon* icon, bool isShown = true);

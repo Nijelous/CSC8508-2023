@@ -114,15 +114,15 @@ LevelManager::~LevelManager() {
 	delete mAnimation;
 
 	delete mInventorySlotTex;
-	delete mHighlightAwardTex;
-	delete mLightOffTex;
-	delete mMakingNoiseTex;
+
 	delete mSilentRunTex;
 	delete mSlowDownTex;
 	delete mStunTex;
-	delete mSwapPositionTex;
+	delete mSpeedUpTex;
 
-	delete mSuspisionBarTex;
+	delete mLowSuspisionBarTex;
+	delete mMidSuspisionBarTex;
+	delete mHighSuspisionBarTex;
 	delete mSuspisionIndicatorTex;
 
 	delete mAnimationShader;
@@ -376,21 +376,20 @@ void LevelManager::InitialiseAssets() {
 
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
-	//mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
-	//mLightOffTex = mRenderer->LoadTexture("LightOff.png");
-	//mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
-	mSilentRunTex = mRenderer->LoadTexture("SilentRun.png");
-	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
+	
+	mSpeedUpTex = mRenderer->LoadTexture("SpeedUp.png");
+	mSilentRunTex = mRenderer->LoadTexture("Silence.png");
+	mSlowDownTex = mRenderer->LoadTexture("SpeedDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-	//mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
 	mKeyIconTex = mRenderer->LoadTexture("key.png");
 	mFlagIconTex = mRenderer->LoadTexture("flag.png");
 
-	
-
-	mSuspisionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
+	mLowSuspisionBarTex = mRenderer->LoadTexture("lowSus.png");
+	mMidSuspisionBarTex = mRenderer->LoadTexture("midSus.png");
+	mHighSuspisionBarTex = mRenderer->LoadTexture("highSus.png");
 	mSuspisionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
@@ -477,35 +476,32 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 }
 
 void LevelManager::InitialiseIcons() {
+	//Inventory
 	UISystem::Icon* mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(0, *mInventoryIcon1);
 
 	UISystem::Icon* mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(1, *mInventoryIcon2);
 
-	UISystem::Icon* mdisguiseBuffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	mUi->SetEquippedItemIcon(2, *mdisguiseBuffIcon);
+	//Buff
+	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(65, 3), 4.5, 7, mSilentRunTex, false);
+	mUi->SetEquippedItemIcon(2, *mSilentSprintIcon);
 
-	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mSilentRunTex, false);
-	mUi->SetEquippedItemIcon(3, *mSilentSprintIcon);
+	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(70, 3), 4.5, 7, mSlowDownTex, false);
+	mUi->SetEquippedItemIcon(3, *mSlowIcon);
 
-	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSlowDownTex, false);
-	mUi->SetEquippedItemIcon(4, *mSlowIcon);
+	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(75, 3), 4.5, 7, mStunTex, false);
+	mUi->SetEquippedItemIcon(4, *mStunIcon);
 
-	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	mUi->SetEquippedItemIcon(5, *mStunIcon);
+	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(80, 3), 4.5, 7, mSpeedUpTex, false);
+	mUi->SetEquippedItemIcon(5, *mSpeedIcon);
 
-	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mStunTex, false);
-	mUi->SetEquippedItemIcon(6, *mSpeedIcon);
+	//suspicion
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspisionBarTex);
+	mUi->SetEquippedItemIcon(6, *mSuspisionBarIcon);
 
-	UISystem::Icon* mFlagSightIcon = mUi->AddIcon(Vector2(18, 92), 4.5, 7, mSwapPositionTex, false);
-	mUi->SetEquippedItemIcon(7, *mFlagSightIcon);
-				  
-	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspisionBarTex);
-	mUi->SetEquippedItemIcon(8, *mSuspisionBarIcon);
-
-	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspisionIndicatorTex);
-	mUi->SetEquippedItemIcon(9, *mSuspisionIndicatorIcon);
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspisionIndicatorTex);
+	mUi->SetEquippedItemIcon(7, *mSuspisionIndicatorIcon);
 
 	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex);
 
@@ -899,10 +895,7 @@ void LevelManager::ResetEquippedIconTexture() {
 	mUi->ChangeBuffSlotTransparency(3, false);
 	mUi->ChangeBuffSlotTransparency(4, false);
 	mUi->ChangeBuffSlotTransparency(5, false);
-	mUi->ChangeBuffSlotTransparency(6, false);
-	mUi->ChangeBuffSlotTransparency(7, false);
-	mUi->ChangeBuffSlotTransparency(8, false);
-	mUi->ChangeBuffSlotTransparency(9, false);
+
 
 }
 

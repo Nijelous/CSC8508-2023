@@ -99,6 +99,10 @@ namespace NCL {
 			void	EnforceMaxSpeeds();
 
 			UISystem* mUi;
+
+			float mSusValue;
+			float mUiTime = 0.0;
+			float mLastSusValue = 0.0;
 			
 		private:
 
