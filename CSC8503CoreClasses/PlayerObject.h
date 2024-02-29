@@ -27,6 +27,11 @@ namespace NCL {
 			int GetPlayerID() const {
 				return mPlayerID;
 			}
+
+			int GetActiveItemSlot() const {
+				return mActiveItemSlot;
+			}
+
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
 			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
