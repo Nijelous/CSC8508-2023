@@ -227,6 +227,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	float* levelSize = new float[3];
 	levelSize = mBuilder->BuildNavMesh(mLevelLayout);
 	if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
+	LoadDoorsInNavGrid();
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
@@ -473,6 +474,48 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 	}
 }
 
+void LevelManager::LoadDoorsInNavGrid() {
+	for (int i = 0; i < mUpdatableObjects.size(); i++) {
+		auto* door = dynamic_cast<InteractableDoor*>(mUpdatableObjects[i]);
+		if (door) {
+			float* startPos = new float[3] {door->GetTransform().GetPosition().x, door->GetTransform().GetPosition().y, door->GetTransform().GetPosition().z};
+			AABBVolume* volume = (AABBVolume*)door->GetBoundingVolume();
+			float* halfExt = new float[3] {volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z};
+			LoadDoorInNavGrid(startPos, halfExt, ClosedDoorFlag);
+			delete[] startPos;
+			delete[] halfExt;
+			continue;
+		}
+		auto* prisonDoor = dynamic_cast<PrisonDoor*>(mUpdatableObjects[i]);
+		if (prisonDoor) {
+			float* startPos = new float[3] {prisonDoor->GetTransform().GetPosition().x, prisonDoor->GetTransform().GetPosition().y, prisonDoor->GetTransform().GetPosition().z};
+			AABBVolume* volume = (AABBVolume*)prisonDoor->GetBoundingVolume();
+			float* halfExt = new float[3] {volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z};
+			LoadDoorInNavGrid(startPos, halfExt, ClosedDoorFlag);
+			delete[] startPos;
+			delete[] halfExt;
+		}
+	}
+}
+
+void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag) {
+	dtQueryFilter* filter = new dtQueryFilter();
+	dtPolyRef* startRef = new dtPolyRef();
+	float* nearestPoint = new float[3];
+	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(position, halfSize, filter, startRef, nearestPoint);
+	dtPolyRef* resultRef = new dtPolyRef[20];
+	dtPolyRef* resultParent = new dtPolyRef[20];
+	int* resultCount = new int();
+	mBuilder->GetNavMeshQuery()->findLocalNeighbourhood(*startRef, position, halfSize[y], filter, resultRef, resultParent, resultCount, 20);
+	mBuilder->GetNavMesh()->setPolyFlags(*startRef, flag);
+	for (int j = 0; j < *resultCount; j++) {
+		mBuilder->GetNavMesh()->setPolyFlags(resultRef[j], flag);
+	}
+	delete[] nearestPoint;
+	delete resultCount;
+	delete filter;
+}
+
 void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(0, *mInventoryIcon1);
@@ -709,7 +752,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 	newDoor->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
 
-	newDoor->SetCollisionLayer(StaticObj);
+	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
 
