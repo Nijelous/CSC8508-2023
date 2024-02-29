@@ -22,6 +22,7 @@ namespace NCL {
 		class GuardObject;
 		class RecastBuilder;
 		class Helipad;
+		class CCTV;
 		class FlagGameObject;
 		class PickupGameObject;
 		class SoundEmitter;
@@ -131,6 +132,8 @@ namespace NCL {
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
 
+			void LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition);
+
 			void LoadDoorsInNavGrid();
 
 			void SendWallFloorInstancesToGPU();
@@ -138,6 +141,7 @@ namespace NCL {
 			GameObject* AddWallToWorld(const Transform& transform);
 			GameObject* AddCornerWallToWorld(const Transform& transform);
 			GameObject* AddFloorToWorld(const Transform& transform);
+			CCTV* AddCCTVToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
@@ -185,6 +189,7 @@ namespace NCL {
 			Mesh* mBonusMesh;
 			Mesh* mStraightWallMesh;
 			Mesh* mCornerWallMesh;
+			Mesh* mCCTVMesh;
 
 			// textures
 			Texture* mBasicTex;

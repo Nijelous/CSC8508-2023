@@ -147,7 +147,7 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 	{
 		Transform newTransform = Transform();
 		newTransform.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
-			.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, keyValuePairs[3]["y"]-180, 0));
+			.SetOrientation(Quaternion(keyValuePairs[3]["x"], keyValuePairs[3]["w"], keyValuePairs[3]["z"], keyValuePairs[3]["y"]));
 		if (level) level->mCCTVTransforms.push_back(newTransform);
 		else room->mCCTVTransforms.push_back(newTransform);
 	}

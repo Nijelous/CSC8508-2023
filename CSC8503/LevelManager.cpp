@@ -9,6 +9,7 @@
 #include "PlayerObject.h"
 #include "GuardObject.h"
 #include "Helipad.h"
+#include "CCTV.h"
 #include "Vent.h"
 #include "InteractableDoor.h"
 #include "PrisonDoor.h"
@@ -136,6 +137,8 @@ LevelManager::~LevelManager() {
 	delete mRigMaterial;
 	delete mRigMesh;
 
+	delete mCCTVMesh;
+
 	delete mGuardAnimationStand;
 	delete mGuardAnimationSprint;
 	delete mGuardAnimationWalk;
@@ -199,6 +202,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
+	LoadCCTVs((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
 	mUpdatableObjects.push_back(prisonDoorPtr);
@@ -215,6 +219,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 					LoadMap(room->GetTileMap(), key);
 					LoadLights(room->GetLights(), key);
 					LoadDoors(room->GetDoors(), key);
+					LoadCCTVs(room->GetCCTVTransforms(), key);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
@@ -324,6 +329,7 @@ void LevelManager::InitialiseAssets() {
 	mCapsuleMesh = mRenderer->LoadMesh("capsule.msh");
 	mStraightWallMesh = mRenderer->LoadMesh("Walls/StraightWallCoridoor.msh");
 	mCornerWallMesh = mRenderer->LoadMesh("Walls/CornerWallCoridoor.msh");
+	mCCTVMesh = mRenderer->LoadMesh("Security_Camera.msh");
 
 	mBasicTex = mRenderer->LoadTexture("checkerboard.png");
 	mKeeperAlbedo = mRenderer->LoadTexture("fleshy_albedo.png");
@@ -408,7 +414,6 @@ void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMa
 			break;
 		}
 	}
-	
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
@@ -471,6 +476,14 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 	for (int i = 0; i < doors.size(); i++) {
 		InteractableDoor* interactableDoorPtr =AddDoorToWorld(doors[i], centre);
 		mUpdatableObjects.push_back(interactableDoorPtr);
+	}
+}
+
+void LevelManager::LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition) {
+	for (int i = 0; i < transforms.size(); i++) {
+		Transform offsetTransform = Transform();
+		offsetTransform.SetPosition(transforms[i].GetPosition() + startPosition).SetOrientation(transforms[i].GetOrientation());
+		AddCCTVToWorld(offsetTransform);
 	}
 }
 
@@ -636,6 +649,29 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	if (!mBaseFloor) mBaseFloor = floor;
 
 	return floor;
+}
+
+CCTV* LevelManager::AddCCTVToWorld(const Transform& transform) {
+	CCTV* camera = new CCTV();
+
+	Vector3 wallSize = Vector3(1, 1, 1);
+	camera->GetTransform()
+		.SetScale(wallSize * 2)
+		.SetPosition(transform.GetPosition())
+		.SetOrientation(transform.GetOrientation());
+
+	camera->SetRenderObject(new RenderObject(&camera->GetTransform(), mCCTVMesh, mFloorAlbedo, mFloorNormal, mBasicShader,
+		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
+	camera->SetPhysicsObject(new PhysicsObject(&camera->GetTransform(), camera->GetBoundingVolume()));
+
+	camera->GetPhysicsObject()->SetInverseMass(0);
+	camera->GetPhysicsObject()->InitCubeInertia();
+
+	camera->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
+
+	mWorld->AddGameObject(camera);
+
+	return camera;
 }
 
 Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
