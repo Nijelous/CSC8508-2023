@@ -159,14 +159,19 @@ void LevelManager::ClearLevel() {
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
-	mLevelMatrices.clear();
+	mLevelFloorMatrices.clear();
+	mLevelWallMatrices.clear();
+	mLevelCornerWallMatrices.clear();
 	mUpdatableObjects.clear();
 	mLevelLayout.clear();
-	mRenderer->SetWallFloorObject(nullptr);
+	mRenderer->ClearInstanceObjects();
 	mAnimation->Clear();
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
-	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();	
+	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();
+	mBaseFloor = nullptr;
+	mBaseWall = nullptr;
+	mBaseCornerWall = nullptr;
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -231,7 +236,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
-	//SendWallFloorInstancesToGPU();
+	SendWallFloorInstancesToGPU();
 
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
@@ -252,11 +257,13 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
-	OGLMesh* instance = (OGLMesh*)mWallFloorCubeMesh;
-	instance->SetInstanceMatrices(mLevelMatrices);
-	if (!mLevelLayout.empty()) {
-		mRenderer->SetWallFloorObject(mLevelLayout[0]);
-	}
+	OGLMesh* floorInstance = (OGLMesh*)mFloorCubeMesh;
+	floorInstance->SetInstanceMatrices(mLevelFloorMatrices);
+	OGLMesh* wallInstance = (OGLMesh*)mStraightWallMesh;
+	wallInstance->SetInstanceMatrices(mLevelWallMatrices);
+	OGLMesh* cornerWallInstance = (OGLMesh*)mCornerWallMesh;
+	cornerWallInstance->SetInstanceMatrices(mLevelCornerWallMatrices);
+	mRenderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
 }
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
@@ -307,7 +314,7 @@ void LevelManager::FixedUpdate(float dt){
 
 void LevelManager::InitialiseAssets() {
 	mCubeMesh = mRenderer->LoadMesh("cube.msh");
-	mWallFloorCubeMesh = mRenderer->LoadMesh("cube.msh");
+	mFloorCubeMesh = mRenderer->LoadMesh("cube.msh");
 	mSphereMesh = mRenderer->LoadMesh("sphere.msh");
 	mCapsuleMesh = mRenderer->LoadMesh("Capsule.msh");
 	mCharMesh = mRenderer->LoadMesh("goat.msh");
@@ -508,11 +515,15 @@ GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
 
 	wall->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
-	wall->GetRenderObject()->SetIsInstanced(false);
+	wall->GetRenderObject()->SetIsInstanced(true);
 
 	mWorld->AddGameObject(wall);
 
 	mLevelLayout.push_back(wall);
+
+	mLevelWallMatrices.push_back(wall->GetTransform().GetMatrix());
+
+	if (!mBaseWall) mBaseWall = wall;
 
 	return wall;
 }
@@ -538,11 +549,15 @@ GameObject* LevelManager::AddCornerWallToWorld(const Transform& transform) {
 
 	wall->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
-	wall->GetRenderObject()->SetIsInstanced(false);
+	wall->GetRenderObject()->SetIsInstanced(true);
 
 	mWorld->AddGameObject(wall);
 
 	mLevelLayout.push_back(wall);
+
+	mLevelCornerWallMatrices.push_back(wall->GetTransform().GetMatrix());
+
+	if (!mBaseCornerWall) mBaseCornerWall = wall;
 
 	return wall;
 }
@@ -550,16 +565,16 @@ GameObject* LevelManager::AddCornerWallToWorld(const Transform& transform) {
 GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	GameObject* floor = new GameObject(StaticObj, "Floor");
 
-	Vector3 wallSize = Vector3(4.5f, 0.5f, 4.5f);
-	AABBVolume* volume = new AABBVolume(wallSize);
+	Vector3 floorSize = Vector3(4.5f, 0.5f, 4.5f);
+	AABBVolume* volume = new AABBVolume(floorSize);
 	floor->SetBoundingVolume((CollisionVolume*)volume);
 	floor->GetTransform()
-		.SetScale(wallSize * 2)
+		.SetScale(floorSize * 2)
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mWallFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
-		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
+	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mFloorCubeMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 
+		std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -567,13 +582,15 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 
 	floor->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
-	floor->GetRenderObject()->SetIsInstanced(false);
+	floor->GetRenderObject()->SetIsInstanced(true);
 
 	mWorld->AddGameObject(floor);
 
-	//if(position.y < 0) mLevelLayout.push_back(floor);
+	if(transform.GetPosition().y < 0) mLevelLayout.push_back(floor);
 
-	mLevelMatrices.push_back(floor->GetTransform().GetMatrix());
+	mLevelFloorMatrices.push_back(floor->GetTransform().GetMatrix());
+
+	if (!mBaseFloor) mBaseFloor = floor;
 
 	return floor;
 }
@@ -909,8 +926,6 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetCollisionLayer(Npc);
 
 	guard->SetPlayer(mTempPlayer);
-	guard->SetGameWorld(mWorld);
-	guard->SetPrisonPosition(prisonPosition);
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
 
