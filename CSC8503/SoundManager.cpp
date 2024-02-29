@@ -18,7 +18,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/Barefoot-Footsteps-Fast-www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &mFootStepSound);
+	mResult = mSystem->createSound("../Assets/Sounds/Footsteps-on-metal-warehouse-floor--Slow--www.fesliyanstudios.com.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &mFootStepSound);
 
 	if (mResult != FMOD_OK) {
 		return;
@@ -41,6 +41,7 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 		std::cout << "Add walk sound error" << std::endl;
 		return nullptr;
 	}
+	footStepChannel->setVolume(2.0f);
 	return footStepChannel;
 }
 
