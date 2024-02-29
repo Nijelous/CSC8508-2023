@@ -24,6 +24,11 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout<<"Attenuation Setting error" << std::endl;
+		return;
+	}
 	//TO_DO
 	//footStepSound->setMode(FMOD_3D);
 }
@@ -46,6 +51,7 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 }
 
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
+	SetListenerAttributes();
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		GameObject::GameObjectState state = obj->GetGameOjbectState();
@@ -58,6 +64,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
 	}
+	mSystem->update();
 }
 
 void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel) {
@@ -72,7 +79,6 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 		break;
 	case GameObject::GameObjectState::Walk:
 		if (channel) {
-			SetListenerAttributes();
 			channel->setPaused(false);
 			channel->set3DAttributes(&pos, nullptr);
 			//!!!Issue!!!  !!!!cannot hear sound uppaused if set posiiton before uspause the channel !!!!
@@ -80,7 +86,6 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 		break;
 	case GameObject::GameObjectState::Sprint:
 		if (channel) {
-			SetListenerAttributes();
 			channel->set3DAttributes(&pos, nullptr);
 			channel->setPaused(false);
 		}
@@ -106,7 +111,6 @@ void SoundManager::SetListenerAttributes() {
 	Vector3 right = mGameWorld->GetMainCamera().GetRightVector();
 	FMOD_VECTOR camForward = ConvertVector(forward);
 	FMOD_VECTOR camUp = GetUpVector(forward, right);
-
 	mSystem->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
 }
 
