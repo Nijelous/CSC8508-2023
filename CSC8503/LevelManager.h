@@ -26,6 +26,7 @@ namespace NCL {
 		class PickupGameObject;
 		class SoundEmitter;
 		class InteractableDoor;
+		class PointGameObject;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -40,6 +41,13 @@ namespace NCL {
 			MenuState,
 			LevelState,
 			PauseState
+		};
+
+		enum PolyFlags {
+			FloorFlag = 1,
+			ClosedDoorFlag = 2,
+			LockedDoorFlag = 4,
+			MAX_FLAGS = 8
 		};
 
 		class LevelManager : public PlayerInventoryObserver {
@@ -64,11 +72,17 @@ namespace NCL {
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
 
+			RecastBuilder* GetBuilder() { return mBuilder; }
+
 			InventoryBuffSystemClass* GetInventoryBuffSystem();
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
-			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
+			const std::vector<Matrix4>& GetLevelFloorMatrices() { return mLevelFloorMatrices; }
+
+			const std::vector<Matrix4>& GetLevelWallMatrices() { return mLevelWallMatrices; }
+
+			const std::vector<Matrix4>& GetLevelCornerWallMatrices() { return mLevelCornerWallMatrices; }
 
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
 
@@ -93,6 +107,8 @@ namespace NCL {
 			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
 
 			FlagGameObject* GetMainFlag();
+
+			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -114,6 +130,9 @@ namespace NCL {
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+
+			void LoadDoorsInNavGrid();
+
 			void SendWallFloorInstancesToGPU();
 
 			GameObject* AddWallToWorld(const Transform& transform);
@@ -128,6 +147,8 @@ namespace NCL {
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
+			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
+
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
 			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
@@ -137,7 +158,12 @@ namespace NCL {
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
 			std::vector<GameObject*> mLevelLayout;
-			std::vector<Matrix4> mLevelMatrices;
+			std::vector<Matrix4> mLevelFloorMatrices;
+			std::vector<Matrix4> mLevelWallMatrices;
+			std::vector<Matrix4> mLevelCornerWallMatrices;
+			GameObject* mBaseFloor;
+			GameObject* mBaseWall;
+			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
 			GameTechRenderer* mRenderer;
@@ -151,7 +177,7 @@ namespace NCL {
 
 			// meshes
 			Mesh* mCubeMesh;
-			Mesh* mWallFloorCubeMesh;
+			Mesh* mFloorCubeMesh;
 			Mesh* mSphereMesh;
 			Mesh* mCapsuleMesh;
 			Mesh* mCharMesh;

@@ -1220,6 +1220,12 @@ void dtNavMesh::getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile*
 	*poly = &m_tiles[it].polys[ip];
 }
 
+void dtNavMesh::setPolyFlagsUnsafe(const dtPolyRef ref, dtPoly* poly, unsigned short flag) {
+	unsigned int salt, it, ip;
+	decodePolyId(ref, salt, it, ip);
+	m_tiles[it].polys[ip].flags = flag;
+}
+
 bool dtNavMesh::isValidPolyRef(dtPolyRef ref) const
 {
 	if (!ref) return false;

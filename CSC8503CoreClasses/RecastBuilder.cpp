@@ -45,9 +45,12 @@ float* RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
 		int lastVertCount = vertCount;
 		std::vector<Vector3> vertsVector = objects[i]->GetRenderObject()->GetMesh()->GetPositionData();
 		for (int j = 0; j < vertsVector.size(); j++) {
-			verts[vCount++] = (vertsVector[j].x * objects[i]->GetTransform().GetScale().x) + objects[i]->GetTransform().GetPosition().x;
-			verts[vCount++] = (vertsVector[j].y * objects[i]->GetTransform().GetScale().y) + objects[i]->GetTransform().GetPosition().y;
-			verts[vCount++] = (vertsVector[j].z * objects[i]->GetTransform().GetScale().z) + objects[i]->GetTransform().GetPosition().z;
+			vertsVector[j] *= objects[i]->GetTransform().GetScale();
+			vertsVector[j] = (objects[i]->GetTransform().GetOrientation() * Quaternion(vertsVector[j], 0) * objects[i]->GetTransform().GetOrientation().Conjugate()).ToVector3();
+			vertsVector[j] += objects[i]->GetTransform().GetPosition();
+			verts[vCount++] = vertsVector[j].x;
+			verts[vCount++] = vertsVector[j].y;
+			verts[vCount++] = vertsVector[j].z;
 			bmin[x] = std::min(bmin[x], verts[vCount + (x-3)]);
 			bmin[y] = std::min(bmin[y], verts[vCount + (y-3)]);
 			bmin[z] = std::min(bmin[z], verts[vCount + (z-3)]);

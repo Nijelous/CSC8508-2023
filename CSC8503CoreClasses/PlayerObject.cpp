@@ -74,8 +74,6 @@ PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
 	mActiveItemSlot = 0;
 
 	mPlayerID = playerID;
-	mFirstInventorySlotUsageCount = 0;
-	mSecondInventorySlotUsageCount = 0;
 	mPlayerPoints = 0;
 	mIsPlayer = true;
 	mHasSilentSprintBuff = false;
@@ -170,7 +168,7 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 }
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
-	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot,mPlayerID);
+	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mPlayerID, mActiveItemSlot);
 }
 
 void PlayerObject::ClosePrisonDoor(){
@@ -236,18 +234,6 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void NCL::CSC8503::PlayerObject::OnPlayerUseItem() {
-
-	if (mActiveItemSlot == 0) {
-		mFirstInventorySlotUsageCount++;
-	}
-	else {
-		mSecondInventorySlotUsageCount++;
-	}
-	int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
-}
-
 void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 	bool isRaycastTriggered = false;
 	NCL::CSC8503::InteractType interactType;
@@ -266,6 +252,9 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
+		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
+			return;
 		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
 	}
@@ -301,7 +290,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
 					interactablePtr->Interact(interactType);
 					if (interactType == ItemUse) {
-						OnPlayerUseItem();
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 					}
 
 					return;
@@ -312,22 +301,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 		}
 	}
 }
-
-void PlayerObject::UseItemForInteractable(Interactable* interactable)
-{
-
-	/*
-	PlayerInventory::item* interactableRelatedItem = (interactable->GetRelatedItem());
-	
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) &&
-		*interactableRelatedItem ==
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mActiveItemSlot, mPlayerID))
-	{
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->SetPlayerAbleToUseItem(*interactableRelatedItem,mPlayerID,true);
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mActiveItemSlot, mPlayerID);
-	}
-	*/
-};
 
 void PlayerObject::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
@@ -347,14 +320,10 @@ void PlayerObject::ControlInventory() {
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
-
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
 		if (equippedItemUseType == DirectUse) {
-			OnPlayerUseItem();
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 		}
-
-		int itemUseCount = mActiveItemSlot == 0 ? mFirstInventorySlotUsageCount : mSecondInventorySlotUsageCount;
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot, itemUseCount);
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
@@ -364,6 +333,8 @@ void PlayerObject::ControlInventory() {
 	//Handle Equipped Item Log
 	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
 	Debug::Print(itemName, Vector2(10, 80));
+	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+	Debug::Print(usesLeft, Vector2(10, 85));
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
@@ -583,11 +554,6 @@ void PlayerObject::ChangeToStunned(){
 }
 
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
-
-	if (isItemRemoved) {
-		ResetEquippedItemUsageCount(invSlot);
-	}
-
 	switch (invEvent)
 	{
 	case InventoryBuffSystem::flagDropped:
@@ -612,21 +578,6 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 void PlayerObject::MatchCameraRotation(float yawValue) {
 	Matrix4 yawRotation = Matrix4::Rotation(yawValue, Vector3(0, 1, 0));
 	GetTransform().SetOrientation(yawRotation);
-}
-
-void NCL::CSC8503::PlayerObject::ResetEquippedItemUsageCount(int inventorySlot) {
-	switch (inventorySlot) {
-	case 0: {
-		mFirstInventorySlotUsageCount = 0;
-		break;
-	}
-	case 1: {
-		mSecondInventorySlotUsageCount = 0;
-		break;
-	}
-	default:
-		break;
-	}
 }
 
 void PlayerObject::StopSliding() {

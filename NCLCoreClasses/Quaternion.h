@@ -43,6 +43,7 @@ namespace NCL::Maths {
 		Vector3		ToEuler() const;
 		Quaternion	Conjugate() const;
 		void		CalculateW();	//builds 4th component when loading in shortened, 3 component quaternions
+		Vector3		ToVector3() const;
 
 		static Quaternion EulerAnglesToQuaternion(float pitch, float yaw, float roll);
 		static Quaternion AxisAngleToQuaterion(const Vector3& vector, float degrees);

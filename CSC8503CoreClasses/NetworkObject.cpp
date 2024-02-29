@@ -41,8 +41,9 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 
 	this->playerInputs.isCrouching = playerInputs.isCrouching;
 	this->playerInputs.isSprinting = playerInputs.isSprinting;
-	this->playerInputs.isLeftHandUsed = playerInputs.isLeftHandUsed;
-	this->playerInputs.isRightHandUsed = playerInputs.isRightHandUsed;
+	this->playerInputs.isEquippedItemUsed = playerInputs.isEquippedItemUsed;
+	this->playerInputs.isInteractButtonPressed = playerInputs.isInteractButtonPressed;
+	this->playerInputs.isHoldingInteractButton = playerInputs.isHoldingInteractButton;
 
 	this->playerInputs.leftHandItemId = playerInputs.leftHandItemId;
 	this->playerInputs.rightHandItemId = playerInputs.rightHandItemId;
@@ -60,6 +61,8 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	this->playerInputs.rightAxis.y = playerInputs.rightAxis.y;
 	this->playerInputs.rightAxis.z = playerInputs.rightAxis.z;
 	this->playerInputs.cameraYaw = playerInputs.cameraYaw;
+
+	this->playerInputs.rayFromPlayer = playerInputs.rayFromPlayer;
 	
 	this-> lastId = lastId;
 	this->mouseXLook = mouseXLook;
@@ -68,6 +71,27 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
 	this->objectID = objectID;
 	this->playerID = playerID;
+}
+
+ClientUsePowerupPacket::ClientUsePowerupPacket(int playerID, int powerUpID) {
+	this->playerID = playerID;
+	this->powerUpID = powerUpID;
+}
+
+ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
+	this->firstItemUsage = firstItemUsage;
+	this->secondItemUsage = secondItemUsage;
+	this->playerID = playerID;
+}
+
+ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount) {
+	type = BasicNetworkMessages::ClientSyncItemSlot;
+	size = sizeof(ClientSyncItemSlotPacket);
+
+	this->playerID = playerID;
+	this->slotId = slotId;
+	this->equippedItem = equippedItem;
+	this->usageCount = usageCount;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
