@@ -75,8 +75,6 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 			}
 
 			return invSlot;
-
-			return;
 		}
 	}
 	return -1;

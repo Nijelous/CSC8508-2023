@@ -43,7 +43,7 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-		
+			float	GetPlayerPitch();
 
 		protected:
 			bool mIsCrouched;
@@ -99,6 +99,8 @@ namespace NCL {
 			void	UseItemForInteractable(Interactable* interactable);
 
 			void	EnforceMaxSpeeds();
+
+			bool	IsSeenByGameObject(GameObject* otherGameObject);
 		private:
 		};
 	}

@@ -70,6 +70,7 @@ bool Vent::CanUseItem(){
 		return true;
 		break;
 	default:
+		return false;
 		break;
 	}
 }
