@@ -380,7 +380,7 @@ void GameTechRenderer::RenderCamera() {
 	CombineBuffers();
 }
 
-void GameTechRenderer::DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix) {
+void GameTechRenderer::DrawWallsFloorsInstanced() {
 	for (int i = 0; i < MAX_INSTANCE_MESHES; i++) {
 		if (!mInstanceTiles[i]) continue;
 		RenderObject* rendObj = mInstanceTiles[i]->GetRenderObject();
@@ -429,7 +429,7 @@ void GameTechRenderer::FillGBuffer() {
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
-	if(!mInstanceTiles.empty()) DrawWallsFloorsInstanced(viewMatrix, projMatrix);
+	if(!mInstanceTiles.empty()) DrawWallsFloorsInstanced();
 
 	OGLShader* activeShader = nullptr;
 	int modelLocation = 0;
@@ -451,7 +451,6 @@ void GameTechRenderer::FillGBuffer() {
 			BindTextureToShader(*(OGLTexture*)(*i).GetAlbedoTexture(), "mainTex", 0);
 
 		}
-
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}

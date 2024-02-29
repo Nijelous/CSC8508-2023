@@ -51,6 +51,7 @@ namespace NCL {
 				mInstanceTiles.push_back(floorTile);
 				mInstanceTiles.push_back(wallTile);
 				mInstanceTiles.push_back(cornerWallTile);
+			}
 			void FillLightUBO();
 
 			void SetUIObject(UISystem* ui) {
