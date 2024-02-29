@@ -107,13 +107,17 @@ bool GuardObject::CheckPolyDistance() {
 	}
 }
 
-void GuardObject::MoveTowardFocalPoint(Vector3 direction, float* endPos) {
+void GuardObject::MoveTowardFocalPoint(float* endPos) {
 	if (CheckPolyDistance() == true) {
 		mNextPoly = QueryNavmesh(endPos);
+	}
+	else {
+		delete[] endPos;
 	}
 	Vector3 dir = Vector3(mNextPoly[0], mNextPoly[1], mNextPoly[2]) - this->GetTransform().GetPosition();
 	Vector3 dirNorm = dir.Normalised();
 	mDist = dir.Length();
+	LookTowardFocalPoint(dir);
 	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
 }
 
@@ -121,10 +125,16 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
+		this->GetPhysicsObject()->AddTorque(Vector3(0,10, 0));
+		if (angleOfPlayer > -0.1) {
+			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		}
 	}
 	else if (angleOfPlayer > 0) {
 		this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
+		if (angleOfPlayer < 0.1) {
+			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		}
 	}
 }
 
@@ -164,8 +174,6 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	delete startRef;
 	delete endRef;
 	delete[] nearestPoint1;
-	//delete[] nearestPoint2;
-	
 
 	bool* isPosOverPoly = new bool;
 	float* closestPos = new float[3];
@@ -246,9 +254,8 @@ BehaviourAction* GuardObject::Patrol() {
 
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
-				LookTowardFocalPoint(direction);
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
-				MoveTowardFocalPoint(direction, endPos);
+				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
 				if (dist < 36) {
 					mCurrentNode = mNextNode;
@@ -280,21 +287,20 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 
-				int GuardCatchingDistanceSquared = 25;
+				int GuardCatchingDistanceSquared = 36;
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 
-				LookTowardFocalPoint(direction);
-
 				float dist = direction.LengthSquared();
 				if (dist < GuardCatchingDistanceSquared) {
+					LookTowardFocalPoint(direction);
 					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
 					return Failure;
 				}
 				else {
 					float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
-					MoveTowardFocalPoint(direction, endPos);
+					MoveTowardFocalPoint(endPos);
 				}
 			}
 			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {

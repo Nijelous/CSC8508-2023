@@ -11,7 +11,7 @@ using namespace InventoryBuffSystem;
 namespace NCL {
     namespace CSC8503 {
         class PlayerObject;
-        constexpr int MIN_DIST_TO_NEXT_POS = 36;
+        constexpr int MIN_DIST_TO_NEXT_POS = 49;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -53,7 +53,7 @@ namespace NCL {
 
             void BehaviourTree();
             void ExecuteBT();
-            void MoveTowardFocalPoint(Vector3 direction, float* endPos);
+            void MoveTowardFocalPoint(float* endPos);
             void LookTowardFocalPoint(Vector3 direction);
             void GrabPlayer();
             float* QueryNavmesh(float* endPos);
