@@ -54,13 +54,22 @@ namespace NCL {
 			void SetEquippedItemIcon(int slotNum, Icon& icon);
 
 			void SetTextureVector(string itemType, std::vector<Texture*> itemTexVec) {
-				if (itemType=="key") {
+				if (itemType == "key") {
 					mKeyTexVec = itemTexVec;
 				}
 				if (itemType == "bar") {
 					mSusBarTexVec = itemTexVec;
 				}
 			}
+
+			vector<Texture*> GetKeyTexVec(){
+				return mKeyTexVec;
+			}
+
+			vector<Texture*> GetSusBarTexVec() {
+				return mSusBarTexVec;
+			}
+
 
 
 		protected:
@@ -82,6 +91,7 @@ namespace NCL {
 			std::vector<Icon*> mIconsVec;
 			std::vector<Texture*> mKeyTexVec;
 			std::vector<Texture*> mSusBarTexVec;
+
 		};
 	}
 }

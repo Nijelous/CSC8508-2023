@@ -114,18 +114,19 @@ void PlayerObject::UpdateObject(float dt) {
 		//It have some problem here
 		mUiTime = mUiTime + dt;
 		mUiTime = std::fmod(mUiTime, 1.0f);
-		
 		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-
+		mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[0];
+		if (mSusValue > 33) {
+			mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[1];
+			if (mSusValue > 66) {
+				mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[2];
+			}
+		}
 		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
 		float iconValue = 100.00 - (mSusValue*0.7+14.00);
-
 		mLastSusValue = mSusValue;
-
-		
-
 		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
+
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
 		), Vector2(70, 90));
@@ -358,9 +359,35 @@ void PlayerObject::ControlInventory() {
 
 	//Handle Equipped Item Log
 	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+	
 	Debug::Print(itemName, Vector2(10, 80));
 	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
 	Debug::Print(usesLeft, Vector2(10, 85));
+
+	if (mActiveItemSlot == 0) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+
+	if (mActiveItemSlot == 1) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+	
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {

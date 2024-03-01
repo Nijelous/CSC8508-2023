@@ -120,10 +120,10 @@ LevelManager::~LevelManager() {
 	delete mStunTex;
 	delete mSpeedUpTex;
 
-	delete mLowSuspisionBarTex;
-	delete mMidSuspisionBarTex;
-	delete mHighSuspisionBarTex;
-	delete mSuspisionIndicatorTex;
+	delete mLowSuspicionBarTex;
+	delete mMidSuspicionBarTex;
+	delete mHighSuspicionBarTex;
+	delete mSuspicionIndicatorTex;
 
 	delete mAnimationShader;
 
@@ -153,6 +153,7 @@ LevelManager::~LevelManager() {
 	delete mSuspicionSystemClassPtr;
 
 	delete mSoundManager;
+
 }
 
 void LevelManager::ClearLevel() {
@@ -173,6 +174,7 @@ void LevelManager::ClearLevel() {
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
 	mGuardObjects.clear();
+
 	ResetEquippedIconTexture();
 }
 
@@ -386,16 +388,32 @@ void LevelManager::InitialiseAssets() {
 
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
+	
 	mKeyIconTex3 = mRenderer->LoadTexture("key3.png");
 	mKeyIconTex2 = mRenderer->LoadTexture("key2.png");
 	mKeyIconTex1 = mRenderer->LoadTexture("key1.png");
+	vector<Texture*> keyTexVec = { 
+		{mKeyIconTex1},
+		{mKeyIconTex2},
+		{mKeyIconTex3}
+	};
+
+	mLowSuspicionBarTex = mRenderer->LoadTexture("lowSus.png");
+	mMidSuspicionBarTex = mRenderer->LoadTexture("midSus.png");
+	mHighSuspicionBarTex = mRenderer->LoadTexture("highSus.png");
+	vector<Texture*> susTexVec = {
+		{mLowSuspicionBarTex},
+		{mMidSuspicionBarTex},
+		{mHighSuspicionBarTex}
+	};
+	mUi->SetTextureVector("key", keyTexVec);
+	mUi->SetTextureVector("bar", susTexVec);
 
 	mFlagIconTex = mRenderer->LoadTexture("flag.png");
 
-	mLowSuspisionBarTex = mRenderer->LoadTexture("lowSus.png");
-	mMidSuspisionBarTex = mRenderer->LoadTexture("midSus.png");
-	mHighSuspisionBarTex = mRenderer->LoadTexture("highSus.png");
-	mSuspisionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
+
+
+	mSuspicionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition) {
@@ -544,10 +562,10 @@ void LevelManager::InitialiseIcons() {
 	mUi->SetEquippedItemIcon(5, *mSpeedIcon);
 
 	//suspicion
-	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspisionBarTex);
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspicionBarTex);
 	mUi->SetEquippedItemIcon(6, *mSuspisionBarIcon);
 
-	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspisionIndicatorTex);
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspicionIndicatorTex);
 	mUi->SetEquippedItemIcon(7, *mSuspisionIndicatorIcon);
 
 	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex);
@@ -1012,6 +1030,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
+
 
 	return guard;
 }
