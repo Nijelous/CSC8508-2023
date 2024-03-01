@@ -43,8 +43,6 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-			float	GetPlayerPitch();
-
 		protected:
 			bool mIsCrouched;
 

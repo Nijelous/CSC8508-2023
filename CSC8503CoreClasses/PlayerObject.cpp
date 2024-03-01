@@ -186,12 +186,6 @@ void PlayerObject::ClosePrisonDoor(){
 	mPrisonDoorPtr->Close();
 }
 
-float PlayerObject::GetPlayerPitch()
-{
-	//Might need to change 
-	return mGameWorld->GetMainCamera().GetPitch();
-}
-
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
 	offset.y += 3;
