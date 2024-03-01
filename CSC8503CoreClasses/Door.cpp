@@ -30,6 +30,7 @@ void Door::InitStateMachine()
 	mStateMachine->AddTransition(new StateTransition(DoorOpen, DoorClosed,
 		[&]() -> bool
 		{
+			this->GetSoundObject()->TriggerSoundEvent();
 			return !mIsOpen;
 		}
 	));
@@ -69,8 +70,4 @@ void Door::SetNavMeshFlags(int flag) {
 	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
 	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };
 	LevelManager::GetLevelManager()->LoadDoorInNavGrid(pos, halfSize, (PolyFlags)flag);
-}
-
-bool Door::GetIsOpen() {
-	return mIsOpen;
 }

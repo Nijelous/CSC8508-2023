@@ -17,9 +17,13 @@ namespace NCL {
 
 			Channel* GetChannel();
 
+			void TriggerSoundEvent();
+
+			bool GetisTiggered();
 		private:
 			Channel* mChannel = nullptr;
 			std::vector<Channel*> mChannels;
+			bool mIsTriggered;
 		};
     }
 }

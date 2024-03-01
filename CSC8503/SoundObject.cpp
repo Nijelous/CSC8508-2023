@@ -24,3 +24,12 @@ std::vector<Channel*> SoundObject::GetChannels() {
 Channel* SoundObject::GetChannel() {
 	return mChannel;
 }
+
+void SoundObject::TriggerSoundEvent() {
+	mIsTriggered = true;
+
+}
+
+bool SoundObject::GetisTiggered(){
+	return mIsTriggered;
+}
