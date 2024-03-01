@@ -658,15 +658,15 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	OGLTexture* t = (OGLTexture*)i.texture;
+	OGLTexture* t = (OGLTexture*)i.mTexture;
 	BindTextureToShader(*t, "iconTex", t->GetObjectID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
+	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
 	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
-	glUniform1i(texSlot, i.isAppear);
+	glUniform1i(texSlot, i.mTransparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	//0.02, 0, 0, 0
