@@ -172,6 +172,7 @@ void LevelManager::ClearLevel() {
 	mBaseFloor = nullptr;
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
+	mGuardObjects.clear();
 	ResetEquippedIconTexture();
 }
 

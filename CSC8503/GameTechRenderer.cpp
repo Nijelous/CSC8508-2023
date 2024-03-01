@@ -535,7 +535,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
-		glUniform1i(location, mOutlinedObjects[i]->GetAnimationObject()->GetAnimation() ? 1 : 0);
+		glUniform1i(location, mOutlinedObjects[i]->GetAnimationObject()? 1 : 0);
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
 		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
@@ -543,7 +543,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimationObject()->GetAnimation()) {
+			if (mOutlinedObjects[i]->GetAnimationObject()) {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
