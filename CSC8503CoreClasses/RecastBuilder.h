@@ -33,6 +33,7 @@ namespace NCL {
 			~RecastBuilder();
 			float* BuildNavMesh(std::vector<GameObject*> objects);
 			dtNavMeshQuery* GetNavMeshQuery() const { return mNavMeshQuery; }
+			dtNavMesh* GetNavMesh() const { return mNavMesh; }
 		protected:
 			bool InitialiseConfig(const float* bmin, const float* bmax);
 			bool RasterizeInputPolygon(float* verts, const int vertCount, const unsigned int* tris, const int trisCount);
@@ -58,7 +59,7 @@ namespace NCL {
 			float mCellHeight = 0.2f;
 
 			float mGuardMaxSlope = 45.0f;
-			float mGuardRadius = 1.0f;
+			float mGuardRadius = 3.0f;
 			float mGuardHeight = 3.0f;
 			float mGuardMaxClimb = 0.9f;
 
