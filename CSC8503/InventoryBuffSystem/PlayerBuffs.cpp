@@ -1,5 +1,10 @@
 #include "PlayerBuffs.h"
 #include "Level.h"
+#include "GameServer.h"
+#include "NetworkObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
@@ -9,27 +14,64 @@ void PlayerBuffs::Init(){
 		mActiveBuffDurationMap[playerNo].clear();
 
 	mBuffsObserverList.clear();
+	mBuffsToRemove->clear();
 }
 
-void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
-	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo, const bool& isSync){
 	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
 	if (foundBuffDuration != mBuffInitDurationMap.end())
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
+
+	if (!isSync)
+	{
+		Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+		HandleApplyBuffNetworking(inBuff, playerNo);
+	}
 }
 
-void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
+void PlayerBuffs::HandleApplyBuffNetworking(const buff& inBuff, const int& playerNo){
+	int localPlayerId = 0;
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		const auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
+
+		const bool isServer = game->GetIsServer();
+		if (isServer) {
+			game->SendClientSyncBuffPacket(playerNo,inBuff,true);
+		}
+	}
+}
+
+void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo, const bool& isSync){
 	auto foundBuff = mActiveBuffDurationMap[playerNo].find(inBuff);
 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
-		Notify(mOnBuffRemovedBuffEventMap[inBuff],playerNo);
-		mActiveBuffDurationMap[playerNo].erase(foundBuff);
+		mBuffsToRemove[playerNo].push_back(inBuff);
+		if (!isSync) {
+			Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
+			HandleApplyBuffNetworking(inBuff, playerNo);
+		}
 	}
 };
+
+void PlayerBuffs::HandleRemoveBuffNetworking(const buff& inBuff, const int& playerNo) {
+	int localPlayerId = 0;
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		const auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
+
+		const bool isServer = game->GetIsServer();
+		if (isServer) {
+			game->SendClientSyncBuffPacket(playerNo, inBuff, false);
+		}
+	}
+}
 
 PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool){
 	std::random_device rd;
@@ -39,7 +81,6 @@ PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vec
 }
 
 void PlayerBuffs::Update(float dt){
-	vector<buff> buffsToRemove;
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 	{
 		for (auto entry = mActiveBuffDurationMap[playerNo].begin();
@@ -53,16 +94,16 @@ void PlayerBuffs::Update(float dt){
 			}
 			else
 			{
-				buffsToRemove.push_back(entry->first);
+				RemoveBuffFromPlayer(entry->first, playerNo);
 			}
 		}
 
-		for (const buff thisBuff : buffsToRemove)
+		for (const buff thisBuff : mBuffsToRemove[playerNo])
 		{
-			RemoveBuffFromPlayer(thisBuff, playerNo);
+			mActiveBuffDurationMap[playerNo].erase(thisBuff);
 		}
 
-		buffsToRemove.clear();
+		mBuffsToRemove[playerNo].clear();
 	}
 }
 
@@ -95,4 +136,11 @@ void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo)
 
 float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
 	return mBuffInitDurationMap[inBuff];
+}
+
+void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply){
+	if (toApply)
+		ApplyBuffToPlayer(buffToSync,playerID,true);
+	else
+		RemoveBuffFromPlayer(buffToSync, playerID, true);
 }
