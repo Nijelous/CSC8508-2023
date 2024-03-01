@@ -66,6 +66,37 @@ namespace NCL::CSC8503 {
 		ClientPlayerInputPacket(int lastId,  const PlayerInputs& playerInputs);
 	};
 
+	struct ClientUseItemPacket : public GamePacket {
+		int objectID;
+		int playerID;
+
+		ClientUseItemPacket(int objectID, int playerID);
+	};
+
+	struct ClientUsePowerupPacket : public GamePacket {
+		int playerID;
+		int powerUpID;
+
+		ClientUsePowerupPacket(int playerID, int powerUpID);
+	};
+
+	struct ClientSyncItemSlotUsagePacket : public GamePacket {
+		int playerID;
+		int firstItemUsage;
+		int secondItemUsage;
+
+		ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage);
+	};
+
+	struct ClientSyncItemSlotPacket : public GamePacket {
+		int playerID;
+		int slotId;
+		int equippedItem;
+		int usageCount;
+
+		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

@@ -19,7 +19,7 @@ namespace NCL {
                 bool isMultiplayer,
                 unsigned int randomSeed = 10,
                 std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr,
-                float initCooldown = 2.0f);
+                float initCooldown = 50.0f);
             ~PickupGameObject();
 
             virtual void UpdateObject(float dt);
@@ -30,8 +30,8 @@ namespace NCL {
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
         protected:
-            void GoOver(float dt); //go over the surface
-            void GoUnder(float dt); // go under the surface
+            void Activate(float dt); //go over the surface
+            void Deactivate(float dt); // go under the surface
             void Waiting(float dt); // wait to go over
 
             StateMachine* mStateMachine;

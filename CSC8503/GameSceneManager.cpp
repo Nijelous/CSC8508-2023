@@ -42,11 +42,10 @@ void GameSceneManager::UpdateGame(float dt) {
 		mPushdownMachine->Update(dt);
 	}
 
-
 	if (!(mGameState == PauseScreenState))
 		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
 	else
-		Debug::Print("PAUSED", Vector2(50, 50));
+		DisplayPauseScreen();
 
 
 	if (mGameState == MainMenuState)
@@ -105,4 +104,10 @@ void GameSceneManager::DisplayVictory() {
 void GameSceneManager::DisplayDefeat() {
 	// to be replaced by proper UI
 	Debug::Print("DEFEAT", Vector2(45, 50));
+}
+
+void GameSceneManager::DisplayPauseScreen() {
+	Debug::Print("PAUSED", Vector2(47, 50));
+	Debug::Print("Press E to exit", Vector2(40, 55));
+	Debug::Print("Press R to restart", Vector2(37, 60));
 }

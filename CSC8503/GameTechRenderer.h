@@ -14,7 +14,7 @@
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
 
-#include "UI.h"
+#include "UISystem.h"
 
 
 
@@ -24,6 +24,8 @@ namespace NCL {
 	class Maths::Vector4;
 	namespace CSC8503 {
 		class RenderObject;
+
+		constexpr int MAX_INSTANCE_MESHES = 3;
 
 		class GameTechRenderer : public OGLRenderer	{
 		public:
@@ -39,11 +41,16 @@ namespace NCL {
 
 			void AddLight(Light* light);
 			void ClearLights();
-			void SetWallFloorObject(GameObject* wallFloorTile) {
-				mWallFloorTile = wallFloorTile;
+
+			void ClearInstanceObjects() { mInstanceTiles.clear(); }
+
+			void SetInstanceObjects(GameObject* floorTile, GameObject* wallTile, GameObject* cornerWallTile) {
+				mInstanceTiles.push_back(floorTile);
+				mInstanceTiles.push_back(wallTile);
+				mInstanceTiles.push_back(cornerWallTile);
 			}
 
-			void SetUIObject(UI* ui) {
+			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}
 
@@ -51,7 +58,7 @@ namespace NCL {
 			void NewRenderLines();
 			void NewRenderText();
 
-			void RenderIcons(UI::Icon icon);
+			void RenderIcons(UISystem::Icon icon);
 			
 
 			void RenderFrame()	override;
@@ -121,7 +128,7 @@ namespace NCL {
 			Shader* mCombineShader;
 			const OGLMesh* mSphereMesh;
 			OGLMesh* mQuad;
-			GameObject* mWallFloorTile;
+			std::vector<GameObject*> mInstanceTiles;
 
 			vector<Vector3> debugTextPos;
 			vector<Vector4> debugTextColours;
@@ -157,7 +164,7 @@ namespace NCL {
 
 			Frustum mFrameFrustum;
 
-			UI* mUi;
+			UISystem* mUi;
 		};
 	}
 }

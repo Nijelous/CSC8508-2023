@@ -7,9 +7,8 @@
 #include "GameClient.h"
 #include "NetworkObject.h"
 #include "NetworkPlayer.h"
-#include "NetworkObject.h"
-#include "PhysicsObject.h"
 #include "RenderObject.h"
+#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
 
 namespace{
     constexpr int MAX_PLAYER = 4;
@@ -23,7 +22,9 @@ DebugNetworkedGame::DebugNetworkedGame() {
     mThisServer = nullptr;
     mThisClient = nullptr;
 
-    mGameState = GameStates::MainMenuState;
+    mClientSideLastFullID = 0;
+    mServerSideLastFullID = 0;
+    mGameState = GameSceneState::MainMenuState;
     
     NetworkBase::Initialise();
     mTimeToNextPacket = 0.0f;
@@ -62,6 +63,8 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(GameStartState, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage,this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot,this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
@@ -130,7 +133,7 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted){
         SendStartGameStatusPacket();
     }
     if (isGameStarted){
-        mGameState = GameStates::InitialisingLevelState;
+        mGameState = GameSceneState::InitialisingLevelState;
         StartLevel();
     }
 }
@@ -191,10 +194,20 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         HandleClientPlayerInputPacket(packet, source + 1);
         break;
     }
+    case BasicNetworkMessages::ClientSyncItemSlot:{
+        ClientSyncItemSlotPacket* packet = (ClientSyncItemSlotPacket*)(payload);
+        HandlePlayerEquippedItemChange(packet);
+    }
     default:
         std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
         break;
     }
+}
+
+void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
+    PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
+    NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
+    mThisServer->SendGlobalPacket(packet);
 }
 
 GameClient* DebugNetworkedGame::GetClient() const{
@@ -203,6 +216,10 @@ GameClient* DebugNetworkedGame::GetClient() const{
 
 GameServer* DebugNetworkedGame::GetServer() const{
     return mThisServer;
+}
+
+NetworkPlayer* DebugNetworkedGame::GetLocalPlayer() const {
+    return static_cast<NetworkPlayer*>(mLocalPlayer);
 }
 
 void DebugNetworkedGame::UpdateAsServer(float dt){
@@ -244,7 +261,7 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame){
         //NetworkPlayer struct. 
         int playerState = o->GetLatestNetworkState().stateID;
         GamePacket* newPacket = nullptr;
-        if (o->WritePacket(&newPacket, deltaFrame, playerState)){
+        if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)){
             mThisServer->SendGlobalPacket(*newPacket);
             delete newPacket;
         }
@@ -285,6 +302,10 @@ int DebugNetworkedGame::GetPlayerPeerID(int peerId){
         }
     }
     return -1;
+}
+
+const int DebugNetworkedGame::GetClientLastFullID() const {
+    return mClientSideLastFullID;
 }
 
 void DebugNetworkedGame::SendStartGameStatusPacket(){
@@ -382,6 +403,7 @@ void DebugNetworkedGame::HandleFullPacket(FullPacket* fullPacket){
             mNetworkObjects[i]->ReadPacket(*fullPacket);
         }
     }
+    mClientSideLastFullID = fullPacket->fullState.stateID;
 }
 
 void DebugNetworkedGame::HandleDeltaPacket(DeltaPacket* deltaPacket){
@@ -397,6 +419,7 @@ void DebugNetworkedGame::HandleClientPlayerInputPacket(ClientPlayerInputPacket* 
     auto* playerToHandle = mServerPlayers[playerIndex];
 
     playerToHandle->SetPlayerInput(clientPlayerInputPacket->playerInputs);
+    mServerSideLastFullID = clientPlayerInputPacket->lastId;
 }
 
 void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet){
@@ -419,4 +442,11 @@ void DebugNetworkedGame::SyncPlayerList(){
 }
 
 void DebugNetworkedGame::SetItemsLeftToZero(){
+}
+
+void DebugNetworkedGame::HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const {
+	const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* inventorySystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr();
+    const PlayerInventory::item equippedItem =  static_cast<PlayerInventory::item>(packet->equippedItem);
+	inventorySystem->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, equippedItem, packet->usageCount);
 }

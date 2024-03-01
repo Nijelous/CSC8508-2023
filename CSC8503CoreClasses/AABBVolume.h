@@ -7,9 +7,10 @@ namespace NCL {
 	class AABBVolume : CollisionVolume
 	{
 	public:
-		AABBVolume(const Vector3& halfDims) {
+		AABBVolume(const Vector3& halfDims, const Maths::Vector3& offset = Maths::Vector3(0, 0, 0)) {
 			type		= VolumeType::AABB;
 			halfSizes	= halfDims;
+			this->offset = offset;
 			this->applyPhysics = true;
 		}
 		~AABBVolume() {
@@ -20,7 +21,12 @@ namespace NCL {
 			return halfSizes;
 		}
 
+		Vector3 GetOffset() const {
+			return offset;
+		}
+
 	protected:
 		Vector3 halfSizes;
+		Vector3 offset;
 	};
 }

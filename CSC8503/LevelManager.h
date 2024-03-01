@@ -6,6 +6,7 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
+#include "SoundManager.h"
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -14,6 +15,8 @@ using namespace SuspicionSystem;
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.25f;
+	constexpr float INIT_TIMER_VALUE = 1000;
 	namespace CSC8503 {
 		class PlayerObject;
 		class GuardObject;
@@ -23,6 +26,7 @@ namespace NCL {
 		class PickupGameObject;
 		class SoundEmitter;
 		class InteractableDoor;
+		class PointGameObject;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -33,11 +37,25 @@ namespace NCL {
 			}
 		};
 
+		enum GameStates {
+			MenuState,
+			LevelState,
+			PauseState
+		};
+
+		enum PolyFlags {
+			FloorFlag = 1,
+			ClosedDoorFlag = 2,
+			LockedDoorFlag = 4,
+			MAX_FLAGS = 8
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
@@ -54,13 +72,21 @@ namespace NCL {
 
 			GameTechRenderer* GetRenderer() { return mRenderer; }
 
+			RecastBuilder* GetBuilder() { return mBuilder; }
+
 			InventoryBuffSystemClass* GetInventoryBuffSystem();
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
-			const std::vector<Matrix4>& GetLevelMatrices() { return mLevelMatrices; }
+			const std::vector<Matrix4>& GetLevelFloorMatrices() { return mLevelFloorMatrices; }
+
+			const std::vector<Matrix4>& GetLevelWallMatrices() { return mLevelWallMatrices; }
+
+			const std::vector<Matrix4>& GetLevelCornerWallMatrices() { return mLevelCornerWallMatrices; }
 
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
+
+			void FixedUpdate(float dt);
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
 
@@ -69,6 +95,8 @@ namespace NCL {
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform);
 
 			void ChangeEquippedIconTexture(int itemSlot, PlayerInventory::item equippedItem);
+
+			void DropEquippedIconTexture(int itemSlot);
 
 			GameResults CheckGameWon();
 
@@ -79,6 +107,8 @@ namespace NCL {
 			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
 
 			FlagGameObject* GetMainFlag();
+
+			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -89,21 +119,25 @@ namespace NCL {
 
 			void InitialiseIcons();
 
-			void LoadMap(const std::map<Vector3, TileType>& tileMap, const Vector3& startPosition);
+			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre);
 
 			void LoadGuards(int guardCount);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions,const bool& isMultiplayer);
+			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+
+			void LoadDoorsInNavGrid();
+
 			void SendWallFloorInstancesToGPU();
 
-			GameObject* AddWallToWorld(const Vector3& position);
-			GameObject* AddFloorToWorld(const Vector3& position);
+			GameObject* AddWallToWorld(const Transform& transform);
+			GameObject* AddCornerWallToWorld(const Transform& transform);
+			GameObject* AddFloorToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent);
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
@@ -112,6 +146,8 @@ namespace NCL {
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
+
+			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
@@ -122,7 +158,12 @@ namespace NCL {
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
 			std::vector<GameObject*> mLevelLayout;
-			std::vector<Matrix4> mLevelMatrices;
+			std::vector<Matrix4> mLevelFloorMatrices;
+			std::vector<Matrix4> mLevelWallMatrices;
+			std::vector<Matrix4> mLevelCornerWallMatrices;
+			GameObject* mBaseFloor;
+			GameObject* mBaseWall;
+			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
 			GameTechRenderer* mRenderer;
@@ -130,16 +171,20 @@ namespace NCL {
 			PhysicsSystem* mPhysics;
 			AnimationSystem* mAnimation;
 
+			SoundManager* mSoundManager;
+
 			vector<GameObject*> mUpdatableObjects;
 
 			// meshes
 			Mesh* mCubeMesh;
-			Mesh* mWallFloorCubeMesh;
+			Mesh* mFloorCubeMesh;
 			Mesh* mSphereMesh;
 			Mesh* mCapsuleMesh;
 			Mesh* mCharMesh;
 			Mesh* mEnemyMesh;
 			Mesh* mBonusMesh;
+			Mesh* mStraightWallMesh;
+			Mesh* mCornerWallMesh;
 
 			// textures
 			Texture* mBasicTex;
@@ -147,8 +192,10 @@ namespace NCL {
 			Texture* mKeeperNormal;
 			Texture* mFloorAlbedo;
 			Texture* mFloorNormal;
+			Texture* mWallTex;
+			Texture* mWallNormal;
 
-			UI* mUi;
+			UISystem* mUi;
 			Texture* mInventorySlotTex;
 
 			//powerup
@@ -164,6 +211,9 @@ namespace NCL {
 			Texture* mSuspensionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
+			//item icon
+			Texture* mFlagIconTex;
+			Texture* mKeyIconTex;
 
 			// shaders
 			Shader* mBasicShader;
@@ -210,6 +260,8 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			float mTimer;
+			float mDtSinceLastFixedUpdate;
+			GameStates mGameState;
 		};
 	}
 }

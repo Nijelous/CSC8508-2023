@@ -1,6 +1,7 @@
 #pragma once
 #include "GameObject.h"
 #include "PlayerObject.h"
+#include "Ray.h"
 
 namespace NCL::CSC8503{
 	class DebugNetworkedGame;
@@ -13,8 +14,9 @@ namespace NCL {
 		struct PlayerInputs{
 			bool isSprinting = false;
 			bool isCrouching = false;
-			bool isLeftHandUsed = false;
-			bool isRightHandUsed = false;
+			bool isEquippedItemUsed = false;
+			bool isInteractButtonPressed = false;
+			bool isHoldingInteractButton = false;
 
 			int leftHandItemId = 0;
 			int rightHandItemId = 0;
@@ -25,6 +27,7 @@ namespace NCL {
 
 			Vector3 fwdAxis;
 			Vector3 rightAxis;
+			Ray rayFromPlayer;
 		};
 		
 		class NetworkPlayer : public PlayerObject{
@@ -42,10 +45,6 @@ namespace NCL {
 			void UpdateObject(float dt) override;
 			void MovePlayer(float dt) override;
 
-			int GetPlayerNum() const {
-				return playerNum;
-			}
-
 		protected:
 			bool mIsClientInputReceived = false;
 			bool mIsLocalPlayer = false;
@@ -54,12 +53,14 @@ namespace NCL {
 			float mCameraYaw = 0.f;
 			
 			DebugNetworkedGame* game;
-			int playerNum;
 
 			PlayerInputs mPlayerInputs;
 			
 			void HandleMovement(float dt, const PlayerInputs& playerInputs);
-			
+
+			void RayCastFromPlayer(GameWorld* world, float dt) override;
+
+			void ControlInventory() override;
 		};
 	}
 }

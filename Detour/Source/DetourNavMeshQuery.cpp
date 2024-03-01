@@ -60,6 +60,16 @@
 ///
 /// @see dtNavMeshQuery
 
+enum PolyFlags {
+	Floor = 1,
+	ClosedDoor = 2,
+	LockedDoor = 4,
+	MAX_FLAGS = 8
+};
+
+constexpr int CLOSED_DOOR_COST = 1000;
+constexpr int LOCKED_DOOR_COST = 100000000;
+
 dtQueryFilter::dtQueryFilter() :
 	m_includeFlags(0xffff),
 	m_excludeFlags(0)
@@ -1115,6 +1125,11 @@ dtStatus dtNavMeshQuery::findPath(dtPolyRef startRef, dtPolyRef endRef,
 				cost = bestNode->cost + curCost;
 				heuristic = dtVdist(neighbourNode->pos, endPos)*H_SCALE;
 			}
+
+			if (neighbourPoly->flags & PolyFlags::ClosedDoor) {
+				cost += CLOSED_DOOR_COST;
+			}
+			else if (neighbourPoly->flags & PolyFlags::LockedDoor) cost += LOCKED_DOOR_COST;
 
 			const float total = cost + heuristic;
 			

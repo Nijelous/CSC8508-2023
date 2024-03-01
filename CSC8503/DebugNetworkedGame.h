@@ -4,6 +4,10 @@
 #include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
+namespace NCL::CSC8503 {
+	struct ClientSyncItemSlotPacket;
+}
+
 namespace NCL{
     namespace CSC8503{
         struct DeltaPacket;
@@ -22,6 +26,8 @@ namespace NCL{
             
             bool GetIsServer() const;
 
+            const int GetClientLastFullID() const;
+
             void StartAsServer();
             void StartAsClient(char a, char b, char c, char d);
 
@@ -35,8 +41,11 @@ namespace NCL{
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
+            void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
+
             GameClient* GetClient() const;
             GameServer* GetServer() const;
+            NetworkPlayer* GetLocalPlayer() const;
 
         protected:
             bool mIsGameStarted = false;
@@ -71,10 +80,15 @@ namespace NCL{
             void SyncPlayerList();
             void SetItemsLeftToZero() override;
 
+            void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
+
 
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
+
+            int mClientSideLastFullID;
+            int mServerSideLastFullID;
 
         private:
         };

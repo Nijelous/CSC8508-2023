@@ -443,6 +443,8 @@ public:
 	///  @param[out]	poly	The polygon.
 	void getTileAndPolyByRefUnsafe(const dtPolyRef ref, const dtMeshTile** tile, const dtPoly** poly) const;
 
+	void setPolyFlagsUnsafe(const dtPolyRef ref, dtPoly* poly, unsigned short flag);
+
 	/// Checks the validity of a polygon reference.
 	///  @param[in]	ref		The polygon reference to check.
 	/// @return True if polygon reference is valid for the navigation mesh.

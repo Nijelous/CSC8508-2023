@@ -43,6 +43,7 @@ namespace NCL::Maths {
 		Vector3		ToEuler() const;
 		Quaternion	Conjugate() const;
 		void		CalculateW();	//builds 4th component when loading in shortened, 3 component quaternions
+		Vector3		ToVector3() const;
 
 		static Quaternion EulerAnglesToQuaternion(float pitch, float yaw, float roll);
 		static Quaternion AxisAngleToQuaterion(const Vector3& vector, float degrees);
@@ -130,3 +131,20 @@ namespace NCL::Maths {
 		return i;
 	}
 }
+
+template <>
+struct std::hash<NCL::Maths::Quaternion>
+{
+	std::size_t operator()(const NCL::Maths::Quaternion& key) const {
+		size_t seed = 0;
+		hashCombine(seed, std::hash<float>()(key.x));
+		hashCombine(seed, std::hash<float>()(key.y));
+		hashCombine(seed, std::hash<float>()(key.z));
+		hashCombine(seed, std::hash<float>()(key.w));
+		return seed;
+	}
+private:
+	void hashCombine(size_t& seed, size_t hash) const {
+		seed ^= hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+	}
+};

@@ -30,47 +30,35 @@ using namespace CSC8503;
 #include <thread>
 #include <sstream>
 
-namespace{
-    constexpr int SERVER_CHOICE = 1;
+namespace {
+    constexpr int NETWORK_TEST_WIDTH = 800;
+    constexpr int NETWORK_TEST_HEIGHT = 600;
+
+    constexpr int GAME_WINDOW_WIDTH = 1280;
+    constexpr int GAME_WINDOW_HEIGHT = 720;
 }
 
 int main(){
-    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", 1280, 720);
+    bool isNetworkTestActive = false;
+
+    float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
+    float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
+    bool isFullScreen = !isNetworkTestActive;
+
+    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
 
     if (!w->HasInitialised()) {
         return -1;
     }
 
-
     auto* sceneManager = SceneManager::GetSceneManager();
     
     GameSceneManager* gm = nullptr;
     //erendgrmnc: make the bool below true for network test.
-    bool isNetworkTestActive = false;
 
     w->ShowOSPointer(isNetworkTestActive);
     w->LockMouseToWindow(!isNetworkTestActive);
-    
-    if (isNetworkTestActive){
-        gm = new DebugNetworkedGame();
 
-        int choice = 0;
-        std::cout << "--------Network Test ----------" << std::endl;
-        std::cout <<"Enter '1' to start as server or '2' to start as client: ";
-        std::cin >> choice;
-        
-        auto* networkedGame = (DebugNetworkedGame*)gm;
-        if (choice == SERVER_CHOICE){
-            networkedGame->StartAsServer();
-        }
-        else{
-            networkedGame->StartAsClient(127, 0, 0, 1);
-        }
-    }
-    else{
-        gm = new GameSceneManager();
-    }
-    
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
     while (w->UpdateWindow() && !sceneManager->GetIsForceQuit()) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
@@ -90,7 +78,6 @@ int main(){
         }
 
         w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
-        //gm->UpdateGame(dt);
 
         if (sceneManager->GetScenePushdownMachine() != nullptr) {
             sceneManager->GetScenePushdownMachine()->Update(dt);

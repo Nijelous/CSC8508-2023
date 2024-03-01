@@ -10,13 +10,6 @@ namespace NCL {
 		class Interactable;
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
-			enum PlayerState {
-				Stand,
-				Walk,
-				Sprint,
-				Crouch,
-				Happy
-			};
 
 			enum PlayerSpeedState {
 				Default,
@@ -31,6 +24,13 @@ namespace NCL {
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
+			int GetPlayerID() const {
+				return mPlayerID;
+			}
+
+			int GetActiveItemSlot() const {
+				return mActiveItemSlot;
+			}
 
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
@@ -43,7 +43,7 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-			PlayerState GetPlayerState() { return mObjectState; };
+		
 
 		protected:
 			bool mIsCrouched;
@@ -54,15 +54,12 @@ namespace NCL {
 			int mCrouchSpeed;
 			int mActiveItemSlot;
 
-			int mPlayerNo;
+			int mPlayerID;
 			float mInteractHeldDt;
 			bool mHasSilentSprintBuff;
-			int mFirstInventorySlotUsageCount;
-			int mSecondInventorySlotUsageCount;
 
 			int mPlayerPoints;
 
-			PlayerState mObjectState;
 			PlayerSpeedState mPlayerSpeedState;
 			PrisonDoor* mPrisonDoorPtr;
 
@@ -71,18 +68,14 @@ namespace NCL {
 			SuspicionSystem::SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;
 
 			virtual void MovePlayer(float dt);
-
-			virtual void OnPlayerUseItem();
 			
-			void RayCastFromPlayer(GameWorld* world, float dt);
+			virtual void RayCastFromPlayer(GameWorld* world, float dt);
 
-			void ControlInventory();
+			virtual void ControlInventory();
 
 			void AttachCameraToPlayer(GameWorld* world);
 
 			virtual void MatchCameraRotation(float yawValue);
-
-			void ResetEquippedItemUsageCount(int inventorySlot);
 
 			void StopSliding();
 

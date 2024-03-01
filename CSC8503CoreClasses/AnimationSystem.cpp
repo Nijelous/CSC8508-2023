@@ -12,8 +12,7 @@ AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g){
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
-	mGuardState = Stand;
-	mPlayerState = Stand;
+
 	
 }
 
@@ -91,13 +90,14 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 		
+		
 		if (mGuardState != mObjectState) {
-			mGuardState =(AnimationState)mObjectState;
+			mGuardState =(GameObject::GameObjectState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
 			switch (mObjectState)
 			{
-			case GameObject::GameObjectState::Stand:
+			case GameObject::GameObjectState::Idle:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
 
 				break;
@@ -120,12 +120,12 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 
 		if (mPlayerState != mObjectState) {
-			mPlayerState = (AnimationState)mObjectState;
+			mPlayerState = (GameObject::GameObjectState)mObjectState;
 			obj->GetAnimationObject()->ReSetCurrentFrame();
 
 			switch (mObjectState)
 			{
-			case GameObject::GameObjectState::Stand:
+			case GameObject::GameObjectState::Idle:
 				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
 
 				break;
