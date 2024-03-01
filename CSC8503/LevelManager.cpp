@@ -126,8 +126,7 @@ LevelManager::~LevelManager() {
 	delete mHighSuspisionBarTex;
 	delete mSuspisionIndicatorTex;
 
-	delete mGuardAnimationShader;
-	delete mPlayerAnimationShader;
+	delete mAnimationShader;
 
 	delete mGuardMaterial;
 	delete mGuardMesh;
@@ -242,8 +241,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
 	mRenderer->FillLightUBO();
-	mRenderer->FillAnimFrameUBOs(*mTempPlayer);
-	mRenderer->FillAnimFrameUBOs(*mGuardObjects[0]);
+	
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
@@ -340,8 +338,7 @@ void LevelManager::InitialiseAssets() {
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
 	mInstanceShader = mRenderer->LoadShader("sceneInstanced.vert", "scene.frag");
-	mGuardAnimationShader = mRenderer->LoadShader("guardAnimScene.vert", "scene.frag");
-	mPlayerAnimationShader = mRenderer->LoadShader("playerAnimScene.vert", "scene.frag");
+	mAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
 
 
 
@@ -889,7 +886,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mEnemyMesh, mKeeperAlbedo, mKeeperNormal, mBasicShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
-
+	
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -907,7 +904,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mPlayerAnimationShader, PLAYER_MESH_SIZE));
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mGuardAnimationStand, mGuardMaterial));
 
@@ -996,7 +993,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mGuardAnimationShader, meshSize));
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
 	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
 

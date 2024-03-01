@@ -234,8 +234,7 @@ namespace NCL {
 			MeshMaterial* mGuardMaterial;
 			MeshMaterial* mPlayerMaterial;
 
-			Shader* mGuardAnimationShader;
-			Shader* mPlayerAnimationShader;
+			Shader* mAnimationShader;
 
 			vector<GLuint>  mGuardTextures;
 			vector<GLuint> mPlayerTextures;

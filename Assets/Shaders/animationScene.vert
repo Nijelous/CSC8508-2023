@@ -23,13 +23,9 @@ layout(std140, binding = 3) uniform ObjectBlock {
 	bool hasVertexColours;
 } objectData;
 
-layout (std140, binding = 4) uniform GuardAnimBlock {
-	mat4 layer1Frames[128];
-	mat4 layer2Frames[128];
-	mat4 layer3Frames[128];
-	mat4 layer4Frames[128];
-	int layer;
-} guardAnimData;
+layout (std140, binding = 4) uniform AnimBlock {
+	mat4 joints[128];
+} animData;
 
 out Vertex
 {
@@ -62,34 +58,14 @@ void main(void)
 		OUT.colour		= objectData.objectColour * colour;
 	}
 
-	int layer = guardAnimData.layer;
-	float jointData;
 	
 
 	for(int i = 0; i < 4; ++i) {
 		int   jointIndex 	= jointIndices[i];
 		float jointWeight 	= jointWeights[i];
 
-		switch(layer) {
-		case 1:
-			jointData = guardAnimData.layer1Frames[jointIndex];
-			break;
-		case 2:
-			jointData = guardAnimData.layer2Frames[jointIndex];
-			break;
-		case 3:
-			jointData = guardAnimData.layer3Frames[jointIndex];
-			break;
-		case 4:
-			jointData = guardAnimData.layer4Frames[jointIndex];
-			break;
-		default:
-			break;
-	}
-
-		skelPos += jointData * localPos * jointWeight;
-
-		skelNormal += jointData * localNormal * jointWeight;
+		skelPos += animData.joints[jointIndex] * localPos * jointWeight;
+		skelNormal += animData.joints[jointIndex] * localNormal * jointWeight;
 	}
 
 	

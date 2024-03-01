@@ -85,12 +85,7 @@ namespace NCL {
 			};
 
 			struct AnimFrameData {
-				Matrix4 layer1Frames[128] = { 0 };
-				Matrix4 layer2Frames[128] = { 0 };
-				Matrix4 layer3Frames[128] = { 0 };
-				Matrix4 layer4Frames[128] = { 0 };
-				int layer = -1;
-				float padding[63] = { 0.0f };
+				Matrix4 frames[128];
 			};
 
 			enum BufferBlockNames {
@@ -98,8 +93,7 @@ namespace NCL {
 				staticDataUBO,
 				lightsUBO,
 				objectsUBO,
-				guardAnimFramesUBO,
-				playerAnimFramesUBO,
+				animFramesUBO,
 				MAX_UBO
 			};
 
