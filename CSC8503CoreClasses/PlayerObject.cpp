@@ -61,6 +61,7 @@ namespace {
 
 PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
 	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	UISystem* UI,
 	const std::string& objName,
 	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
@@ -69,6 +70,7 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 	mPrisonDoorPtr = prisonDoorPtr;
+	SetUIObject(UI);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;
