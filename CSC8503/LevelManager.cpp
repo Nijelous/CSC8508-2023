@@ -860,7 +860,7 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
-	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, prisonDoor);
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, playerName, prisonDoor);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
@@ -1012,6 +1012,10 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
 	return mInventoryBuffSystemClassPtr;
+}
+
+SuspicionSystemClass* NCL::CSC8503::LevelManager::GetSuspicionSystem() {
+	return mSuspicionSystemClassPtr;
 }
 
 void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
