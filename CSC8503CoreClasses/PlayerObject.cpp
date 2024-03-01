@@ -59,10 +59,10 @@ namespace {
 	constexpr bool DEBUG_MODE = true;
 }
 
-PlayerObject::PlayerObject(GameWorld* world,
-	InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
-	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr, const std::string& objName,
-	PrisonDoor* prisonDoorPtr,
+PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	const std::string& objName,
+	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;

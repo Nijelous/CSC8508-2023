@@ -1014,6 +1014,10 @@ InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
 	return mInventoryBuffSystemClassPtr;
 }
 
+SuspicionSystemClass* NCL::CSC8503::LevelManager::GetSuspicionSystem() {
+	return mSuspicionSystemClassPtr;
+}
+
 void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent)
 	{

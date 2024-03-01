@@ -22,7 +22,7 @@ namespace NCL {
 			PlayerObject(GameWorld* world,
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
 				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr,
-				const std::string& objName = "", PrisonDoor* prisonDoorPtr = nullptr,
+				const std::string& objName = "",PrisonDoor* prisonDoorPtr = nullptr,
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
