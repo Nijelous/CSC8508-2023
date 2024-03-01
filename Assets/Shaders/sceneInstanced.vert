@@ -1,6 +1,5 @@
-#version 420 core
+#version 430 core
 
-uniform mat4 shadowMatrix 	= mat4(1.0f);
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
@@ -16,9 +15,12 @@ layout(std140, binding = 0) uniform CamBlock{
 	vec3 camPos;
 } camData;
 
-uniform vec4 		objectColour = vec4(1,1,1,1);
-
-uniform bool hasVertexColours = false;
+layout(std430, binding = 3) buffer ObjectBlock {
+	mat4 modelMatrix;
+	mat4 shadowMatrix;
+	vec4 objectColour;
+	bool hasVertexColours;
+}; 
 
 
 out Vertex

@@ -27,6 +27,7 @@ namespace NCL {
 
 		constexpr short MAX_INSTANCE_MESHES = 3;
 		constexpr short MAX_POSSIBLE_LIGHTS = 64;
+		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer	{
 		public:
@@ -74,10 +75,22 @@ namespace NCL {
 				float padding[52] = { 0.0f };
 			};
 
-			enum UBOBlockNames {
+			/*(Author: B Schwarz) SSBOs report an alignment of 16, so this can be significantly more efficiently packed than the LightData
+			* Don't ask me why it's so different to the UBO's alignment; I asked the graphics driver, and lo, that is what handed down to me. 
+			*/
+			struct ObjectData {
+				Matrix4 modelMatrix;
+				Matrix4 shadowMatrix;
+				Vector4 objectColour = { 0,0,0,0 };
+				bool hasVertexColours = 0;
+				float padding[27] = { 0.0f };				
+			};
+
+			enum BufferBlockNames {
 				camUBO,
 				staticDataUBO,
 				lightsUBO,
+				objectsUBO,
 				MAX_UBO
 			};
 
@@ -87,7 +100,8 @@ namespace NCL {
 			void FillCamMatricesUBOs();
 			void GenStaticDataUBO();
 			void GenLightDataUBO();
-
+			void GenObjectDataUBO();
+			void FillObjectDataUBO();
 			void NewRenderLines();
 			void NewRenderText();
 
@@ -130,6 +144,7 @@ namespace NCL {
 			OGLShader* mDebugTextShader;
 			OGLShader*  mSkyboxShader;
 			OGLShader* mOutlineShader;
+			OGLShader* mAnimatedOutlineShader;
 			OGLShader*  mIconShader;
 
 			OGLMesh*	skyboxMesh;

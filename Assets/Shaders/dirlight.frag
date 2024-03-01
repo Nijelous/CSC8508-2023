@@ -4,11 +4,6 @@ uniform mat4 modelMatrix 	= mat4(1.0f);
 uniform sampler2D 	depthTex;
 uniform sampler2D normTex;
 
-uniform vec3 lightDirection;
-uniform vec3 lightPos;
-uniform float lightRadius;
-uniform vec4	lightColour;
-
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
@@ -55,8 +50,8 @@ void main(void)
 	float lambert = clamp(dot(incident, normal), 0.0, 1.0);
 	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
 	specFactor = pow(specFactor, 60.0);
-	diffuseOutput = vec4(lightColour.xyz * lambert, 1.0);
+	diffuseOutput = vec4(lightData.lightColour * lambert, 1.0);
 
-	specularOutput = vec4(lightColour.xyz * specFactor * 0.33, 1.0);
+	specularOutput = vec4(lightData.lightColour * specFactor * 0.33, 1.0);
 
 }

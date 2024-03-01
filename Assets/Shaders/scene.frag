@@ -1,10 +1,9 @@
-#version 400 core
+#version 430 core
 
-uniform vec4 		objectColour;
+
 uniform sampler2D 	mainTex;
 uniform sampler2D   normTex;
-uniform sampler2DShadow shadowTex;
-uniform bool hasTexture;
+uniform sampler2DShadow	shadowTex;
 
 in Vertex
 {
