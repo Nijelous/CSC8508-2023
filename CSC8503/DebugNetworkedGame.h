@@ -5,6 +5,7 @@
 #include "NetworkedGame.h"
 
 namespace NCL::CSC8503 {
+	struct SyncInteractablePacket;
 	struct ClientSyncItemSlotPacket;
 }
 
@@ -82,6 +83,7 @@ namespace NCL{
 
             void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
 
+            void HandleInteractablePacket(SyncInteractablePacket* packet) const;
 
             std::vector<std::function<void()>> mOnGameStarts;
 

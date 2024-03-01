@@ -8,6 +8,7 @@ namespace NCL {
 		public:
 			InteractableDoor(){
 				GameObject::mName = "InteractableDoor";
+				mInteractableItemType = InteractableItems::InteractableDoors;
 				mIsLocked = false;
 				mIsOpen = false;
 				InitStateMachine();
@@ -19,7 +20,7 @@ namespace NCL {
 
 			void Unlock();
 			void Lock();
-			void Interact(InteractType interactType) override;
+			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
 			virtual void InitStateMachine() override;
 

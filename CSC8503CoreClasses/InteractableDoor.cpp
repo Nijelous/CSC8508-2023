@@ -14,7 +14,7 @@ void InteractableDoor::Lock(){
 	mIsLocked = true;
 }
 
-void InteractableDoor::Interact(InteractType interactType)
+void InteractableDoor::Interact(InteractType interactType, GameObject* interactedObject)
 {
 	if (!CanBeInteractedWith(interactType))
 		return;
