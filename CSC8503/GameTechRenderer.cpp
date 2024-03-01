@@ -510,6 +510,7 @@ void GameTechRenderer::FillGBuffer() {
 		if (mActiveObjects[i]->GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*) mActiveObjects[i]->GetNormalTexture(), "normTex", 2);
 		}
+		if ((*i).GetAnimationObject()) {
 		if (mActiveObjects[i]->GetAnimation()) {
 			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
 		}
@@ -628,7 +629,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimation()) {
+			if (mOutlinedObjects[i]->GetAnimationObject()->GetAnimation()) {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());

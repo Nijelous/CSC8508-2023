@@ -217,7 +217,10 @@ namespace NCL {
 			FlagGameObject* mMainFlag;
 			//item icon
 			Texture* mFlagIconTex;
-			Texture* mKeyIconTex;
+			Texture* mKeyIconTex1;
+			Texture* mKeyIconTex2;
+			Texture* mKeyIconTex3;
+
 
 			// shaders
 			Shader* mBasicShader;

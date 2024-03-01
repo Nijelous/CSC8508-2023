@@ -53,7 +53,14 @@ namespace NCL {
 
 			void SetEquippedItemIcon(int slotNum, Icon& icon);
 
-
+			void SetTextureVector(string itemType, std::vector<Texture*> itemTexVec) {
+				if (itemType=="key") {
+					mKeyTexVec = itemTexVec;
+				}
+				if (itemType == "bar") {
+					mSusBarTexVec = itemTexVec;
+				}
+			}
 
 
 		protected:
@@ -73,6 +80,8 @@ namespace NCL {
 			Icon* mSuspensionIndicatorIcon;
 
 			std::vector<Icon*> mIconsVec;
+			std::vector<Texture*> mKeyTexVec;
+			std::vector<Texture*> mSusBarTexVec;
 		};
 	}
 }
