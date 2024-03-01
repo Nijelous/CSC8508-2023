@@ -207,15 +207,27 @@ void GameTechRenderer::GenStaticDataUBO() {
 
 void GameTechRenderer::GenObjectDataUBO() {
 	glGenBuffers(1, &uBOBlocks[objectsUBO]);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, uBOBlocks[objectsUBO]);
-	glBufferData(GL_SHADER_STORAGE_BUFFER, MAX_POSSIBLE_OBJECTS * sizeof(ObjectData), NULL, GL_DYNAMIC_DRAW);
-	glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[objectsUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_OBJECTS * sizeof(ObjectData), NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GameTechRenderer::GenLightDataUBO() {
 	glGenBuffers(1, &uBOBlocks[lightsUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
 	glBufferData(GL_UNIFORM_BUFFER, MAX_POSSIBLE_LIGHTS * sizeof(LightData), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::GenAndFillAnimFramesUBOs() {
+	for (int i = guardAnimFramesUBO; i < MAX_UBO; i++)	{
+		glGenBuffers(1, &uBOBlocks[i]);
+		glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[i]);
+		AnimFrameData* animData = new AnimFrameData();
+		glBindBufferBase(GL_UNIFORM_BUFFER, i, uBOBlocks[i]);
+		glBufferData(GL_UNIFORM_BUFFER, sizeof(AnimFrameData), NULL, GL_DYNAMIC_DRAW);		
+		delete[] animData;
+	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -325,6 +337,8 @@ void GameTechRenderer::RenderFrame() {
 void GameTechRenderer::BuildObjectList() {
 	mActiveObjects.clear();
 	mOutlinedObjects.clear();
+	int x;
+	glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &x);
 
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {

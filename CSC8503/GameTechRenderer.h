@@ -26,7 +26,7 @@ namespace NCL {
 		class RenderObject;
 
 		constexpr short MAX_INSTANCE_MESHES = 3;
-		constexpr short MAX_POSSIBLE_LIGHTS = 64;
+		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer	{
@@ -75,9 +75,6 @@ namespace NCL {
 				float padding[52] = { 0.0f };
 			};
 
-			/*(Author: B Schwarz) SSBOs report an alignment of 16, so this can be significantly more efficiently packed than the LightData
-			* Don't ask me why it's so different to the UBO's alignment; I asked the graphics driver, and lo, that is what handed down to me. 
-			*/
 			struct ObjectData {
 				Matrix4 modelMatrix;
 				Matrix4 shadowMatrix;
@@ -86,11 +83,22 @@ namespace NCL {
 				float padding[27] = { 0.0f };				
 			};
 
+			struct AnimFrameData {
+				Matrix4 layer1Frames[128] = { 0 };
+				Matrix4 layer2Frames[128] = { 0 };
+				Matrix4 layer3Frames[128] = { 0 };
+				Matrix4 layer4Frames[128] = { 0 };
+				int layer = -1;
+				float padding[63] = { 0.0f };
+			};
+
 			enum BufferBlockNames {
 				camUBO,
 				staticDataUBO,
 				lightsUBO,
 				objectsUBO,
+				guardAnimFramesUBO,
+				playerAnimFramesUBO,
 				MAX_UBO
 			};
 
@@ -101,6 +109,7 @@ namespace NCL {
 			void GenStaticDataUBO();
 			void GenLightDataUBO();
 			void GenObjectDataUBO();
+			void GenAndFillAnimFramesUBOs();
 			void FillObjectDataUBO();
 			void NewRenderLines();
 			void NewRenderText();
