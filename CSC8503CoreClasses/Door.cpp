@@ -70,3 +70,7 @@ void Door::SetNavMeshFlags(int flag) {
 	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };
 	LevelManager::GetLevelManager()->LoadDoorInNavGrid(pos, halfSize, (PolyFlags)flag);
 }
+
+bool Door::GetIsOpen() {
+	return mIsOpen;
+}

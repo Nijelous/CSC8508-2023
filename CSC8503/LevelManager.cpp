@@ -714,7 +714,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
-
+	newDoor->SetSoundObject(new SoundObject(mSoundManager->AddDoorOpenSound()));
 
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
@@ -747,7 +747,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
-
+	newDoor->SetSoundObject(new SoundObject(mSoundManager->AddDoorOpenSound()));
 
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
