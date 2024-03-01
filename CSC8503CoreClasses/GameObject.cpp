@@ -3,7 +3,7 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
-#include "AnimationObject.h"
+
 
 using namespace NCL::CSC8503;
 
@@ -18,7 +18,7 @@ GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectN
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
 
-	mAnimationObject = nullptr;
+	
 	mCollisionLayer = collisionLayer;
 	
 	mObjectState = Idle;
@@ -31,7 +31,7 @@ GameObject::~GameObject()	{
 	delete mPhysicsObject;
 	delete mRenderObject;
 	delete mNetworkObject;
-	delete mAnimationObject;
+
 
 }
 

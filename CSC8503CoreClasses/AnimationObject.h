@@ -17,12 +17,16 @@ namespace NCL {
         class Transform;
         class Maths::Vector3;
         class Maths::Vector4;
+
         class AnimationObject
         {
         public:
-            
+            enum AnimationType {
+                playerAnimation,
+                guardAnimation
+            };
 
-            AnimationObject(MeshAnimation* animation, MeshMaterial* material);
+            AnimationObject(AnimationType animationType,MeshAnimation* animation, MeshMaterial* material);
             ~AnimationObject();
 
             void Update(float dt);
@@ -58,12 +62,16 @@ namespace NCL {
             float GetRate() {
                 return mRate;
             }
+
+            AnimationType GetAnimationType() {
+                return mAnimationType;
+            }
            
             
         protected:
             MeshAnimation* mAnimation;
             MeshMaterial* mMaterial;
-           
+            AnimationType mAnimationType;
            
             int		mCurrentFrame;
             int		mNextFrame;

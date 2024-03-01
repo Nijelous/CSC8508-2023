@@ -63,7 +63,7 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::none, mInventorySlotTex},
 	{PlayerInventory::item::disguise, mStunTex},
 	{PlayerInventory::item::soundEmitter,  mStunTex},
-	{PlayerInventory::item::doorKey,  mKeyIconTex},
+	{PlayerInventory::item::doorKey,  mKeyIconTex3},
 	{PlayerInventory::item::flag , mFlagIconTex},
     {PlayerInventory::item::stunItem, mStunTex},
     {PlayerInventory::item::screwdriver, mStunTex}
@@ -385,7 +385,10 @@ void LevelManager::InitialiseAssets() {
 
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
-	mKeyIconTex = mRenderer->LoadTexture("key.png");
+	mKeyIconTex3 = mRenderer->LoadTexture("key3.png");
+	mKeyIconTex2 = mRenderer->LoadTexture("key2.png");
+	mKeyIconTex1 = mRenderer->LoadTexture("key1.png");
+
 	mFlagIconTex = mRenderer->LoadTexture("flag.png");
 
 	mLowSuspisionBarTex = mRenderer->LoadTexture("lowSus.png");
@@ -902,7 +905,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
-	playerObject.SetAnimationObject(new AnimationObject(mGuardAnimationStand, mGuardMaterial));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mGuardAnimationStand, mGuardMaterial));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -991,7 +994,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
-	guard->SetAnimationObject(new AnimationObject(mRigAnimationStand, mRigMaterial));
+	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
+
+
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);

@@ -385,7 +385,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
-		if ((*i).GetAnimation()) {
+		if ((*i).GetAnimationObject()) {
 			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
 		}
 		if (activeShader != shader) {
@@ -426,7 +426,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 
 		//Animation basic draw
-		if ((*i).GetAnimation()) {
+		if ((*i).GetAnimationObject()) {
 			BindMesh((OGLMesh&)*(*i).GetMesh());
 			mMesh = (*i).GetMesh();
 			size_t layerCount = mMesh->GetSubMeshCount();
@@ -535,7 +535,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
-		glUniform1i(location, mOutlinedObjects[i]->GetAnimation() ? 1 : 0);
+		glUniform1i(location, mOutlinedObjects[i]->GetAnimationObject()->GetAnimation() ? 1 : 0);
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
 		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
@@ -543,7 +543,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimation()) {
+			if (mOutlinedObjects[i]->GetAnimationObject()->GetAnimation()) {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
