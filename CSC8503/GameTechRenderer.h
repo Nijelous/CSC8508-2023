@@ -55,7 +55,6 @@ namespace NCL {
 				mInstanceTiles.push_back(cornerWallTile);
 			}
 			void FillLightUBO();
-			void FillAnimFrameUBOs(const GameObject& animObj);
 
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
@@ -90,6 +89,7 @@ namespace NCL {
 				lightsUBO,
 				objectsUBO,
 				animFramesUBO,
+				iconUBO,
 				MAX_UBO
 			};
 
@@ -97,6 +97,7 @@ namespace NCL {
 			void GenUBOBuffers();
 			void GenCamMatricesUBOS();
 			void FillCamMatricesUBOs();
+			void GenIconUBO();
 			void GenStaticDataUBO();
 			void GenLightDataUBO();
 			void GenObjectDataUBO();

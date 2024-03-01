@@ -18,8 +18,8 @@ Matrix4 biasMatrix = Matrix4::Translation(Vector3(0.5f, 0.5f, 0.5f)) * Matrix4::
 GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetWindow()), gameWorld(world) {
 	glEnable(GL_DEPTH_TEST);
 
-	mDebugLineShader = new OGLShader("DebugLines.vert", "debug.frag");
-	mDebugTextShader = new OGLShader("DebugText.vert", "debug.frag");
+	mDebugLineShader = new OGLShader("DebugLines.vert", "DebugLines.frag");
+	mDebugTextShader = new OGLShader("DebugText.vert", "DebugText.frag");
 	mShadowShader = new OGLShader("shadow.vert", "shadow.frag");
 	mOutlineShader = new OGLShader("outline.vert", "outline.frag");
 	mAnimatedOutlineShader = new OGLShader("outlineAnimated.vert", "outline.frag");
@@ -169,6 +169,14 @@ void GameTechRenderer::GenUBOBuffers() {
 	GenLightDataUBO();
 	GenObjectDataUBO();
 	GenAnimFramesUBOs();
+	GenIconUBO();
+}
+
+void GameTechRenderer::GenIconUBO() {
+	glGenBuffers(1, &uBOBlocks[iconUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[iconUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, 2, NULL, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void GameTechRenderer::GenCamMatricesUBOS() {
@@ -444,9 +452,6 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 			BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
 		}
 
-		int shadowLocation = glGetUniformLocation(shader->GetProgramID(), "shadowMatrix");
-		int colourLocation = glGetUniformLocation(shader->GetProgramID(), "objectColour");
-		int hasVColLocation = glGetUniformLocation(shader->GetProgramID(), "hasVertexColours");
 		int hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
 		int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
 
@@ -454,8 +459,6 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 		glUniform1i(shadowTexLocation, 1);
 
 		Vector4 colour = rendObj->GetColour();
-		glUniform4fv(colourLocation, 1, &colour.x);
-		glUniform1i(hasVColLocation, !rendObj->GetMesh()->GetColourData().empty());
 		glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
 		OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
 		BindMesh(*mesh);
@@ -609,10 +612,14 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimationObject()->GetAnimation()) {
+			if (mOutlinedObjects[i]->GetAnimationObject()) {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
-				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
+				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
+				Matrix4* frameData = new Matrix4[128];
+				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
+				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4) * 128, frameData);
 			}
 			DrawBoundMesh((uint32_t)b);
 		}
@@ -687,8 +694,6 @@ void GameTechRenderer::NewRenderLines() {
 		return;
 	}
 	BindShader(*mDebugLineShader);
-	GLuint texSlot = glGetUniformLocation(mDebugLineShader->GetProgramID(), "useTexture");
-	glUniform1i(texSlot, 0);
 
 	debugLineData.clear();
 
@@ -721,8 +726,9 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
-	bool texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "isOn");
-	glUniform1i(texSlot, i.mTransparency);
+	bool iconData = i.mTransparency;
+	glBindBufferBase(GL_UNIFORM_BUFFER, iconUBO, uBOBlocks[iconUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 1, &iconData);
 
 	SetUIiconBufferSizes(iconVertCount);
 
@@ -756,8 +762,6 @@ void GameTechRenderer::NewRenderText() {
 		glBindTexture(GL_TEXTURE_2D, 0);
 		BindTextureToShader(*t, "mainTex", 0);
 	}
-	GLuint texSlot = glGetUniformLocation(mDebugTextShader->GetProgramID(), "useTexture");
-	glUniform1i(texSlot, 1);
 
 	debugTextPos.clear();
 	debugTextColours.clear();
