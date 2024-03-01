@@ -97,6 +97,14 @@ namespace NCL::CSC8503 {
 		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
 	};
 
+	struct SyncInteractablePacket : public GamePacket {
+		int networkObjId;
+		bool isOpen;
+		int interactableItemType;
+
+		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
