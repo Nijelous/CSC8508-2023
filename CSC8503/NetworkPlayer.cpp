@@ -18,13 +18,16 @@ namespace {
 	constexpr int MOVE_RIGHT_INDEX = 3;
 }
 
-NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(), LevelManager::GetLevelManager()->GetSuspicionSystem(), "") {
+NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
+	PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
+	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(),"") {
 	//this->game = game;
 	mPlayerID = num;
 }
 
-NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
-	LevelManager::GetLevelManager()->GetSuspicionSystem(), "") {
+NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(game->GetLevelManager()->GetGameWorld(),
+	LevelManager::GetLevelManager()->GetInventoryBuffSystem(),LevelManager::GetLevelManager()->GetSuspicionSystem(),
+	LevelManager::GetLevelManager()->GetUiSystem(), "") {
 	this->game = game;
 	mPlayerID = num;
 }
