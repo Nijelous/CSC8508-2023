@@ -241,6 +241,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
 	mRenderer->FillLightUBO();
+	mRenderer->FillAnimFrameUBOs(*mTempPlayer);
+	mRenderer->FillAnimFrameUBOs(*mGuardObjects[0]);
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 
 	delete[] levelSize;
@@ -337,7 +339,8 @@ void LevelManager::InitialiseAssets() {
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
 	mInstanceShader = mRenderer->LoadShader("sceneInstanced.vert", "scene.frag");
-	mGuardAnimationShader = mRenderer->LoadShader("animationScene.vert", "scene.frag");
+	mGuardAnimationShader = mRenderer->LoadShader("guardAnimScene.vert", "scene.frag");
+	mPlayerAnimationShader = mRenderer->LoadShader("playerAnimScene.vert", "scene.frag");
 
 
 

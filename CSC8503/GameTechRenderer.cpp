@@ -219,16 +219,32 @@ void GameTechRenderer::GenLightDataUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void GameTechRenderer::GenAndFillAnimFramesUBOs() {
+void GameTechRenderer::GenAnimFramesUBOs() {
 	for (int i = guardAnimFramesUBO; i < MAX_UBO; i++)	{
 		glGenBuffers(1, &uBOBlocks[i]);
 		glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[i]);
-		AnimFrameData* animData = new AnimFrameData();
 		glBindBufferBase(GL_UNIFORM_BUFFER, i, uBOBlocks[i]);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(AnimFrameData), NULL, GL_DYNAMIC_DRAW);		
-		delete[] animData;
 	}
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::FillAnimFrameUBOs(const GameObject& animObj) {
+	int index = -1;
+	if (animObj.GetName() == "Player") index = playerAnimFramesUBO;
+	else if (animObj.GetName() == "Guard") index = guardAnimFramesUBO;
+	else return;
+
+	AnimFrameData* animData = new AnimFrameData();
+	size_t layerCount = animObj.GetRenderObject()->GetMesh()->GetSubMeshCount();
+	
+	for (size_t i = 0; i < layerCount; i++) {
+		int offset = i * sizeof(animData->layer1Frames);
+		/*animObj.GetRenderObject().GetFrameMatricesVec()[i].data();
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(float), (float*));*/
+	}
+	animObj.GetRenderObject()->GetFrameMatricesVec();
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[index]);
 }
 
 void GameTechRenderer::FillLightUBO() {
