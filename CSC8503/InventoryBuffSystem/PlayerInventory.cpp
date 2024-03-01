@@ -217,12 +217,12 @@ ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inI
 }
 
 void InventoryBuffSystem::PlayerInventory::TransferItemBetweenInventories(const int& givingPlayerNo, const int& givingPlayerInvSlot, const int& receivingPlayerNo){
-	if (IsInventoryFull(receivingPlayerNo) || IsInventoryEmpty(givingPlayerNo))
-		return;
 	item itemToRemove = GetItemInInventorySlot(givingPlayerNo, givingPlayerInvSlot);
-	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
+	if (IsInventoryFull(receivingPlayerNo) || itemToRemove == none)
+		return;
 	int receivingSlot = AddItemToPlayer(itemToRemove, receivingPlayerNo);
 	SetItemUsageCount(receivingPlayerNo, receivingSlot, GetItemUsageCount(givingPlayerNo, givingPlayerInvSlot));
+	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
 }
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer) {

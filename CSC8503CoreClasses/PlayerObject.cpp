@@ -129,7 +129,13 @@ void PlayerObject::UpdateObject(float dt) {
 			Debug::Print("Stunned", Vector2(45, 80));
 			break;
 		}
-		
+		const PlayerInventory::item equippedItem = GetEquippedItem();
+		//Handle Equipped Item Log
+		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+		Debug::Print(itemName, Vector2(10, 80));
+		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+		Debug::Print(usesLeft, Vector2(10, 85));
+		Debug::Print(to_string(mGameWorld->GetMainCamera().GetYaw()), Vector2(54, 90));
 	}
 }
 
@@ -220,14 +226,13 @@ void PlayerObject::MovePlayer(float dt) {
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
 	
 	GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(mGameWorld->GetMainCamera().GetPitch(), mGameWorld->GetMainCamera().GetYaw(), 0));
-	Debug::Print(to_string(mGameWorld->GetMainCamera().GetYaw()), Vector2(54, 90));
+
 	if (isIdle){
 		if(mObjectState != Idle && mSuspicionSystemClassPtr != nullptr ) {
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-
 		}
 		if (mIsCrouched)
 			mObjectState = IdleCrouch;
@@ -363,11 +368,11 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 
-	//Handle Equipped Item Log
-	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-	Debug::Print(itemName, Vector2(10, 80));
-	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-	Debug::Print(usesLeft, Vector2(10, 85));
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
+	}
+
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
