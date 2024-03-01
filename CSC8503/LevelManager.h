@@ -118,16 +118,18 @@ namespace NCL {
 
 			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
-			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
+			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
 			void SendWallFloorInstancesToGPU();
+
+			void AddNetworkObject(GameObject& objToAdd);
 
 			GameObject* AddWallToWorld(const Transform& transform);
 			GameObject* AddCornerWallToWorld(const Transform& transform);
 			GameObject* AddFloorToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
-			Vent* AddVentToWorld(Vent* vent);
+			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
@@ -247,6 +249,7 @@ namespace NCL {
 			std::map<PlayerInventory::item, Texture*> mItemTextureMap;
 			// key variables
 			int mActiveLevel;
+			int mNetworkIdBuffer;
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;

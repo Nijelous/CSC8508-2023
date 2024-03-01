@@ -22,6 +22,14 @@
 
 #include <filesystem>
 
+#include "DebugNetworkedGame.h"
+#include "NetworkObject.h"
+#include "SceneManager.h"
+
+namespace {
+	constexpr int NETWORK_ID_BUFFER_START = 10;
+}
+
 using namespace NCL::CSC8503;
 
 LevelManager* LevelManager::instance = nullptr;
@@ -54,8 +62,9 @@ LevelManager::LevelManager() {
 	mActiveLevel = -1;
 
 	mGameState = MenuState;
-	
-	
+
+	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
+
 	InitialiseAssets();
 	InitialiseIcons();
 
@@ -196,7 +205,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	std::vector<Vector3> itemPositions;
 	std::vector<Vector3> roomItemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
-	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections());
+	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections(), isMultiplayer);
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
@@ -264,6 +273,17 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	OGLMesh* cornerWallInstance = (OGLMesh*)mCornerWallMesh;
 	cornerWallInstance->SetInstanceMatrices(mLevelCornerWallMatrices);
 	mRenderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+}
+
+void LevelManager::AddNetworkObject(GameObject& objToAdd) {
+	auto* networkObj = new NetworkObject(objToAdd, mNetworkIdBuffer);
+	mNetworkIdBuffer++;
+	objToAdd.SetNetworkObject(networkObj);
+
+	auto* sceneManager = SceneManager::GetSceneManager();
+	Scene* currentScene = sceneManager->GetCurrentScene();
+	DebugNetworkedGame* networkScene = static_cast<DebugNetworkedGame*>(currentScene);
+	networkScene->AddNetworkObjectToNetworkObjects(networkObj);
 }
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
@@ -456,10 +476,10 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	}
 }
 
-void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> ventConnections) {
+void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> ventConnections, bool isMultiplayerLevel) {
 	std::vector<Vent*> addedVents;
 	for (int i = 0; i < vents.size(); i++) {
-		addedVents.push_back(AddVentToWorld(vents[i]));
+		addedVents.push_back(AddVentToWorld(vents[i], isMultiplayerLevel));
 	}
 	for (int i = 0; i < addedVents.size(); i++) {
 		addedVents[i]->ConnectVent(addedVents[ventConnections[i]]);
@@ -621,8 +641,9 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 	return helipad;
 }
 
-Vent* LevelManager::AddVentToWorld(Vent* vent) {
+Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	Vent* newVent = new Vent();
+	newVent->SetName("Vent");
 
 	Vector3 size = Vector3(1.25f, 1.25f, 0.05f);
 	OBBVolume* volume = new OBBVolume(size);
@@ -638,11 +659,16 @@ Vent* LevelManager::AddVentToWorld(Vent* vent) {
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
 	newVent->SetPhysicsObject(new PhysicsObject(&newVent->GetTransform(), newVent->GetBoundingVolume(), 1, 1, 5));
 
+	newVent->GetRenderObject()->SetRenderName("Vent");
 
 	newVent->GetPhysicsObject()->SetInverseMass(0);
 	newVent->GetPhysicsObject()->InitCubeInertia();
 
 	newVent->SetCollisionLayer(StaticObj);
+
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*newVent);
+	}
 
 	mWorld->AddGameObject(newVent);
 
