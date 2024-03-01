@@ -235,11 +235,11 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 					item->OnPlayerInteract(mPlayerID);
 					return;
 				}
-
+					
 				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
-					interactablePtr->Interact(interactType);
+					interactablePtr->Interact(interactType, this);
 					if (interactType == ItemUse) {
 						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 					}
