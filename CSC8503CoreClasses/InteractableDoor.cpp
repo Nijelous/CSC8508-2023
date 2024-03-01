@@ -3,6 +3,7 @@
 #include "StateMachine.h"
 #include "StateTransition.h"
 #include "State.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace NCL::CSC8503;
 
@@ -51,13 +52,27 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 		return !mIsLocked;
 		break;
 	case ItemUse:
-		return !mIsOpen;
+		return CanUseItem() && !mIsOpen;
+		break;
 	case LongUse:
 		return (mIsLocked && !mIsOpen);
 		break;
 	default:
 		return false;
 		break;
+	}
+}
+
+bool InteractableDoor::CanUseItem(){
+	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
+
+	switch (usedItem) {
+	case InventoryBuffSystem::PlayerInventory::doorKey:
+		return true;
+		break;
+	default:
+		return false;
 	}
 }
 
@@ -130,6 +145,8 @@ void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionM
 		break;
 	}
 }
+
+
 
 void InteractableDoor::UpdateObject(float dt) {
 	mStateMachine->Update(dt);

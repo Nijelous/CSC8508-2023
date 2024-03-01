@@ -13,10 +13,11 @@ namespace NCL {
             void HandleItemUse();
             void HandlePlayerUse();
             void Interact(NCL::CSC8503::InteractType interactType) override;
-            virtual bool CanBeInteractedWith(InteractType interactType) { return true; };
+            virtual bool CanBeInteractedWith(InteractType interactType) override;
         protected:
             bool mIsOpen;
             Vent* mConnectedVent;
+            bool CanUseItem();
         };
     }
 }
