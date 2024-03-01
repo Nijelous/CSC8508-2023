@@ -8,10 +8,12 @@ using namespace NCL::CSC8503;
 
 void InteractableDoor::Unlock(){
 	mIsLocked = false;
+	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock(){
 	mIsLocked = true;
+	SetNavMeshFlags(4);
 }
 
 void InteractableDoor::Interact(InteractType interactType)
