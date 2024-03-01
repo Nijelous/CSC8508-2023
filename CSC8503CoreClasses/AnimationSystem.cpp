@@ -61,8 +61,7 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 					}
 					frameMatricesVec.emplace_back(frameMatrices);
 				}
-				obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
-				obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
+
 				obj->GetRenderObject()->SetCurrentFrame(currentFrame);
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 				
@@ -171,12 +170,16 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 			AnimationObject* animObj = obj->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
+			obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
+			obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
+			obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
+			obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
 		}
 	}
 }

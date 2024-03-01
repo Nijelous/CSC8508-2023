@@ -20,8 +20,6 @@ namespace NCL {
         class AnimationObject
         {
         public:
-            
-
             AnimationObject(MeshAnimation* animation, MeshMaterial* material);
             ~AnimationObject();
 
@@ -58,12 +56,11 @@ namespace NCL {
             float GetRate() {
                 return mRate;
             }
-           
+
             
         protected:
             MeshAnimation* mAnimation;
             MeshMaterial* mMaterial;
-           
            
             int		mCurrentFrame;
             int		mNextFrame;

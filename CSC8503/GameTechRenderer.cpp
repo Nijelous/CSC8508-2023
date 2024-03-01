@@ -168,6 +168,7 @@ void GameTechRenderer::GenUBOBuffers() {
 	GenStaticDataUBO();
 	GenLightDataUBO();
 	GenObjectDataUBO();
+	GenAnimFramesUBOs();
 }
 
 void GameTechRenderer::GenCamMatricesUBOS() {
@@ -236,12 +237,11 @@ void GameTechRenderer::FillAnimFrameUBOs(const GameObject& animObj) {
 	else return;
 
 	AnimFrameData* animData = new AnimFrameData();
-	size_t layerCount = animObj.GetRenderObject()->GetMesh()->GetSubMeshCount();
 	
-	for (size_t i = 0; i < layerCount; i++) {
+	for (size_t i = 0; i < 4; i++) {
 		int offset = i * sizeof(animData->layer1Frames);
-		/*animObj.GetRenderObject().GetFrameMatricesVec()[i].data();
-		glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(float), (float*));*/
+		vector<Matrix4> frameMats = animObj.GetRenderObject()->GetFrameMatricesVec()[i];
+		glBufferSubData(GL_UNIFORM_BUFFER, offset, sizeof(float), (float*) frameMats.data());
 	}
 	animObj.GetRenderObject()->GetFrameMatricesVec();
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[index]);
@@ -517,13 +517,15 @@ void GameTechRenderer::FillGBuffer() {
 		//Animation basic draw
 		if (mActiveObjects[i]->GetAnimation()) {
 			BindMesh((OGLMesh&)*mActiveObjects[i]->GetMesh());
+			BufferBlockNames animIndex;
+			mActiveObjects[i]->GetAnimation();
+			
 			mMesh = mActiveObjects[i]->GetMesh();
 			size_t layerCount = mMesh->GetSubMeshCount();
 			for (size_t b = 0; b < layerCount; ++b) {
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = mActiveObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
-				glUniformMatrix4fv(glGetUniformLocation(shader->GetProgramID(), "joints"), mActiveObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mActiveObjects[i]->GetFrameMatricesVec()[b].data());
 				DrawBoundMesh((uint32_t)b);
 			}
 		}

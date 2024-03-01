@@ -6,7 +6,6 @@ AnimationObject::AnimationObject(MeshAnimation* animation, MeshMaterial* materia
 	this->mAnimation = animation;
 	this->mMaterial = material;
 
-
 	mCurrentFrame = 0;
 	mNextFrame = 0;
 	mFrameTime = 0.0f;
