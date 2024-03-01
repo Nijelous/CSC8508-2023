@@ -106,6 +106,7 @@ void PickupGameObject::ChangeToRandomPickup() {
 void PickupGameObject::ActivatePickup(int playerNo) {
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
+
 	else
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(mCurrentItem, playerNo);
 
