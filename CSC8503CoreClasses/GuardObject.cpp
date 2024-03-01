@@ -27,6 +27,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
+	delete[] mLastKnownPos;
 }
 
 void GuardObject::UpdateObject(float dt) {
@@ -138,6 +139,12 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	}
 }
 
+void GuardObject::RunAfterPlayer(Vector3 dir) {
+	LookTowardFocalPoint(dir);
+	Vector3 dirNorm = dir.Normalised();
+	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
+}
+
 void GuardObject::GrabPlayer() {
 	Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
 	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
@@ -151,7 +158,6 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	dtPolyRef* endRef = new dtPolyRef();
 	float* nearestPoint1 = new float[3];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(startPos, halfExt, filter, startRef, nearestPoint1);
-	//float* nearestPoint2 = new float[3];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(endPos, halfExt, filter, endRef, nearestPoint1);
 	int* pathCount = new int;
 	dtPolyRef* path = new dtPolyRef[1000];
@@ -217,14 +223,18 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
+	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
+	BehaviourSelector* ChasePlayerSelector = new BehaviourSelector("Chase Player Selector");
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
-	FirstSelect->AddChild(ChasePlayerSetup());
-	FirstSelect->AddChild(CaughtPlayerSequence);
+	FirstSelect->AddChild(SeenPlayerSequence);
+	SeenPlayerSequence->AddChild(ChasePlayerSelector);
+	ChasePlayerSelector->AddChild(ChasePlayerSetup());
+	ChasePlayerSelector->AddChild(GoToLastKnownLocation());
+	SeenPlayerSequence->AddChild(CaughtPlayerSequence);
 	CaughtPlayerSequence->AddChild(ConfiscateItems());
 	CaughtPlayerSequence->AddChild(SendToPrison());
-
 }
 
 void GuardObject::ExecuteBT() {
@@ -296,17 +306,18 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					LookTowardFocalPoint(direction);
 					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
-					return Failure;
+					return Success;
 				}
 				else {
-					float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
-					MoveTowardFocalPoint(endPos);
+					RunAfterPlayer(direction);
+					//float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
+					//MoveTowardFocalPoint(endPos);
 				}
 			}
-			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
-				return Success;
-			}
 			else {
+				mLastKnownPos[0] = mPlayer->GetTransform().GetPosition().x;
+				mLastKnownPos[1] = 0;
+				mLastKnownPos[2] = mPlayer->GetTransform().GetPosition().z;
 				return Failure;
 			}
 		}
@@ -316,10 +327,36 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 	return ChasePlayer;
 }
 
+BehaviourAction* GuardObject::GoToLastKnownLocation() {
+	BehaviourAction* GoToLastKnownLocation = new BehaviourAction("Go To Last Known Location", [&](float dt, BehaviourState state)->BehaviourState {
+		if (state == Initialise) {
+			state = Ongoing;
+		}
+		else if (state == Ongoing) {
+			float* endPos = new float[3] {mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]};
+			MoveTowardFocalPoint(endPos);
+			if (this->GetTransform().GetPosition() == Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2])) {
+				if (mCanSeePlayer == true) {
+					return Success;
+				}
+				else {
+					return Failure;
+				}
+			}
+		}
+		return state;
+	}
+	);
+	return GoToLastKnownLocation;
+}
+
 BehaviourAction* GuardObject::ConfiscateItems() {
 	BehaviourAction* ConfiscateItems = new BehaviourAction("Confiscate Items", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			mConfiscateItemsTime = 60;
+			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
+				return Failure;
+			}
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {

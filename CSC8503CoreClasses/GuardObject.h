@@ -55,6 +55,7 @@ namespace NCL {
             void ExecuteBT();
             void MoveTowardFocalPoint(float* endPos);
             void LookTowardFocalPoint(Vector3 direction);
+            void RunAfterPlayer(Vector3 direction);
             void GrabPlayer();
             float* QueryNavmesh(float* endPos);
 
@@ -64,9 +65,11 @@ namespace NCL {
             float* mNextPoly = new float[3];
             float mConfiscateItemsTime;
             int mGuardSpeedMultiplier;
+            float* mLastKnownPos = new float[3];
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();
+            BehaviourAction* GoToLastKnownLocation();
             BehaviourAction* ConfiscateItems();
             BehaviourAction* SendToPrison();
 
