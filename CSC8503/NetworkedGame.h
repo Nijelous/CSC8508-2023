@@ -49,6 +49,8 @@ namespace NCL {
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
+			void AddNetworkObjectToNetworkObjects(NetworkObject* networkObj);
+
 		protected:
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);

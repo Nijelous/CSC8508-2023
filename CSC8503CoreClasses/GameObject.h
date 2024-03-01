@@ -159,6 +159,10 @@ namespace NCL::CSC8503 {
 			return mObjectState;
 		}
 
+		void SetName(const std::string& name) {
+			mName = name;
+		}
+
 	protected:
 		Transform			mTransform;
 
