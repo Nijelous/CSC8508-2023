@@ -43,6 +43,8 @@ namespace NCL {
 
 			float ImpulseResolveCollision(GameObject& a , GameObject&b, CollisionDetection::ContactPoint& p) const;
 
+			float GetCollisionElasticity(PhysicsObject objectA, PhysicsObject objectB) const;
+
 			void FrictionImpulse(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float j) const;
 
 			bool GetIsCapsule(GameObject& obj) const;

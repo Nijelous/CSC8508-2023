@@ -733,15 +733,15 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	OGLTexture* t = (OGLTexture*)i.texture;
+	OGLTexture* t = (OGLTexture*)i.mTexture;
 	BindTextureToShader(*t, "iconTex", t->GetObjectID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
+	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
-	bool texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "isOn");
-	glUniform1i(texSlot, i.isAppear);
+	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
+	glUniform1i(texSlot, i.mTransparency);
 
 	SetUIiconBufferSizes(iconVertCount);
 

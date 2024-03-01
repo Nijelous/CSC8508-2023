@@ -115,16 +115,16 @@ LevelManager::~LevelManager() {
 	delete mAnimation;
 
 	delete mInventorySlotTex;
-	delete mHighlightAwardTex;
-	delete mLightOffTex;
-	delete mMakingNoiseTex;
+
 	delete mSilentRunTex;
 	delete mSlowDownTex;
 	delete mStunTex;
-	delete mSwapPositionTex;
+	delete mSpeedUpTex;
 
-	delete mSuspensionBarTex;
-	delete mSuspensionIndicatorTex;
+	delete mLowSuspisionBarTex;
+	delete mMidSuspisionBarTex;
+	delete mHighSuspisionBarTex;
+	delete mSuspisionIndicatorTex;
 
 	delete mGuardAnimationShader;
 	delete mPlayerAnimationShader;
@@ -174,6 +174,7 @@ void LevelManager::ClearLevel() {
 	mBaseFloor = nullptr;
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
+	ResetEquippedIconTexture();
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -381,21 +382,21 @@ void LevelManager::InitialiseAssets() {
 
 	//icons
 	mInventorySlotTex = mRenderer->LoadTexture("InventorySlot.png");
-	mHighlightAwardTex = mRenderer->LoadTexture("HighlightAward.png");
-	mLightOffTex = mRenderer->LoadTexture("LightOff.png");
-	mMakingNoiseTex = mRenderer->LoadTexture("MakingNoise.png");
-	mSilentRunTex = mRenderer->LoadTexture("SilentRun.png");
-	mSlowDownTex = mRenderer->LoadTexture("SlowDown.png");
+	
+	mSpeedUpTex = mRenderer->LoadTexture("SpeedUp.png");
+	mSilentRunTex = mRenderer->LoadTexture("Silence.png");
+	mSlowDownTex = mRenderer->LoadTexture("SpeedDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-	mSwapPositionTex = mRenderer->LoadTexture("SwapPosition.png");
+
+	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
 	mKeyIconTex = mRenderer->LoadTexture("key.png");
 	mFlagIconTex = mRenderer->LoadTexture("flag.png");
 
-	
-
-	mSuspensionBarTex = mRenderer->LoadTexture("SuspensionBar.png");
-	mSuspensionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
+	mLowSuspisionBarTex = mRenderer->LoadTexture("lowSus.png");
+	mMidSuspisionBarTex = mRenderer->LoadTexture("midSus.png");
+	mHighSuspisionBarTex = mRenderer->LoadTexture("highSus.png");
+	mSuspisionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition) {
@@ -522,25 +523,39 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 }
 
 void LevelManager::InitialiseIcons() {
+	//Inventory
 	UISystem::Icon* mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(0, *mInventoryIcon1);
 
 	UISystem::Icon* mInventoryIcon2 = mUi->AddIcon(Vector2(50, 90), 4.5, 8, mInventorySlotTex);
 	mUi->SetEquippedItemIcon(1, *mInventoryIcon2);
 
-	UISystem::Icon* mHighlightAwardIcon = mUi->AddIcon(Vector2(3, 84), 4.5, 7, mHighlightAwardTex, false);
-	UISystem::Icon* mLightOffIcon = mUi->AddIcon(Vector2(8, 84), 4.5, 7, mLightOffTex, false);
-	UISystem::Icon* mMakingNoiseIcon = mUi->AddIcon(Vector2(13, 84), 4.5, 7, mMakingNoiseTex, false);
-	UISystem::Icon* mSilentRunIcon = mUi->AddIcon(Vector2(18, 84), 4.5, 7, mSilentRunTex, false);
-	UISystem::Icon* mSlowDownIcon = mUi->AddIcon(Vector2(3, 92), 4.5, 7, mSlowDownTex, false);
-	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(8, 92), 4.5, 7, mStunTex, false);
-	UISystem::Icon* mSwapPositionIcon = mUi->AddIcon(Vector2(13, 92), 4.5, 7, mSwapPositionTex, false);
-				  
-	UISystem::Icon* mSuspensionBarIcon = mUi->AddIcon(Vector2(90, 16), 12, 75, mSuspensionBarTex);
-	UISystem::Icon* mSuspensionIndicatorIcon = mUi->AddIcon(Vector2(92, 86), 4, 4, mSuspensionIndicatorTex);
+	//Buff
+	UISystem::Icon* mSilentSprintIcon = mUi->AddIcon(Vector2(65, 3), 4.5, 7, mSilentRunTex, false);
+	mUi->SetEquippedItemIcon(2, *mSilentSprintIcon);
 
+	UISystem::Icon* mSlowIcon = mUi->AddIcon(Vector2(70, 3), 4.5, 7, mSlowDownTex, false);
+	mUi->SetEquippedItemIcon(3, *mSlowIcon);
+
+	UISystem::Icon* mStunIcon = mUi->AddIcon(Vector2(75, 3), 4.5, 7, mStunTex, false);
+	mUi->SetEquippedItemIcon(4, *mStunIcon);
+
+	UISystem::Icon* mSpeedIcon = mUi->AddIcon(Vector2(80, 3), 4.5, 7, mSpeedUpTex, false);
+	mUi->SetEquippedItemIcon(5, *mSpeedIcon);
+
+	//suspicion
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspisionBarTex);
+	mUi->SetEquippedItemIcon(6, *mSuspisionBarIcon);
+
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspisionIndicatorTex);
+	mUi->SetEquippedItemIcon(7, *mSuspisionIndicatorIcon);
+
+	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex);
 
 	mRenderer->SetUIObject(mUi);
+
+	
+	
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
@@ -856,6 +871,7 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
 	mTempPlayer->SetIsRendered(false);
+	mTempPlayer->SetUIObject(mUi);
 	return mTempPlayer;
 }
 
@@ -913,6 +929,21 @@ void LevelManager::DropEquippedIconTexture(int itemSlot) {
 	Texture& itemTex = *mInventorySlotTex;
 
 	mUi->ChangeEquipmentSlotTexture(itemSlot, itemTex);
+}
+
+void LevelManager::ResetEquippedIconTexture() {
+
+	Texture& itemTex = *mInventorySlotTex;
+
+	mUi->ChangeEquipmentSlotTexture(0, itemTex);
+	mUi->ChangeEquipmentSlotTexture(1, itemTex);
+
+	mUi->ChangeBuffSlotTransparency(2, false);
+	mUi->ChangeBuffSlotTransparency(3, false);
+	mUi->ChangeBuffSlotTransparency(4, false);
+	mUi->ChangeBuffSlotTransparency(5, false);
+
+
 }
 
 
