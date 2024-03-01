@@ -8,6 +8,7 @@
 #include <glad/gl.h>
 
 #include "Transform.h"
+#include <AnimationObject.h>
 
 
 namespace NCL {
@@ -97,21 +98,6 @@ namespace NCL {
 				return mIsInstanced;
 			}
 
-			void SetAnimation(MeshAnimation* animation) {
-				mAnimation = animation;
-			}
-
-			MeshAnimation* GetAnimation() const{
-				return mAnimation;
-			}
-
-			void SetMaterial(MeshMaterial* material) {
-				mMaterial = material;
-			}
-
-			MeshMaterial* GetMaterial() const{
-				return mMaterial;
-			}
 
 			void SetCurrentFrame(int currentFrame) {
 				mCurrentFrame = currentFrame;
@@ -137,15 +123,26 @@ namespace NCL {
 				return mFrameMatricesVec;
 			}
 
+			AnimationObject* GetAnimationObject() const {
+				return mAnimationObject;
+			}
+
+			void SetAnimationObject(AnimationObject* newObject) {
+				mAnimationObject = newObject;
+			}
+
+
+
 		protected:
 			Mesh*		mMesh;
 			Texture* mAlbedoTex;
 			Texture* mNormalTex;
 			Shader*		mShader;
 			Transform*	mTransform;
-			MeshAnimation* mAnimation;
-			MeshMaterial* mMaterial;
+	
+
 			Vector4		mColour;
+			AnimationObject* mAnimationObject;
 
 			float		mCullSphereRadius;
 			float mSqDistToCam;
