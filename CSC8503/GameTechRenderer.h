@@ -84,10 +84,6 @@ namespace NCL {
 				float padding[27] = { 0.0f };				
 			};
 
-			struct AnimFrameData {
-				Matrix4 frames[128];
-			};
-
 			enum BufferBlockNames {
 				camUBO,
 				staticDataUBO,

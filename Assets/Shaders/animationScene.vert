@@ -1,6 +1,5 @@
 #version 430 core
 
-
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
 layout(location = 2) in vec2 texCoord;
@@ -51,15 +50,6 @@ void main(void)
 	vec4 skelPos 	= vec4(0,0,0,0);
 	vec4 skelNormal = vec4(0,0,0,0);
 
-
-
-
-	if(objectData.hasVertexColours) {
-		OUT.colour		= objectData.objectColour * colour;
-	}
-
-	
-
 	for(int i = 0; i < 4; ++i) {
 		int   jointIndex 	= jointIndices[i];
 		float jointWeight 	= jointWeights[i];
@@ -68,7 +58,9 @@ void main(void)
 		skelNormal += animData.joints[jointIndex] * localNormal * jointWeight;
 	}
 
-	
+	if(objectData.hasVertexColours) {
+		OUT.colour		= objectData.objectColour * colour;
+	}
 	
 	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
 	OUT.shadowProj 	=  objectData.shadowMatrix * vec4 ( skelPos.xyz,1);

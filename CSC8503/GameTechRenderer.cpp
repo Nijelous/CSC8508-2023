@@ -223,8 +223,7 @@ void GameTechRenderer::GenLightDataUBO() {
 void GameTechRenderer::GenAnimFramesUBOs() {
 	glGenBuffers(1, &uBOBlocks[animFramesUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[animFramesUBO]);
-	glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(AnimFrameData), NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(Matrix4) * 128, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -503,12 +502,12 @@ void GameTechRenderer::FillGBuffer() {
 			for (size_t b = 0; b < layerCount; ++b) {
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = mActiveObjects[i]->GetMatTextures()[b];
-				glBindTexture(GL_TEXTURE_2D, textureID);
-				glBindBufferRange(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO], sizeof(AnimFrameData), sizeof(Matrix4));
-				vector<vector<Matrix4>> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec();
+				glBindTexture(GL_TEXTURE_2D, textureID);				
+				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
-				frameData = frameMatrices[b].data();
-				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(AnimFrameData), frameData);
+				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
+				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4) * 128, frameData);
 				DrawBoundMesh((uint32_t)b);
 			}
 		}

@@ -1,7 +1,5 @@
 #version 430 core
 
-uniform mat4 joints[128];
-
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
 layout(location = 2) in vec2 texCoord;
@@ -23,6 +21,10 @@ layout(std140, binding = 3) uniform ObjectBlock {
 	bool hasVertexColours;
 } objectData;
 
+layout (std140, binding = 4) uniform AnimBlock {
+	mat4 joints[128];
+} animData;
+
 out Vertex
 {
 	vec2 texCoord;
@@ -38,7 +40,7 @@ void main(void)
 		int   jointIndex 	= jointIndices[i];
 		float jointWeight 	= jointWeights[i];
 
-		skelPos += joints[jointIndex] * localPos * jointWeight;
+		skelPos += animData.joints[jointIndex] * localPos * jointWeight;
 		}
 	OUT.texCoord = texCoord;
 	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
