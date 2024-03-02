@@ -145,7 +145,7 @@ namespace NCL {
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
-			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
