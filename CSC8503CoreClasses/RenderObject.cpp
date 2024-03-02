@@ -15,8 +15,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mColour	= Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
-	mAnimation = nullptr;
-	mMaterial = nullptr;
+
 	mCurrentFrame = 0;
 	
 	vector<GLuint>  mMatTextures = {};
@@ -34,8 +33,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mColour = colour;
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
-	mAnimation = nullptr;
-	mMaterial = nullptr;
+
 	mCurrentFrame = 0;
 	vector<GLuint>  mMatTextures = {};
 	vector<Matrix4> mFrameMatrices = {};
