@@ -120,7 +120,7 @@ namespace NCL {
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
-			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false);
 			void SendWallFloorInstancesToGPU();
 
 			void AddNetworkObject(GameObject& objToAdd);
@@ -130,7 +130,7 @@ namespace NCL {
 			GameObject* AddFloorToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
-			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
+			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset, bool isMultiplayerLevel = false);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);

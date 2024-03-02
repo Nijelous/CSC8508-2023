@@ -1,8 +1,13 @@
 #include "Door.h"
 #include "InteractableDoor.h"
+
+#include "GameServer.h"
 #include "StateMachine.h"
 #include "StateTransition.h"
 #include "State.h"
+#include "NetworkObject.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
 
 using namespace NCL::CSC8503;
 
@@ -22,10 +27,7 @@ void InteractableDoor::Interact(InteractType interactType, GameObject* interacte
 	switch (interactType)
 	{
 	case Use:
-		if (mIsOpen)
-			Close();
-		else
-			Open();
+		SetIsOpen(!mIsOpen, true);
 		break;
 	case LongUse:
 		Unlock();
@@ -59,6 +61,22 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 	}
 }
 
+void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
+	mIsOpen = isOpen;
+	if (isOpen) {
+		GameObject::SetActive(false);
+		mTimer = initDoorTimer;
+	}
+	else {
+		GameObject::SetActive(true);
+	}
+
+	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
+	if (isMultiplayerGame && isSettedByServer) {
+		SyncInteractableDoorStatusInMultiplayer();
+	}
+}
+
 void InteractableDoor::InitStateMachine()
 {
 	mStateMachine = new StateMachine();
@@ -67,8 +85,8 @@ void InteractableDoor::InitStateMachine()
 		{
 			this->CountDownTimer(dt);
 
-			if (mTimer == 0)
-				Close();
+			//if (mTimer == 0)
+				//SetIsOpen(false, true);
 		}
 	);
 
@@ -116,6 +134,20 @@ void InteractableDoor::InitStateMachine()
 			return !this->mIsLocked;
 		}
 	));
+}
+
+void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
+	auto* sceneManager = SceneManager::GetSceneManager();
+	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+	if (networkedGame) {
+		auto* networkObj = GetNetworkObject();
+		if (networkObj) {
+			const int networkId = networkObj->GetnetworkID();
+
+			SyncInteractablePacket packet(networkId, mIsOpen, mInteractableItemType);
+			networkedGame->GetServer()->SendGlobalPacket(packet);
+		}
+	}
 }
 
 void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint){

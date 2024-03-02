@@ -6,6 +6,7 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "Interactable.h"
+#include "InteractableDoor.h"
 #include "NetworkObject.h"
 #include "NetworkPlayer.h"
 #include "RenderObject.h"
@@ -163,10 +164,6 @@ void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event) {
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
 	switch (type) {
-	case BasicNetworkMessages::String_Message: {
-		int a = 0;
-		break;
-	}
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
 		SetIsGameStarted(packet->isGameStarted);
@@ -200,12 +197,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	case BasicNetworkMessages::ClientSyncItemSlot: {
 		ClientSyncItemSlotPacket* packet = (ClientSyncItemSlotPacket*)(payload);
 		HandlePlayerEquippedItemChange(packet);
+		break;
 	}
 	case BasicNetworkMessages::SyncInteractable: {
 		SyncInteractablePacket* packet = (SyncInteractablePacket*)(payload);
 		HandleInteractablePacket(packet);
 		break;
-
 	}
 
 	default:
@@ -473,8 +470,11 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 	}
 
 	switch (interactableItemType) {
-	case InteractableItems::InteractableDoors:
+	case InteractableItems::InteractableDoors: {
+		InteractableDoor* doorObj = reinterpret_cast<InteractableDoor*>(interactedObj);
+		doorObj->SetIsOpen(packet->isOpen, false);
 		break;
+	}
 	case InteractableItems::InteractableVents:
 		Vent* ventObj = reinterpret_cast<Vent*>(interactedObj);
 		ventObj->SetIsOpen(packet->isOpen, false);

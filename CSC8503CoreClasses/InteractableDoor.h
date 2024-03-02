@@ -22,7 +22,9 @@ namespace NCL {
 			void Lock();
 			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
+			void SetIsOpen(bool isOpen, bool isSettedByServer);
 			virtual void InitStateMachine() override;
+			void SyncInteractableDoorStatusInMultiplayer();
 
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;

@@ -206,7 +206,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	std::vector<Vector3> roomItemPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections(), isMultiplayer);
-	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0));
+	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0), isMultiplayer);
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
@@ -223,7 +223,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 				if (room->GetType() == Medium) {
 					LoadMap(room->GetTileMap(), key);
 					LoadLights(room->GetLights(), key);
-					LoadDoors(room->GetDoors(), key);
+					LoadDoors(room->GetDoors(), key, isMultiplayer);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
@@ -486,9 +486,9 @@ void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> v
 	}
 }
 
-void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre) {
+void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel) {
 	for (int i = 0; i < doors.size(); i++) {
-		InteractableDoor* interactableDoorPtr =AddDoorToWorld(doors[i], centre);
+		InteractableDoor* interactableDoorPtr = AddDoorToWorld(doors[i], centre, isMultiplayerLevel);
 		mUpdatableObjects.push_back(interactableDoorPtr);
 	}
 }
@@ -659,7 +659,6 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
 	newVent->SetPhysicsObject(new PhysicsObject(&newVent->GetTransform(), newVent->GetBoundingVolume(), 1, 1, 5));
 
-	newVent->GetRenderObject()->SetRenderName("Vent");
 
 	newVent->GetPhysicsObject()->SetInverseMass(0);
 	newVent->GetPhysicsObject()->InitCubeInertia();
@@ -675,7 +674,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	return newVent;
 }
 
-InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset) {
+InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset, bool isMultiplayerLevel) {
 	InteractableDoor* newDoor = new InteractableDoor();
 	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
 	if (abs(door->GetTransform().GetOrientation().y) == 1 || abs(door->GetTransform().GetOrientation().w) == 1) {
@@ -701,6 +700,10 @@ InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset
 	newDoor->GetPhysicsObject()->InitCubeInertia();
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
+
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*newDoor);
+	}
 
 	mWorld->AddGameObject(newDoor);
 

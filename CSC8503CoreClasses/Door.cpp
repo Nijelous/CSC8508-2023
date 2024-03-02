@@ -46,16 +46,18 @@ void Door::Open()
 {
 	SetActive(false);
 	mTimer = initDoorTimer;
-	mIsOpen = true;
 }
 
 void Door::Close()
 {
 	SetActive(true);
-	mIsOpen = false;
 }
 
 void Door::CountDownTimer(float dt)
 {
 	mTimer = std::max(mTimer - dt, 0.0f);
+}
+
+void Door::SetIsOpen(bool isOpen) {
+	mIsOpen = isOpen;
 }
