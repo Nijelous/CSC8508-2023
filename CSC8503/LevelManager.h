@@ -76,6 +76,10 @@ namespace NCL {
 
 			InventoryBuffSystemClass* GetInventoryBuffSystem();
 
+			SuspicionSystemClass* GetSuspicionSystem();
+
+			UISystem* GetUiSystem() { return mUi; };
+
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
 			const std::vector<Matrix4>& GetLevelFloorMatrices() { return mLevelFloorMatrices; }
