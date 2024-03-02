@@ -9,7 +9,6 @@ namespace NCL::CSC8503 {
 	class NetworkObject;
 	class RenderObject;
 	class PhysicsObject;
-	class AnimationObject;
 	class SoundObject;
 
 	enum CollisionLayer {
@@ -108,9 +107,7 @@ namespace NCL::CSC8503 {
     
         void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
     
-		AnimationObject* GetAnimationObject() const {
-			return mAnimationObject;
-		}
+	
 
 		void SetRenderObject(RenderObject* newObject) {
 			mRenderObject = newObject;
@@ -120,9 +117,7 @@ namespace NCL::CSC8503 {
 			mPhysicsObject = newObject;
 		}
 
-		void SetAnimationObject(AnimationObject* newObject) {
-			mAnimationObject = newObject;
-		}
+
 
 		void SetSoundObject(SoundObject* newObject) {
 			mSoundObject = newObject;
@@ -175,7 +170,6 @@ namespace NCL::CSC8503 {
 		PhysicsObject*		mPhysicsObject;
 		RenderObject*		mRenderObject;
 		NetworkObject*		mNetworkObject;
-		AnimationObject*    mAnimationObject;
 		SoundObject*        mSoundObject;
 
 		bool		mIsSensed;

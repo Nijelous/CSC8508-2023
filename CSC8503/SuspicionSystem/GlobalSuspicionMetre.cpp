@@ -28,7 +28,11 @@ void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(const continuousGlobal
     {
         mContinuousGlobalSusCauseVector.erase(foundCause);
     }
-};
+}
+void GlobalSuspicionMetre::SetMinGlobalSusMetre(const instantGlobalSusCause& inCause){
+    SetMinGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
+}
+;
 
 void GlobalSuspicionMetre::Attach(GlobalSuspicionObserver* observer) {
     mGlobalSuspicionObserverList.push_back(observer);
@@ -46,6 +50,17 @@ void GlobalSuspicionMetre::Notify(const SuspicionMetre::SusBreakpoint susBreakpo
     }
 }
 
+/*
+void GlobalSuspicionMetre::UpdateInventoryObserver(InventoryBuffSystem::InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved){
+    switch (invEvent){
+    case InventoryBuffSystem::flagAdded:
+        SetPlayerGlobalSusMetre(flagCaptured);
+        break;
+    default:
+        break;
+    }
+}
+*/
 void GlobalSuspicionMetre::Update(float dt){
 
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
@@ -71,6 +86,15 @@ void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount){
         100.0f);
     if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
         Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
-    if (amount < 0)
+    if (amount > 0)
+        mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
+}
+
+void GlobalSuspicionMetre::SetMinGlobalSusMetre(float amount) {
+    SuspicionMetre::SusBreakpoint tempBreakpoint = SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter);
+    mGlobalSusMeter = std::max(amount, mGlobalSusMeter);
+    if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
+        Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
+    if (amount > 0)
         mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
 };

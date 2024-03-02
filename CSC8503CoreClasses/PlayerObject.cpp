@@ -54,6 +54,8 @@ namespace {
 	constexpr float TIME_UNTIL_LONG_INTERACT = 1.5f;
 	constexpr float TIME_UNTIL_PICKPOCKET = 0.75f;
 
+	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 20;
+
 	constexpr bool DEBUG_MODE = true;
 }
 
@@ -144,7 +146,12 @@ void PlayerObject::UpdateObject(float dt) {
 			Debug::Print("Stunned", Vector2(45, 80));
 			break;
 		}
-		
+		const PlayerInventory::item equippedItem = GetEquippedItem();
+		//Handle Equipped Item Log
+		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+		Debug::Print(itemName, Vector2(10, 80));
+		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+		Debug::Print(usesLeft, Vector2(10, 85));
 	}
 }
 
@@ -236,6 +243,8 @@ void PlayerObject::MovePlayer(float dt) {
 
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
+	
+	GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(mGameWorld->GetMainCamera().GetPitch(), mGameWorld->GetMainCamera().GetYaw(), 0));
 
 	if (isIdle){
 		if(mObjectState != Idle && mSuspicionSystemClassPtr != nullptr ) {
@@ -243,7 +252,6 @@ void PlayerObject::MovePlayer(float dt) {
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-
 		}
 		if (mIsCrouched)
 			mObjectState = IdleCrouch;
@@ -333,12 +341,14 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 
 					return;
 				}
-
-				PlayerObject* playerObjectPtr = dynamic_cast<PlayerObject*>(objectHit);
-				if (playerObjectPtr != nullptr){
-					mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
-						TransferItemBetweenInventories(playerObjectPtr->GetPlayerID(), 
-							playerObjectPtr->GetActiveItemSlot(),this->GetPlayerID());
+				if (interactType == PickPocket)
+				{
+					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
+					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
+							TransferItemBetweenInventories(1,
+								0, this->GetPlayerID());
+					}
 				}
 
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
@@ -375,11 +385,11 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 
-	//Handle Equipped Item Log
-	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-	Debug::Print(itemName, Vector2(10, 80));
-	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-	Debug::Print(usesLeft, Vector2(10, 85));
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
+	}
+
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
@@ -524,6 +534,14 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject){
+	float thisPitch = GetTransform().GetOrientation().ToEuler().y;
+	float otherPitch= otherGameObject->GetTransform().GetOrientation().ToEuler().y;
+
+	float PitchDiff = abs(otherPitch-thisPitch);
+	return PitchDiff <= MAX_PICKPOCKET_PITCH_DIFF;
 }
 
 void PlayerObject::EnforceSpedUpMaxSpeeds() {
