@@ -2,8 +2,10 @@
 #include "Vector3.h"
 #include "../FMODCoreAPI/includes/fmod.hpp"
 #include "../CSC8503CoreClasses/GameObject.h"
+#include "../CSC8503CoreClasses/GuardObject.h"
 #include "../CSC8503CoreClasses/GameWorld.h"
 #include "../CSC8503CoreClasses/PlayerObject.h"
+#include "SoundObject.h"
 
 namespace NCL{
 	using namespace Maths;
@@ -13,9 +15,14 @@ namespace NCL{
 			SoundManager(GameWorld* GameWorld);
 			~SoundManager();
 			
-			FMOD::Channel* AddWalkSound(Vector3 soundPos);
+			FMOD::Channel* AddWalkSound();
+			FMOD::Channel* AddDoorOpenSound();
 
-			void UpdateSounds(GameObject::GameObjectState state, Vector3 soundPos);
+			void UpdateSounds(vector<GameObject*> object);
+
+			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
+
+			void UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Channel* channel);
 
 			void SetListenerAttributes();
 
@@ -27,8 +34,9 @@ namespace NCL{
 			GameWorld* mGameWorld;
 			FMOD::System* mSystem = nullptr;
 			FMOD::Sound* mFootStepSound = nullptr;
+			FMOD::Sound* mDoorOpenSound = nullptr;
 			FMOD_RESULT mResult;
-			FMOD::Channel* mChannel = nullptr;
+			bool mTempIsOpen = false;
 		};
 	}
 }

@@ -5,6 +5,7 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "AnimationObject.h"
+#include "SoundObject.h"
 
 #include "PlayerObject.h"
 #include "GuardObject.h"
@@ -19,6 +20,8 @@
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "PointGameObject.h"
 #include "UISystem.h"
+
+#include <fmod.hpp>
 
 #include <filesystem>
 
@@ -292,14 +295,13 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mGameState = PauseState;
 	}
 	else {
-		if (mTempPlayer) {
-			Vector3 pos = mTempPlayer->GetTransform().GetPosition();
-			mSoundManager->UpdateSounds(mTempPlayer->GetGameOjbectState(), pos);
-		}
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
 		mPhysics->Update(dt);
 		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
+		if (mUpdatableObjects.size()>0) {
+			mSoundManager->UpdateSounds(mUpdatableObjects);
+		}
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 		mDtSinceLastFixedUpdate += dt;
@@ -731,7 +733,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
-
+	newDoor->SetSoundObject(new SoundObject(mSoundManager->AddDoorOpenSound()));
 
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
@@ -764,7 +766,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
-
+	newDoor->SetSoundObject(new SoundObject(mSoundManager->AddDoorOpenSound()));
 
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
@@ -905,7 +907,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mGuardMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mGuardAnimationStand, mGuardMaterial));
+
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
@@ -994,8 +998,8 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
+	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
-
 
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
