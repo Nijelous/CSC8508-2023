@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
+#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -42,6 +43,10 @@ namespace NCL {
 			PlayerInventory::item GetEquippedItem();
 
 			void ClosePrisonDoor();
+
+			void SetUIObject(UISystem* ui) {
+				mUi = ui;
+			}
 
 		protected:
 			bool mIsCrouched;
@@ -99,7 +104,15 @@ namespace NCL {
 			void	EnforceMaxSpeeds();
 
 			bool	IsSeenByGameObject(GameObject* otherGameObject);
+
+			UISystem* mUi;
+
+			float mSusValue;
+			float mUiTime = 0.0;
+			float mLastSusValue = 0.0;
+			
 		private:
+
 		};
 	}
 }

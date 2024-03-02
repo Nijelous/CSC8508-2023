@@ -9,6 +9,8 @@
 
 #include "Window.h"
 #include "GameWorld.h"
+#include "UISystem.h"
+
 
 using namespace NCL::CSC8503;
 
@@ -113,6 +115,21 @@ void PlayerObject::UpdateObject(float dt) {
 
 	if (DEBUG_MODE)
 	{
+		//It have some problem here
+		mUiTime = mUiTime + dt;
+		mUiTime = std::fmod(mUiTime, 1.0f);
+		
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+
+		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
+
+		float iconValue = 100.00 - (mSusValue*0.7+14.00);
+
+		mLastSusValue = mSusValue;
+
+		
+
+		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
 		), Vector2(70, 90));
@@ -146,30 +163,39 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	switch (buffEvent) {
 	case slowApplied:
 		ChangeToSlowedSpeeds();
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, true);
 		break;
 	case slowRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
 		break;
 	case speedApplied:
 		ChangeToSpedUpSpeeds();
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, true);
 		break;
 	case speedRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
 		break;
 	case stunApplied:
 		ChangeToStunned();
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, true);
 		break;
 	case stunRemoved:
 		ChangeToDefaultSpeeds();
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, false);
 		break;
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, true);
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, false);
 		mObjectState = Idle;
 
 		break;
@@ -240,8 +266,6 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	ToggleCrouch(isCrouching);
-
-	//std::cout << mObjectState << std::endl;
 
 	StopSliding();
 }

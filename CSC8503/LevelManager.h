@@ -98,6 +98,8 @@ namespace NCL {
 
 			void DropEquippedIconTexture(int itemSlot);
 
+			void ResetEquippedIconTexture();
+
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
@@ -197,23 +199,28 @@ namespace NCL {
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
+			Texture* mCrossTex;
 
-			//powerup
-			Texture* mHighlightAwardTex;
-			Texture* mLightOffTex;
-			Texture* mMakingNoiseTex;
+			//powerup Icon
+
 			Texture* mSilentRunTex;
+			Texture* mSpeedUpTex;
 			Texture* mSlowDownTex;
 			Texture* mStunTex;
-			Texture* mSwapPositionTex;
 
-			Texture* mSuspensionBarTex;
-			Texture* mSuspensionIndicatorTex;
+
+			Texture* mLowSuspisionBarTex;
+			Texture* mMidSuspisionBarTex;
+			Texture* mHighSuspisionBarTex;
+			Texture* mSuspisionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
 			//item icon
 			Texture* mFlagIconTex;
-			Texture* mKeyIconTex;
+			Texture* mKeyIconTex1;
+			Texture* mKeyIconTex2;
+			Texture* mKeyIconTex3;
+
 
 			// shaders
 			Shader* mBasicShader;
