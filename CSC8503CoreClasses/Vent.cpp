@@ -21,33 +21,16 @@ void Vent::ConnectVent(Vent* vent) {
 	mConnectedVent = vent;
 }
 
-void Vent::HandleItemUse(GameObject* userObj) {
-	if (!mIsOpen) {
-		auto* playerComp = static_cast<PlayerObject*>(userObj);
-		if (playerComp != nullptr) {
-
-			PlayerInventory::item usedItem = playerComp->GetEquippedItem();
-
-			switch (usedItem) {
-			case InventoryBuffSystem::PlayerInventory::screwdriver:
-				SetIsOpen(true, true);
-				break;
-			default:
-				break;
-			}
-		}
-	}
-}
-
 void Vent::HandlePlayerUse(GameObject* userObj) {
 	if (mIsOpen) {
 		auto* playerToTeleport = userObj;
 		Transform& playerTransform = playerToTeleport->GetTransform();
 		const Vector3& playerPos = playerToTeleport->GetTransform().GetPosition();
 
-		const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
-		const Quaternion& teleportOrient = mConnectedVent->GetTransform().GetOrientation();
-		const Vector3 newPlayerPos = teleportPos + (teleportOrient * Vector3(5, 0, 0));
+	const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
+	const Quaternion& teleportOrient = mConnectedVent->GetTransform().GetOrientation();
+	const Vector3 newPlayerPos = teleportPos + (teleportOrient * Vector3(5, 0, 0));
+
 
 		playerTransform.SetPosition(newPlayerPos);
 		playerTransform.SetOrientation(teleportOrient);
@@ -89,6 +72,33 @@ void Vent::Interact(InteractType interactType, GameObject* interactedObject) {
 		HandleItemUse(interactedObject);
 		break;
 	default:
+		break;
+	}
+}
+
+bool Vent::CanBeInteractedWith(InteractType interactType){
+	switch (interactType) {
+	case Use:
+		return mIsOpen;
+		break;
+	case ItemUse:
+		return CanUseItem() && !mIsOpen;
+		break;
+	default:
+		break;
+	}
+}
+
+bool Vent::CanUseItem(){
+	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
+
+	switch (usedItem) {
+	case InventoryBuffSystem::PlayerInventory::screwdriver:
+		return true;
+		break;
+	default:
+		return false;
 		break;
 	}
 }

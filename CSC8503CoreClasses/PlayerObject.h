@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
+#include "UISystem.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -27,6 +28,11 @@ namespace NCL {
 			int GetPlayerID() const {
 				return mPlayerID;
 			}
+
+			int GetActiveItemSlot() const {
+				return mActiveItemSlot;
+			}
+
 			int GetPoints() { return mPlayerPoints; }
 			void ResetPlayerPoints() { mPlayerPoints = 0; }
 			void AddPlayerPoints(int addedPoints) { mPlayerPoints += addedPoints; }
@@ -38,7 +44,9 @@ namespace NCL {
 
 			void ClosePrisonDoor();
 
-		
+			void SetUIObject(UISystem* ui) {
+				mUi = ui;
+			}
 
 		protected:
 			bool mIsCrouched;
@@ -94,7 +102,17 @@ namespace NCL {
 			void	UseItemForInteractable(Interactable* interactable);
 
 			void	EnforceMaxSpeeds();
+
+			bool	IsSeenByGameObject(GameObject* otherGameObject);
+
+			UISystem* mUi;
+
+			float mSusValue;
+			float mUiTime = 0.0;
+			float mLastSusValue = 0.0;
+			
 		private:
+
 		};
 	}
 }

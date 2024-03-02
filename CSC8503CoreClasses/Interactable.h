@@ -5,7 +5,8 @@ namespace NCL {
 	namespace CSC8503 {
 		enum InteractType {
 			Use,
-			LongUse, 
+			LongUse,
+			PickPocket,
 			ItemUse
 		};
 

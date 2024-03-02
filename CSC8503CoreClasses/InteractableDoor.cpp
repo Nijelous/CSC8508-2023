@@ -11,12 +11,14 @@
 
 using namespace NCL::CSC8503;
 
-void InteractableDoor::Unlock(){
+void InteractableDoor::Unlock() {
 	mIsLocked = false;
+	SetNavMeshFlags(2);
 }
 
-void InteractableDoor::Lock(){
+void InteractableDoor::Lock() {
 	mIsLocked = true;
+	SetNavMeshFlags(4);
 }
 
 void InteractableDoor::Interact(InteractType interactType, GameObject* interactedObject)
@@ -51,7 +53,8 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 		return !mIsLocked;
 		break;
 	case ItemUse:
-		return !mIsOpen;
+		return CanUseItem() && !mIsOpen;
+		break;
 	case LongUse:
 		return (mIsLocked && !mIsOpen);
 		break;
@@ -74,6 +77,19 @@ void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
 	if (isMultiplayerGame && isSettedByServer) {
 		SyncInteractableDoorStatusInMultiplayer();
+	}
+}
+
+bool InteractableDoor::CanUseItem() {
+	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
+
+	switch (usedItem) {
+	case InventoryBuffSystem::PlayerInventory::doorKey:
+		return true;
+		break;
+	default:
+		return false;
 	}
 }
 
@@ -150,7 +166,7 @@ void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
 	}
 }
 
-void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint){
+void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) {
 	switch (susBreakpoint)
 	{
 	case SuspicionSystem::SuspicionMetre::high:
@@ -160,6 +176,8 @@ void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionM
 		break;
 	}
 }
+
+
 
 void InteractableDoor::UpdateObject(float dt) {
 	mStateMachine->Update(dt);

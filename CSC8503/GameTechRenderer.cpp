@@ -385,7 +385,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 		if ((*i).GetNormalTexture()) {
 			BindTextureToShader(*(OGLTexture*)(*i).GetNormalTexture(), "normTex", 2);
 		}
-		if ((*i).GetAnimation()) {
+		if ((*i).GetAnimationObject()) {
 			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
 		}
 		if (activeShader != shader) {
@@ -426,7 +426,7 @@ void GameTechRenderer::FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix) {
 
 
 		//Animation basic draw
-		if ((*i).GetAnimation()) {
+		if ((*i).GetAnimationObject()) {
 			BindMesh((OGLMesh&)*(*i).GetMesh());
 			mMesh = (*i).GetMesh();
 			size_t layerCount = mMesh->GetSubMeshCount();
@@ -535,7 +535,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 
 	for (int i = 0; i < mOutlinedObjects.size(); i++) {
 		int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
-		glUniform1i(location, mOutlinedObjects[i]->GetAnimation() ? 1 : 0);
+		glUniform1i(location, mOutlinedObjects[i]->GetAnimationObject()->GetAnimation() ? 1 : 0);
 		Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
 		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
@@ -543,7 +543,7 @@ void GameTechRenderer::DrawOutlinedObjects() {
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
 			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimation()) {
+			if (mOutlinedObjects[i]->GetAnimationObject()->GetAnimation()) {
 				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
 				glBindTexture(GL_TEXTURE_2D, textureID);
 				glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "joints"), mOutlinedObjects[i]->GetFrameMatricesVec()[b].size(), false, (float*)mOutlinedObjects[i]->GetFrameMatricesVec()[b].data());
@@ -658,15 +658,15 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	OGLTexture* t = (OGLTexture*)i.texture;
+	OGLTexture* t = (OGLTexture*)i.mTexture;
 	BindTextureToShader(*t, "iconTex", t->GetObjectID());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	mUi->BuildVerticesForIcon(i.position, i.length, i.height, UIiconPos, UIiconUVs);
+	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
 	bool texSlot = glGetUniformLocation(iconShader->GetProgramID(), "isOn");
-	glUniform1i(texSlot, i.isAppear);
+	glUniform1i(texSlot, i.mTransparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	//0.02, 0, 0, 0

@@ -18,11 +18,12 @@ namespace NCL {
 			virtual void CountDownTimer(float dt);
 			void SetIsOpen(bool isOpen);
 		protected:
+			void SetNavMeshFlags(int flag);
+
 			const float initDoorTimer = 10.0f;
 			StateMachine* mStateMachine;
 			float mTimer;
 			bool mIsOpen;
-
 		};
 	}
 }

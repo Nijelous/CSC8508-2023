@@ -44,9 +44,10 @@ void PlayerInventory::Init() {
 	mInventoryObserverList.clear();
 }
 
-void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
+//Returns the inventory slot the item is in or -1 if inventory is full
+int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 	if (IsInventoryFull(playerNo))
-		return;
+		return -1;
 
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
@@ -73,9 +74,10 @@ void PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 				Notify(mOnItemAddedInventoryEventMap[inItem], playerNo, invSlot);
 			}
 
-			return;
+			return invSlot;
 		}
 	}
+	return -1;
 }
 
 //Returns the inventory slot the item is in or -1 if it was not found
@@ -96,6 +98,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	mPlayerInventory[playerNo][invSlot] = none;
 
+	//Potentially move the multiplayer related code below to a function like HandleMultiplayerItemRemoval(...);
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -124,11 +127,12 @@ void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo
 }
 
 void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot) {
-	RemoveItemFromPlayer(playerNo, invSlot);
-	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
+	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) !=
+		mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]], playerNo, invSlot);
 	}
+	RemoveItemFromPlayer(playerNo, invSlot);
 	//Extra drop logic
 }
 
@@ -203,8 +207,24 @@ bool PlayerInventory::IsInventoryFull(const int& playerNo) {
 	return true;
 }
 
+bool InventoryBuffSystem::PlayerInventory::IsInventoryEmpty(const int& playerNo){
+	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
+		if (mPlayerInventory[playerNo][invSlot] != none)
+			return false;
+	return true;
+}
+
 ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inItem) {
 	return mItemToItemUseTypeMap[inItem];
+}
+
+void InventoryBuffSystem::PlayerInventory::TransferItemBetweenInventories(const int& givingPlayerNo, const int& givingPlayerInvSlot, const int& receivingPlayerNo){
+	item itemToRemove = GetItemInInventorySlot(givingPlayerNo, givingPlayerInvSlot);
+	if (IsInventoryFull(receivingPlayerNo) || itemToRemove == none)
+		return;
+	int receivingSlot = AddItemToPlayer(itemToRemove, receivingPlayerNo);
+	SetItemUsageCount(receivingPlayerNo, receivingSlot, GetItemUsageCount(givingPlayerNo, givingPlayerInvSlot));
+	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
 }
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer) {

@@ -43,6 +43,13 @@ namespace NCL {
 			PauseState
 		};
 
+		enum PolyFlags {
+			FloorFlag = 1,
+			ClosedDoorFlag = 2,
+			LockedDoorFlag = 4,
+			MAX_FLAGS = 8
+		};
+
 		class LevelManager : public PlayerInventoryObserver {
 		public:
 			static LevelManager* GetLevelManager();
@@ -91,6 +98,8 @@ namespace NCL {
 
 			void DropEquippedIconTexture(int itemSlot);
 
+			void ResetEquippedIconTexture();
+
 			GameResults CheckGameWon();
 
 			bool CheckGameLost();
@@ -100,6 +109,8 @@ namespace NCL {
 			void AddBuffToGuards(PlayerBuffs::buff buffToApply);
 
 			FlagGameObject* GetMainFlag();
+
+			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -121,6 +132,9 @@ namespace NCL {
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false);
+
+			void LoadDoorsInNavGrid();
+
 			void SendWallFloorInstancesToGPU();
 
 			void AddNetworkObject(GameObject& objToAdd);
@@ -133,7 +147,7 @@ namespace NCL {
 			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset, bool isMultiplayerLevel = false);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
-			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr);
+			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
@@ -187,23 +201,28 @@ namespace NCL {
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
+			Texture* mCrossTex;
 
-			//powerup
-			Texture* mHighlightAwardTex;
-			Texture* mLightOffTex;
-			Texture* mMakingNoiseTex;
+			//powerup Icon
+
 			Texture* mSilentRunTex;
+			Texture* mSpeedUpTex;
 			Texture* mSlowDownTex;
 			Texture* mStunTex;
-			Texture* mSwapPositionTex;
 
-			Texture* mSuspensionBarTex;
-			Texture* mSuspensionIndicatorTex;
+
+			Texture* mLowSuspisionBarTex;
+			Texture* mMidSuspisionBarTex;
+			Texture* mHighSuspisionBarTex;
+			Texture* mSuspisionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
 			//item icon
 			Texture* mFlagIconTex;
-			Texture* mKeyIconTex;
+			Texture* mKeyIconTex1;
+			Texture* mKeyIconTex2;
+			Texture* mKeyIconTex3;
+
 
 			// shaders
 			Shader* mBasicShader;

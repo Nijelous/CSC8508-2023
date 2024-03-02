@@ -1,6 +1,7 @@
 #include "Door.h"
 #include "State.h"
 #include "StateTransition.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace NCL::CSC8503;
 
@@ -42,15 +43,15 @@ void Door::InitStateMachine()
 }
 
 
-void Door::Open()
-{
+void Door::Open() {
 	SetActive(false);
 	mTimer = initDoorTimer;
+	SetNavMeshFlags(1);
 }
 
-void Door::Close()
-{
+void Door::Close() {
 	SetActive(true);
+	SetNavMeshFlags(2);
 }
 
 void Door::CountDownTimer(float dt)
@@ -60,4 +61,16 @@ void Door::CountDownTimer(float dt)
 
 void Door::SetIsOpen(bool isOpen) {
 	mIsOpen = isOpen;
+	if(isOpen) {
+		Open();
+	}
+	else {
+		Close();
+	}
+}
+void Door::SetNavMeshFlags(int flag) {
+	float* pos = new float[3] { mTransform.GetPosition().x, mTransform.GetPosition().y, mTransform.GetPosition().z };
+	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
+	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };
+	LevelManager::GetLevelManager()->LoadDoorInNavGrid(pos, halfSize, (PolyFlags)flag);
 }

@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed
+		none, flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed, screwDriverDropped
 	};
 
 	class PlayerInventoryObserver
@@ -45,7 +45,7 @@ namespace InventoryBuffSystem
 		}
 
 		void Init();
-		void AddItemToPlayer(const item &inItem, const int &playerNo);
+		int AddItemToPlayer(const item &inItem, const int &playerNo);
 		int RemoveItemFromPlayer(const item& inItem, const int& playerNo);
 		void RemoveItemFromPlayer(const int& playerNo, const int& invSlot);
 		void DropItemFromPlayer(const item &inItem, const int &playerNo);
@@ -56,8 +56,10 @@ namespace InventoryBuffSystem
 		bool HandleItemRemoval(const item& item, const int& playerNo, const int& invSlot);
 		bool ItemInPlayerInventory(const item &inItem, const int &playerNo);
 		bool IsInventoryFull(const int& playerNo);
+		bool IsInventoryEmpty(const int& playerNo);
 		ItemUseType GetItemUseType(const item &inItem);
 
+		void TransferItemBetweenInventories(const int& givingPlayerNo, const int& givingPlayerInvSlot, const int& receivingPlayerNo);
 
 		void Attach(PlayerInventoryObserver* observer);
 		void Detach(PlayerInventoryObserver* observer);
@@ -77,7 +79,7 @@ namespace InventoryBuffSystem
 
 		PlayerInventory::item GetItemInInventorySlot(const int playerNo, const int itemSlot) { return mPlayerInventory[playerNo][itemSlot];  };
 		
-		int GetItemUsageCount(const int itemSlot, const int playerNo) { return mItemUseCount[playerNo][itemSlot]; };
+		int GetItemUsageCount( const int playerNo, const int itemSlot) { return mItemUseCount[playerNo][itemSlot]; };
 
 		void SetPlayerAbleToUseItem(const item& inItem, const int& playerNo, const bool& isAbleToUseKey) {
 			PlayerAbleToUseItem[inItem][playerNo] = isAbleToUseKey;
@@ -93,11 +95,12 @@ namespace InventoryBuffSystem
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {
-
+			{flag,flagAdded}
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemDroppedInventoryEventMap = {
-			{flag,flagDropped}
+			{flag,flagDropped},
+			{screwdriver,screwDriverDropped}
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemUsedInventoryEventMap = {
@@ -114,6 +117,7 @@ namespace InventoryBuffSystem
 			{ soundEmitter, "Sound Emitter" },
 			{ doorKey, "Door Key" },
 			{ stunItem, "Stun Item"},
+			{ flag, "Heist Item"},
 			{ none, "No Equipped Item" }
 		};
 
@@ -147,6 +151,9 @@ namespace InventoryBuffSystem
 		}
 		void ResetItemUsageCount(const int& playerNo, const int& invSlot) {
 			mItemUseCount[playerNo][invSlot]=0;
+		}
+		void SetItemUsageCount(const int& playerNo, const int& invSlot, const int& usageCount) {
+			mItemUseCount[playerNo][invSlot] = usageCount;
 		}
 	};
 
