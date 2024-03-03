@@ -69,7 +69,7 @@ namespace InventoryBuffSystem {
 
 		std::vector< buff> mBuffsInMultiplayerPlayerRandomPool =
 		{
-			speed, silentSprint, slow, flagSight
+			speed, silentSprint, slow
 		};
 
 		std::map<const buff, const float> mBuffInitDurationMap =

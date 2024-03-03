@@ -27,7 +27,6 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo, con
 
 	if (!isSync)
 	{
-		Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 		HandleApplyBuffNetworking(inBuff, playerNo);
 	}
 }
@@ -41,9 +40,12 @@ void PlayerBuffs::HandleApplyBuffNetworking(const buff& inBuff, const int& playe
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
+			Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 			game->SendClientSyncBuffPacket(playerNo,inBuff,true);
 		}
 	}
+	else
+		Notify(mOnBuffAppliedBuffEventMap[inBuff], 0);
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo, const bool& isSync){
@@ -52,9 +54,10 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo, 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
 		mBuffsToRemove[playerNo].push_back(inBuff);
+		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
+
 		if (!isSync) {
-			Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
-			HandleApplyBuffNetworking(inBuff, playerNo);
+			HandleRemoveBuffNetworking(inBuff, playerNo);
 		}
 	}
 };
@@ -88,9 +91,12 @@ void PlayerBuffs::Update(float dt){
 		{
 			entry->second -= dt;
 
+			auto foundEvent = mOnBuffTickBuffEventMap.find(entry->first);
+
 			if (entry->second > 0)
 			{
-				Notify(mOnBuffTickBuffEventMap[entry->first],playerNo);
+				if (foundEvent != mOnBuffTickBuffEventMap.end())
+					Notify(mOnBuffTickBuffEventMap[entry->first],playerNo);
 			}
 			else
 			{
@@ -139,8 +145,11 @@ float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
 }
 
 void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply){
+	if (localPlayerID != playerID)
+		return;
+
 	if (toApply)
-		ApplyBuffToPlayer(buffToSync,playerID,true);
+		ApplyBuffToPlayer(buffToSync, localPlayerID, true);
 	else
-		RemoveBuffFromPlayer(buffToSync, playerID, true);
+		RemoveBuffFromPlayer(buffToSync, localPlayerID, true);
 }

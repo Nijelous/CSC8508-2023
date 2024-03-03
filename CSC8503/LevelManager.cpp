@@ -18,6 +18,8 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "PointGameObject.h"
+#include "DebugNetworkedGame.h"
+#include "SceneManager.h"
 #include "UISystem.h"
 
 #include <filesystem>
@@ -232,9 +234,25 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+	}
+	else {
+		if (!serverPlayersPtr){
+			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+			serverPlayersPtr = game->GetServerPlayersPtr();
+		}
+
+		for (const auto& pair : *serverPlayersPtr)
+		{
+			PlayerInventoryObserver* invObserver = reinterpret_cast<PlayerInventoryObserver*>(pair.second);
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+		}
 	}
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -251,11 +269,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
-	if (mTempPlayer)
-	{
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
-	}
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 }
 

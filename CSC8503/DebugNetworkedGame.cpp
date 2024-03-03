@@ -66,6 +66,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage,this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot,this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
@@ -198,6 +199,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
     case BasicNetworkMessages::ClientSyncItemSlot:{
         ClientSyncItemSlotPacket* packet = (ClientSyncItemSlotPacket*)(payload);
         HandlePlayerEquippedItemChange(packet);
+        break;
+    }
+    case BasicNetworkMessages::ClientSyncBuffs: {
+        ClientSyncBuffPacket* packet = (ClientSyncBuffPacket*)(payload);
+        HandlePlayerBuffChange(packet);
+        break;
     }
     default:
         std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
@@ -211,9 +218,9 @@ void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot
     mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const{
+void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const {
     PlayerBuffs::buff buffToSync = (PlayerBuffs::buff)(buffType);
-    NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffType, toApply);
+    NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffToSync, toApply);
     mThisServer->SendGlobalPacket(packet);
 }
 
@@ -462,6 +469,5 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
     const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
     auto* buffSystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr();
     const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
-    const bool toApply = static_cast<bool>(packet->toApply);
-    buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, toApply);
+    buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
 }

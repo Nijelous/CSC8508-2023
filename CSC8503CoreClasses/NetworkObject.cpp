@@ -73,7 +73,10 @@ ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
 	this->playerID = playerID;
 }
 
-ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID,bool toApply) {
+ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncBuffs;
+	size = sizeof(ClientSyncBuffPacket);
+
 	this->playerID = playerID;
 	this->buffID = buffID;
 	this->toApply = toApply;
