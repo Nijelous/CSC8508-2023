@@ -37,9 +37,10 @@ namespace InventoryBuffSystem {
 
 		};
 		void Init();
-		void ApplyBuffToPlayer(const buff& inBuff, const int& playerNo);
-		void RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo);
-		void HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply);
+		void ApplyBuffToPlayer(const buff& inBuff, const int& playerNo, const bool& isSync = false);
+		void HandleApplyBuffNetworking(const buff& inBuff, const int& playerNo);
+		void RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo, const bool& isSync = false);
+		void HandleRemoveBuffNetworking(const buff& inBuff, const int& playerNo);
 		void Update(float dt);
 
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;

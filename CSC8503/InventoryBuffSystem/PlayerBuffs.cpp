@@ -17,7 +17,7 @@ void PlayerBuffs::Init(){
 	mBuffsToRemove->clear();
 }
 
-void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
+void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo, const bool& isSync){
 	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
 	if (foundBuffDuration != mBuffInitDurationMap.end())
@@ -25,24 +25,13 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
 
-	HandleBuffNetworking(inBuff, playerNo,true);
-	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+	if (!isSync)
+	{
+		HandleApplyBuffNetworking(inBuff, playerNo);
+	}
 }
 
-void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
-	auto foundBuff = mActiveBuffDurationMap[playerNo].find(inBuff);
-
-	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
-	{
-		mBuffsToRemove[playerNo].push_back(inBuff);
-
-		HandleBuffNetworking(inBuff, playerNo, false);
-		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
-	}
-};
-
-//returns localPlayerID or 0 if singleplayer
-void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply) {
+void PlayerBuffs::HandleApplyBuffNetworking(const buff& inBuff, const int& playerNo){
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -51,7 +40,38 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
-			game->SendClientSyncBuffPacket(playerNo, inBuff, toApply);
+			Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+			game->SendClientSyncBuffPacket(playerNo,inBuff,true);
+		}
+	}
+	else
+		Notify(mOnBuffAppliedBuffEventMap[inBuff], 0);
+}
+
+void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo, const bool& isSync){
+	auto foundBuff = mActiveBuffDurationMap[playerNo].find(inBuff);
+
+	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
+	{
+		mBuffsToRemove[playerNo].push_back(inBuff);
+		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
+
+		if (!isSync) {
+			HandleRemoveBuffNetworking(inBuff, playerNo);
+		}
+	}
+};
+
+void PlayerBuffs::HandleRemoveBuffNetworking(const buff& inBuff, const int& playerNo) {
+	int localPlayerId = 0;
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		const auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
+
+		const bool isServer = game->GetIsServer();
+		if (isServer) {
+			game->SendClientSyncBuffPacket(playerNo, inBuff, false);
 		}
 	}
 }
@@ -129,7 +149,7 @@ void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSy
 		return;
 
 	if (toApply)
-		ApplyBuffToPlayer(buffToSync, localPlayerID);
+		ApplyBuffToPlayer(buffToSync, localPlayerID, true);
 	else
-		RemoveBuffFromPlayer(buffToSync, localPlayerID);
+		RemoveBuffFromPlayer(buffToSync, localPlayerID, true);
 }

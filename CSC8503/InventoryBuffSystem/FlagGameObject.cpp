@@ -8,17 +8,15 @@
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
 #include "../LevelManager.h"
-#include "../SuspicionSystem/GlobalSuspicionMetre.h"
+
 using namespace NCL;
 using namespace CSC8503;
 
-FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr,
-	std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
+FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
 	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr) {
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
-	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mPoints = pointsWorth;
@@ -75,7 +73,6 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 	if ((otherObject->GetCollisionLayer() & Player) &&
 		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
-		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		plObj->AddPlayerPoints(mPoints);
 		GetFlag(0);
 	}
