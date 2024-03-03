@@ -4,15 +4,13 @@
 #include "StateMachine.h"
 #include "InventoryBuffSystem.h"
 #include "Item.h"
-#include "../SuspicionSystem/SuspicionSystem.h"
 using namespace InventoryBuffSystem;
-using namespace SuspicionSystem;
 
 namespace NCL {
     namespace CSC8503 {
         class FlagGameObject : public Item, public PlayerBuffsObserver{
         public:
-            FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
+            FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
             ~FlagGameObject();
 
             void GetFlag(int playerNo);
@@ -33,7 +31,6 @@ namespace NCL {
 
             std::map<GameObject*, int>* mPlayerObjectToPlayerNoMap;
             InventoryBuffSystemClass* mInventoryBuffSystemClassPtr;
-            SuspicionSystemClass* mSuspicionSystemClassPtr;
             int mPoints;
         };
     }
