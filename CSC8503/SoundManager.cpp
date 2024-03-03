@@ -88,9 +88,9 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 		}
 		else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
-			bool isOpen;
-			std::cout << isOpen << std::endl;
-			UpdateOpenDoorSound(isOpen, soundPos, channel);
+			//bool isOpen;
+			//std::cout << isOpen << std::endl;
+			//UpdateOpenDoorSound(isOpen, soundPos, channel);
 		}
 	}
 	mSystem->update();
