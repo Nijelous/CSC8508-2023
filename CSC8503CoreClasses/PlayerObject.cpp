@@ -6,8 +6,6 @@
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
 #include "../CSC8503/LevelManager.h"
-#include "../CSC8503/DebugNetworkedGame.h"
-#include "../CSC8503/SceneManager.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -157,13 +155,11 @@ void PlayerObject::UpdateObject(float dt) {
 		Debug::Print(itemName, Vector2(10, 80));
 		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
 		Debug::Print(usesLeft, Vector2(10, 85));
-		Debug::Print(to_string(mGameWorld->GetMainCamera().GetYaw()), Vector2(54, 90));
 	}
 }
 
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
-	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-	if (mPlayerID != playerNo || game->GetIsServer())
+	if (mPlayerID != playerNo)
 		return;
 
 	switch (buffEvent) {
