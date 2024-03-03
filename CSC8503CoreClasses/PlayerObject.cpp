@@ -393,7 +393,10 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
 	}
 
-
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
+		DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
+	}
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
