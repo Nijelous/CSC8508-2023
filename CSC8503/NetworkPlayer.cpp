@@ -172,6 +172,11 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mPlayerInputs.rayFromPlayer = ray;
 		}
 
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::L) &&
+			DEBUG_MODE) {
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::slow, mPlayerID);
+		}
+
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 

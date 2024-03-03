@@ -6,8 +6,6 @@
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
 #include "../CSC8503/LevelManager.h"
-#include "../CSC8503/DebugNetworkedGame.h"
-#include "../CSC8503/SceneManager.h"
 
 #include "Window.h"
 #include "GameWorld.h"
@@ -162,8 +160,7 @@ void PlayerObject::UpdateObject(float dt) {
 }
 
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
-	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-	if (mPlayerID != playerNo || game->GetIsServer())
+	if (mPlayerID != playerNo)
 		return;
 
 	switch (buffEvent) {
