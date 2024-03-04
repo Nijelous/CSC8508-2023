@@ -116,7 +116,8 @@ void PickupGameObject::ActivatePickup(int playerNo) {
 void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 	//Simulate only in server
 	auto* sceneManager = SceneManager::GetSceneManager();
-	if (!sceneManager->IsServer()) {
+	bool isSinglePlayer = sceneManager->IsInSingleplayer();
+	if (!isSinglePlayer && !sceneManager->IsServer()) {
 		return;
 	}
 	if (mCooldown == 0){
