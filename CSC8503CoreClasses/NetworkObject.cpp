@@ -98,6 +98,15 @@ ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int
 	this->usageCount = usageCount;
 }
 
+SyncInteractablePacket::SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) {
+	type = BasicNetworkMessages::SyncInteractable;
+	size = sizeof(SyncInteractablePacket);
+
+	this->networkObjId = networkObjectId;
+	this->isOpen = isOpen;
+	this->interactableItemType = interactableItemType;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;
