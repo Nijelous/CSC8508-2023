@@ -1,7 +1,13 @@
-#version 400 core
+#version 420 core
 
 uniform sampler2D iconTex;
-uniform bool isOn;
+uniform float uTransparency;
+
+
+layout(std140, binding = 5) uniform IconBlock {
+	bool useTexture;
+} iconData; 
+
 
 in Vertex
 {
@@ -12,10 +18,7 @@ out vec4 fragColor;
 
 void main(void)
 { 
-     if(isOn){
-          fragColor = texture(iconTex, IN.texCoord);
-     }
-     else{
-          fragColor = texture(iconTex, IN.texCoord) * vec4(0.06, 0.06, 0.06, 0.2);
-     }
+    vec4 texColor = texture(iconTex, IN.texCoord);
+    fragColor = vec4(texColor.rgb, texColor.a * uTransparency);
+
 }

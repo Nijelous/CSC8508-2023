@@ -39,6 +39,7 @@ namespace InventoryBuffSystem {
 		void Init();
 		void ApplyBuffToPlayer(const buff& inBuff, const int& playerNo);
 		void RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo);
+		void HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply);
 		void Update(float dt);
 
 		virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
@@ -53,14 +54,21 @@ namespace InventoryBuffSystem {
 			if (isSingleplayer)
 				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
 			else
-				return GetRandomBuffFromPool(seed, &mBuffsInSinglePlayerRandomPool);
+				return GetRandomBuffFromPool(seed, &mBuffsInMultiplayerPlayerRandomPool);
 		}
 
 		float GetBuffDuration(PlayerBuffs::buff inBuff);
+
+		void SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply);
 	private:
 		std::vector< buff> mBuffsInSinglePlayerRandomPool =
 		{
 			speed, silentSprint, slow, flagSight
+		};
+
+		std::vector< buff> mBuffsInMultiplayerPlayerRandomPool =
+		{
+			speed, silentSprint, slow
 		};
 
 		std::map<const buff, const float> mBuffInitDurationMap =
@@ -111,5 +119,6 @@ namespace InventoryBuffSystem {
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
 		std::list<PlayerBuffsObserver*> mBuffsObserverList;
+		vector<buff> mBuffsToRemove[NCL::CSC8503::MAX_PLAYERS];
 	};
 }

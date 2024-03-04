@@ -1,9 +1,4 @@
-#version 400 core
-
-uniform mat4 modelMatrix 	= mat4(1.0f);
-uniform mat4 viewMatrix 	= mat4(1.0f);
-uniform mat4 projMatrix 	= mat4(1.0f);
-uniform mat4 shadowMatrix 	= mat4(1.0f);
+#version 430 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
@@ -13,10 +8,23 @@ layout(location = 4) in vec4 tangent;
 layout(location = 5) in vec4 jointWeights;
 layout(location = 6) in ivec4 jointIndices;
 
-uniform mat4 joints[128];
+layout(std140, binding = 0) uniform CamBlock{
+	mat4 projMatrix;
+	mat4 viewMatrix;
+	mat4 invProjView;
+	vec3 camPos;
+} camData;
 
-uniform vec4 		objectColour = vec4(1,1,1,1);
-uniform bool hasVertexColours = false;
+layout(std140, binding = 3) uniform ObjectBlock {
+	mat4 modelMatrix;
+	mat4 shadowMatrix;
+	vec4 objectColour;
+	bool hasVertexColours;
+} objectData;
+
+layout (std140, binding = 4) uniform AnimBlock {
+	mat4 joints[128];
+} animData;
 
 out Vertex
 {
@@ -32,8 +40,8 @@ out Vertex
 
 void main(void)
 {
-	mat4 mvp 		  = (projMatrix * viewMatrix * modelMatrix);
-	mat3 normalMatrix = transpose ( inverse ( mat3 ( modelMatrix )));
+	mat4 mvp 		  = (camData.projMatrix * camData.viewMatrix * objectData.modelMatrix);
+	mat3 normalMatrix = transpose ( inverse ( mat3 ( objectData.modelMatrix )));
 	vec3 wNormal = normalize ( normalMatrix * normalize (normal.xyz));
 	vec3 wTangent = normalize(normalMatrix * normalize(tangent.xyz));
 
@@ -42,33 +50,25 @@ void main(void)
 	vec4 skelPos 	= vec4(0,0,0,0);
 	vec4 skelNormal = vec4(0,0,0,0);
 
-
-
-
-	if(hasVertexColours) {
-		OUT.colour		= objectColour * colour;
-	}
-
-
-
 	for(int i = 0; i < 4; ++i) {
 		int   jointIndex 	= jointIndices[i];
 		float jointWeight 	= jointWeights[i];
 
-		skelPos += joints[jointIndex] * localPos * jointWeight;
-
-		skelNormal += joints[jointIndex] * localNormal * jointWeight;
+		skelPos += animData.joints[jointIndex] * localPos * jointWeight;
+		skelNormal += animData.joints[jointIndex] * localNormal * jointWeight;
 	}
 
-	
+	if(objectData.hasVertexColours) {
+		OUT.colour		= objectData.objectColour * colour;
+	}
 	
 	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
-	OUT.shadowProj 	=  shadowMatrix * vec4 ( skelPos.xyz,1);
-	OUT.worldPos 	= ( modelMatrix * vec4 ( skelPos.xyz ,1)). xyz ;
+	OUT.shadowProj 	=  objectData.shadowMatrix * vec4 ( skelPos.xyz,1);
+	OUT.worldPos 	= ( objectData.modelMatrix * vec4 ( skelPos.xyz ,1)). xyz ;
 	OUT.tangent = wTangent;
 	OUT.binormal = cross(wTangent, wNormal) * tangent.w;
 	OUT.texCoord	= vec2(texCoord.x,1-texCoord.y);
-	OUT.colour		= objectColour;
+	OUT.colour		= objectData.objectColour;
 	OUT.normal 		= skelNormal.xyz;
 	
 }

@@ -1,5 +1,10 @@
 #include "PlayerBuffs.h"
 #include "Level.h"
+#include "GameServer.h"
+#include "NetworkObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
@@ -9,16 +14,19 @@ void PlayerBuffs::Init(){
 		mActiveBuffDurationMap[playerNo].clear();
 
 	mBuffsObserverList.clear();
+	mBuffsToRemove->clear();
 }
 
 void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
-	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 	//mOnBuffAppliedFunctionMap[inBuff](playerNo);
 	auto foundBuffDuration = mBuffInitDurationMap.find(inBuff);
 	if (foundBuffDuration != mBuffInitDurationMap.end())
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
+
+	HandleBuffNetworking(inBuff, playerNo,true);
+	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
@@ -26,10 +34,27 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
-		Notify(mOnBuffRemovedBuffEventMap[inBuff],playerNo);
-		mActiveBuffDurationMap[playerNo].erase(foundBuff);
+		mBuffsToRemove[playerNo].push_back(inBuff);
+
+		HandleBuffNetworking(inBuff, playerNo, false);
+		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 	}
 };
+
+//returns localPlayerID or 0 if singleplayer
+void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply) {
+	int localPlayerId = 0;
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		const auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
+
+		const bool isServer = game->GetIsServer();
+		if (isServer) {
+			game->SendClientSyncBuffPacket(playerNo, inBuff, toApply);
+		}
+	}
+}
 
 PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool){
 	std::random_device rd;
@@ -39,7 +64,6 @@ PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vec
 }
 
 void PlayerBuffs::Update(float dt){
-	vector<buff> buffsToRemove;
 	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
 	{
 		for (auto entry = mActiveBuffDurationMap[playerNo].begin();
@@ -47,22 +71,25 @@ void PlayerBuffs::Update(float dt){
 		{
 			entry->second -= dt;
 
+			auto foundEvent = mOnBuffTickBuffEventMap.find(entry->first);
+
 			if (entry->second > 0)
 			{
-				Notify(mOnBuffTickBuffEventMap[entry->first],playerNo);
+				if (foundEvent != mOnBuffTickBuffEventMap.end())
+					Notify(mOnBuffTickBuffEventMap[entry->first],playerNo);
 			}
 			else
 			{
-				buffsToRemove.push_back(entry->first);
+				RemoveBuffFromPlayer(entry->first, playerNo);
 			}
 		}
 
-		for (const buff thisBuff : buffsToRemove)
+		for (const buff thisBuff : mBuffsToRemove[playerNo])
 		{
-			RemoveBuffFromPlayer(thisBuff, playerNo);
+			mActiveBuffDurationMap[playerNo].erase(thisBuff);
 		}
 
-		buffsToRemove.clear();
+		mBuffsToRemove[playerNo].clear();
 	}
 }
 
@@ -95,4 +122,14 @@ void InventoryBuffSystem::PlayerBuffs::Notify(BuffEvent buffEvent, int playerNo)
 
 float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
 	return mBuffInitDurationMap[inBuff];
+}
+
+void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply){
+	if (localPlayerID != playerID)
+		return;
+
+	if (toApply)
+		ApplyBuffToPlayer(buffToSync, localPlayerID);
+	else
+		RemoveBuffFromPlayer(buffToSync, localPlayerID);
 }
