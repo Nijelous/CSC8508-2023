@@ -39,7 +39,7 @@ namespace NCL {
 			void SetPause() { mGameState = PauseScreenState; }
 
 			// to be repalced by actual game logic
-			bool PlayerWonGame();
+			virtual bool PlayerWonGame();
 			bool PlayerLostGame();
 
 			void CreateLevel();
