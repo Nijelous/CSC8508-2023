@@ -40,8 +40,6 @@ namespace NCL {
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
-			virtual void UpdateSound();
-
 			PlayerInventory::item GetEquippedItem();
 
 			void ClosePrisonDoor();
