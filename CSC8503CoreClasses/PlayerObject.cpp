@@ -54,7 +54,7 @@ namespace {
 	constexpr float TIME_UNTIL_LONG_INTERACT = 1.5f;
 	constexpr float TIME_UNTIL_PICKPOCKET = 0.75f;
 
-	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 20;
+	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 45;
 
 	constexpr bool DEBUG_MODE = true;
 }
@@ -129,7 +129,7 @@ void PlayerObject::ShowDebugInfo(float dt)
 	mUiTime = mUiTime + dt;
 	mUiTime = std::fmod(mUiTime, 1.0f);
 
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
 
 	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
 
@@ -137,11 +137,9 @@ void PlayerObject::ShowDebugInfo(float dt)
 
 	mLastSusValue = mSusValue;
 
-
-
 	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
 	Debug::Print("Sus:" + std::to_string(
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)
 	), Vector2(70, 90));
 	if (mHasSilentSprintBuff)
 		Debug::Print("HasSilentSprint", Vector2(70, 95));
