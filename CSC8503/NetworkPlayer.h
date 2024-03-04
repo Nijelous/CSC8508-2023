@@ -1,6 +1,8 @@
 #pragma once
 #include "GameObject.h"
 #include "PlayerObject.h"
+#include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
+#include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "Ray.h"
 
 namespace NCL::CSC8503{
@@ -30,7 +32,7 @@ namespace NCL {
 			Ray rayFromPlayer;
 		};
 		
-		class NetworkPlayer : public PlayerObject{
+		class NetworkPlayer : public PlayerObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 			NetworkPlayer(NetworkedGame* game, int num);
 			NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName);
@@ -44,6 +46,10 @@ namespace NCL {
 			void ResetPlayerInput();
 			void UpdateObject(float dt) override;
 			void MovePlayer(float dt) override;
+			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override 
+			{ PlayerObject::UpdatePlayerBuffsObserver(buffEvent,playerNo); };
+			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override 
+			{ PlayerObject::UpdateInventoryObserver(invEvent,playerNo, invSlot, isItemRemoved); };
 
 		protected:
 			bool mIsClientInputReceived = false;

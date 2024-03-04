@@ -21,7 +21,9 @@ enum BasicNetworkMessages {
 	GameEndState,
 	ClientPlayerInputState,
 	ClientSyncItemSlotUsage,
-	ClientSyncItemSlot
+	ClientSyncItemSlot,
+	SyncInteractable,
+	ClientSyncBuffs
 };
 
 struct GamePacket {
