@@ -11,13 +11,25 @@
 
 using namespace NCL::CSC8503;
 
-void InteractableDoor::Unlock() {
+InteractableDoor::InteractableDoor() {
+	GameObject::mName = "InteractableDoor";
+	mInteractableItemType = InteractableItems::InteractableDoors;
 	mIsLocked = false;
+	mIsOpen = false;
+
+	bool isServer = SceneManager::GetSceneManager()->IsServer();
+	if (isServer) {
+		InitStateMachine();
+	}
+}
+
+void InteractableDoor::Unlock() {
+	SetIsOpen(false, false);
 	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock() {
-	mIsLocked = true;
+	SetIsOpen(true, false);
 	SetNavMeshFlags(4);
 }
 
@@ -67,11 +79,13 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	mIsOpen = isOpen;
 	if (isOpen) {
-		GameObject::SetActive(false);
-		mTimer = initDoorTimer;
+		SetActive(false);
+		if (isSettedByServer) {
+			mTimer = initDoorTimer;
+		}
 	}
 	else {
-		GameObject::SetActive(true);
+		SetActive(true);
 	}
 
 	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
@@ -101,8 +115,8 @@ void InteractableDoor::InitStateMachine()
 		{
 			this->CountDownTimer(dt);
 
-			//if (mTimer == 0)
-				//SetIsOpen(false, true);
+			if (mTimer == 0)
+				SetIsOpen(false, true);
 		}
 	);
 

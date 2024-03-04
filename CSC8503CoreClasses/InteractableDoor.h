@@ -6,13 +6,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class InteractableDoor : public Door, public Interactable, SuspicionSystem::GlobalSuspicionObserver {
 		public:
-			InteractableDoor(){
-				GameObject::mName = "InteractableDoor";
-				mInteractableItemType = InteractableItems::InteractableDoors;
-				mIsLocked = false;
-				mIsOpen = false;
-				InitStateMachine();
-			}
+			InteractableDoor();
 			~InteractableDoor() {
 
 			}
@@ -28,7 +22,7 @@ namespace NCL {
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:
 			bool CanUseItem();
-			const float initDoorTimer = 3.0f;
+			const float initDoorTimer = 60.0f;
 			bool mIsLocked;
 		};
 	}

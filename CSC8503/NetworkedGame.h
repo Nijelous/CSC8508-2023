@@ -51,6 +51,8 @@ namespace NCL {
 
 			void AddNetworkObjectToNetworkObjects(NetworkObject* networkObj);
 
+			std::map<int, NetworkPlayer*>* GetServerPlayersPtr() { return &mServerPlayers;  };
+
 		protected:
 			void UpdateAsServer(float dt);
 			void UpdateAsClient(float dt);

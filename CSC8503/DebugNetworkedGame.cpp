@@ -12,6 +12,7 @@
 #include "RenderObject.h"
 #include "Vent.h"
 #include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
+#include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
 
 namespace {
 	constexpr int MAX_PLAYER = 4;
@@ -69,6 +70,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
@@ -204,7 +206,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleInteractablePacket(packet);
 		break;
 	}
-
+	case BasicNetworkMessages::ClientSyncBuffs: {
+		ClientSyncBuffPacket* packet = (ClientSyncBuffPacket*)(payload);
+		HandlePlayerBuffChange(packet);
+		break;
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -217,7 +223,13 @@ void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot
 	mThisServer->SendGlobalPacket(packet);
 }
 
-GameClient* DebugNetworkedGame::GetClient() const {
+void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const {
+	PlayerBuffs::buff buffToSync = (PlayerBuffs::buff)(buffType);
+	NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffToSync, toApply);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+GameClient * DebugNetworkedGame::GetClient() const {
 	return mThisClient;
 }
 
@@ -480,4 +492,10 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 		ventObj->SetIsOpen(packet->isOpen, false);
 		break;
 	}
+}
+void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const{
+    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* buffSystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr();
+    const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
+    buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
 }

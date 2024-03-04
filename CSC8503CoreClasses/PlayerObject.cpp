@@ -59,15 +59,19 @@ namespace {
 	constexpr bool DEBUG_MODE = true;
 }
 
-PlayerObject::PlayerObject(GameWorld* world, const std::string& objName,
-	InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
-	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr, PrisonDoor* prisonDoorPtr,
+PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	UISystem* UI, SoundObject* soundObject,
+	const std::string& objName,
+	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 	mPrisonDoorPtr = prisonDoorPtr;
+	SetUIObject(UI);
+	SetSoundObject(soundObject);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;
@@ -389,7 +393,10 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
 	}
 
-
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
+		DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
+	}
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {

@@ -20,15 +20,12 @@
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/SoundEmitter.h"
 #include "PointGameObject.h"
+#include "DebugNetworkedGame.h"
+#include "SceneManager.h"
+#include "NetworkObject.h"
 #include "UISystem.h"
-
-#include <fmod.hpp>
-
 #include <filesystem>
 
-#include "DebugNetworkedGame.h"
-#include "NetworkObject.h"
-#include "SceneManager.h"
 
 namespace {
 	constexpr int NETWORK_ID_BUFFER_START = 10;
@@ -232,7 +229,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 					LoadMap(room->GetTileMap(), key);
 					LoadLights(room->GetLights(), key);
 					LoadDoors(room->GetDoors(), key, isMultiplayer);
-					LoadDoors(room->GetDoors(), key);
 					LoadCCTVs(room->GetCCTVTransforms(), key);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
@@ -250,9 +246,25 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+	}
+	else {
+		if (!serverPlayersPtr){
+			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+			serverPlayersPtr = game->GetServerPlayersPtr();
+		}
+
+		for (const auto& pair : *serverPlayersPtr)
+		{
+			PlayerInventoryObserver* invObserver = reinterpret_cast<PlayerInventoryObserver*>(pair.second);
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+		}
 	}
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -269,11 +281,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
-	if (mTempPlayer)
-	{
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
-	}
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 }
 
@@ -931,14 +938,13 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
-	mTempPlayer = new PlayerObject(mWorld, playerName, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, prisonDoor);
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName, prisonDoor);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
 	mTempPlayer->SetIsRendered(false);
-	mTempPlayer->SetUIObject(mUi);
 	return mTempPlayer;
 }
 
@@ -1087,6 +1093,10 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 InventoryBuffSystemClass* NCL::CSC8503::LevelManager::GetInventoryBuffSystem() {
 	return mInventoryBuffSystemClassPtr;
+}
+
+SuspicionSystemClass* NCL::CSC8503::LevelManager::GetSuspicionSystem() {
+	return mSuspicionSystemClassPtr;
 }
 
 void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
