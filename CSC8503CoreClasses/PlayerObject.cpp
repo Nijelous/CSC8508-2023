@@ -123,11 +123,11 @@ void PlayerObject::UpdateObject(float dt) {
 		mUiTime = mUiTime + dt;
 		mUiTime = std::fmod(mUiTime, 1.0f);
 		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-		mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[0];
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 		if (mSusValue > 33) {
-			mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[1];
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
 			if (mSusValue > 66) {
-				mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[2];
+				mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
 			}
 		}
 		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
@@ -402,27 +402,27 @@ void PlayerObject::ControlInventory() {
 	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
 	Debug::Print(usesLeft, Vector2(10, 85));
 
-	if (mActiveItemSlot == 0) {
+	if (mActiveItemSlot == FIRST_ITEM_SLOT) {
 		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[0];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
 		}
 		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[1];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
 		}
 		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[2];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
 		}
 	}
 
-	if (mActiveItemSlot == 1) {
+	if (mActiveItemSlot == SECOND_ITEM_SLOT) {
 		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[0];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
 		}
 		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[1];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
 		}
 		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[2];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
 		}
 	}
 	

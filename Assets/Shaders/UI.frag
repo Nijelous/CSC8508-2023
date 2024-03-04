@@ -6,6 +6,7 @@ uniform float uTransparency;
 
 layout(std140, binding = 5) uniform IconBlock {
 	bool useTexture;
+    float uTransparency;
 } iconData; 
 
 
