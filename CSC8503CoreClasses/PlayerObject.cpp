@@ -120,9 +120,22 @@ void PlayerObject::UpdateObject(float dt) {
 	if (DEBUG_MODE)
 	{
 		//It have some problem here
-		mUiTime = mUiTime + dt;
-		mUiTime = std::fmod(mUiTime, 1.0f);
-		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+		
+
+		if (dt*mUiTime < 0.6) {
+			mUiTime++;
+			tempSusValue = tempSusValue + (mSusValue - mLastSusValue) * 0.016;
+			if (tempSusValue < 0.016) {
+				tempSusValue = 0;
+			}
+
+		}
+		else{
+			mUiTime = 1;
+			mLastSusValue = tempSusValue;
+			mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+		}
+		float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 		if (mSusValue > 33) {
 			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
@@ -130,10 +143,8 @@ void PlayerObject::UpdateObject(float dt) {
 				mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
 			}
 		}
-		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-		float iconValue = 100.00 - (mSusValue*0.7+14.00);
-		mLastSusValue = mSusValue;
-		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
+		
+		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)

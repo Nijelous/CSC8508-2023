@@ -107,8 +107,9 @@ namespace NCL {
 
 			UISystem* mUi;
 
-			float mSusValue;
-			float mUiTime = 0.0;
+			float mSusValue=0.0;
+			int mUiTime = 1;
+			float tempSusValue = 0.0;
 			float mLastSusValue = 0.0;
 			
 
