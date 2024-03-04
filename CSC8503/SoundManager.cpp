@@ -96,6 +96,10 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	mSystem->update();
 }
 
+void SoundManager::UpdateSound(GameObject* obj) {
+
+}
+
 void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel) {
 
 	FMOD_VECTOR pos = ConvertVector(soundPos);

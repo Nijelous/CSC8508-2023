@@ -168,6 +168,8 @@ namespace NCL::CSC8503 {
 			return mObjectState;
 		}
 
+		virtual void UpdateSound();
+
 	protected:
 		Transform			mTransform;
 

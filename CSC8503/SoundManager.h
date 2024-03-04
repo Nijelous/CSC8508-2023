@@ -20,6 +20,8 @@ namespace NCL{
 
 			void UpdateSounds(vector<GameObject*> object);
 
+			void UpdateSound(GameObject* obj);
+
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
 
 			void UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Channel* channel);

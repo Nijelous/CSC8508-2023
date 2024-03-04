@@ -70,3 +70,7 @@ void GameObject::UpdateBroadphaseAABB() {
 void GameObject::UpdateObject(float dt) {
 
 }
+
+void GameObject::UpdateSound() {
+
+}
