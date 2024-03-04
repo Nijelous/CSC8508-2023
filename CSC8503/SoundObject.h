@@ -24,7 +24,6 @@ namespace NCL {
 
 			void SetNotTriggered();
 
-			void SetChannel(Channel* channel);
 		private:
 			Channel* mChannel = nullptr;
 			std::vector<Channel*> mChannels;

@@ -21,10 +21,6 @@ void SoundObject::AddChannel(Channel* channel) {
 	mChannels.emplace_back(channel);
 }
 
-void SoundObject::SetChannel(Channel* channel) {
-	mChannel = channel;
-}
-
 std::vector<Channel*> SoundObject::GetChannels() {
 	return mChannels;
 }
