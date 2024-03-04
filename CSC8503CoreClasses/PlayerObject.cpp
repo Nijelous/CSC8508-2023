@@ -119,44 +119,49 @@ void PlayerObject::UpdateObject(float dt) {
 
 	if (DEBUG_MODE)
 	{
-		//It have some problem here
-		mUiTime = mUiTime + dt;
-		mUiTime = std::fmod(mUiTime, 1.0f);
-		
-		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-
-		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-		float iconValue = 100.00 - (mSusValue*0.7+14.00);
-
-		mLastSusValue = mSusValue;
-
-		
-
-		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
-		Debug::Print("Sus:" + std::to_string(
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
-		), Vector2(70, 90));
-		if(mHasSilentSprintBuff)
-			Debug::Print("HasSilentSprint", Vector2(70, 95));
-		switch(mPlayerSpeedState){
-		case SpedUp:
-			Debug::Print("Sped Up", Vector2(45, 80));
-			break;
-		case SlowedDown:
-			Debug::Print("Slowed Down", Vector2(45, 80));
-			break;
-		case Stunned:
-			Debug::Print("Stunned", Vector2(45, 80));
-			break;
-		}
-		const PlayerInventory::item equippedItem = GetEquippedItem();
-		//Handle Equipped Item Log
-		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-		Debug::Print(itemName, Vector2(10, 80));
-		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-		Debug::Print(usesLeft, Vector2(10, 85));
+		ShowDebugInfo(dt);
 	}
+}
+
+void PlayerObject::ShowDebugInfo(float dt)
+{
+	//It have some problem here
+	mUiTime = mUiTime + dt;
+	mUiTime = std::fmod(mUiTime, 1.0f);
+
+	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+
+	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
+
+	float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
+
+	mLastSusValue = mSusValue;
+
+
+
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
+	Debug::Print("Sus:" + std::to_string(
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
+	), Vector2(70, 90));
+	if (mHasSilentSprintBuff)
+		Debug::Print("HasSilentSprint", Vector2(70, 95));
+	switch (mPlayerSpeedState) {
+	case SpedUp:
+		Debug::Print("Sped Up", Vector2(45, 80));
+		break;
+	case SlowedDown:
+		Debug::Print("Slowed Down", Vector2(45, 80));
+		break;
+	case Stunned:
+		Debug::Print("Stunned", Vector2(45, 80));
+		break;
+	}
+	const PlayerInventory::item equippedItem = GetEquippedItem();
+	//Handle Equipped Item Log
+	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+	Debug::Print(itemName, Vector2(10, 80));
+	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+	Debug::Print(usesLeft, Vector2(10, 85));
 }
 
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
