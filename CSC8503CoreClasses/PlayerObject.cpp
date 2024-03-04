@@ -122,18 +122,19 @@ void PlayerObject::UpdateObject(float dt) {
 		//It have some problem here
 		mUiTime = mUiTime + dt;
 		mUiTime = std::fmod(mUiTime, 1.0f);
-		
 		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-
+		mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[0];
+		if (mSusValue > 33) {
+			mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[1];
+			if (mSusValue > 66) {
+				mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[2];
+			}
+		}
 		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
 		float iconValue = 100.00 - (mSusValue*0.7+14.00);
-
 		mLastSusValue = mSusValue;
-
-		
-
 		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
+
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
 		), Vector2(70, 90));
@@ -166,39 +167,39 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	switch (buffEvent) {
 	case slowApplied:
 		ChangeToSlowedSpeeds();
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 0.3);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 1.0);
 		break;
 	case slowRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 0.3);
 		break;
 	case speedApplied:
 		ChangeToSpedUpSpeeds();
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 0.3);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 1.0);
 		break;
 	case speedRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 0.3);
 		break;
 	case stunApplied:
 		ChangeToStunned();
-		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, 1.0);
 		break;
 	case stunRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, 0.3);
 		break;
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
 		mObjectState = Idle;
 
 		break;
@@ -362,20 +363,24 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 }
 
 void PlayerObject::ControlInventory() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
 		mActiveItemSlot = 0;
-
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2))
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.5);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
 		mActiveItemSlot = 1;
-
-	if (Window::GetMouse()->GetWheelMovement() > 0)
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.5);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
+	}
+	if (Window::GetMouse()->GetWheelMovement() > 0) {
 		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
-		? mActiveItemSlot + 1 : 0;
-
-	if (Window::GetMouse()->GetWheelMovement() < 0)
+			? mActiveItemSlot + 1 : 0;
+	}
+	if (Window::GetMouse()->GetWheelMovement() < 0) {
 		mActiveItemSlot = (mActiveItemSlot > 0)
-		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
-
+			? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
+	}
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
@@ -389,6 +394,39 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 
+
+	//Handle Equipped Item Log
+	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+	
+	Debug::Print(itemName, Vector2(10, 80));
+	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+	Debug::Print(usesLeft, Vector2(10, 85));
+
+	if (mActiveItemSlot == 0) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+
+	if (mActiveItemSlot == 1) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+	
+
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
 	}
@@ -397,6 +435,7 @@ void PlayerObject::ControlInventory() {
 		DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
 	}
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {

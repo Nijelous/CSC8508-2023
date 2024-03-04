@@ -20,18 +20,18 @@ UISystem::~UISystem() {
 }
 
 
-UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
+UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, float transparency) {
 	Icon* mIcon = new Icon();
 	mIcon->mPosition = Pos;
 	mIcon->mLength = horiSize;
 	mIcon->mHeight = vertSize;
 	mIcon->mTexture = tex;
-	mIcon->mTransparency = isShown;
+	mIcon->mTransparency = transparency;
 	mIconsVec.emplace_back(mIcon);
 	return mIcon;
 }
 
-UISystem::Icon* UISystem::AddIcon(Icon* icon, bool isShown) {
+UISystem::Icon* UISystem::AddIcon(Icon* icon, float transparency) {
 	mIconsVec.emplace_back(icon);
 	return icon;
 }
@@ -98,26 +98,35 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 	}
 }
 
-void UISystem::ChangeBuffSlotTransparency(int slotNum, bool isShown){
+void UISystem::ChangeBuffSlotTransparency(int slotNum, float transparency){
 	switch (slotNum)
 	{
+	case FIRST_ITEM_SLOT:
+		mFirstEquippedItem->mTransparency = transparency;
+		break;
+	case SECOND_ITEM_SLOT:
+		mSecondEquippedItem->mTransparency = transparency;
+		break;
 	case SILENT_BUFF_SLOT:
-		mSilentSprintIcon->mTransparency = isShown;
+		mSilentSprintIcon->mTransparency = transparency;
 		break;
 	case SLOW_BUFF_SLOT:
-		mSlowIcon->mTransparency = isShown;
+		mSlowIcon->mTransparency = transparency;
 		break;
 	case STUN_BUFF_SLOT:
-		mStunIcon->mTransparency = isShown;
+		mStunIcon->mTransparency = transparency;
 		break;
 	case SPEED_BUFF_SLOT:
-		mSpeedIcon->mTransparency = isShown;
+		mSpeedIcon->mTransparency = transparency;
 		break;
 	case SUSPISION_BAR_SLOT:
-		mSuspensionBarIcon->mTransparency = isShown;
+		mSuspensionBarIcon->mTransparency = transparency;
 		break;
 	case SUSPISION_INDICATOR_SLOT:
-		mSuspensionIndicatorIcon->mTransparency = isShown;
+		mSuspensionIndicatorIcon->mTransparency = transparency;
+		break;
+	case CROSS:
+		mCross->mTransparency = transparency;
 		break;
 
 	default:
@@ -152,6 +161,9 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 			break;
 		case SUSPISION_INDICATOR_SLOT:
 			mSuspensionIndicatorIcon = &icon;
+			break;
+		case CROSS:
+			mCross = &icon;
 			break;
 
 	default:

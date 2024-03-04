@@ -27,6 +27,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
+	delete mSightedObject;
 }
 
 void GuardObject::UpdateObject(float dt) {

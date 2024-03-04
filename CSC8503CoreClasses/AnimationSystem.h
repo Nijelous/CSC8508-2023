@@ -46,7 +46,7 @@ namespace NCL {
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
-			Texture* mAnimTexture = nullptr;	
+			Texture* mAnimTexture;	
 
 			GameObject::GameObjectState mGuardState;
 			GameObject::GameObjectState mPlayerState;
