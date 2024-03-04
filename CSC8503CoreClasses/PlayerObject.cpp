@@ -61,7 +61,7 @@ namespace {
 
 PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
 	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
-	UISystem* UI,
+	UISystem* UI, SoundObject* soundObject,
 	const std::string& objName,
 	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
@@ -71,6 +71,7 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 	mPrisonDoorPtr = prisonDoorPtr;
 	SetUIObject(UI);
+	SetSoundObject(soundObject);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;

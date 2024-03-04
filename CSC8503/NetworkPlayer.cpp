@@ -7,6 +7,7 @@
 #include "NetworkObject.h"
 #include "PhysicsObject.h"
 #include "InventoryBuffSystem/Item.h"
+#include "SoundManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -22,14 +23,14 @@ namespace {
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
 	PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
-	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(),"") {
+	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	//this->game = game;
 	mPlayerID = num;
 }
 
 NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(game->GetLevelManager()->GetGameWorld(),
 	LevelManager::GetLevelManager()->GetInventoryBuffSystem(),LevelManager::GetLevelManager()->GetSuspicionSystem(),
-	LevelManager::GetLevelManager()->GetUiSystem(), "") {
+	LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	this->game = game;
 	mPlayerID = num;
 }

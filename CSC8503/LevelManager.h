@@ -81,6 +81,7 @@ namespace NCL {
 			SuspicionSystemClass* GetSuspicionSystem();
 
 			UISystem* GetUiSystem() { return mUi; };
+			SoundManager* GetSoundManager() { return mSoundManager; };
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
