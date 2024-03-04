@@ -105,6 +105,8 @@ namespace NCL {
 
 			void	EnforceMaxSpeeds();
 
+			bool	IsSeenByGameObject(GameObject* otherGameObject);
+
 			UISystem* mUi;
 
 			float mSusValue;

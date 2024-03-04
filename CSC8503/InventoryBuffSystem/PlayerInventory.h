@@ -14,7 +14,7 @@ namespace InventoryBuffSystem
 {
 	const enum InventoryEvent
 	{
-		flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed, flagAdded
+		none, flagDropped,disguiseItemUsed,soundEmitterUsed, doorKeyUsed, screwdriverUsed, stunItemUsed, screwDriverDropped
 	};
 
 	class PlayerInventoryObserver
@@ -95,11 +95,12 @@ namespace InventoryBuffSystem
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {
-			{flag,flagAdded}
+			
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemDroppedInventoryEventMap = {
-			{flag,flagDropped}
+			{flag,flagDropped},
+			{screwdriver,screwDriverDropped}
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemUsedInventoryEventMap = {
@@ -116,6 +117,7 @@ namespace InventoryBuffSystem
 			{ soundEmitter, "Sound Emitter" },
 			{ doorKey, "Door Key" },
 			{ stunItem, "Stun Item"},
+			{ flag, "Heist Item"},
 			{ none, "No Equipped Item" }
 		};
 

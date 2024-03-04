@@ -98,6 +98,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	mPlayerInventory[playerNo][invSlot] = none;
 
+	//Potentially move the multiplayer related code below to a function like HandleMultiplayerItemRemoval(...);
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -126,11 +127,12 @@ void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo
 }
 
 void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot) {
-	RemoveItemFromPlayer(playerNo, invSlot);
-	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemDroppedInventoryEventMap.end())
+	if (mOnItemDroppedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) !=
+		mOnItemDroppedInventoryEventMap.end())
 	{
 		Notify(mOnItemDroppedInventoryEventMap[mPlayerInventory[playerNo][invSlot]], playerNo, invSlot);
 	}
+	RemoveItemFromPlayer(playerNo, invSlot);
 	//Extra drop logic
 }
 
@@ -217,12 +219,12 @@ ItemUseType InventoryBuffSystem::PlayerInventory::GetItemUseType(const item& inI
 }
 
 void InventoryBuffSystem::PlayerInventory::TransferItemBetweenInventories(const int& givingPlayerNo, const int& givingPlayerInvSlot, const int& receivingPlayerNo){
-	if (IsInventoryFull(receivingPlayerNo) || IsInventoryEmpty(givingPlayerNo))
-		return;
 	item itemToRemove = GetItemInInventorySlot(givingPlayerNo, givingPlayerInvSlot);
-	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
+	if (IsInventoryFull(receivingPlayerNo) || itemToRemove == none)
+		return;
 	int receivingSlot = AddItemToPlayer(itemToRemove, receivingPlayerNo);
 	SetItemUsageCount(receivingPlayerNo, receivingSlot, GetItemUsageCount(givingPlayerNo, givingPlayerInvSlot));
+	RemoveItemFromPlayer(givingPlayerNo, givingPlayerInvSlot);
 }
 
 void InventoryBuffSystem::PlayerInventory::Attach(PlayerInventoryObserver* observer) {

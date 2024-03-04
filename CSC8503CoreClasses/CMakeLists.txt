@@ -47,6 +47,12 @@ set(AI_Guard
 )
 source_group("AI\\Guard" FILES ${AI_Guard})
 
+set(AI_CCTV
+    "CCTV.h"
+    "CCTV.cpp"
+)
+source_group("AI\\CCTV" FILES ${AI_CCTV})
+
 set(Collision_Detection
     "AABBVolume.h"
     "CapsuleVolume.h"  
@@ -198,6 +204,7 @@ set(ALL_FILES
     ${enet_Files}
     ${Lights}
     ${AI_Guard}
+    ${AI_CCTV}
 )
 
 set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
