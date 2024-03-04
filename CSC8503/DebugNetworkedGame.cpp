@@ -9,6 +9,7 @@
 #include "NetworkPlayer.h"
 #include "RenderObject.h"
 #include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
+#include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
 
 namespace{
     constexpr int MAX_PLAYER = 4;
@@ -65,6 +66,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage,this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot,this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
@@ -197,6 +199,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
     case BasicNetworkMessages::ClientSyncItemSlot:{
         ClientSyncItemSlotPacket* packet = (ClientSyncItemSlotPacket*)(payload);
         HandlePlayerEquippedItemChange(packet);
+        break;
+    }
+    case BasicNetworkMessages::ClientSyncBuffs: {
+        ClientSyncBuffPacket* packet = (ClientSyncBuffPacket*)(payload);
+        HandlePlayerBuffChange(packet);
+        break;
     }
     default:
         std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
@@ -207,6 +215,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
     PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
     NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
+    mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const {
+    PlayerBuffs::buff buffToSync = (PlayerBuffs::buff)(buffType);
+    NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffToSync, toApply);
     mThisServer->SendGlobalPacket(packet);
 }
 
@@ -449,4 +463,11 @@ void DebugNetworkedGame::HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket
     auto* inventorySystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr();
     const PlayerInventory::item equippedItem =  static_cast<PlayerInventory::item>(packet->equippedItem);
 	inventorySystem->ChangePlayerItem(packet->playerID, localPlayerID, packet->slotId, equippedItem, packet->usageCount);
+}
+
+void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const{
+    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* buffSystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr();
+    const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
+    buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
 }

@@ -28,6 +28,7 @@ namespace NCL {
 		class SoundEmitter;
 		class InteractableDoor;
 		class PointGameObject;
+		class NetworkPlayer;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -76,6 +77,11 @@ namespace NCL {
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
 			InventoryBuffSystemClass* GetInventoryBuffSystem();
+
+			SuspicionSystemClass* GetSuspicionSystem();
+
+			UISystem* GetUiSystem() { return mUi; };
+			SoundManager* GetSoundManager() { return mSoundManager; };
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
@@ -274,6 +280,7 @@ namespace NCL {
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
+			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
 		};
 	}
 }
