@@ -112,40 +112,32 @@ void PlayerObject::UpdateObject(float dt) {
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
 	MatchCameraRotation(yawValue);
 
-	if (mPlayerSpeedState == SpedUp)
+	if (mPlayerSpeedState == SpedUp) {
 		EnforceSpedUpMaxSpeeds();
-	else
+	}
+	else {
 		EnforceMaxSpeeds();
+	}
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
 
-	if (DEBUG_MODE)
-	{
-		//It have some problem here
-		
-
-		if (dt*mUiTime < 0.6) {
-			mUiTime++;
-			tempSusValue = tempSusValue + (mSusValue - mLastSusValue) * 0.016;
-			if (tempSusValue < 0.016) {
-				tempSusValue = 0;
-			}
-
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+			mAlarmTime = mAlarmTime + dt;
 		}
-		else{
-			mUiTime = 1;
-			mLastSusValue = tempSusValue;
-			mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-		}
-		float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
-		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
-		if (mSusValue > 33) {
-			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
-			if (mSusValue > 66) {
-				mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-			}
-		}
-		
-		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+	}
+	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
+
+	if (DEBUG_MODE){
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
 		), Vector2(70, 90));
@@ -591,6 +583,24 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+float PlayerObject::SusLinerInterpolation(float dt)
+{
+	if (dt * mUiTime < 0.6) {
+		mUiTime++;
+		tempSusValue = tempSusValue + (mSusValue - mLastSusValue) * 0.016;
+		if (tempSusValue < 0.016) {
+			tempSusValue = 0;
+		}
+	}
+	else {
+		mUiTime = 1;
+		mLastSusValue = tempSusValue;
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+	}
+	float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
+	return iconValue;
 }
 
 bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject){

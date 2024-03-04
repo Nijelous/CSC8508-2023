@@ -423,9 +423,9 @@ void LevelManager::InitialiseAssets() {
 	mSilentRunTex = mRenderer->LoadTexture("Silence.png");
 	mSlowDownTex = mRenderer->LoadTexture("SpeedDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
+	mAlarmTex = mRenderer->LoadTexture("Alarm.png");
 	
 	mKeyIconTex3 = mRenderer->LoadTexture("key3.png");
 	mKeyIconTex2 = mRenderer->LoadTexture("key2.png");
@@ -614,6 +614,9 @@ void LevelManager::InitialiseIcons() {
 
 	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex,0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
+
+	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mAlarmTex, 0.0);
+	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
 	mRenderer->SetUIObject(mUi);
 
