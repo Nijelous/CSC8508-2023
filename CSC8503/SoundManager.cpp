@@ -73,7 +73,6 @@ FMOD::Channel* SoundManager::AddDoorOpenSound() {
 
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	SetListenerAttributes();
-	std::cout<<"  one loop     " << std::endl;
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		if (PlayerObject* playerObj = dynamic_cast<PlayerObject*>(obj)) {
@@ -86,14 +85,13 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-		/*
-		else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
-			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
-			bool isOpen;
-			std::cout << isOpen << std::endl;
-			UpdateOpenDoorSound(isOpen, soundPos, channel);
-		}
-		*/
+		//TO DO
+		//else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
+		//	FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
+		//	//bool isOpen;
+		//	//std::cout << isOpen << std::endl;
+		//	//UpdateOpenDoorSound(isOpen, soundPos, channel);
+		//}
 	}
 	mSystem->update();
 }
@@ -140,7 +138,7 @@ void SoundManager::UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Chan
 		FMOD_VECTOR pos = ConvertVector(soundPos);
 		if (channel) {
 			channel->set3DAttributes(&pos, nullptr);
-			//channel->setPosition(0, FMOD_TIMEUNIT_MS);
+			//channel->setPosition(0, FMOD_TIMEUNIT_MS);  To Do
 			channel->setPaused(false);
 		}
 		mTempIsOpen = isOpen;
@@ -148,7 +146,7 @@ void SoundManager::UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Chan
 	else if (mTempIsOpen != isOpen) {
 		mTempIsOpen = isOpen;
 	}
-	/*channel->setPaused(false);
+	/*channel->setPaused(false);             to do
 	mResult = channel->setLoopCount(2);
 	mSystem->update();*/
 }
