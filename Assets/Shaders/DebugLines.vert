@@ -1,8 +1,15 @@
-#version 420 core
+#version 460 core
+
+#extension GL_ARB_bindless_texture : require
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
 layout(location = 2) in vec2 texCoord;
+
+layout(std140, binding = 6) uniform TextureHandles {
+	int handles[64];
+	int index[6];
+} texHandles;
 
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;

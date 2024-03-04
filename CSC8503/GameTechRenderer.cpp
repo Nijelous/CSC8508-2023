@@ -79,13 +79,14 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	glGenBuffers(1, &iconVertVBO);
 	glGenBuffers(1, &iconTexVBO);
 
-	Debug::CreateDebugFont("PressStart2P.fnt", *LoadTexture("PressStart2P.png"));
+	Debug::CreateDebugFont("PressStart2P.fnt", *LoadDebugTexture("PressStart2P.png"));
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
 }
 
 GameTechRenderer::~GameTechRenderer() {
+	UnbindAllTextures();
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
 
@@ -238,12 +239,15 @@ void GameTechRenderer::GenAnimFramesUBOs() {
 void GameTechRenderer::GenTextureIndexUBO() {
 	glGenBuffers(1, &uBOBlocks[textureIdUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[textureIdUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, sizeof(float) * mTextureHandles.size(), NULL, GL_STATIC_DRAW);
+	glBindBufferBase(GL_ARRAY_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextureHandleData), mTextureHandles.data());
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
-void GameTechRenderer::BindAllTextures() {
-	
+void GameTechRenderer::UnbindAllTextures() {
+	for (GLuint64 handle : mTextureHandles) {
+		glMakeTextureHandleNonResidentARB(handle);
+	}
 }
 
 void GameTechRenderer::FillLightUBO() {
@@ -672,11 +676,15 @@ void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
 	GLuint internalFormat = depth ? GL_DEPTH24_STENCIL8 : GL_RGBA8;
 	GLuint format = depth ? GL_DEPTH_STENCIL : GL_RGBA;
 	GLuint type = depth ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE;
-
-	const GLuint64 handle = glGetTextureHandleARB(tex);
-	mTextureHandles.emplace(tex, handle);
+	
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, format, type, NULL);
+
+	const GLuint64 handle = glGetTextureHandleARB(tex);
+	if (std::find(mTextureHandles.begin(), mTextureHandles.end(), handle) != mTextureHandles.end()) {
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(handle);
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -735,8 +743,7 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	OGLTexture* t = (OGLTexture*)i.mTexture;
 	BindTextureToShader(*t, "iconTex", t->GetObjectID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
@@ -769,11 +776,6 @@ void GameTechRenderer::NewRenderText() {
 	OGLTexture* t = (OGLTexture*)Debug::GetDebugFont()->GetTexture();
 
 	if (t) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glBindTexture(GL_TEXTURE_2D, 0);
 		BindTextureToShader(*t, "mainTex", 0);
 	}
 
@@ -805,9 +807,29 @@ void GameTechRenderer::NewRenderText() {
 }
 
 Texture* GameTechRenderer::LoadTexture(const std::string& name) {
+	
 	OGLTexture*  tex = OGLTexture::TextureFromFile(name).release();
 	const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
-	mTextureHandles.emplace(tex->GetObjectID(), handle);
+	if (std::find(mTextureHandles.begin(), mTextureHandles.end(), handle) != mTextureHandles.end()) {
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(handle);
+	}
+	
+	return tex;
+}
+
+Texture* GameTechRenderer::LoadDebugTexture(const std::string& name) {
+	OGLTexture* tex = OGLTexture::TextureFromFile(name).release();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->GetObjectID());	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
+	if (std::find(mTextureHandles.begin(), mTextureHandles.end(), handle) != mTextureHandles.end()) {
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(handle);
+	}
 	return tex;
 }
 

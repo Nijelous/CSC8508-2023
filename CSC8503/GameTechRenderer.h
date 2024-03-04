@@ -39,6 +39,7 @@ namespace NCL {
 
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
+			Texture* LoadDebugTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
 			MeshAnimation* LoadAnimation(const std::string& name);
 			MeshMaterial* LoadMaterial(const std::string& name);
@@ -62,6 +63,29 @@ namespace NCL {
 
 		protected:
 
+			enum BufferBlockNames {
+				camUBO,
+				staticDataUBO,
+				lightsUBO,
+				objectsUBO,
+				animFramesUBO,
+				iconUBO,
+				textureIdUBO,
+				MAX_UBO
+			};
+
+
+
+			enum TextureTypes {
+				albedo,
+				normal,
+				depth,
+				shadow,
+				albedoLight,
+				specularLight,
+				MAX_TEXTURE_TYPES
+			};
+
 			/* (Author: B Schwarz) Data sent to a UBO buffer can be accessed reliably at offsets of 256 bytes, thus this struct is padded to 256.
 			Yes, this means it is 81.25% empty data.
 			No, I am not happy about it. */
@@ -83,15 +107,10 @@ namespace NCL {
 				float padding[27] = { 0.0f };				
 			};
 
-			enum BufferBlockNames {
-				camUBO,
-				staticDataUBO,
-				lightsUBO,
-				objectsUBO,
-				animFramesUBO,
-				iconUBO,
-				textureIdUBO,
-				MAX_UBO
+			
+			struct TextureHandleData {
+				int handles[64];
+				int index[MAX_TEXTURE_TYPES];
 			};
 
 			void InitUBOBlocks();
@@ -107,7 +126,7 @@ namespace NCL {
 			void NewRenderLines();
 			void NewRenderText();
 			void GenTextureIndexUBO();
-			void BindAllTextures();
+			void UnbindAllTextures();
 
 			void RenderIcons(UISystem::Icon icon);
 			
@@ -144,7 +163,7 @@ namespace NCL {
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
 
-			std::unordered_map<GLuint, GLuint64> mTextureHandles;
+			vector<GLuint64> mTextureHandles;
 
 			OGLShader*  mDebugLineShader;
 			OGLShader* mDebugTextShader;

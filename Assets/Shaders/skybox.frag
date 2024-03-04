@@ -1,6 +1,13 @@
-#version 330 core
+#version 460 core
+
+#extension GL_ARB_bindless_texture : require
 
 uniform samplerCube cubeTex;
+
+layout(std140, binding = 6) uniform TextureHandles {
+	int handles[64];
+	int index[6];
+} texHandles;
 
 in Vertex {
 	vec3 viewDir;
