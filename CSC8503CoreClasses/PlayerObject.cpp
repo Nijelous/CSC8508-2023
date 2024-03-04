@@ -650,3 +650,6 @@ void PlayerObject::StopSliding() {
 	}
 }
 
+void PlayerObject::UpdateSound() {
+
+}

@@ -26,7 +26,7 @@ namespace NCL{
 
 			void UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Channel* channel);
 
-			void SetListenerAttributes();
+			void UpdateListenerAttributes();
 
 			FMOD_VECTOR ConvertVector(Vector3 vector);
 

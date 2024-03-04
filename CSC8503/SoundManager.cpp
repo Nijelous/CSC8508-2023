@@ -72,7 +72,7 @@ FMOD::Channel* SoundManager::AddDoorOpenSound() {
 }
 
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
-	SetListenerAttributes();
+	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		if (PlayerObject* playerObj = dynamic_cast<PlayerObject*>(obj)) {
@@ -155,7 +155,7 @@ void SoundManager::UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Chan
 	mSystem->update();*/
 }
 
-void SoundManager::SetListenerAttributes() {
+void SoundManager::UpdateListenerAttributes() {
 	FMOD_VECTOR camPos = ConvertVector(mGameWorld->GetMainCamera().GetPosition());
 	Vector3 forward = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 right = mGameWorld->GetMainCamera().GetRightVector();
