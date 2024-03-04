@@ -1025,7 +1025,9 @@ void LevelManager::ResetEquippedIconTexture() {
 
 GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
-		if (mHelipad->GetCollidingWithPlayer()) {
+		std::tuple<bool, int> colResult = mHelipad->GetCollidingWithPlayer();
+		bool isPlayerOnHelipad = std::get<0>(colResult);
+		if (isPlayerOnHelipad) {
 			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
 				return GameResults(true, mTempPlayer->GetPoints());
 		}
@@ -1141,4 +1143,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 
 FlagGameObject* LevelManager::GetMainFlag() {
 	return mMainFlag;
+}
+
+Helipad* LevelManager::GetHelipad() {
+	return mHelipad;
 }

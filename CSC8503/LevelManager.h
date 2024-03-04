@@ -117,6 +117,8 @@ namespace NCL {
 
 			FlagGameObject* GetMainFlag();
 
+			Helipad* GetHelipad(); 
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 		protected:
 			LevelManager();
