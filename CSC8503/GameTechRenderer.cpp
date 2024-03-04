@@ -661,7 +661,7 @@ void GameTechRenderer::SetUpFBOs() {
 }
 
 void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
-	glGenTextures(1, &tex);
+	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -672,6 +672,9 @@ void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
 	GLuint internalFormat = depth ? GL_DEPTH24_STENCIL8 : GL_RGBA8;
 	GLuint format = depth ? GL_DEPTH_STENCIL : GL_RGBA;
 	GLuint type = depth ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE;
+
+	const GLuint64 handle = glGetTextureHandleARB(tex);
+	mTextureHandles.emplace(tex, handle);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, format, type, NULL);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -802,7 +805,10 @@ void GameTechRenderer::NewRenderText() {
 }
 
 Texture* GameTechRenderer::LoadTexture(const std::string& name) {
-	return OGLTexture::TextureFromFile(name).release();
+	OGLTexture*  tex = OGLTexture::TextureFromFile(name).release();
+	const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
+	mTextureHandles.emplace(tex->GetObjectID(), handle);
+	return tex;
 }
 
 Shader* GameTechRenderer::LoadShader(const std::string& vertex, const std::string& fragment) {

@@ -144,7 +144,7 @@ namespace NCL {
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
 
-			std::unordered_map<Texture*, GLuint64> mTextureHandles;
+			std::unordered_map<GLuint, GLuint64> mTextureHandles;
 
 			OGLShader*  mDebugLineShader;
 			OGLShader* mDebugTextShader;
