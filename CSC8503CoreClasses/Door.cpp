@@ -30,6 +30,7 @@ void Door::InitStateMachine()
 	mStateMachine->AddTransition(new StateTransition(DoorOpen, DoorClosed,
 		[&]() -> bool
 		{
+			this->GetSoundObject()->TriggerSoundEvent();
 			return !mIsOpen;
 		}
 	));

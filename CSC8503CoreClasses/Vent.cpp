@@ -39,6 +39,24 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 	}
 }
 
+void Vent::HandleItemUse(GameObject* userObj) {
+	if (!mIsOpen) {
+		auto* playerComp = static_cast<PlayerObject*>(userObj);
+		if (playerComp != nullptr) {
+
+			PlayerInventory::item usedItem = playerComp->GetEquippedItem();
+
+			switch (usedItem) {
+			case InventoryBuffSystem::PlayerInventory::screwdriver:
+				SetIsOpen(true, true);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
 void Vent::SyncVentStatusInMultiplayer() const {
 	auto* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
