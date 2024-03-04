@@ -17,7 +17,7 @@ namespace NCL {
 		constexpr int SPEED_BUFF_SLOT = 5;
 		constexpr int SUSPISION_BAR_SLOT = 6;
 		constexpr int SUSPISION_INDICATOR_SLOT = 7;
-
+		constexpr int CROSS = 8;
 
 		class UISystem {
 		public:
@@ -29,15 +29,15 @@ namespace NCL {
 				int mLength;
 				int mHeight;
 				Texture* mTexture;
-				bool mTransparency;
+				float mTransparency;
 				void SetIconSize(float length, float height) {
 					mLength = length;
 					mHeight = height;
 					
 				}
 			};
-			Icon* AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
-			Icon* AddIcon(Icon* icon, bool isShown = true);
+			Icon* AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, float transparency=1.0);
+			Icon* AddIcon(Icon* icon, float transparency=1.0);
 
 			std::vector<Icon*>& GetIcons();
 
@@ -49,7 +49,7 @@ namespace NCL {
 
 			void ChangeEquipmentSlotTexture(int slotNum, Texture& texture);
 
-			void ChangeBuffSlotTransparency(int slotNum, bool isShown);
+			void ChangeBuffSlotTransparency(int slotNum, float transparency);
 
 			void SetEquippedItemIcon(int slotNum, Icon& icon);
 
@@ -87,7 +87,7 @@ namespace NCL {
 
 			Icon* mSuspensionBarIcon;
 			Icon* mSuspensionIndicatorIcon;
-
+			Icon* mCross;
 			std::vector<Icon*> mIconsVec;
 			std::vector<Texture*> mKeyTexVec;
 			std::vector<Texture*> mSusBarTexVec;

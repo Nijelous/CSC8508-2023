@@ -733,9 +733,17 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
-	bool iconData = i.mTransparency;
-	glBindBufferBase(GL_UNIFORM_BUFFER, iconUBO, uBOBlocks[iconUBO]);
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, 1, &iconData);
+	GLint texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "uTransparency");
+	glUniform1f(texSlot, i.mTransparency);
+
+	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
+	//0.02, 0, 0, 0
+	//0, 0.02, 0, 0
+	//0, 0, -1, 0;
+	//-1, 1, 0, 1
+
+	int matSlot = glGetUniformLocation(mIconShader->GetProgramID(), "viewProjMatrix");
+	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
 
 	SetUIiconBufferSizes(iconVertCount);
 
