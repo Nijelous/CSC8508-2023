@@ -189,6 +189,10 @@ bool InventoryBuffSystem::PlayerInventory::HandleItemRemoval(const item& item, c
 }
 
 bool PlayerInventory::ItemInPlayerInventory(const item& inItem, const int& playerNo) {
+	if (playerNo < 0 || playerNo > 3) {
+		return false;
+	}
+
 	for (int invSlot = 0; invSlot < MAX_INVENTORY_SLOTS; invSlot++)
 	{
 		if (mPlayerInventory[playerNo][invSlot] == inItem)
