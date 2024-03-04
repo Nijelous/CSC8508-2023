@@ -235,6 +235,17 @@ void GameTechRenderer::GenAnimFramesUBOs() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void GameTechRenderer::GenTextureIndexUBO() {
+	glGenBuffers(1, &uBOBlocks[textureIdUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[textureIdUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(float) * mTextureHandles.size(), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::BindAllTextures() {
+	
+}
+
 void GameTechRenderer::FillLightUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
 	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS * sizeof(LightData));

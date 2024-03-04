@@ -90,6 +90,7 @@ namespace NCL {
 				objectsUBO,
 				animFramesUBO,
 				iconUBO,
+				textureIdUBO,
 				MAX_UBO
 			};
 
@@ -105,6 +106,8 @@ namespace NCL {
 			void FillObjectDataUBO();
 			void NewRenderLines();
 			void NewRenderText();
+			void GenTextureIndexUBO();
+			void BindAllTextures();
 
 			void RenderIcons(UISystem::Icon icon);
 			
@@ -140,6 +143,8 @@ namespace NCL {
 
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
+
+			std::unordered_map<Texture*, GLuint64> mTextureHandles;
 
 			OGLShader*  mDebugLineShader;
 			OGLShader* mDebugTextShader;
