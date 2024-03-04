@@ -17,6 +17,7 @@ namespace NCL{
 
         struct FullPacket;
         struct ClientPlayerInputPacket;
+        struct ClientSyncBuffPacket;
         struct AddPlayerScorePacket;
 
         class DebugNetworkedGame : public NetworkedGame{
@@ -42,6 +43,7 @@ namespace NCL{
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
+            void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;
@@ -82,6 +84,7 @@ namespace NCL{
 
             void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
 
+            void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
 
             std::vector<std::function<void()>> mOnGameStarts;
 

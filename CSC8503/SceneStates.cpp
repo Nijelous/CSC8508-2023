@@ -73,5 +73,7 @@ PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** ne
 void ClientState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	auto* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
-	client->StartAsClient(10,58,221,142);
+	//client->StartAsClient(10,58,221,142);
+	//Localhost IP
+	client->StartAsClient(127, 0, 0, 1);
 }

@@ -11,7 +11,6 @@ namespace NCL {
 				mIsLocked = false;
 				mIsOpen = false;
 				InitStateMachine();
-				//mRelatedItem = InventoryBuffSystem::PlayerInventory::doorKey;
 			}
 			~InteractableDoor() {
 
@@ -22,10 +21,11 @@ namespace NCL {
 			void Interact(InteractType interactType) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
 			virtual void InitStateMachine() override;
-
+		
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:
+			bool CanUseItem();
 			const float initDoorTimer = 3.0f;
 			bool mIsLocked;
 		};
