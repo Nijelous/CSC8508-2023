@@ -29,6 +29,8 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
+		class InventoryBuffSystem::PlayerInventoryObserver;
+		class InventoryBuffSystem::PlayerBuffsObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -281,6 +283,9 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+
+			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
+			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;
 		};
 	}
 }

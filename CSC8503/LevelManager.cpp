@@ -41,8 +41,9 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 	mUi = new UISystem();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
+	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	mDtSinceLastFixedUpdate = 0;
 
 	mSoundManager = new SoundManager(mWorld);
@@ -242,8 +243,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
@@ -257,9 +256,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		for (const auto& pair : *serverPlayersPtr)
 		{
 			PlayerInventoryObserver* invObserver = reinterpret_cast<PlayerInventoryObserver*>(pair.second);
-			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+			mPlayerInventoryObservers.push_back(invObserver);
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
-			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
 	}
   
@@ -273,11 +272,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	mTimer = INIT_TIMER_VALUE;
 
-	//Temp fix for crash problem
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
+	for (const auto invObserver : mPlayerInventoryObservers)
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+
+	for (const auto buffsObserver : mPlayerBuffsObservers)
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -850,7 +850,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->GetPhysicsObject()->InitSphereInertia(false);
 
 	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
-
+	
+	mPlayerInventoryObservers.push_back(flag);
+	mPlayerBuffsObservers.push_back(flag);
 	mWorld->AddGameObject(flag);
 
 	return flag;
@@ -920,6 +922,9 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
+	mPlayerInventoryObservers.push_back(mTempPlayer);
+	mPlayerBuffsObservers.push_back(mTempPlayer);
+
 	mTempPlayer->SetIsRendered(false);
 	return mTempPlayer;
 }
