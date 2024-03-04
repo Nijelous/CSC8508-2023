@@ -7,6 +7,7 @@
 #include "NetworkObject.h"
 #include "PhysicsObject.h"
 #include "InventoryBuffSystem/Item.h"
+#include "SoundManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -16,18 +17,20 @@ namespace {
 	constexpr int MOVE_LEFT_INDEX = 1;
 	constexpr int MOVE_BACKWARDS_INDEX = 2;
 	constexpr int MOVE_RIGHT_INDEX = 3;
+
+	constexpr bool DEBUG_MODE = true;
 }
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
 	PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
-	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(),"") {
+	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	//this->game = game;
 	mPlayerID = num;
 }
 
 NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::string& objName) : PlayerObject(game->GetLevelManager()->GetGameWorld(),
 	LevelManager::GetLevelManager()->GetInventoryBuffSystem(),LevelManager::GetLevelManager()->GetSuspicionSystem(),
-	LevelManager::GetLevelManager()->GetUiSystem(), "") {
+	LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	this->game = game;
 	mPlayerID = num;
 }
@@ -91,6 +94,46 @@ void NetworkPlayer::UpdateObject(float dt) {
 		EnforceSpedUpMaxSpeeds();
 	else
 		EnforceMaxSpeeds();
+
+	if (DEBUG_MODE)
+	{
+		//It have some problem here
+		mUiTime = mUiTime + dt;
+		mUiTime = std::fmod(mUiTime, 1.0f);
+
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+
+		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
+
+		float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
+
+		mLastSusValue = mSusValue;
+
+		mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
+		Debug::Print("Sus:" + std::to_string(
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
+		), Vector2(70, 90));
+		if (mHasSilentSprintBuff)
+			Debug::Print("HasSilentSprint", Vector2(70, 95));
+		switch (mPlayerSpeedState) {
+		case SpedUp:
+			Debug::Print("Sped Up", Vector2(45, 80));
+			break;
+		case SlowedDown:
+			Debug::Print("Slowed Down", Vector2(45, 80));
+			break;
+		case Stunned:
+			Debug::Print("Stunned", Vector2(45, 80));
+			break;
+		}
+		const PlayerInventory::item equippedItem = GetEquippedItem();
+		//Handle Equipped Item Log
+		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+		Debug::Print(itemName, Vector2(10, 80));
+		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+		Debug::Print(usesLeft, Vector2(10, 85));
+		Debug::Print(to_string(mGameWorld->GetMainCamera().GetYaw()), Vector2(54, 90));
+	}
 }
 
 void NetworkPlayer::MovePlayer(float dt) {
@@ -128,6 +171,16 @@ void NetworkPlayer::MovePlayer(float dt) {
 		if (mPlayerInputs.isInteractButtonPressed || mPlayerInputs.isEquippedItemUsed || mPlayerInputs.isHoldingInteractButton) {
 			Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(mGameWorld->GetMainCamera());
 			mPlayerInputs.rayFromPlayer = ray;
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::L) &&
+			DEBUG_MODE) {
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::slow, mPlayerID);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
+			DEBUG_MODE) {
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
 		}
 
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();

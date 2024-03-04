@@ -73,9 +73,13 @@ ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
 	this->playerID = playerID;
 }
 
-ClientUsePowerupPacket::ClientUsePowerupPacket(int playerID, int powerUpID) {
+ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncBuffs;
+	size = sizeof(ClientSyncBuffPacket);
+
 	this->playerID = playerID;
-	this->powerUpID = powerUpID;
+	this->buffID = buffID;
+	this->toApply = toApply;
 }
 
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
