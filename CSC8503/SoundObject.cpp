@@ -35,6 +35,7 @@ void SoundObject::TriggerSoundEvent() {
 
 void SoundObject::SetNotTriggered() {
 	mIsTriggered = false;
+
 }
 
 bool SoundObject::GetisTiggered(){

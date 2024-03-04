@@ -46,7 +46,6 @@ void Door::InitStateMachine()
 void Door::Open() {
 	SetActive(false);
 	mTimer = initDoorTimer;
-	this->GetSoundObject()->TriggerSoundEvent();
 	SetNavMeshFlags(1);
 }
 
