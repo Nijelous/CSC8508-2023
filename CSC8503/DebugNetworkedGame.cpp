@@ -5,10 +5,13 @@
 
 #include "GameServer.h"
 #include "GameClient.h"
+#include "Helipad.h"
 #include "Interactable.h"
 #include "InteractableDoor.h"
+#include "MultiplayerStates.h"
 #include "NetworkObject.h"
 #include "NetworkPlayer.h"
+#include "PushdownMachine.h"
 #include "RenderObject.h"
 #include "Vent.h"
 #include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
@@ -34,6 +37,8 @@ DebugNetworkedGame::DebugNetworkedGame() {
 	mTimeToNextPacket = 0.0f;
 	mPacketsToSnapshot = 0;
 
+	InitInGameMenuManager();
+
 	for (int i = 0; i < MAX_PLAYER; i++) {
 		mPlayerList.push_back(-1);
 	}
@@ -44,6 +49,18 @@ DebugNetworkedGame::~DebugNetworkedGame() {
 
 bool DebugNetworkedGame::GetIsServer() const {
 	return mIsServer;
+}
+
+bool DebugNetworkedGame::PlayerWonGame() {
+	//TODO(erendgrmnc): lots of func calls, optimize it(ex: cache variables).
+	std::tuple<bool, int> helipadCollisionResult = mLevelManager->GetHelipad()->GetCollidingWithPlayer();
+	bool isAnyPlayerOnHelipad = std::get<0>(helipadCollisionResult);
+	if (std::get<0>(helipadCollisionResult)) {
+		int playerIDOnHelipad = std::get<1>(helipadCollisionResult);
+		if (mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag, playerIDOnHelipad))
+			return true;
+	}
+	return false;
 }
 
 void DebugNetworkedGame::StartAsServer() {
@@ -89,6 +106,10 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		}
 	}
 
+	if (mPushdownMachine != nullptr) {
+		mPushdownMachine->Update(dt);
+	}
+
 	if (mIsGameStarted) {
 		//TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
 
@@ -111,18 +132,6 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		}
 
 		mLevelManager->Update(dt, mGameState == InitialisingLevelState, false);
-	}
-	else {
-		if (mThisServer) {
-			Debug::Print(" Waiting for player to join ...", Vector2(5, 95), Debug::RED);
-			if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)) {
-				SetIsGameStarted(true);
-			}
-		}
-		else {
-			Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
-		}
-		mLevelManager->GetRenderer()->Render();
 	}
 
 	if (mThisServer) {
@@ -217,6 +226,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	}
 }
 
+void DebugNetworkedGame::InitInGameMenuManager() {
+	auto* multiplayerLobby = new MultiplayerLobby(this);
+	mPushdownMachine = new PushdownMachine(multiplayerLobby);
+}
+
 void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
 	PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
 	NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
@@ -254,12 +268,6 @@ void DebugNetworkedGame::UpdateAsServer(float dt) {
 
 void DebugNetworkedGame::UpdateAsClient(float dt) {
 	mThisClient->UpdateClient();
-
-	int peer = GetPlayerPeerID();
-	StringPacket newPacket("Client sends it regards :O ");
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-		mThisClient->SendPacket(newPacket);
-	}
 }
 
 void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {

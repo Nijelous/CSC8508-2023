@@ -27,6 +27,7 @@ namespace NCL{
             ~DebugNetworkedGame();
             
             bool GetIsServer() const;
+            bool PlayerWonGame() override;
 
             const int GetClientLastFullID() const;
 
@@ -42,6 +43,7 @@ namespace NCL{
             void AddEventOnGameStarts(std::function<void()> event);
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
+            void InitInGameMenuManager() override;
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
