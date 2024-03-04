@@ -5,6 +5,7 @@
 #include "NetworkedGame.h"
 
 namespace NCL::CSC8503 {
+	struct SyncInteractablePacket;
 	struct ClientSyncItemSlotPacket;
 }
 
@@ -69,7 +70,8 @@ namespace NCL{
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
             void SpawnPlayers();
-            NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
+
+        	NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
 
@@ -80,13 +82,16 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
-            void SetItemsLeftToZero() override;
+
+        	void SetItemsLeftToZero() override;
 
             void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
 
-            void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
+            void HandleInteractablePacket(SyncInteractablePacket* packet) const;
 
-            std::vector<std::function<void()>> mOnGameStarts;
+        	void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
+
+        	std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 

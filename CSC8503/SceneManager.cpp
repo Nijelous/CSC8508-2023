@@ -52,16 +52,15 @@ bool SceneManager::IsInSingleplayer() const {
 }
 
 const bool SceneManager::IsServer() const {
-	auto* networkGame = (DebugNetworkedGame*)(currentScene);
-
-	if (networkGame->GetServer()) {
-		return true;
-	}
-	return false;
+	return mIsServer;
 }
 
 void SceneManager::SetIsForceQuit(bool isForceQuit) {
 	this->isForceQuit = isForceQuit;
+}
+
+void SceneManager::SetIsServer(bool isServer) {
+	mIsServer = isServer;
 }
 
 PushdownMachine* SceneManager::GetScenePushdownMachine() {

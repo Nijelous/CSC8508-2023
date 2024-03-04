@@ -1,5 +1,6 @@
 #version 430 core
 
+
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
 layout(location = 2) in vec2 texCoord;
@@ -14,12 +15,13 @@ layout(std140, binding = 0) uniform CamBlock{
 	vec3 camPos;
 } camData;
 
-layout(std140, binding = 3) uniform ObjectBlock {
+layout(std430, binding = 3) buffer ObjectBlock {
 	mat4 modelMatrix;
 	mat4 shadowMatrix;
 	vec4 objectColour;
 	bool hasVertexColours;
-} objectData; 
+}; 
+
 
 out Vertex
 {
@@ -37,24 +39,25 @@ void main(void)
 	mat4 mvp;
 	mat3 normalMatrix;
 
-	mvp 		  = (camData.projMatrix * camData.viewMatrix * objectData.modelMatrix);
-	normalMatrix = transpose ( inverse ( mat3 (objectData.modelMatrix )));
-	OUT.worldPos 	= ( objectData.modelMatrix * vec4 ( position ,1)). xyz ;
-
+	mvp 		  = (camData.projMatrix * camData.viewMatrix * instanceMatrix);
+	normalMatrix = transpose ( inverse ( mat3 ( instanceMatrix )));
+	OUT.worldPos 	= ( instanceMatrix * vec4 ( position ,1)). xyz ;
+	
 	vec3 wNormal = normalize ( normalMatrix * normalize ( normal ));
 	vec3 wTangent = normalize(normalMatrix * normalize(tangent.xyz));
 
-	OUT.shadowProj 	=  objectData.shadowMatrix * vec4 ( position,1);
+	OUT.shadowProj 	=  shadowMatrix * vec4 ( position,1);
+	
 	OUT.normal 		= wNormal;
 	OUT.tangent = wTangent;
 	OUT.binormal = cross(wTangent, wNormal) * tangent.w;
 
 	
 	OUT.texCoord	= texCoord;
-	OUT.colour		= objectData.objectColour;
+	OUT.colour		= objectColour;
 
-	if(objectData.hasVertexColours) {
-		OUT.colour		= objectData.objectColour * colour;
+	if(hasVertexColours) {
+		OUT.colour		= objectColour * colour;
 	}
 	gl_Position		= mvp * vec4(position, 1.0);
 }

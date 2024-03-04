@@ -163,7 +163,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mPlayerInputs.isCrouching = true;
 		if (Window::GetMouse()->ButtonDown(MouseButtons::Left))
 			mPlayerInputs.isEquippedItemUsed = true;
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::E))
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::E))
 			mPlayerInputs.isInteractButtonPressed = true;
 		if (Window::GetKeyboard()->KeyDown(KeyCodes::E))
 			mPlayerInputs.isHoldingInteractButton = true;
@@ -291,11 +291,11 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 					item->OnPlayerInteract(mPlayerID);
 					return;
 				}
-
+					
 				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
 				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
-					interactablePtr->Interact(interactType);
+					interactablePtr->Interact(interactType, this);
 					if (interactType == ItemUse) {
 						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 					}

@@ -49,6 +49,8 @@ namespace NCL {
 
 			void OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b);
 
+			void AddNetworkObjectToNetworkObjects(NetworkObject* networkObj);
+
 			std::map<int, NetworkPlayer*>* GetServerPlayersPtr() { return &mServerPlayers;  };
 
 		protected:

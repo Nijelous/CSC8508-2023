@@ -136,9 +136,9 @@ namespace NCL {
 
 			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
-			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections);
+			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
-			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre);
+			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false);
 
 			void LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition);
 
@@ -146,13 +146,15 @@ namespace NCL {
 
 			void SendWallFloorInstancesToGPU();
 
+			void AddNetworkObject(GameObject& objToAdd);
+
 			GameObject* AddWallToWorld(const Transform& transform);
 			GameObject* AddCornerWallToWorld(const Transform& transform);
 			GameObject* AddFloorToWorld(const Transform& transform);
 			CCTV* AddCCTVToWorld(const Transform& transform);
 			Helipad* AddHelipadToWorld(const Vector3& position);
-			Vent* AddVentToWorld(Vent* vent);
-			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset);
+			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
+			InteractableDoor* AddDoorToWorld(Door* door, const Vector3& offset, bool isMultiplayerLevel = false);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
@@ -237,6 +239,7 @@ namespace NCL {
 
 			// shaders
 			Shader* mBasicShader;
+			Shader* mInstanceShader;
 
 			// animation 
 			Mesh* mGuardMesh;
@@ -277,6 +280,7 @@ namespace NCL {
 			std::map<PlayerInventory::item, Texture*> mItemTextureMap;
 			// key variables
 			int mActiveLevel;
+			int mNetworkIdBuffer;
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
