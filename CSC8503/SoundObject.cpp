@@ -6,7 +6,11 @@ using namespace FMOD;
 
 SoundObject::SoundObject(Channel* channel) {
 	mChannel = channel;
+	mIsTriggered = false;
 	mChannels.emplace_back(channel);
+}
+SoundObject::SoundObject() {
+	mIsTriggered = false;
 }
 
 SoundObject::~SoundObject() {
@@ -15,6 +19,10 @@ SoundObject::~SoundObject() {
 
 void SoundObject::AddChannel(Channel* channel) {
 	mChannels.emplace_back(channel);
+}
+
+void SoundObject::SetChannel(Channel* channel) {
+	mChannel = channel;
 }
 
 std::vector<Channel*> SoundObject::GetChannels() {
@@ -27,7 +35,10 @@ Channel* SoundObject::GetChannel() {
 
 void SoundObject::TriggerSoundEvent() {
 	mIsTriggered = true;
+}
 
+void SoundObject::SetNotTriggered() {
+	mIsTriggered = false;
 }
 
 bool SoundObject::GetisTiggered(){

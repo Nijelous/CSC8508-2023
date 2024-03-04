@@ -30,7 +30,6 @@ void Door::InitStateMachine()
 	mStateMachine->AddTransition(new StateTransition(DoorOpen, DoorClosed,
 		[&]() -> bool
 		{
-			this->GetSoundObject()->TriggerSoundEvent();
 			return !mIsOpen;
 		}
 	));
@@ -49,6 +48,7 @@ void Door::Open()
 	SetActive(false);
 	mTimer = initDoorTimer;
 	mIsOpen = true;
+	this->GetSoundObject()->TriggerSoundEvent();
 	SetNavMeshFlags(1);
 	
 }
