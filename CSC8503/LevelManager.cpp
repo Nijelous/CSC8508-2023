@@ -366,6 +366,9 @@ void LevelManager::InitialiseAssets() {
 	mStraightWallMesh = mRenderer->LoadMesh("Walls/StraightWallCoridoor.msh");
 	mCornerWallMesh = mRenderer->LoadMesh("Walls/CornerWallCoridoor.msh");
 	mCCTVMesh = mRenderer->LoadMesh("Security_Camera.msh");
+	mChest = mRenderer->LoadMesh("chest.msh");
+	mPresent = mRenderer->LoadMesh("present.msh");
+
 
 	mBasicTex = mRenderer->LoadTexture("checkerboard.png");
 	mKeeperAlbedo = mRenderer->LoadTexture("fleshy_albedo.png");
@@ -374,6 +377,11 @@ void LevelManager::InitialiseAssets() {
 	mFloorNormal = mRenderer->LoadTexture("panel_normal.png");
 	mWallTex = mRenderer->LoadTexture("corridor_wall_c.tga");
 	mWallNormal = mRenderer->LoadTexture("corridor_wall_n.tga");
+	mPresentAlbedo = mRenderer->LoadTexture("paper_diffuse1.png");
+	mPresentNormal = mRenderer->LoadTexture("present_Present_Normal.png");
+
+	mChestAlbedo = mRenderer->LoadTexture("Tex_Chest_01_Albedo.png");
+	mChestNormal = mRenderer->LoadTexture("Tex_Chest_01_Normal.png");
 
 	mBasicShader = mRenderer->LoadShader("scene.vert", "scene.frag");
 	mInstanceShader = mRenderer->LoadShader("sceneInstanced.vert", "scene.frag");
@@ -889,7 +897,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mChest, mChestAlbedo, mChestNormal, mBasicShader, 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetCollisionLayer(Collectable);
@@ -913,10 +921,10 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	SphereVolume* volume = new SphereVolume(0.75f);
 	pickup->SetBoundingVolume((CollisionVolume*)volume);
 	pickup->GetTransform()
-		.SetScale(size * 2)
+		.SetScale(size * 6)
 		.SetPosition(position);
 
-	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mPresent, mPresentAlbedo, mPresentAlbedo, mBasicShader, 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
 	pickup->SetCollisionLayer(Collectable);

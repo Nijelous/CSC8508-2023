@@ -200,6 +200,9 @@ namespace NCL {
 			Mesh* mStraightWallMesh;
 			Mesh* mCornerWallMesh;
 			Mesh* mCCTVMesh;
+			Mesh* mChest;
+			Mesh* mPresent;
+
 
 			// textures
 			Texture* mBasicTex;
@@ -209,6 +212,10 @@ namespace NCL {
 			Texture* mFloorNormal;
 			Texture* mWallTex;
 			Texture* mWallNormal;
+			Texture* mChestAlbedo;
+			Texture* mChestNormal;
+			Texture* mPresentAlbedo;
+			Texture* mPresentNormal;
 
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
