@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "DebugNetworkedGame.h"
+#include "GameServer.h"
 #include "Window.h"
 #include "SceneManager.h"
 #include "MainMenuScene.h"
@@ -49,8 +50,15 @@ void SingleplayerState::OnAwake() {
 }
 
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
+	GameStates currentState = LevelManager::GetLevelManager()->GetGameState();
+	bool isInMenuState = currentState == MenuState;
+	if (isInMenuState) {
 		*newState = new MainMenuSceneState();
+		auto* networkGame = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+		if (networkGame->GetIsServer()) {
+			auto* server = networkGame->GetServer();
+			server->Shutdown();
+		}
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -60,11 +68,12 @@ void ServerState::OnAwake(){
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	SceneManager::GetSceneManager()->SetIsServer(true);
 	auto* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
 	server->StartAsServer();
 }
 
 PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE) && LevelManager::GetLevelManager()->GetGameState() == MenuState) {
 		*newState = new MainMenuSceneState();
 		return PushdownResult::Push;
 	}
@@ -74,6 +83,7 @@ PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** ne
 void ClientState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	SceneManager::GetSceneManager()->SetIsServer(false);
+	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
 	auto* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 	//client->StartAsClient(10,58,221,142);
 	//Localhost IP
