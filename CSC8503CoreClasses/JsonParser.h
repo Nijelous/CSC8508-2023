@@ -5,6 +5,7 @@ namespace NCL {
 	namespace CSC8503 {
 		enum ParserVariables {
 			SetRoomType,
+			RoomDoorPos,
 			TileMap,
 			RoomList,
 			GuardCount,
