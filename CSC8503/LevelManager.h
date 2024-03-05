@@ -213,6 +213,7 @@ namespace NCL {
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
 			Texture* mCrossTex;
+			Texture* mAlarmTex;
 
 			//powerup Icon
 
@@ -222,10 +223,11 @@ namespace NCL {
 			Texture* mStunTex;
 
 
-			Texture* mLowSuspisionBarTex;
-			Texture* mMidSuspisionBarTex;
-			Texture* mHighSuspisionBarTex;
-			Texture* mSuspisionIndicatorTex;
+			Texture* mLowSuspicionBarTex;
+			Texture* mMidSuspicionBarTex;
+			Texture* mHighSuspicionBarTex;
+
+			Texture* mSuspicionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
 			//item icon
@@ -233,6 +235,7 @@ namespace NCL {
 			Texture* mKeyIconTex1;
 			Texture* mKeyIconTex2;
 			Texture* mKeyIconTex3;
+			
 
 
 			// shaders
@@ -257,8 +260,7 @@ namespace NCL {
 			MeshAnimation* mGuardAnimationStand;
 			MeshAnimation* mGuardAnimationSprint;
 			MeshAnimation* mGuardAnimationWalk;
-			MeshAnimation* mGuardAnimationHappy;
-			MeshAnimation* mGuardAnimationAngry;
+
 
 			MeshAnimation* mPlayerAnimationStand;
 			MeshAnimation* mPlayerAnimationSprint;

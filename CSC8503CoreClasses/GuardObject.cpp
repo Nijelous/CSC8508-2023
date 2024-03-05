@@ -27,6 +27,8 @@ GuardObject::GuardObject(const std::string& objectName) {
 GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
+	delete[] mLastKnownPos;
+  delete mSightedObject;
 }
 
 void GuardObject::UpdateObject(float dt) {
@@ -107,13 +109,17 @@ bool GuardObject::CheckPolyDistance() {
 	}
 }
 
-void GuardObject::MoveTowardFocalPoint(Vector3 direction, float* endPos) {
+void GuardObject::MoveTowardFocalPoint(float* endPos) {
 	if (CheckPolyDistance() == true) {
 		mNextPoly = QueryNavmesh(endPos);
+	}
+	else {
+		delete[] endPos;
 	}
 	Vector3 dir = Vector3(mNextPoly[0], mNextPoly[1], mNextPoly[2]) - this->GetTransform().GetPosition();
 	Vector3 dirNorm = dir.Normalised();
 	mDist = dir.Length();
+	LookTowardFocalPoint(dir);
 	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
 }
 
@@ -121,11 +127,23 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
+		this->GetPhysicsObject()->AddTorque(Vector3(0,10, 0));
+		if (angleOfPlayer > -0.1) {
+			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		}
 	}
 	else if (angleOfPlayer > 0) {
 		this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
+		if (angleOfPlayer < 0.1) {
+			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
+		}
 	}
+}
+
+void GuardObject::RunAfterPlayer(Vector3 dir) {
+	LookTowardFocalPoint(dir);
+	Vector3 dirNorm = dir.Normalised();
+	this->GetPhysicsObject()->AddForce(Vector3(dirNorm.x, 0, dirNorm.z) * mGuardSpeedMultiplier);
 }
 
 void GuardObject::GrabPlayer() {
@@ -141,7 +159,6 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	dtPolyRef* endRef = new dtPolyRef();
 	float* nearestPoint1 = new float[3];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(startPos, halfExt, filter, startRef, nearestPoint1);
-	//float* nearestPoint2 = new float[3];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findNearestPoly(endPos, halfExt, filter, endRef, nearestPoint1);
 	int* pathCount = new int;
 	dtPolyRef* path = new dtPolyRef[1000];
@@ -164,8 +181,6 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	delete startRef;
 	delete endRef;
 	delete[] nearestPoint1;
-	//delete[] nearestPoint2;
-	
 
 	bool* isPosOverPoly = new bool;
 	float* closestPos = new float[3];
@@ -209,14 +224,18 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
+	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
+	BehaviourSelector* ChasePlayerSelector = new BehaviourSelector("Chase Player Selector");
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
-	FirstSelect->AddChild(ChasePlayerSetup());
-	FirstSelect->AddChild(CaughtPlayerSequence);
+	FirstSelect->AddChild(SeenPlayerSequence);
+	SeenPlayerSequence->AddChild(ChasePlayerSelector);
+	ChasePlayerSelector->AddChild(ChasePlayerSetup());
+	ChasePlayerSelector->AddChild(GoToLastKnownLocation());
+	SeenPlayerSequence->AddChild(CaughtPlayerSequence);
 	CaughtPlayerSequence->AddChild(ConfiscateItems());
 	CaughtPlayerSequence->AddChild(SendToPrison());
-
 }
 
 void GuardObject::ExecuteBT() {
@@ -246,11 +265,10 @@ BehaviourAction* GuardObject::Patrol() {
 
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
-				LookTowardFocalPoint(direction);
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
-				MoveTowardFocalPoint(direction, endPos);
+				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
-				if (dist < 36) {
+				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
 					if (mCurrentNode == mNodes.size() - 1) {
 						mNextNode = 0;
@@ -280,27 +298,26 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 
-				int GuardCatchingDistanceSquared = 25;
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 
-				LookTowardFocalPoint(direction);
-
 				float dist = direction.LengthSquared();
-				if (dist < GuardCatchingDistanceSquared) {
+				if (dist < GUARD_CATCHING_DISTANCE_SQUARED) {
+					LookTowardFocalPoint(direction);
 					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
-					return Failure;
+					return Success;
 				}
 				else {
-					float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
-					MoveTowardFocalPoint(direction, endPos);
+					RunAfterPlayer(direction);
+					//float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
+					//MoveTowardFocalPoint(endPos);
 				}
 			}
-			else if (mCanSeePlayer == false && mHasCaughtPlayer == false) {
-				return Success;
-			}
 			else {
+				mLastKnownPos[0] = mPlayer->GetTransform().GetPosition().x;
+				mLastKnownPos[1] = 0;
+				mLastKnownPos[2] = mPlayer->GetTransform().GetPosition().z;
 				return Failure;
 			}
 		}
@@ -308,6 +325,31 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		}
 	);
 	return ChasePlayer;
+}
+
+BehaviourAction* GuardObject::GoToLastKnownLocation() {
+	BehaviourAction* GoToLastKnownLocation = new BehaviourAction("Go To Last Known Location", [&](float dt, BehaviourState state)->BehaviourState {
+		if (state == Initialise) {
+			state = Ongoing;
+		}
+		else if (state == Ongoing) {
+			float* endPos = new float[3] {mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]};
+			MoveTowardFocalPoint(endPos);
+			Vector3 direction = Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition();
+			float dist = direction.LengthSquared();
+			if (mCanSeePlayer == true) {
+				return Failure;
+			}
+			else if (dist < MIN_DIST_TO_NEXT_POS) {
+				if (mCanSeePlayer == false) {
+					return Success;
+				}
+			}
+		}
+		return state;
+	}
+	);
+	return GoToLastKnownLocation;
 }
 
 BehaviourAction* GuardObject::ConfiscateItems() {

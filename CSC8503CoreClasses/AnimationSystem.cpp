@@ -12,11 +12,13 @@ AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g){
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
-
+	mAnimTexture = nullptr;
 	
 }
 
 AnimationSystem::~AnimationSystem(){
+
+
 }
 
 void AnimationSystem::Clear(){

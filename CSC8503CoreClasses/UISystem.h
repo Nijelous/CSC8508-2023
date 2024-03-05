@@ -17,7 +17,8 @@ namespace NCL {
 		constexpr int SPEED_BUFF_SLOT = 5;
 		constexpr int SUSPISION_BAR_SLOT = 6;
 		constexpr int SUSPISION_INDICATOR_SLOT = 7;
-
+		constexpr int CROSS = 8;
+		constexpr int ALARM = 9;
 
 		class UISystem {
 		public:
@@ -26,18 +27,18 @@ namespace NCL {
 
 			struct Icon {
 				Vector2 mPosition;
-				int mLength;
-				int mHeight;
+				float mLength;
+				float mHeight;
 				Texture* mTexture;
-				bool mTransparency;
+				float mTransparency;
 				void SetIconSize(float length, float height) {
 					mLength = length;
 					mHeight = height;
 					
 				}
 			};
-			Icon* AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown = true);
-			Icon* AddIcon(Icon* icon, bool isShown = true);
+			Icon* AddIcon(Vector2 Pos, float horiSize, float vertSize, Texture* tex, float transparency=1.0);
+			Icon* AddIcon(Icon* icon, float transparency=1.0);
 
 			std::vector<Icon*>& GetIcons();
 
@@ -45,22 +46,31 @@ namespace NCL {
 
 			void DeleteIcon(Icon icon);
 
-			void BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
+			void BuildVerticesForIcon(const Vector2& iconPos, float horiSize, float vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords);
 
 			void ChangeEquipmentSlotTexture(int slotNum, Texture& texture);
 
-			void ChangeBuffSlotTransparency(int slotNum, bool isShown);
+			void ChangeBuffSlotTransparency(int slotNum, float transparency);
 
 			void SetEquippedItemIcon(int slotNum, Icon& icon);
 
 			void SetTextureVector(string itemType, std::vector<Texture*> itemTexVec) {
-				if (itemType=="key") {
+				if (itemType == "key") {
 					mKeyTexVec = itemTexVec;
 				}
 				if (itemType == "bar") {
 					mSusBarTexVec = itemTexVec;
 				}
 			}
+
+			vector<Texture*> GetKeyTexVec(){
+				return mKeyTexVec;
+			}
+
+			vector<Texture*> GetSusBarTexVec() {
+				return mSusBarTexVec;
+			}
+
 
 
 		protected:
@@ -78,10 +88,12 @@ namespace NCL {
 
 			Icon* mSuspensionBarIcon;
 			Icon* mSuspensionIndicatorIcon;
-
+			Icon* mCross;
+			Icon* mAlarm;
 			std::vector<Icon*> mIconsVec;
 			std::vector<Texture*> mKeyTexVec;
 			std::vector<Texture*> mSusBarTexVec;
+
 		};
 	}
 }

@@ -9,6 +9,7 @@ namespace NCL {
 		class SoundObject {
 		public:
 			SoundObject(Channel* channel);
+			SoundObject();
 			~SoundObject();
 
 			void AddChannel(Channel* channel);
@@ -19,11 +20,21 @@ namespace NCL {
 
 			void TriggerSoundEvent();
 
+			void CloseDoorTriggered();
+
 			bool GetisTiggered();
+
+			bool GetIsClosed();
+
+			void SetNotTriggered();
+
+			void CloseDoorFinished();
+
 		private:
 			Channel* mChannel = nullptr;
 			std::vector<Channel*> mChannels;
 			bool mIsTriggered;
+			bool mIsClosed;
 		};
     }
 }

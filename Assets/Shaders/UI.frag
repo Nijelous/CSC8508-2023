@@ -2,8 +2,8 @@
 
 #extension GL_ARB_bindless_texture : require
 
+
 layout(std140, binding = 5) uniform IconBlock {
-	bool isOn;
 	bool useTexture;
 } iconData; 
 
@@ -34,4 +34,7 @@ void main(void)
      else{
           fragColor = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord) * vec4(0.06, 0.06, 0.06, 0.2);
      }
+    vec4 texColor = texture(iconTex, IN.texCoord);
+    fragColor = vec4(texColor.rgb, texColor.a * uTransparency);
+
 }
