@@ -33,6 +33,12 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mResult = mSystem->createSound("../Assets/Sounds/closing-door-2-www.FesliyanStudios.com.mp3", FMOD_3D, 0, &mDoorCloseSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Door Close Sound Error !!" << std::endl;
+		return;
+	}
+
 	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
@@ -44,10 +50,17 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		std::cout << "Door Open Sound Attenuation Setting error" << std::endl;
 		return;
 	}
+
+	mResult = mDoorCloseSound->set3DMinMaxDistance(20.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
+		return;
+	}
 }
 
 SoundManager::~SoundManager() {
 	mDoorOpenSound->release();
+	mDoorCloseSound->release();
 	mFootStepSound->release();
 	mSystem->close();
 	mSystem->release();
@@ -80,6 +93,22 @@ void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
 	doorOpenChannel->setPaused(false);
 }
 
+void SoundManager::PlayDoorCloseSound(Vector3 soundPos) {
+	FMOD::Channel* doorCloseChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mDoorCloseSound, 0, true, &doorCloseChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = doorCloseChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	doorCloseChannel->setPaused(false);
+}
+
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
@@ -99,6 +128,11 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			if (isOpen) {
 				PlayDoorOpenSound(soundPos);
 				obj->GetSoundObject()->SetNotTriggered();
+			}
+			bool isClose = obj->GetSoundObject()->GetIsClosed();
+			if (isClose) {
+				PlayDoorCloseSound(soundPos);
+				obj->GetSoundObject()->CloseDoorFinished();
 			}
 		}
 	}

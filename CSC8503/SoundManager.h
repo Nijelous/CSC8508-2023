@@ -18,6 +18,8 @@ namespace NCL{
 			FMOD::Channel* AddWalkSound();
 			void PlayDoorOpenSound(Vector3 soudPos);
 
+			void PlayDoorCloseSound(Vector3 soundPos);
+
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
@@ -33,6 +35,7 @@ namespace NCL{
 			FMOD::System* mSystem = nullptr;
 			FMOD::Sound* mFootStepSound = nullptr;
 			FMOD::Sound* mDoorOpenSound = nullptr;
+			FMOD::Sound* mDoorCloseSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

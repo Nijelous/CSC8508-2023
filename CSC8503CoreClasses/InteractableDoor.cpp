@@ -86,6 +86,7 @@ void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 		}
 	}
 	else {
+		this->GetSoundObject()->CloseDoorTriggered();
 		SetActive(true);
 	}
 
