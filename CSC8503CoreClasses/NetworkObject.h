@@ -73,11 +73,12 @@ namespace NCL::CSC8503 {
 		ClientUseItemPacket(int objectID, int playerID);
 	};
 
-	struct ClientUsePowerupPacket : public GamePacket {
+	struct ClientSyncBuffPacket : public GamePacket {
 		int playerID;
-		int powerUpID;
+		int buffID;
+		bool toApply;
 
-		ClientUsePowerupPacket(int playerID, int powerUpID);
+		ClientSyncBuffPacket(int playerID, int buffID, bool toApply);
 	};
 
 	struct ClientSyncItemSlotUsagePacket : public GamePacket {
@@ -95,6 +96,14 @@ namespace NCL::CSC8503 {
 		int usageCount;
 
 		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
+	};
+
+	struct SyncInteractablePacket : public GamePacket {
+		int networkObjId;
+		bool isOpen;
+		int interactableItemType;
+
+		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
 	};
 
 	class NetworkObject	{

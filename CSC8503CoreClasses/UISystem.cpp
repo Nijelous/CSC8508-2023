@@ -7,11 +7,12 @@ using namespace CSC8503;
 using namespace InventoryBuffSystem;
 
 namespace {
-	constexpr  int FIRST_ITEM_SLOT = 0;
-	constexpr int SECOND_ITEM_SLOT = 1;
+
+
 }
 
 UISystem::UISystem() {
+
 }
 
 UISystem::~UISystem() {
@@ -19,30 +20,27 @@ UISystem::~UISystem() {
 }
 
 
-UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, bool isShown) {
+UISystem::Icon* UISystem::AddIcon(Vector2 Pos, float horiSize, float vertSize, Texture* tex, float transparency) {
 	Icon* mIcon = new Icon();
-	mIcon->position = Pos;
-	mIcon->length = horiSize;
-	mIcon->height = vertSize;
-	mIcon->texture = tex;
-	mIcon->isAppear = isShown;
+	mIcon->mPosition = Pos;
+	mIcon->mLength = horiSize;
+	mIcon->mHeight = vertSize;
+	mIcon->mTexture = tex;
+	mIcon->mTransparency = transparency;
 	mIconsVec.emplace_back(mIcon);
 	return mIcon;
 }
 
-UISystem::Icon* UISystem::AddIcon(Icon* icon, bool isShown) {
+UISystem::Icon* UISystem::AddIcon(Icon* icon, float transparency) {
 	mIconsVec.emplace_back(icon);
 	return icon;
 }
 
 
 void UISystem::SetIconPosition(Vector2 newPos, Icon& icon) {
-	icon.position = newPos;
+	icon.mPosition = newPos;
 }
 
-void UISystem::SetIconTransparency(bool isShown, Icon& icon) {
-	icon.isAppear = isShown;
-}
 
 std::vector<UISystem::Icon*>& UISystem::GetIcons() {
 	return mIconsVec;
@@ -54,14 +52,14 @@ void UISystem::DeleteIcon(Icon icon) {
 	}
 	int j = 0;
 	for (auto& i : mIconsVec) {
-		if (i->position == icon.position) {
+		if (i->mPosition == icon.mPosition) {
 			mIconsVec.erase(mIconsVec.begin() + j);
 		}
 		j++;
 	}
 }
 
-void UISystem::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
+void UISystem::BuildVerticesForIcon(const Vector2& iconPos, float horiSize, float vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
 	positions.reserve(positions.size() + 6);
 	texCoords.reserve(texCoords.size() + 6);
 
@@ -89,24 +87,91 @@ void UISystem::ChangeEquipmentSlotTexture(int slotNum, Texture& texture) {
 
 	switch (slotNum) {
 	case FIRST_ITEM_SLOT:
-		mFirstEquippedItem->texture = &texture;
+		mFirstEquippedItem->mTexture = &texture;
+
 		break;
 	case SECOND_ITEM_SLOT:
-		mSecondEquippedItem->texture = &texture;
+		mSecondEquippedItem->mTexture = &texture;
 		break;
 	default:
 		break;
 	}
 }
 
+void UISystem::ChangeBuffSlotTransparency(int slotNum, float transparency){
+	switch (slotNum)
+	{
+	case FIRST_ITEM_SLOT:
+		mFirstEquippedItem->mTransparency = transparency;
+		break;
+	case SECOND_ITEM_SLOT:
+		mSecondEquippedItem->mTransparency = transparency;
+		break;
+	case SILENT_BUFF_SLOT:
+		mSilentSprintIcon->mTransparency = transparency;
+		break;
+	case SLOW_BUFF_SLOT:
+		mSlowIcon->mTransparency = transparency;
+		break;
+	case STUN_BUFF_SLOT:
+		mStunIcon->mTransparency = transparency;
+		break;
+	case SPEED_BUFF_SLOT:
+		mSpeedIcon->mTransparency = transparency;
+		break;
+	case SUSPISION_BAR_SLOT:
+		mSuspensionBarIcon->mTransparency = transparency;
+		break;
+	case SUSPISION_INDICATOR_SLOT:
+		mSuspensionIndicatorIcon->mTransparency = transparency;
+		break;
+	case CROSS:
+		mCross->mTransparency = transparency;
+		break;
+	case ALARM:
+		mAlarm->mTransparency = transparency;
+		break;
+
+	default:
+		break;
+	}
+
+}
+
 void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 	switch (slotNum) {
 		case FIRST_ITEM_SLOT:
 			mFirstEquippedItem = &icon;
-		break;
+			break;
 		case SECOND_ITEM_SLOT:
 			mSecondEquippedItem = &icon;
 			break;
+			break;
+		case SILENT_BUFF_SLOT:
+			mSilentSprintIcon = &icon;
+			break;
+		case SLOW_BUFF_SLOT:
+			mSlowIcon = &icon;
+			break;
+		case STUN_BUFF_SLOT:
+			mStunIcon = &icon;
+			break;
+		case SPEED_BUFF_SLOT:
+			mSpeedIcon = &icon;
+			break;
+		case SUSPISION_BAR_SLOT:
+			mSuspensionBarIcon = &icon;
+			break;
+		case SUSPISION_INDICATOR_SLOT:
+			mSuspensionIndicatorIcon = &icon;
+			break;
+		case CROSS:
+			mCross = &icon;
+			break;
+		case ALARM:
+			mAlarm = &icon;
+			break;
+
 	default:
 		break;
 	}

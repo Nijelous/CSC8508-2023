@@ -1,22 +1,39 @@
 #include "Door.h"
 #include "InteractableDoor.h"
+
+#include "GameServer.h"
 #include "StateMachine.h"
 #include "StateTransition.h"
 #include "State.h"
+#include "NetworkObject.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
 
 using namespace NCL::CSC8503;
 
-void InteractableDoor::Unlock(){
+InteractableDoor::InteractableDoor() {
+	GameObject::mName = "InteractableDoor";
+	mInteractableItemType = InteractableItems::InteractableDoors;
 	mIsLocked = false;
+	mIsOpen = false;
+
+	bool isServer = SceneManager::GetSceneManager()->IsServer();
+	if (isServer) {
+		InitStateMachine();
+	}
+}
+
+void InteractableDoor::Unlock() {
+	SetIsOpen(false, false);
 	SetNavMeshFlags(2);
 }
 
-void InteractableDoor::Lock(){
-	mIsLocked = true;
+void InteractableDoor::Lock() {
+	SetIsOpen(true, false);
 	SetNavMeshFlags(4);
 }
 
-void InteractableDoor::Interact(InteractType interactType)
+void InteractableDoor::Interact(InteractType interactType, GameObject* interactedObject)
 {
 	if (!CanBeInteractedWith(interactType))
 		return;
@@ -24,10 +41,7 @@ void InteractableDoor::Interact(InteractType interactType)
 	switch (interactType)
 	{
 	case Use:
-		if (mIsOpen)
-			Close();
-		else
-			Open();
+		SetIsOpen(!mIsOpen, true);
 		break;
 	case LongUse:
 		Unlock();
@@ -51,13 +65,45 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 		return !mIsLocked;
 		break;
 	case ItemUse:
-		return !mIsOpen;
+		return CanUseItem() && !mIsOpen;
+		break;
 	case LongUse:
 		return (mIsLocked && !mIsOpen);
 		break;
 	default:
 		return false;
 		break;
+	}
+}
+
+void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
+	mIsOpen = isOpen;
+	if (isOpen) {
+		SetActive(false);
+		if (isSettedByServer) {
+			mTimer = initDoorTimer;
+		}
+	}
+	else {
+		SetActive(true);
+	}
+
+	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
+	if (isMultiplayerGame && isSettedByServer) {
+		SyncInteractableDoorStatusInMultiplayer();
+	}
+}
+
+bool InteractableDoor::CanUseItem() {
+	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
+
+	switch (usedItem) {
+	case InventoryBuffSystem::PlayerInventory::doorKey:
+		return true;
+		break;
+	default:
+		return false;
 	}
 }
 
@@ -70,7 +116,7 @@ void InteractableDoor::InitStateMachine()
 			this->CountDownTimer(dt);
 
 			if (mTimer == 0)
-				Close();
+				SetIsOpen(false, true);
 		}
 	);
 
@@ -120,7 +166,21 @@ void InteractableDoor::InitStateMachine()
 	));
 }
 
-void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint){
+void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
+	auto* sceneManager = SceneManager::GetSceneManager();
+	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+	if (networkedGame) {
+		auto* networkObj = GetNetworkObject();
+		if (networkObj) {
+			const int networkId = networkObj->GetnetworkID();
+
+			SyncInteractablePacket packet(networkId, mIsOpen, mInteractableItemType);
+			networkedGame->GetServer()->SendGlobalPacket(packet);
+		}
+	}
+}
+
+void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) {
 	switch (susBreakpoint)
 	{
 	case SuspicionSystem::SuspicionMetre::high:
@@ -130,6 +190,8 @@ void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionM
 		break;
 	}
 }
+
+
 
 void InteractableDoor::UpdateObject(float dt) {
 	mStateMachine->Update(dt);

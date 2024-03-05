@@ -236,10 +236,10 @@ float PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Colli
 	float impulseForce = Vector3::Dot(contactVelocity, p.normal);
 	float angularEffect = CalculateInertia(physA, physB, relativeA, relativeB, p.normal);
 
-	float cRestitution = 0.66f; // loss of kinetic energy
+	float cRestitution = GetCollisionElasticity(*physA, *physB); // loss of kinetic energy
 
 	float j = (-(1.0f + cRestitution) * impulseForce) / (totalMass + angularEffect);
-	Vector3 fullImpulse = p.normal * j * physA->GetElasticity();
+	Vector3 fullImpulse = p.normal * j;
 
 	// apply impulse in opposite directions for collision responce
 	physA->ApplyLinearImpulse(-fullImpulse);
@@ -248,6 +248,10 @@ float PhysicsSystem::ImpulseResolveCollision(GameObject& a, GameObject& b, Colli
 	physB->ApplyAngularImpulse(Vector3::Cross(relativeB, fullImpulse));
 
 	return j;
+}
+
+float PhysicsSystem::GetCollisionElasticity(PhysicsObject objectA, PhysicsObject objectB) const {
+	return objectA.GetElasticity() * objectB.GetElasticity();
 }
 
 void PhysicsSystem::FrictionImpulse(GameObject& a, GameObject& b, CollisionDetection::ContactPoint& p, float j) const {

@@ -73,9 +73,13 @@ ClientUseItemPacket::ClientUseItemPacket(int objectID, int playerID) {
 	this->playerID = playerID;
 }
 
-ClientUsePowerupPacket::ClientUsePowerupPacket(int playerID, int powerUpID) {
+ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncBuffs;
+	size = sizeof(ClientSyncBuffPacket);
+
 	this->playerID = playerID;
-	this->powerUpID = powerUpID;
+	this->buffID = buffID;
+	this->toApply = toApply;
 }
 
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
@@ -92,6 +96,15 @@ ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int
 	this->slotId = slotId;
 	this->equippedItem = equippedItem;
 	this->usageCount = usageCount;
+}
+
+SyncInteractablePacket::SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) {
+	type = BasicNetworkMessages::SyncInteractable;
+	size = sizeof(SyncInteractablePacket);
+
+	this->networkObjId = networkObjectId;
+	this->isOpen = isOpen;
+	this->interactableItemType = interactableItemType;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
