@@ -55,7 +55,7 @@ void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCau
 
         const bool isServer = game->GetIsServer();
         if (isServer) {
-            //game->SendClientSyncLocalActiveSusCausePacket(playerNo, inCause, toApply);
+            game->SendClientSyncLocalActiveSusCausePacket(playerNo, inCause, toApply);
         }
     }
 }
@@ -93,7 +93,7 @@ void LocalSuspicionMetre::Update(float dt) {
         
             mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
 
-            if (mRecoveryCooldowns[playerNo] == 0.0f)
+            if (mRecoveryCooldowns[playerNo] == 0.0f && GetLocalSusMetreValue(playerNo) != 0.0f)
                 AddActiveLocalSusCause(passiveRecovery, playerNo);
         }
 
@@ -107,13 +107,15 @@ void LocalSuspicionMetre::Update(float dt) {
 }
 
 void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause buffToSync, bool toApply){
-    if (localPlayerID != playerID)
+    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+    const bool isServer = game->GetIsServer();
+    if (localPlayerID != playerID && !isServer)
         return;
 
     if (toApply)
-        AddActiveLocalSusCause(buffToSync, localPlayerID);
+        AddActiveLocalSusCause(buffToSync, playerID);
     else
-        RemoveActiveLocalSusCause(buffToSync, localPlayerID);
+        RemoveActiveLocalSusCause(buffToSync, playerID);
 }
 
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){

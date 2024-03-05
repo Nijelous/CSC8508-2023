@@ -124,11 +124,13 @@ float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
 }
 
 void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply){
-	if (localPlayerID != playerID)
+	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+	const bool isServer = game->GetIsServer();
+	if (localPlayerID != playerID && !isServer)
 		return;
 
 	if (toApply)
-		ApplyBuffToPlayer(buffToSync, localPlayerID);
+		ApplyBuffToPlayer(buffToSync, playerID);
 	else
-		RemoveBuffFromPlayer(buffToSync, localPlayerID);
+		RemoveBuffFromPlayer(buffToSync, playerID);
 }
