@@ -28,11 +28,12 @@ GameStartStatePacket::GameStartStatePacket(bool val) {
 	isGameStarted = val;
 }
 
-GameEndStatePacket::GameEndStatePacket(bool val){
+GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId){
 	type = BasicNetworkMessages::GameEndState;
 	size = sizeof(GameEndStatePacket);
 
-	isGameEnded = val;
+	this->isGameEnded = val;
+	this->winningPlayerId = winningPlayerId;
 }
 
 ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs){

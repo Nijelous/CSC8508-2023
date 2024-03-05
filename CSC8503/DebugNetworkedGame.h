@@ -28,6 +28,8 @@ namespace NCL{
             
             bool GetIsServer() const;
             bool PlayerWonGame() override;
+            bool PlayerLostGame() override;
+            const bool GetIsGameStarted() const;
 
             const int GetClientLastFullID() const;
 
@@ -37,7 +39,7 @@ namespace NCL{
             void UpdateGame(float dt) override;
 
             void SetIsGameStarted(bool isGameStarted);
-            void SetIsGameFinished(bool isGameFinished);
+            void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
             void StartLevel();
 
             void AddEventOnGameStarts(std::function<void()> event);
@@ -57,6 +59,9 @@ namespace NCL{
             bool mIsGameStarted = false;
             bool mIsGameFinished = false;
             bool mIsServer = false;
+
+            int mWinningPlayerId;
+            int mLocalPlayerId;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);

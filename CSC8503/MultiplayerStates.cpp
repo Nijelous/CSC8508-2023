@@ -21,6 +21,11 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 	}
 	else {
 		Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
+		bool isGameStarted = mGameSceneManager->GetIsGameStarted();
+		if (isGameStarted) {
+			*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
+			return PushdownResult::Push;
+		}
 	}
 	mGameSceneManager->GetLevelManager()->GetRenderer()->Render();
 	return PushdownResult::NoChange;
@@ -28,7 +33,7 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 }
 
 void MultiplayerLobby::OnAwake() {
-	mGameSceneManager->SetIsGameFinished(false);
+	mGameSceneManager->SetIsGameFinished(false, -1);
 	mGameSceneManager->SetIsGameStarted(false);
 }
 
@@ -64,8 +69,8 @@ void PlayingMultiplayerLevel::OnAwake() {
 }
 
 PushdownState::PushdownResult MultiplayerVictory::OnUpdate(float dt, PushdownState** newState) {
-	Debug::Print("You Win! :))))))", Vector2(50, 50), Debug::RED);
-	Debug::Print("Press escape to return main menu", Vector2(50, 60), Debug::WHITE);
+	Debug::Print("You Win! :))))))", Vector2(25, 50), Debug::RED);
+	Debug::Print("Press escape to return main menu", Vector2(25, 60), Debug::WHITE);
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		*newState = new MultiplayerLobby(mGameSceneManager);
 		LevelManager::GetLevelManager()->SetGameState(MenuState);
@@ -76,7 +81,6 @@ PushdownState::PushdownResult MultiplayerVictory::OnUpdate(float dt, PushdownSta
 
 void MultiplayerVictory::OnAwake() {
 	mGameSceneManager->ClearNetworkGame();
-	mGameSceneManager->SetIsGameFinished(true);
 }
 
 
@@ -85,8 +89,8 @@ MultiplayerDefeat::MultiplayerDefeat(DebugNetworkedGame* currentGameState) {
 }
 
 PushdownState::PushdownResult MultiplayerDefeat::OnUpdate(float dt, PushdownState** newState) {
-	Debug::Print("You lost! :(", Vector2(50, 50), Debug::RED);
-	Debug::Print("Press escape to return main menu", Vector2(50, 60), Debug::WHITE);
+	Debug::Print("You lost! :(", Vector2(25, 50), Debug::RED);
+	Debug::Print("Press escape to return main menu", Vector2(25, 60), Debug::WHITE);
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
 		return PushdownResult::Pop;
