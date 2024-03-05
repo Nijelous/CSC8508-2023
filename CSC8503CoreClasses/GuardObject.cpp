@@ -267,7 +267,7 @@ BehaviourAction* GuardObject::Patrol() {
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
-				if (dist < 36) {
+				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
 					if (mCurrentNode == mNodes.size() - 1) {
 						mNextNode = 0;
@@ -297,12 +297,11 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
 
-				int GuardCatchingDistanceSquared = 36;
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 
 				float dist = direction.LengthSquared();
-				if (dist < GuardCatchingDistanceSquared) {
+				if (dist < GUARD_CATCHING_DISTANCE_SQUARED) {
 					LookTowardFocalPoint(direction);
 					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
@@ -335,12 +334,14 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 		else if (state == Ongoing) {
 			float* endPos = new float[3] {mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]};
 			MoveTowardFocalPoint(endPos);
-			if (this->GetTransform().GetPosition() == Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2])) {
-				if (mCanSeePlayer == true) {
+			Vector3 direction = Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition();
+			float dist = direction.LengthSquared();
+			if (mCanSeePlayer == true) {
+				return Failure;
+			}
+			else if (dist < MIN_DIST_TO_NEXT_POS) {
+				if (mCanSeePlayer == false) {
 					return Success;
-				}
-				else {
-					return Failure;
 				}
 			}
 		}
@@ -354,9 +355,6 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 	BehaviourAction* ConfiscateItems = new BehaviourAction("Confiscate Items", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			mConfiscateItemsTime = 60;
-			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
-				return Failure;
-			}
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
