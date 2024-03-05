@@ -423,9 +423,9 @@ void LevelManager::InitialiseAssets() {
 	mSilentRunTex = mRenderer->LoadTexture("Silence.png");
 	mSlowDownTex = mRenderer->LoadTexture("SpeedDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
+	mAlarmTex = mRenderer->LoadTexture("Alarm.png");
 	
 	mKeyIconTex3 = mRenderer->LoadTexture("key3.png");
 	mKeyIconTex2 = mRenderer->LoadTexture("key2.png");
@@ -606,14 +606,17 @@ void LevelManager::InitialiseIcons() {
 	mUi->SetEquippedItemIcon(SPEED_BUFF_SLOT, *mSpeedIcon);
 
 	//suspicion
-	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspicionBarTex, 0.3);
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspicionBarTex, 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_BAR_SLOT, *mSuspisionBarIcon);
 
-	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspicionIndicatorTex, 0.3);
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspicionIndicatorTex, 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_INDICATOR_SLOT, *mSuspisionIndicatorIcon);
 
 	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex,0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
+
+	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mAlarmTex, 0.0);
+	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
 	mRenderer->SetUIObject(mUi);
 

@@ -213,6 +213,7 @@ namespace NCL {
 			UISystem* mUi;
 			Texture* mInventorySlotTex;
 			Texture* mCrossTex;
+			Texture* mAlarmTex;
 
 			//powerup Icon
 

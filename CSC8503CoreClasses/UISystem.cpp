@@ -20,7 +20,7 @@ UISystem::~UISystem() {
 }
 
 
-UISystem::Icon* UISystem::AddIcon(Vector2 Pos, int horiSize, int vertSize, Texture* tex, float transparency) {
+UISystem::Icon* UISystem::AddIcon(Vector2 Pos, float horiSize, float vertSize, Texture* tex, float transparency) {
 	Icon* mIcon = new Icon();
 	mIcon->mPosition = Pos;
 	mIcon->mLength = horiSize;
@@ -59,7 +59,7 @@ void UISystem::DeleteIcon(Icon icon) {
 	}
 }
 
-void UISystem::BuildVerticesForIcon(const Vector2& iconPos, int horiSize, int vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
+void UISystem::BuildVerticesForIcon(const Vector2& iconPos, float horiSize, float vertSize, std::vector<Vector3>& positions, std::vector<Vector2>& texCoords) {
 	positions.reserve(positions.size() + 6);
 	texCoords.reserve(texCoords.size() + 6);
 
@@ -128,6 +128,9 @@ void UISystem::ChangeBuffSlotTransparency(int slotNum, float transparency){
 	case CROSS:
 		mCross->mTransparency = transparency;
 		break;
+	case ALARM:
+		mAlarm->mTransparency = transparency;
+		break;
 
 	default:
 		break;
@@ -164,6 +167,9 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 			break;
 		case CROSS:
 			mCross = &icon;
+			break;
+		case ALARM:
+			mAlarm = &icon;
 			break;
 
 	default:
