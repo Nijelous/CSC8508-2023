@@ -120,6 +120,8 @@ namespace NCL {
 			Helipad* GetHelipad(); 
 
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
+
+			void SetGameState(GameStates state);
 		protected:
 			LevelManager();
 			~LevelManager();

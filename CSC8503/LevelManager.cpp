@@ -565,6 +565,10 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 	delete filter;
 }
 
+void LevelManager::SetGameState(GameStates state) {
+	mGameState = state;
+}
+
 void LevelManager::InitialiseIcons() {
 	//Inventory
 	UISystem::Icon* mInventoryIcon1 = mUi->AddIcon(Vector2(45, 90), 4.5, 8, mInventorySlotTex);
