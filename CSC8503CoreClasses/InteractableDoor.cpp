@@ -79,12 +79,14 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	mIsOpen = isOpen;
 	if (isOpen) {
+		this->GetSoundObject()->TriggerSoundEvent();
 		SetActive(false);
 		if (isSettedByServer) {
 			mTimer = initDoorTimer;
 		}
 	}
 	else {
+		this->GetSoundObject()->CloseDoorTriggered();
 		SetActive(true);
 	}
 
