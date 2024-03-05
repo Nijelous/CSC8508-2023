@@ -1,5 +1,6 @@
 #include "MultiplayerStates.h"
 #include "DebugNetworkedGame.h"
+#include "GameServer.h"
 #include "SceneManager.h"
 #include "SinglePlayerStates.h"
 
@@ -12,6 +13,7 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 	if (isServer) {
 		Debug::Print(" Waiting for player to join ...", Vector2(5, 95), Debug::RED);
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)) {
+			
 			mGameSceneManager->SetIsGameStarted(true);
 			*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
 			return PushdownResult::Push;
@@ -26,11 +28,13 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 }
 
 void MultiplayerLobby::OnAwake() {
-	mGameSceneManager->GetLevelManager()->ClearLevel();
+	mGameSceneManager->SetIsGameFinished(false);
+	mGameSceneManager->SetIsGameStarted(false);
 }
 
 InitialisingMultiplayerLevel::InitialisingMultiplayerLevel(DebugNetworkedGame* currentGameState){
 	mGameSceneManager = currentGameState;
+	
 }
 
 PushdownState::PushdownResult InitialisingMultiplayerLevel::OnUpdate(float dt, PushdownState** newState) {
@@ -39,7 +43,7 @@ PushdownState::PushdownResult InitialisingMultiplayerLevel::OnUpdate(float dt, P
 }
 
 void InitialisingMultiplayerLevel::OnAwake() {
-	LevelManager::GetLevelManager()->ClearLevel();
+
 }
 
 PushdownState::PushdownResult PlayingMultiplayerLevel::OnUpdate(float dt, PushdownState** newState) {
@@ -63,14 +67,16 @@ PushdownState::PushdownResult MultiplayerVictory::OnUpdate(float dt, PushdownSta
 	Debug::Print("You Win! :))))))", Vector2(50, 50), Debug::RED);
 	Debug::Print("Press escape to return main menu", Vector2(50, 60), Debug::WHITE);
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
-		return PushdownResult::Pop;
+		*newState = new MultiplayerLobby(mGameSceneManager);
+		LevelManager::GetLevelManager()->SetGameState(MenuState);
+		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
 }
 
 void MultiplayerVictory::OnAwake() {
-	LevelManager::GetLevelManager()->ClearLevel();
+	mGameSceneManager->ClearNetworkGame();
+	mGameSceneManager->SetIsGameFinished(true);
 }
 
 
