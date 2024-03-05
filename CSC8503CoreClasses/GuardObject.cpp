@@ -28,6 +28,7 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
+  delete mSightedObject;
 }
 
 void GuardObject::UpdateObject(float dt) {

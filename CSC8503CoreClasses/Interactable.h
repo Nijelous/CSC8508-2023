@@ -3,16 +3,22 @@
 
 namespace NCL {
 	namespace CSC8503 {
-		enum InteractType
-		{
+		enum InteractType {
 			Use,
-			LongUse, 
+			LongUse,
+			PickPocket,
 			ItemUse
+		};
+
+		enum InteractableItems {
+			Default,
+			InteractableVents,
+			InteractableDoors
 		};
 
 		class Interactable{
 		public:
-			virtual void Interact(InteractType interactType) { 
+			virtual void Interact(InteractType interactType, GameObject* interactingObject = nullptr) { 
 				if (!CanBeInteractedWith(interactType))
 					return; 
 			};
@@ -21,6 +27,7 @@ namespace NCL {
 			//virtual InventoryBuffSystem::PlayerInventory::item* GetRelatedItem() { return &mRelatedItem; };
 		protected:
 			bool mInteractable = false;
+			InteractableItems mInteractableItemType;
 			//InventoryBuffSystem::PlayerInventory::item mRelatedItem;
 		};
 	}

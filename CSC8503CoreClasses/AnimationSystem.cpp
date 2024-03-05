@@ -12,11 +12,13 @@ AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g){
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
-
+	mAnimTexture = nullptr;
 	
 }
 
 AnimationSystem::~AnimationSystem(){
+
+
 }
 
 void AnimationSystem::Clear(){
@@ -34,8 +36,8 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects){
 		for (auto& obj : UpdatableObjects) {
-			if (obj->GetAnimationObject()) {
-				AnimationObject* animObj = obj->GetAnimationObject();
+			if (obj->GetRenderObject()->GetAnimationObject()) {
+				AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
@@ -61,8 +63,7 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 					}
 					frameMatricesVec.emplace_back(frameMatrices);
 				}
-				obj->GetRenderObject()->SetAnimation(obj->GetAnimationObject()->GetAnimation());
-				obj->GetRenderObject()->SetMaterial(obj->GetAnimationObject()->GetMaterial());
+
 				obj->GetRenderObject()->SetCurrentFrame(currentFrame);
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 				
@@ -93,20 +94,20 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 		
 		if (mGuardState != mObjectState) {
 			mGuardState =(GameObject::GameObjectState)mObjectState;
-			obj->GetAnimationObject()->ReSetCurrentFrame();
+			obj->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();
 
 			switch (mObjectState)
 			{
 			case GameObject::GameObjectState::Idle:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
 
 				break;
 			case GameObject::GameObjectState::Walk:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
 
 				break;
 			case GameObject::GameObjectState::Sprint:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
 
 				break;
 			}
@@ -121,20 +122,20 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 
 		if (mPlayerState != mObjectState) {
 			mPlayerState = (GameObject::GameObjectState)mObjectState;
-			obj->GetAnimationObject()->ReSetCurrentFrame();
+			obj->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();
 
 			switch (mObjectState)
 			{
 			case GameObject::GameObjectState::Idle:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
 
 				break;
 			case GameObject::GameObjectState::Walk:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
 
 				break;
 			case GameObject::GameObjectState::Sprint:
-				obj->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
 
 				break;
 			}
@@ -168,15 +169,17 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 	for (auto& obj : UpdatableObjects) {
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
-			AnimationObject* animObj = obj->GetAnimationObject();
+			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
+
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
-			AnimationObject* animObj = obj->GetAnimationObject();
+			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
+
 		}
 	}
 }

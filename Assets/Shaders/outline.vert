@@ -1,10 +1,4 @@
-#version 400 core
-
-uniform mat4 modelMatrix 	= mat4(1.0f);
-uniform mat4 viewMatrix 	= mat4(1.0f);
-uniform mat4 projMatrix 	= mat4(1.0f);
-uniform bool hasAnim;
-uniform mat4 joints[128];
+#version 430 core
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
@@ -17,21 +11,30 @@ out Vertex
 	vec2 texCoord;
 } OUT;
 
+layout(std140, binding = 0) uniform CamBlock{
+	mat4 projMatrix;
+	mat4 viewMatrix;
+	mat4 invProjView;
+	vec3 camPos;
+
+} camData;
+
+layout(std140, binding = 3) uniform ObjectBlock {
+	mat4 modelMatrix;
+	mat4 shadowMatrix;
+	vec4 objectColour;
+	bool hasVertexColours;
+} objectData;
+
+
+
 
 void main(void)
 {
-	mat4 mvp 		  = (projMatrix * viewMatrix * modelMatrix);
+	mat4 mvp 		  = (camData.projMatrix * camData.viewMatrix * objectData.modelMatrix);
 	vec4 localPos 	= vec4(position, 1.0f);
-	vec4 skelPos 	= vec4(0,0,0,0);
-	for(int i = 0; i < 4; ++i) {
-		int   jointIndex 	= jointIndices[i];
-		float jointWeight 	= jointWeights[i];
-
-		skelPos += joints[jointIndex] * localPos * jointWeight;
-		}
 	OUT.texCoord = texCoord;
-	if(hasAnim)	gl_Position = mvp * vec4(skelPos.xyz, 1.0);
-	else gl_Position = mvp * localPos;
+	gl_Position = mvp * localPos;
 }
 
 
