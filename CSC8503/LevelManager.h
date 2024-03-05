@@ -15,7 +15,7 @@ using namespace SuspicionSystem;
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
 	constexpr float PLAYER_INVERSE_MASS = 0.5f;
-	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.25f;
+	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.15f;
 	constexpr float INIT_TIMER_VALUE = 1000;
 	namespace CSC8503 {
 		class PlayerObject;

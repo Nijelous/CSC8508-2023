@@ -59,7 +59,7 @@ void NetworkedGame::UpdateGame(float dt) {
 		else if (mThisClient) {
 			UpdateAsClient(dt);
 		}
-		mTimeToNextPacket += 1.0f / 20.0f; //20hz server/client update
+		mTimeToNextPacket += 1.0f / 5.0f; //20hz server/client update
 	}
 
 	if (!mThisServer && Window::GetKeyboard()->KeyPressed(KeyCodes::F9)) {

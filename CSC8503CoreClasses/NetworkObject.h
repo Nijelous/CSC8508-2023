@@ -98,6 +98,14 @@ namespace NCL::CSC8503 {
 		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
 	};
 
+	struct ClientSyncLocalActiveSusCausePacket : public GamePacket {
+		int playerID;
+		int activeLocalSusCauseID;
+		bool toApply;
+
+		ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

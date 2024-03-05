@@ -64,7 +64,7 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 
 				//if it's server, inform clients
 				if (game->GetIsServer()) {
-					game->SendClinentSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
+					game->SendClientSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
 				}
 			}
 
@@ -107,7 +107,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
-			game->SendClinentSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+			game->SendClientSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 		}
 	}
 
@@ -154,7 +154,7 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 			//if it's server, inform clients
 			if (game->GetIsServer()) {
 				int usageCount = mItemUseCount[playerNo][invSlot];
-				game->SendClinentSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
+				game->SendClientSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
 			}
 		}
 

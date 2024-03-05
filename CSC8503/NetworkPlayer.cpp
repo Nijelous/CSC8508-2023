@@ -29,7 +29,7 @@ namespace {
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
 	PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
-	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
+	LevelManager::GetLevelManager()->GetSuspicionSystem(),new UISystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	//this->game = game;
 	mPlayerID = num;
 }
@@ -154,6 +154,16 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
 		}
 
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::N) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::M) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
+		}
+
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 
@@ -172,7 +182,6 @@ void NetworkPlayer::MovePlayer(float dt) {
 }
 
 void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
-
 	Vector3 fwdAxis;
 	Vector3 rightAxis;
 	if (mIsLocalPlayer) {
@@ -196,7 +205,29 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 	if (playerInputs.movementButtons[MOVE_RIGHT_INDEX])
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 
-	ActivateSprint(playerInputs.isSprinting);
+	bool isIdle = true;
+	for (auto buttonState : mPlayerInputs.movementButtons)
+		if (buttonState)
+			isIdle = false;
+
+	if (isIdle) {
+		if (mObjectState != Idle && mSuspicionSystemClassPtr != nullptr) {
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
+				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
+		}
+		if (mIsCrouched)
+			mObjectState = IdleCrouch;
+		else
+			mObjectState = Idle;
+	}
+	else {
+
+		ActivateSprint(playerInputs.isSprinting);
+		if (mIsCrouched)
+			mObjectState = Crouch;
+	}
 	ToggleCrouch(playerInputs.isCrouching);
 
 	StopSliding();

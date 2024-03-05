@@ -8,8 +8,8 @@
 #include "NetworkObject.h"
 #include "NetworkPlayer.h"
 #include "RenderObject.h"
-#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
-#include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
+#include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
+#include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 
 namespace{
     constexpr int MAX_PLAYER = 4;
@@ -212,7 +212,7 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
     }
 }
 
-void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
+void DebugNetworkedGame::SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
     PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
     NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
     mThisServer->SendGlobalPacket(packet);
@@ -221,6 +221,12 @@ void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot
 void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const {
     PlayerBuffs::buff buffToSync = (PlayerBuffs::buff)(buffType);
     NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffToSync, toApply);
+    mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const {
+    LocalSuspicionMetre::activeLocalSusCause buffToSync = (LocalSuspicionMetre::activeLocalSusCause)(buffType);
+    NCL::CSC8503::ClientSyncLocalActiveSusCausePacket packet(playerNo, buffToSync, toApply);
     mThisServer->SendGlobalPacket(packet);
 }
 
@@ -470,4 +476,11 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
     auto* buffSystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr();
     const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
     buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
+}
+
+void DebugNetworkedGame::HandleActiveSusCauseChange(ClientSyncBuffPacket* packet) const{
+    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetLocalSuspicionMetre();
+    const LocalSuspicionMetre::activeLocalSusCause activeCause = static_cast<LocalSuspicionMetre::activeLocalSusCause>(packet->buffID);
+    localSusMetre->SyncActiveSusCauses(packet->playerID, localPlayerID, activeCause, packet->toApply);
 }

@@ -41,7 +41,6 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	}
 };
 
-//returns localPlayerID or 0 if singleplayer
 void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply) {
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());

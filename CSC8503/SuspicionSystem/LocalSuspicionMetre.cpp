@@ -2,6 +2,10 @@
 #include <algorithm>
 #include "Debug.h"
 #include <string>
+#include "NetworkObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace SuspicionSystem;
 
@@ -18,30 +22,42 @@ void LocalSuspicionMetre::AddInstantLocalSusCause(const instantLocalSusCause &in
     ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
 };
 
-bool LocalSuspicionMetre::AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
+void LocalSuspicionMetre::AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already in the activeSusCauses vector of that player
     if (foundCause == mActiveLocalSusCauseVector[playerNo].end())
     {
         mActiveLocalSusCauseVector[playerNo].push_back(inCause);
-        return true;
     }
 
-    return false;
+    HandleActiveSusCauseNetworking(inCause,playerNo,true);
 };
 
-bool LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
+void LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
     auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
 
     //If the foundCause is not already int the activeSusCauses vector of that player
     if (foundCause != mActiveLocalSusCauseVector[playerNo].end())
     {
-        mActiveLocalSusCauseVector[playerNo].erase(foundCause);
-        return true;
+        mActiveLocalSusCausesToRemove[playerNo].push_back(inCause);
     }
 
-    return false;
+    HandleActiveSusCauseNetworking(inCause, playerNo, false);
+}
+
+void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply){
+    int localPlayerId = 0;
+    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+    if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+        const auto* localPlayer = game->GetLocalPlayer();
+        localPlayerId = localPlayer->GetPlayerID();
+
+        const bool isServer = game->GetIsServer();
+        if (isServer) {
+            //game->SendClientSyncLocalActiveSusCausePacket(playerNo, inCause, toApply);
+        }
+    }
 }
 
 void LocalSuspicionMetre::UpdatePlayerBuffsObserver(const BuffEvent buffEvent, const int playerNo){
@@ -65,7 +81,7 @@ void LocalSuspicionMetre::Update(float dt) {
     for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
     {
         if (GetLocalSusMetreValue(playerNo) != 0.0f ||
-            mActiveLocalSusCauseVector[playerNo].size() > 1)
+            mActiveLocalSusCauseVector[playerNo].size() >= 1)
         {
             for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
             {
@@ -74,14 +90,30 @@ void LocalSuspicionMetre::Update(float dt) {
 
             if (mRecoveryCooldowns[playerNo] == DT_UNTIL_LOCAL_RECOVERY)
                 RemoveActiveLocalSusCause(passiveRecovery, playerNo);
+        
+            mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
+
+            if (mRecoveryCooldowns[playerNo] == 0.0f)
+                AddActiveLocalSusCause(passiveRecovery, playerNo);
         }
-        mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
 
-        if (mRecoveryCooldowns[playerNo] == 0.0f)
-            AddActiveLocalSusCause(passiveRecovery, playerNo);
 
+        for(const activeLocalSusCause activeSusCause:mActiveLocalSusCausesToRemove[playerNo])
+            mActiveLocalSusCauseVector[playerNo].erase(std::remove(
+            mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), activeSusCause),
+            mActiveLocalSusCauseVector[playerNo].end());
     }
+    mActiveLocalSusCausesToRemove->clear();
+}
 
+void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause buffToSync, bool toApply){
+    if (localPlayerID != playerID)
+        return;
+
+    if (toApply)
+        AddActiveLocalSusCause(buffToSync, localPlayerID);
+    else
+        RemoveActiveLocalSusCause(buffToSync, localPlayerID);
 }
 
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){

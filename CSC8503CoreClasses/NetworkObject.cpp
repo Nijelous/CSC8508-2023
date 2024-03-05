@@ -82,6 +82,15 @@ ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toAppl
 	this->toApply = toApply;
 }
 
+ClientSyncLocalActiveSusCausePacket::ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncLocalActiveBuff;
+	size = sizeof(ClientSyncLocalActiveSusCausePacket);
+
+	this->playerID = playerID;
+	this->activeLocalSusCauseID = activeLocalSusCauseID;
+	this->toApply = toApply;
+}
+
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
 	this->firstItemUsage = firstItemUsage;
 	this->secondItemUsage = secondItemUsage;
