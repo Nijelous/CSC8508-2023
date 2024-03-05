@@ -3,9 +3,10 @@
 #extension GL_ARB_bindless_texture : require
 
 
-layout(std140, binding = 5) uniform IconBlock {
-	float transparency
-} iconData; 
+
+layout(std140, binding = 5) uniform IconData {
+	float transparency;
+} iconBlock;
 
 layout(std140, binding = 6) uniform TextureHandles {
 	sampler2D handles[64];
@@ -20,6 +21,9 @@ layout(std140, binding = 7) uniform TextureHandleIDs{
 	int specLightIndex;
 } texIndices;
 
+
+
+
 in Vertex
 {
     vec2 texCoord;
@@ -29,6 +33,6 @@ out vec4 fragColor;
 
 void main(void)
 { 
-    vec4 texColor = texture(texHandles.handles[texIndices.albedoIndex] , IN.texCoord);
-    fragColor = vec4(texColor.rgb, texColor.a * iconData.transparency);
+    vec4 texColor = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord);
+    fragColor = vec4(texColor.rgb, texColor.a * iconBlock.transparency);
 }

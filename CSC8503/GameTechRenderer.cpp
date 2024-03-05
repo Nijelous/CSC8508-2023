@@ -188,7 +188,7 @@ void GameTechRenderer::GenUBOBuffers() {
 void GameTechRenderer::GenIconUBO() {
 	glGenBuffers(1, &uBOBlocks[iconUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[iconUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, 1, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -721,7 +721,7 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
 	glBindBufferBase(GL_UNIFORM_BUFFER, iconUBO, uBOBlocks[iconUBO]);
-	glBufferSubData(GL_UNIFORM, 0, sizeof(float), &i.mTransparency);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &i.mTransparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
 	SetUIiconBufferSizes(iconVertCount);
