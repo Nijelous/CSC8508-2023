@@ -15,6 +15,7 @@ namespace NCL {
 			Room(int type, int doorPos, int primaryDoor);
 			Room(std::string roomPath);
 			~Room();
+			std::string GetName() const { return mRoomName; }
 			RoomType GetType() const { return mType; }
 			std::unordered_map<Transform, TileType> GetTileMap() const { return mTileMap; }
 			std::vector<Light*> GetLights() const { return mLights; }

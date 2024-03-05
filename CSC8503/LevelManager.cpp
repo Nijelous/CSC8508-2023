@@ -226,6 +226,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 
 	for (auto const& [key, val] : (*mLevelList[levelID]).GetRooms()) {
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(mRoomList.begin(), mRoomList.end(), g);
 		switch ((*val).GetType()) {
 		case Medium:
 			for (Room* room : mRoomList) {
