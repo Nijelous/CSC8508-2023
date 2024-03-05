@@ -184,3 +184,7 @@ void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
 		mThisClient->SendPacket(newPacket);
 	}
 }
+
+void NetworkedGame::AddNetworkObjectToNetworkObjects(NetworkObject* networkObj) {
+	mNetworkObjects.push_back(networkObj);
+}

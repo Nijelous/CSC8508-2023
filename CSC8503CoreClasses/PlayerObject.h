@@ -19,9 +19,11 @@ namespace NCL {
 				Stunned
 			};
 
-			PlayerObject(GameWorld* world, const std::string& objName = "",
-				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr = nullptr,
-				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr = nullptr, PrisonDoor* prisonDoorPtr = nullptr,
+			PlayerObject(GameWorld* world,
+				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr,
+				UISystem* UI, SoundObject* soundObject,
+				const std::string& objName = "",PrisonDoor* prisonDoorPtr = nullptr,
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
@@ -109,6 +111,8 @@ namespace NCL {
 			float mUiTime = 0.0;
 			float mLastSusValue = 0.0;
 			
+
+			bool	IsSeenByGameObject(GameObject* otherGameObject);
 		private:
 
 		};

@@ -5,6 +5,7 @@
 #include "NetworkedGame.h"
 
 namespace NCL::CSC8503 {
+	struct SyncInteractablePacket;
 	struct ClientSyncItemSlotPacket;
 }
 
@@ -17,6 +18,7 @@ namespace NCL{
 
         struct FullPacket;
         struct ClientPlayerInputPacket;
+        struct ClientSyncBuffPacket;
         struct AddPlayerScorePacket;
 
         class DebugNetworkedGame : public NetworkedGame{
@@ -42,6 +44,7 @@ namespace NCL{
             void ReceivePacket(int type, GamePacket* payload, int source) override;
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
+            void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;
@@ -67,7 +70,8 @@ namespace NCL{
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
             void SpawnPlayers();
-            NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
+
+        	NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
 
@@ -78,12 +82,16 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
-            void SetItemsLeftToZero() override;
+
+        	void SetItemsLeftToZero() override;
 
             void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
 
+            void HandleInteractablePacket(SyncInteractablePacket* packet) const;
 
-            std::vector<std::function<void()>> mOnGameStarts;
+        	void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
+
+        	std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 

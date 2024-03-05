@@ -39,7 +39,7 @@ namespace {
 }
 
 int main(){
-    bool isNetworkTestActive = false;
+    bool isNetworkTestActive = true;
 
     float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
