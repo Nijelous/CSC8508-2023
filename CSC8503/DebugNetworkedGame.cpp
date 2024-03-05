@@ -54,6 +54,10 @@ bool DebugNetworkedGame::GetIsServer() const {
 }
 
 bool DebugNetworkedGame::PlayerWonGame() {
+	if (mIsGameFinished && mWinningPlayerId == mLocalPlayerId) {
+		return true;
+	}
+
 	//TODO(erendgrmnc): lots of func calls, optimize it(ex: cache variables).
 	std::tuple<bool, int> helipadCollisionResult = mLevelManager->GetHelipad()->GetCollidingWithPlayer();
 	bool isAnyPlayerOnHelipad = std::get<0>(helipadCollisionResult);
