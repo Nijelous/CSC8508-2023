@@ -60,6 +60,7 @@ void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCau
     }
 }
 
+
 void LocalSuspicionMetre::UpdatePlayerBuffsObserver(const BuffEvent buffEvent, const int playerNo){
     switch (buffEvent)
     {
@@ -127,4 +128,27 @@ void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const f
     if (ammount > 0)
         mRecoveryCooldowns[playerNo] = DT_UNTIL_LOCAL_RECOVERY;
 
+    HandleLocalSusChangeNetworking(mPlayerMeters[playerNo],playerNo);
+}
+
+void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo) {
+    int localPlayerId = 0;
+    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+    if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+        const auto* localPlayer = game->GetLocalPlayer();
+        localPlayerId = localPlayer->GetPlayerID();
+
+        const bool isServer = game->GetIsServer();
+        if (isServer) {
+            game->SendClientSyncLocalSusChangePacket(playerNo, changedValue);
+        }
+    }
+}
+
+void LocalSuspicionMetre::SyncSusChange(int playerID, int localPlayerID, int changedValue){
+    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+    const bool isServer = game->GetIsServer();
+    if (localPlayerID != playerID && !isServer)
+        return;
+    mPlayerMeters[playerID] = changedValue;
 }

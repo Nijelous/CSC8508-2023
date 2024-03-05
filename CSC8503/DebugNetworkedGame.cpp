@@ -206,6 +206,16 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         HandlePlayerBuffChange(packet);
         break;
     }
+    case BasicNetworkMessages::ClientSyncLocalActiveCause: {
+        ClientSyncLocalActiveSusCausePacket* packet = (ClientSyncLocalActiveSusCausePacket*)(payload);
+        HandleLocalActiveSusCauseChange(packet);
+        break;
+    }
+    case BasicNetworkMessages::ClientSyncLocalSusChange: {
+        ClientSyncLocalSusChangePacket* packet = (ClientSyncLocalSusChangePacket*)(payload);
+        HandleLocalSusChange(packet);
+        break;
+    }
     default:
         std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
         break;
@@ -225,8 +235,13 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 }
 
 void DebugNetworkedGame::SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const {
-    LocalSuspicionMetre::activeLocalSusCause buffToSync = (LocalSuspicionMetre::activeLocalSusCause)(buffType);
-    NCL::CSC8503::ClientSyncLocalActiveSusCausePacket packet(playerNo, buffToSync, toApply);
+    LocalSuspicionMetre::activeLocalSusCause activeCause = (LocalSuspicionMetre::activeLocalSusCause)(buffType);
+    NCL::CSC8503::ClientSyncLocalActiveSusCausePacket packet(playerNo, activeCause, toApply);
+    mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncLocalSusChangePacket(int playerNo, int changedValue) const {
+    NCL::CSC8503::ClientSyncLocalSusChangePacket packet(playerNo, changedValue);
     mThisServer->SendGlobalPacket(packet);
 }
 
@@ -478,9 +493,15 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
     buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
 }
 
-void DebugNetworkedGame::HandleActiveSusCauseChange(ClientSyncBuffPacket* packet) const{
+void DebugNetworkedGame::HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const{
     const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
     auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetLocalSuspicionMetre();
-    const LocalSuspicionMetre::activeLocalSusCause activeCause = static_cast<LocalSuspicionMetre::activeLocalSusCause>(packet->buffID);
+    const LocalSuspicionMetre::activeLocalSusCause activeCause = static_cast<LocalSuspicionMetre::activeLocalSusCause>(packet->activeLocalSusCauseID);
     localSusMetre->SyncActiveSusCauses(packet->playerID, localPlayerID, activeCause, packet->toApply);
 }
+
+void DebugNetworkedGame::HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const {
+    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+    auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetLocalSuspicionMetre();
+    localSusMetre->SyncSusChange(packet->playerID, localPlayerID, packet->changedValue);
+} 

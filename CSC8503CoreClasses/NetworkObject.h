@@ -106,6 +106,13 @@ namespace NCL::CSC8503 {
 		ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply);
 	};
 
+	struct ClientSyncLocalSusChangePacket : public GamePacket {
+		int playerID;
+		int changedValue;
+
+		ClientSyncLocalSusChangePacket(int playerID, int changedValue);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

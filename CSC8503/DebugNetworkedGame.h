@@ -20,6 +20,8 @@ namespace NCL{
         struct ClientSyncBuffPacket;
         struct ClientSyncActiveLocalSusPacket;
         struct AddPlayerScorePacket;
+        struct ClientSyncLocalActiveSusCausePacket;
+        struct ClientSyncLocalSusChangePacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -46,6 +48,7 @@ namespace NCL{
             void SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
             void SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const;
+            void SendClientSyncLocalSusChangePacket(int playerNo, int changedValue) const;
             GameClient* GetClient() const;
             GameServer* GetServer() const;
             NetworkPlayer* GetLocalPlayer() const;
@@ -87,8 +90,8 @@ namespace NCL{
 
             void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
 
-            void HandleActiveSusCauseChange(ClientSyncBuffPacket* packet) const;
-
+            void HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const;
+            void HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const;
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;

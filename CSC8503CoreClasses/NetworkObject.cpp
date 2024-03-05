@@ -83,12 +83,20 @@ ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toAppl
 }
 
 ClientSyncLocalActiveSusCausePacket::ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply) {
-	type = BasicNetworkMessages::ClientSyncLocalActiveBuff;
+	type = BasicNetworkMessages::ClientSyncLocalActiveCause;
 	size = sizeof(ClientSyncLocalActiveSusCausePacket);
 
 	this->playerID = playerID;
 	this->activeLocalSusCauseID = activeLocalSusCauseID;
 	this->toApply = toApply;
+}
+
+ClientSyncLocalSusChangePacket::ClientSyncLocalSusChangePacket(int playerID, int changedValue) {
+	type = BasicNetworkMessages::ClientSyncLocalSusChange;
+	size = sizeof(ClientSyncLocalActiveSusCausePacket);
+
+	this->playerID = playerID;
+	this->changedValue = changedValue;
 }
 
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {

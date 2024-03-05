@@ -36,7 +36,7 @@ namespace SuspicionSystem
 
         void AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         void RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
-        void HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply);
+        
 
         virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent,int playerNo) override;
 
@@ -50,6 +50,7 @@ namespace SuspicionSystem
 
         void Update(float dt);
         void SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause buffToSync, bool toApply);
+        void SyncSusChange(int playerID, int localPlayerID, int changedValue);
     private:
         std::map<const instantLocalSusCause, const float>  mInstantLocalSusCauseSeverityMap =
         {
@@ -69,6 +70,8 @@ namespace SuspicionSystem
         std::vector<activeLocalSusCause> mActiveLocalSusCausesToRemove[NCL::CSC8503::MAX_PLAYERS];
 
         void ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount);
+        void HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply);
+        void HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo);
     };
 }
 
