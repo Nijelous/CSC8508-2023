@@ -10,10 +10,17 @@ layout(std140, binding = 5) uniform IconBlock {
 } iconData; 
 
 layout(std140, binding = 6) uniform TextureHandles {
-	int handles[64];
-	int index[6];
+	sampler2D handles[64];
 } texHandles;
 
+layout(std140, binding = 7) uniform TextureHandleIDs{
+	int albedoIndex;
+	int normalIndex;
+	int depthIndex;
+	int shadowIndex;
+	int albedoLightIndex;
+	int specLightIndex;
+} texIndices;
 in Vertex
 {
     vec2 texCoord;

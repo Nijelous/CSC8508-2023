@@ -2,14 +2,18 @@
 
 #extension GL_ARB_bindless_texture : require
 
-uniform sampler2D 	albedoTex;
-uniform sampler2D 	albedoLight;
-uniform sampler2D 	specularLight;
-
 layout(std140, binding = 6) uniform TextureHandles {
-	int handles[64];
-	int index[6];
+	sampler2D handles[64];
 } texHandles;
+
+layout(std140, binding = 7) uniform TextureHandleIDs{
+	int albedoIndex;
+	int normalIndex;
+	int depthIndex;
+	int shadowIndex;
+	int albedoLightIndex;
+	int specLightIndex;
+} texIndices;
 
 
 in Vertex
@@ -21,9 +25,9 @@ out vec4 fragColor;
 
 void main(void)
 {
-	vec3 diffuse = texture(albedoTex, IN.texCoord).xyz;
-	vec3 light = texture(albedoLight, IN.texCoord).xyz;
-	vec3 specular = texture(specularLight, IN.texCoord).xyz;
+	vec3 diffuse = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord).xyz;
+	vec3 light = texture(texHandles.handles[texIndices.albedoLightIndex], IN.texCoord).xyz;
+	vec3 specular = texture(texHandles.handles[texIndices.specLightIndex], IN.texCoord).xyz;
 
 	fragColor.xyz = diffuse * 0.1;
 	fragColor.xyz += diffuse * light;

@@ -56,7 +56,7 @@ namespace NCL {
 				mInstanceTiles.push_back(cornerWallTile);
 			}
 			void FillLightUBO();
-
+			void FillTextureDataUBO();
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}		
@@ -69,21 +69,10 @@ namespace NCL {
 				lightsUBO,
 				objectsUBO,
 				animFramesUBO,
-				iconUBO,
+				iconUBO,				
+				textureDataUBO,
 				textureIdUBO,
 				MAX_UBO
-			};
-
-
-
-			enum TextureTypes {
-				albedo,
-				normal,
-				depth,
-				shadow,
-				albedoLight,
-				specularLight,
-				MAX_TEXTURE_TYPES
 			};
 
 			/* (Author: B Schwarz) Data sent to a UBO buffer can be accessed reliably at offsets of 256 bytes, thus this struct is padded to 256.
@@ -109,8 +98,16 @@ namespace NCL {
 
 			
 			struct TextureHandleData {
-				int handles[64];
-				int index[MAX_TEXTURE_TYPES];
+				GLuint64 handles[128] = { 0 };
+			};
+
+			struct TextureHandleIndices {
+				int albedoIndex = 0;
+				int normalIndex = 0;
+				int depthIndex = 0;
+				int shadowIndex = 0;
+				int albedoLightIndex = 0;
+				int specLightIndex = 0;
 			};
 
 			void InitUBOBlocks();
@@ -122,11 +119,14 @@ namespace NCL {
 			void GenLightDataUBO();
 			void GenObjectDataUBO();
 			void GenAnimFramesUBOs();
-			void FillObjectDataUBO();
+			void FillObjectDataUBO();			
 			void NewRenderLines();
 			void NewRenderText();
+			void GenTextureDataUBO();
 			void GenTextureIndexUBO();
 			void UnbindAllTextures();
+			int FindTexHandleIndex(GLuint texId);
+			int FindTexHandleIndex(const OGLTexture* tex);
 
 			void RenderIcons(UISystem::Icon icon);
 			
@@ -163,7 +163,7 @@ namespace NCL {
 			vector<const RenderObject*> mActiveObjects;
 			vector<const RenderObject*> mOutlinedObjects;
 
-			vector<GLuint64> mTextureHandles;
+			vector<std::pair<GLuint, GLuint64>> mTextureHandles;
 
 			OGLShader*  mDebugLineShader;
 			OGLShader* mDebugTextShader;

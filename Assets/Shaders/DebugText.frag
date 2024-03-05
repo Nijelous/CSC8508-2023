@@ -5,9 +5,17 @@
 uniform sampler2D 	mainTex;
 
 layout(std140, binding = 6) uniform TextureHandles {
-	int handles[64];
-	int index[6];
+	sampler2D handles[64];
 } texHandles;
+
+layout(std140, binding = 7) uniform TextureHandleIDs{
+	int albedoIndex;
+	int normalIndex;
+	int depthIndex;
+	int shadowIndex;
+	int albedoLightIndex;
+	int specLightIndex;
+} texIndices;
 
 in Vertex
 {
@@ -20,7 +28,7 @@ out vec4 fragColor;
 void main(void)
 {
 
-	float alpha = texture(mainTex, IN.texCoord).r;
+	float alpha = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord).r;
 		
 	if(alpha < 0.00001f) {
 		discard;
