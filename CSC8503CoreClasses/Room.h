@@ -12,7 +12,7 @@ namespace NCL {
 		class Room {
 		public:
 			Room() { mType = INVALID; }
-			Room(int type);
+			Room(int type, int doorPos, int primaryDoor);
 			Room(std::string roomPath);
 			~Room();
 			RoomType GetType() const { return mType; }
@@ -25,6 +25,8 @@ namespace NCL {
 		protected:
 			std::string mRoomName;
 			RoomType mType;
+			int mDoorPos;
+			int mPrimaryDoor;
 			std::unordered_map<Transform, TileType> mTileMap;
 			std::vector<Light*> mLights;
 			std::vector<Transform> mCCTVTransforms;
