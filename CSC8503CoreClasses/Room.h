@@ -21,11 +21,13 @@ namespace NCL {
 			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
 			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
 			std::vector<Door*> GetDoors() const { return mDoors; }
+			int GetDoorConfig() const { return mDoorConfig; }
+			int GetPrimaryDoor() const { return mPrimaryDoor; }
 			friend class JsonParser;
 		protected:
 			std::string mRoomName;
 			RoomType mType;
-			int mDoorPos;
+			int mDoorConfig;
 			int mPrimaryDoor;
 			std::unordered_map<Transform, TileType> mTileMap;
 			std::vector<Light*> mLights;

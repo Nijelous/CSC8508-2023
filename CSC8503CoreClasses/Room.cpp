@@ -22,7 +22,7 @@ Room::Room(int type, int doorPos, int primaryDoor) {
 		mType = INVALID;
 		break;
 	}
-	mDoorPos = doorPos;
+	mDoorConfig = doorPos;
 	mPrimaryDoor = primaryDoor;
 }
 

@@ -111,7 +111,7 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 		room->mType = (RoomType)keyValuePairs[0]["type"];
 		break;
 	case RoomDoorPos:
-		room->mDoorPos = keyValuePairs[0]["doorPositions"];
+		room->mDoorConfig = keyValuePairs[0]["doorPositions"];
 		room->mPrimaryDoor = 0;
 		break;
 	case TileMap:
@@ -203,7 +203,6 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 				keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
 			if (level) level->mLights.push_back(newLight);
 			else room->mLights.push_back(newLight);
-			std::cout << direction << " | " << keyValuePairs[4]["x"] << " " << keyValuePairs[4]["y"] << " " << keyValuePairs[4]["z"] << "\n\n";
 			c++;
 		}
 		break;
