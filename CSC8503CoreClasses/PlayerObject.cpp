@@ -98,6 +98,8 @@ PlayerObject::~PlayerObject() {
 
 void PlayerObject::UpdateObject(float dt) {
 	if (mPlayerSpeedState != Stunned) {
+		const GameObjectState previousObjectState = mObjectState;
+
 		MovePlayer(dt);
 		RayCastFromPlayer(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
@@ -105,6 +107,9 @@ void PlayerObject::UpdateObject(float dt) {
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
 			mInteractHeldDt = 0;
 		}
+
+		if (previousObjectState != mObjectState)
+			ChangeActiveSusCausesBasedOnState(previousObjectState);
 	}
 
 	AttachCameraToPlayer(mGameWorld);
@@ -160,6 +165,30 @@ void PlayerObject::ShowDebugInfo(float dt)
 	Debug::Print(itemName, Vector2(10, 80));
 	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
 	Debug::Print(usesLeft, Vector2(10, 85));
+}
+
+void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState){
+	switch (previousState) {
+	case Walk:
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
+		break;
+	case Sprint:
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::playerSprint, mPlayerID);
+		break;
+	default:
+		break;
+	}
+
+	switch (mObjectState) {
+	case Walk:
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
+		break;
+	case Sprint:
+		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerSprint, mPlayerID);
+		break;
+	default:
+		break;
+	}
 }
 
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
@@ -254,12 +283,6 @@ void PlayerObject::MovePlayer(float dt) {
 	GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(mGameWorld->GetMainCamera().GetPitch(), mGameWorld->GetMainCamera().GetYaw(), 0));
 
 	if (isIdle){
-		if(mObjectState != Idle && mSuspicionSystemClassPtr != nullptr ) {
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-		}
 		if (mIsCrouched)
 			mObjectState = IdleCrouch;
 		else
@@ -406,31 +429,19 @@ void PlayerObject::ToggleCrouch(bool crouchToggled) {
 	if (crouchToggled && mObjectState == Crouch) {
 		//Crouch -> Walk
 		StartWalking();
-		if(mSuspicionSystemClassPtr != nullptr)
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 	}
 	else if (crouchToggled && mObjectState == Walk) {
 		//Walk -> Crouch
 		StartCrouching(); 
-		if (mSuspicionSystemClassPtr != nullptr)
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 	}
 	else if (crouchToggled && mObjectState == IdleCrouch) {
 		//Crouch -> Idle
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 		mIsCrouched = false;
-		if (mSuspicionSystemClassPtr != nullptr)
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 	}
 	else if (crouchToggled && mObjectState == Idle) {
 		//Idle -> Crouch
 		StartCrouching();
-		if (mSuspicionSystemClassPtr != nullptr)
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
 	}
 }
 
@@ -448,13 +459,6 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 
 void PlayerObject::StartWalking() {
 	if (!(mObjectState == Walk)) {
-		if (mSuspicionSystemClassPtr != nullptr) {
-			if (mObjectState == Sprint)
-				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-		}
 		if (mObjectState == Crouch)
 			if(mPlayerSpeedState == SpedUp)
 				mMovementSpeed = SPED_UP_WALK_ACCELERATING_SPEED;
@@ -471,16 +475,6 @@ void PlayerObject::StartWalking() {
 
 void PlayerObject::StartSprinting() {
 	if (!(mObjectState == Sprint)) {
-		if (mSuspicionSystemClassPtr != nullptr) {
-			if (mObjectState== Walk)
-				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-					RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-
-			if (!mHasSilentSprintBuff)
- 				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-					AddActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-		}
-
 		if (mPlayerSpeedState == SpedUp)
 			mMovementSpeed = SPED_UP_SPRINT_ACCELERATING_SPEED;
 		else
@@ -497,15 +491,6 @@ void PlayerObject::StartSprinting() {
 
 void PlayerObject::StartCrouching() {
 	if (!(mObjectState == Crouch)) {
-		if (mSuspicionSystemClassPtr != nullptr){
-			if (mObjectState == Sprint)
-				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-			if (mObjectState == Walk)
-				mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-		}
-
 		if (mObjectState == Walk)
 			mObjectState = Crouch;
 		if (mObjectState == Idle)

@@ -176,7 +176,13 @@ void NetworkPlayer::MovePlayer(float dt) {
 		game->GetClient()->WriteAndSendClientInputPacket(game->GetClientLastFullID(), mPlayerInputs);
 	}
 	else {
+		const GameObjectState previousObjectState = mObjectState;
+
 		HandleMovement(dt, mPlayerInputs);
+
+		if (previousObjectState != mObjectState)
+			ChangeActiveSusCausesBasedOnState(previousObjectState);
+
 		mIsClientInputReceived = false;
 	}
 }
@@ -211,19 +217,12 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 			isIdle = false;
 
 	if (isIdle) {
-		if (mObjectState != Idle && mSuspicionSystemClassPtr != nullptr) {
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-				RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-		}
 		if (mIsCrouched)
 			mObjectState = IdleCrouch;
 		else
 			mObjectState = Idle;
 	}
 	else {
-
 		ActivateSprint(playerInputs.isSprinting);
 		if (mIsCrouched)
 			mObjectState = Crouch;
