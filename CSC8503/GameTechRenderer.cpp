@@ -188,7 +188,7 @@ void GameTechRenderer::GenUBOBuffers() {
 void GameTechRenderer::GenIconUBO() {
 	glGenBuffers(1, &uBOBlocks[iconUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[iconUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, 2, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, 1, NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -449,13 +449,7 @@ void GameTechRenderer::RenderSkybox() {
 	int height = hostWindow.GetScreenSize().y;
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
 	BindShader(*mSkyboxShader);
-
-	glUniform1i(glGetUniformLocation(mSkyboxShader->GetProgramID(), "cubeTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	BindMesh(*skyboxMesh);
@@ -726,18 +720,10 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
-	GLint texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "uTransparency");
-	glUniform1f(texSlot, i.mTransparency);
+	glBindBufferBase(GL_UNIFORM_BUFFER, iconUBO, uBOBlocks[iconUBO]);
+	glBufferSubData(GL_UNIFORM, 0, sizeof(float), &i.mTransparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	//0.02, 0, 0, 0
-	//0, 0.02, 0, 0
-	//0, 0, -1, 0;
-	//-1, 1, 0, 1
-
-	int matSlot = glGetUniformLocation(mIconShader->GetProgramID(), "viewProjMatrix");
-	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
-
 	SetUIiconBufferSizes(iconVertCount);
 
 	glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);

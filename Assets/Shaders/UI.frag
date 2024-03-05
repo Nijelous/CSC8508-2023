@@ -4,7 +4,7 @@
 
 
 layout(std140, binding = 5) uniform IconBlock {
-	bool useTexture;
+	float transparency
 } iconData; 
 
 layout(std140, binding = 6) uniform TextureHandles {
@@ -19,6 +19,7 @@ layout(std140, binding = 7) uniform TextureHandleIDs{
 	int albedoLightIndex;
 	int specLightIndex;
 } texIndices;
+
 in Vertex
 {
     vec2 texCoord;
@@ -28,13 +29,6 @@ out vec4 fragColor;
 
 void main(void)
 { 
-     if(iconData.isOn){
-          fragColor = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord);
-     }
-     else{
-          fragColor = texture(texHandles.handles[texIndices.albedoIndex], IN.texCoord) * vec4(0.06, 0.06, 0.06, 0.2);
-     }
-    vec4 texColor = texture(iconTex, IN.texCoord);
-    fragColor = vec4(texColor.rgb, texColor.a * uTransparency);
-
+    vec4 texColor = texture(texHandles.handles[texIndices.albedoIndex] , IN.texCoord);
+    fragColor = vec4(texColor.rgb, texColor.a * iconData.transparency);
 }
