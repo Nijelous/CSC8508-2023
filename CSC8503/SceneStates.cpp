@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "DebugNetworkedGame.h"
+#include "GameClient.h"
 #include "GameServer.h"
 #include "Window.h"
 #include "SceneManager.h"
@@ -73,8 +74,15 @@ void ServerState::OnAwake(){
 }
 
 PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE) && LevelManager::GetLevelManager()->GetGameState() == MenuState) {
+	GameStates currentState = LevelManager::GetLevelManager()->GetGameState();
+	bool isInMenuState = currentState == MenuState;
+	if (isInMenuState) {
 		*newState = new MainMenuSceneState();
+		DebugNetworkedGame* networkGame = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+		if (!networkGame->GetIsServer()) {
+			GameClient* client = networkGame->GetClient();
+			client->Disconnect();
+		}
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -84,7 +92,7 @@ void ClientState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	SceneManager::GetSceneManager()->SetIsServer(false);
 	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
-	auto* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+	DebugNetworkedGame* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 	//client->StartAsClient(10,58,221,142);
 	//Localhost IP
 	client->StartAsClient(127, 0, 0, 1);

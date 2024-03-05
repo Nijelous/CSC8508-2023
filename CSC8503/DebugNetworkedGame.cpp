@@ -59,11 +59,13 @@ bool DebugNetworkedGame::PlayerWonGame() {
 	bool isAnyPlayerOnHelipad = std::get<0>(helipadCollisionResult);
 	if (std::get<0>(helipadCollisionResult)) {
 		int playerIDOnHelipad = std::get<1>(helipadCollisionResult);
-		if (mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag, playerIDOnHelipad) && mLocalPlayerId == playerIDOnHelipad) {
-			if (mThisServer) {
+		if (mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag, playerIDOnHelipad)) {
+			if (mIsServer) {
 				SetIsGameFinished(true, playerIDOnHelipad);
 			}
-			return true;
+			if (mLocalPlayerId == playerIDOnHelipad) {
+				return true;
+			}
 		}
 	}
 	return false;
@@ -118,7 +120,7 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		}
 		mTimeToNextPacket += 1.0f / 60.0f; //20hz server/client update
 
-		if (mThisServer) {
+		if (mThisServer && !mIsGameFinished) {
 			SyncPlayerList();
 		}
 	}
@@ -127,28 +129,22 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		mPushdownMachine->Update(dt);
 	}
 
-	if (mIsGameStarted) {
+	if (mIsGameStarted && !mIsGameFinished) {
 		//TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
 
 		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
-		if (mIsGameFinished) {
-			Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
-			mLevelManager->GetRenderer()->Render();
-			return;
-		}
 
-		//DEBUG END GAME
 		if (mThisServer) {
 			Debug::Print("SERVER", Vector2(5, 10), Debug::MAGENTA);
-			if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)) {
-				SetIsGameFinished(true, 0);
-			}
 		}
 		else {
 			Debug::Print("CLIENT", Vector2(5, 10), Debug::MAGENTA);
 		}
 
 		mLevelManager->Update(dt, mGameState == InitialisingLevelState, false);
+	}
+	else {
+		mLevelManager->GetRenderer()->Render();
 	}
 
 	if (mThisServer) {
@@ -265,7 +261,13 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 }
 
 void DebugNetworkedGame::ClearNetworkGame() {
-
+	if (mThisClient) {
+		mThisClient->ClearPacketHandlers();
+	}
+	else {
+		mThisServer->ClearPacketHandlers();
+	}
+	
 	mServerPlayers.clear();
 
 	mLevelManager->ClearLevel();

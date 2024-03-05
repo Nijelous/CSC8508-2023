@@ -27,6 +27,8 @@ namespace NCL {
 			void WriteAndSendClientInputPacket(int lastId, const PlayerInputs& playerInputs);
 
 			void WriteAndSendClientUseItemPacket(int playerID, int objectID);
+
+			void Disconnect();
 		protected:
 			int mPeerId;
 			

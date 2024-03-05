@@ -92,8 +92,9 @@ PushdownState::PushdownResult MultiplayerDefeat::OnUpdate(float dt, PushdownStat
 	Debug::Print("You lost! :(", Vector2(25, 50), Debug::RED);
 	Debug::Print("Press escape to return main menu", Vector2(25, 60), Debug::WHITE);
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
-		SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
-		return PushdownResult::Pop;
+		*newState = new MultiplayerLobby(mGameSceneManager);
+		LevelManager::GetLevelManager()->SetGameState(MenuState);
+		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
 }
