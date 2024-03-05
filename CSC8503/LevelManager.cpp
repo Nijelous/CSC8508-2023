@@ -1095,10 +1095,10 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
-	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
+
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 10));
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
-
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
