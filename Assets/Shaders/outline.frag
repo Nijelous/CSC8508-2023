@@ -2,8 +2,6 @@
 
 #extension GL_ARB_bindless_texture : require
 
-uniform sampler2D depthTex;
-
 layout(std140, binding = 1) uniform StaticBlock{
 	mat4 orthProj;
 	vec2 pixelSize;
@@ -31,7 +29,7 @@ in Vertex
 
 void main(void) {
 	vec2 coord = vec2(gl_FragCoord.xy * staticData.pixelSize);
-	float depth = texture(depthTex, coord.xy).r;
+	float depth = texture(texHandles.handles[texIndices.depthIndex], coord.xy).r;
 	if(gl_FragCoord.z <= depth + 0.001f) discard;
 	fragColour = vec4(1,0,0,1);
 }

@@ -35,6 +35,7 @@ void main(void)
 	vec3 bumpNormal = texture(texHandles.handles[texIndices.normalIndex], IN.texCoord).rgb;
 	bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
 	
+	//Author: B Schwarz - if we put shadow-mapping back in, we will need this. But for now, let's can it. 
 //	if( IN . shadowProj . w > 0.0) { // New !
 //		shadow = textureProj ( texHandles.handles[texIndices.index[shadowIndex]] , IN . shadowProj ) * 0.5f;
 //	}

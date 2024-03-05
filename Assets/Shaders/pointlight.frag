@@ -2,9 +2,6 @@
 
 #extension GL_ARB_bindless_texture : require
 
-uniform sampler2D 	depthTex;
-uniform sampler2D normTex;
-
 layout(std140, binding = 0) uniform CamBlock{
 	mat4 projMatrix;
 	mat4 viewMatrix;
@@ -45,7 +42,7 @@ out vec4 specularOutput;
 void main(void)
 {
 	vec2 texCoord = vec2(gl_FragCoord.xy * staticData.pixelSize);
-	float depth = texture(depthTex, texCoord.xy).r;
+	float depth = texture(texHandles.handles[texIndices.depthIndex], texCoord.xy).r;
 	vec3 ndcPos = vec3(texCoord, depth) * 2.0 - 1.0;
 	vec4 invClipPos = camData.invProjView * vec4(ndcPos, 1.0);
 	vec3 worldPos = invClipPos.xyz / invClipPos.w;
@@ -55,7 +52,7 @@ void main(void)
 
 	if(atten == 0.0) { discard; }
 
-	vec3 normal = normalize(texture(normTex, texCoord.xy).xyz * 2.0 - 1.0);
+	vec3 normal = normalize(texture(texHandles.handles[texIndices.normalIndex], texCoord.xy).xyz * 2.0 - 1.0);
 	vec3 incident = normalize(lightData.lightPos - worldPos);
 	vec3 viewDir = normalize(camData.camPos - worldPos);
 	vec3 halfDir = normalize(incident + viewDir);

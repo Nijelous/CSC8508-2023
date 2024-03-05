@@ -323,8 +323,7 @@ void GameTechRenderer::FillLightUBO() {
 }
 
 void GameTechRenderer::FillObjectDataUBO() {
-	if (mActiveObjects.empty() && mOutlinedObjects.empty()) return;
-	if (mActiveObjects.size() + mOutlinedObjects.size() > MAX_POSSIBLE_OBJECTS) return;
+	if (mActiveObjects.empty()) return;
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[objectsUBO]);
 	ObjectData* objectData = new ObjectData[MAX_POSSIBLE_OBJECTS];
 
@@ -334,12 +333,6 @@ void GameTechRenderer::FillObjectDataUBO() {
 		od.shadowMatrix = shadowMatrix * od.modelMatrix;
 		od.objectColour = mActiveObjects[i]->GetColour();
 		od.hasVertexColours = mActiveObjects[i]->GetMesh()->GetColourData().empty() ? 0 : 1;
-		objectData[i] = od;
-	}
-
-	for (int i = mActiveObjects.size(); i < mOutlinedObjects.size(); i++) {
-		ObjectData od;
-		od.modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		objectData[i] = od;
 	}
 	glBufferData(GL_UNIFORM_BUFFER,
@@ -392,9 +385,6 @@ void GameTechRenderer::BuildObjectList() {
 				if (rendObj && isInFrustum && !rendObj->IsInstanced()) {
 					rendObj->SetSqDistToCam(gameWorld.GetMainCamera().GetPosition());
 					mActiveObjects.emplace_back(rendObj);
-					if (rendObj->GetOutlined()) {
-						mOutlinedObjects.emplace_back(rendObj);
-					}
 				}
 			}
 		}
@@ -403,6 +393,11 @@ void GameTechRenderer::BuildObjectList() {
 
 void GameTechRenderer::SortObjectList() {
 	std::sort(mActiveObjects.begin(), mActiveObjects.end(), RenderObject::CompareBySqCamDist);
+	for (int i = 0; i < mActiveObjects.size(); i++) {
+		if (mActiveObjects[i]->GetOutlined()) {
+			mOutlinedObjects.emplace_back(i);
+		}
+	}
 }
 
 void GameTechRenderer::RenderShadowMap() {
@@ -522,7 +517,7 @@ void GameTechRenderer::FillGBuffer() {
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
 				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4) * 128, frameData);
-				
+				delete[] frameData;
 				texInds.albedoIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[b]);
 				glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
@@ -549,14 +544,17 @@ void GameTechRenderer::FillGBuffer() {
 
 void GameTechRenderer::DrawLightVolumes() {
 	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
-	BindCommonLightDataToShader((OGLShader*)mPointLightShader);
-	BindCommonLightDataToShader((OGLShader*)mSpotLightShader);
-	BindCommonLightDataToShader((OGLShader*)mDirLightShader);
+	glClearColor(0.0f, 0.0f, 0.0f, 1);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_ALWAYS);
 	glDepthMask(GL_FALSE);
-
+	TextureHandleIndices texInds;
+	texInds.normalIndex = FindTexHandleIndex(mGBufferNormalTex);
+	texInds.depthIndex = FindTexHandleIndex(mGBufferDepthTex);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 	for (int i = 0; i < mLights.size(); i++) {
 		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * sizeof(LightData), sizeof(float));
 		if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
@@ -570,22 +568,9 @@ void GameTechRenderer::DrawLightVolumes() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
-	glDepthMask(GL_TRUE);
+	glDepthMask(GL_TRUE);	
 	glClearColor(0.2f, 0.2f, 0.2f, 1);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader) {
-	BindShader(*shader);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "normTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mGBufferNormalTex);
-
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "depthTex"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
 }
 
 void GameTechRenderer::CombineBuffers() {
@@ -606,30 +591,21 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
-	BindShader(*mOutlineShader);
-	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
-	BindShader(*mAnimatedOutlineShader);
-	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
+	TextureHandleIndices texInds;
+	texInds.depthIndex = FindTexHandleIndex(mGBufferDepthTex);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 
-	for (int i = 0; i < mOutlinedObjects.size(); i++) {
-		OGLShader* shader;
-		if (mOutlinedObjects[i]->GetAnimationObject()) shader = mAnimatedOutlineShader;
-		else shader = mOutlineShader;
+	for (int ind : mOutlinedObjects) {
+		OGLShader* shader = (mActiveObjects[ind]->GetAnimationObject()) ? mAnimatedOutlineShader : mOutlineShader;
 		BindShader(*shader);
-		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
+		OGLMesh* mesh = (OGLMesh*)mActiveObjects[ind]->GetMesh();
 		BindMesh(*mesh);
 		size_t layerCount = mesh->GetSubMeshCount();
-		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, objectsUBO, uBOBlocks[objectsUBO],
-			mActiveObjects.size() + i * sizeof(ObjectData), sizeof(float));
-
+		glBindBufferRange(GL_UNIFORM_BUFFER, objectsUBO, uBOBlocks[objectsUBO],	ind * sizeof(ObjectData), sizeof(float));
 		for (size_t b = 0; b < layerCount; ++b) {
-			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimationObject()) {
-				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
-				glBindTexture(GL_TEXTURE_2D, textureID);
-				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
+			if (mActiveObjects[ind]->GetAnimationObject()) {
+				vector<Matrix4> frameMatrices = mActiveObjects[ind]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
 				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];

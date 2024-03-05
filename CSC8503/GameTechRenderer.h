@@ -158,10 +158,9 @@ namespace NCL {
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
 			void SetUIiconBufferSizes(size_t newVertCount);
-			void BindCommonLightDataToShader(OGLShader* shader);
 
 			vector<const RenderObject*> mActiveObjects;
-			vector<const RenderObject*> mOutlinedObjects;
+			vector<int> mOutlinedObjects;
 
 			vector<std::pair<GLuint, GLuint64>> mTextureHandles;
 
