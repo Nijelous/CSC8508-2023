@@ -4,18 +4,9 @@
 
 uniform samplerCube cubeTex;
 
-layout(std140, binding = 6) uniform TextureHandles {
-	sampler2D handles[64];
-} texHandles;
-
-layout(std140, binding = 7) uniform TextureHandleIDs{
-	int albedoIndex;
-	int normalIndex;
-	int depthIndex;
-	int shadowIndex;
-	int albedoLightIndex;
-	int specLightIndex;
-} texIndices;
+layout(std140, binding = 8) uniform CubeHandle{
+	samplerCube cubeTex;
+} cubeHandle;
 
 in Vertex {
 	vec3 viewDir;
@@ -24,6 +15,6 @@ in Vertex {
 out vec4 fragColour;
 
 void main(void)	{
-	vec4 samp = texture(cubeTex,normalize(IN.viewDir));
+	vec4 samp = texture(cubeHandle.cubeTex,normalize(IN.viewDir));
 	fragColour = pow(samp, vec4(2.2f));
 }

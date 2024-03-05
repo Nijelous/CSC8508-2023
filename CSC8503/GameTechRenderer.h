@@ -72,6 +72,7 @@ namespace NCL {
 				iconUBO,				
 				textureDataUBO,
 				textureIdUBO,
+				cubeTexUBO,
 				MAX_UBO
 			};
 
@@ -119,7 +120,8 @@ namespace NCL {
 			void GenLightDataUBO();
 			void GenObjectDataUBO();
 			void GenAnimFramesUBOs();
-			void FillObjectDataUBO();			
+			void FillObjectDataUBO();	
+			void CreateAndFillSkyboxUBO();
 			void NewRenderLines();
 			void NewRenderText();
 			void GenTextureDataUBO();

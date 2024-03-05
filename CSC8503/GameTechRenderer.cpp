@@ -148,13 +148,16 @@ void GameTechRenderer::LoadSkybox() {
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	CreateAndFillSkyboxUBO();
+	
+}
 
-	if (FindTexHandleIndex(skyboxTex) == -1) {
-		const GLuint64 handle = glGetTextureHandleARB(skyboxTex);
-		glMakeTextureHandleResidentARB(handle);
-		mTextureHandles.push_back(std::pair<GLuint, GLuint64>(skyboxTex, handle));
-	}
-
+void GameTechRenderer::CreateAndFillSkyboxUBO() {
+	glGenBuffers(1, &uBOBlocks[cubeTexUBO]);
+	glBindBufferRange(GL_UNIFORM_BUFFER, cubeTexUBO, uBOBlocks[cubeTexUBO], 0, sizeof(GLuint64));
+	const GLuint64 handle = glGetTextureHandleARB(skyboxTex);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(TextureHandleData), &handle, GL_STATIC_DRAW);
+	glMakeTextureHandleResidentARB(handle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
@@ -716,9 +719,10 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	OGLTexture* t = (OGLTexture*)i.mTexture;
-	BindTextureToShader(*t, "iconTex", t->GetObjectID());
-
+	TextureHandleIndices texInds;
+	texInds.albedoIndex = FindTexHandleIndex((OGLTexture*)i.mTexture);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
