@@ -47,6 +47,7 @@ namespace NCL{
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
+            void ClearNetworkGame();
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;

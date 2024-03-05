@@ -243,7 +243,18 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 	mThisServer->SendGlobalPacket(packet);
 }
 
-GameClient * DebugNetworkedGame::GetClient() const {
+void DebugNetworkedGame::ClearNetworkGame() {
+
+	mServerPlayers.clear();
+
+	mLevelManager->ClearLevel();
+	
+	mClientSideLastFullID = -1;
+	mClientSideLastFullID = -1;
+	mNetworkObjectCache = 10;
+}
+
+GameClient* DebugNetworkedGame::GetClient() const {
 	return mThisClient;
 }
 
