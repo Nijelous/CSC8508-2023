@@ -38,7 +38,12 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
+#ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
+#endif
+#ifdef USEPROSPERO
+	// use ps5 renderer
+#endif
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 	mAnimation = new AnimationSystem(*mWorld);

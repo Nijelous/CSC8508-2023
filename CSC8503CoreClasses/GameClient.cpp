@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "GameClient.h"
 
 #include "NetworkObject.h"
@@ -72,3 +74,4 @@ void GameClient::SendPacket(GamePacket&  payload) {
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
 	enet_peer_send(mNetPeer, 0, dataPacket);
 }
+#endif#

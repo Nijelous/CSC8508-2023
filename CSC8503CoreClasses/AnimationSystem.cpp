@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
@@ -183,3 +185,4 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 		}
 	}
 }
+#endif

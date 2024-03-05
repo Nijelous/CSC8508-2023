@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "GameObject.h"
 #include "NetworkBase.h"
@@ -146,3 +147,4 @@ namespace NCL::CSC8503 {
 		int networkID;
 	};
 }
+#endif

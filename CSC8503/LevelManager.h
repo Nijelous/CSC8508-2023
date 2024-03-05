@@ -1,6 +1,11 @@
 #pragma once
 #include "Level.h"
+#ifdef USEGL
 #include "GameTechRenderer.h"
+#endif
+#ifdef USEPROSPERO
+// include ps5 renderer
+#endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
@@ -180,7 +185,12 @@ namespace NCL {
 			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
+#ifdef USEGL
 			GameTechRenderer* mRenderer;
+#endif
+#ifdef USEPROSPERO
+			// define PS5 renderer
+#endif
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
 			AnimationSystem* mAnimation;
