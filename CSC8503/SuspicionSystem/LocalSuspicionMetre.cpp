@@ -13,7 +13,7 @@ void LocalSuspicionMetre::Init(){
     for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++)
     {
         mPlayerMeters[i] = 0;
-        mRecoveryCooldowns[i] = 0;
+        mRecoveryCooldowns[i] = DT_UNTIL_LOCAL_RECOVERY;
         mActiveLocalSusCauseVector[i].clear();
     }
 }
@@ -22,28 +22,26 @@ void LocalSuspicionMetre::AddInstantLocalSusCause(const instantLocalSusCause &in
     ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
 };
 
-void LocalSuspicionMetre::AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
-    auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
+bool SuspicionSystem::LocalSuspicionMetre::IsActiveSusCauseForPlayer(const activeLocalSusCause& inCause, const int& playerNo)
+{
+    return std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause)
+        != mActiveLocalSusCauseVector[playerNo].end();
+}
 
-    //If the foundCause is not already in the activeSusCauses vector of that player
-    if (foundCause == mActiveLocalSusCauseVector[playerNo].end())
+void LocalSuspicionMetre::AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
+    if (!IsActiveSusCauseForPlayer(inCause,playerNo))
     {
         mActiveLocalSusCauseVector[playerNo].push_back(inCause);
+        HandleActiveSusCauseNetworking(inCause, playerNo, true);
     }
-
-    HandleActiveSusCauseNetworking(inCause,playerNo,true);
 };
 
 void LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo){
-    auto foundCause = std::find(mActiveLocalSusCauseVector[playerNo].begin(), mActiveLocalSusCauseVector[playerNo].end(), inCause);
-
-    //If the foundCause is not already int the activeSusCauses vector of that player
-    if (foundCause != mActiveLocalSusCauseVector[playerNo].end())
+    if (IsActiveSusCauseForPlayer(inCause, playerNo))
     {
         mActiveLocalSusCausesToRemove[playerNo].push_back(inCause);
+        HandleActiveSusCauseNetworking(inCause, playerNo, false);
     }
-
-    HandleActiveSusCauseNetworking(inCause, playerNo, false);
 }
 
 void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply){
@@ -82,22 +80,26 @@ void LocalSuspicionMetre::Update(float dt) {
     for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
     {
         if (GetLocalSusMetreValue(playerNo) != 0.0f ||
-            mActiveLocalSusCauseVector[playerNo].size() >= 1)
-        {
-            for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo])
-            {
+            mActiveLocalSusCauseVector[playerNo].size() > 0) {
+            const float unChangedSusValue = mPlayerMeters[playerNo];
+
+            for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo]) {
                 ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause] * dt);
             }
 
-            if (mRecoveryCooldowns[playerNo] == DT_UNTIL_LOCAL_RECOVERY)
-                RemoveActiveLocalSusCause(passiveRecovery, playerNo);
-        
-            mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
+            if (mPlayerMeters[playerNo] <= unChangedSusValue){
+                if (mRecoveryCooldowns[playerNo] == 0.0f)
+                    ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[passiveRecovery] * dt);
+                else
+                    mRecoveryCooldowns[playerNo] = std::max(mRecoveryCooldowns[playerNo] - dt, 0.0f);
+            }
+            else {
+                mRecoveryCooldowns[playerNo] = DT_UNTIL_LOCAL_RECOVERY;
+            }
 
-            if (mRecoveryCooldowns[playerNo] == 0.0f && GetLocalSusMetreValue(playerNo) != 0.0f)
-                AddActiveLocalSusCause(passiveRecovery, playerNo);
+            if ((int)(mPlayerMeters[playerNo]) != (int)(unChangedSusValue))
+                HandleLocalSusChangeNetworking(mPlayerMeters[playerNo], playerNo);
         }
-
 
         for(const activeLocalSusCause activeSusCause:mActiveLocalSusCausesToRemove[playerNo])
             mActiveLocalSusCauseVector[playerNo].erase(std::remove(
@@ -107,28 +109,22 @@ void LocalSuspicionMetre::Update(float dt) {
     mActiveLocalSusCausesToRemove->clear();
 }
 
-void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause buffToSync, bool toApply){
+void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause inCause, bool toApply){
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     const bool isServer = game->GetIsServer();
-    if (localPlayerID != playerID && !isServer)
+    if (localPlayerID != playerID)
         return;
 
     if (toApply)
-        AddActiveLocalSusCause(buffToSync, playerID);
+        AddActiveLocalSusCause(inCause, playerID);
     else
-        RemoveActiveLocalSusCause(buffToSync, playerID);
+        RemoveActiveLocalSusCause(inCause, playerID);
 }
 
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){
-    mPlayerMeters[playerNo] += ammount;
-    mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo],
-        mGlobalSusMeterPTR->GetGlobalSusMeter(),
-        100.0f);
-
-    if (ammount > 0)
-        mRecoveryCooldowns[playerNo] = DT_UNTIL_LOCAL_RECOVERY;
-
-    HandleLocalSusChangeNetworking(mPlayerMeters[playerNo],playerNo);
+    mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo] + ammount,
+                                        mGlobalSusMeterPTR->GetGlobalSusMeter(),
+                                        100.0f);
 }
 
 void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo) {
@@ -148,7 +144,7 @@ void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue
 void LocalSuspicionMetre::SyncSusChange(int playerID, int localPlayerID, int changedValue){
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     const bool isServer = game->GetIsServer();
-    if (localPlayerID != playerID && !isServer)
+    if (localPlayerID != playerID)
         return;
     mPlayerMeters[playerID] = changedValue;
 }

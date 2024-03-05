@@ -34,6 +34,7 @@ namespace SuspicionSystem
 
         void AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo);
 
+        bool IsActiveSusCauseForPlayer(const activeLocalSusCause& inCause, const int& playerNo);
         void AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         void RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         

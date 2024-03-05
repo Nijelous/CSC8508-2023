@@ -93,7 +93,7 @@ ClientSyncLocalActiveSusCausePacket::ClientSyncLocalActiveSusCausePacket(int pla
 
 ClientSyncLocalSusChangePacket::ClientSyncLocalSusChangePacket(int playerID, int changedValue) {
 	type = BasicNetworkMessages::ClientSyncLocalSusChange;
-	size = sizeof(ClientSyncLocalActiveSusCausePacket);
+	size = sizeof(ClientSyncLocalSusChangePacket);
 
 	this->playerID = playerID;
 	this->changedValue = changedValue;
