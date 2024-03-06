@@ -28,6 +28,9 @@ namespace NCL{
             ~DebugNetworkedGame();
             
             bool GetIsServer() const;
+            bool PlayerWonGame() override;
+            bool PlayerLostGame() override;
+            const bool GetIsGameStarted() const;
 
             const int GetClientLastFullID() const;
 
@@ -37,15 +40,17 @@ namespace NCL{
             void UpdateGame(float dt) override;
 
             void SetIsGameStarted(bool isGameStarted);
-            void SetIsGameFinished(bool isGameFinished);
+            void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
             void StartLevel();
 
             void AddEventOnGameStarts(std::function<void()> event);
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
+            void InitInGameMenuManager() override;
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
+            void ClearNetworkGame();
 
             GameClient* GetClient() const;
             GameServer* GetServer() const;
@@ -55,6 +60,9 @@ namespace NCL{
             bool mIsGameStarted = false;
             bool mIsGameFinished = false;
             bool mIsServer = false;
+
+            int mWinningPlayerId;
+            int mLocalPlayerId;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);

@@ -74,4 +74,29 @@ void GameClient::SendPacket(GamePacket&  payload) {
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);
 	enet_peer_send(mNetPeer, 0, dataPacket);
 }
+void GameClient::Disconnect() {
+	if (mNetPeer != nullptr) {
+		// Disconnect from the server with a disconnect notification
+		enet_peer_disconnect(mNetPeer, 0);
+
+		// Allow up to 3 seconds for the disconnect to succeed and flush outgoing packets
+		// You can adjust the timeout value as needed
+		enet_host_flush(netHandle);
+
+		// Wait until the disconnect process is complete or the timeout occurs
+		ENetEvent event;
+		if (enet_host_service(netHandle, &event, 3000) > 0 &&
+			event.type == ENET_EVENT_TYPE_DISCONNECT) {
+			// Disconnect successful
+			std::cout << "Disconnected from the server." << std::endl;
+		}
+		else {
+			// Disconnect timed out or encountered an error
+			std::cerr << "Failed to disconnect from the server." << std::endl;
+		}
+
+		// Reset the peer to nullptr after disconnecting
+		mNetPeer = nullptr;
+	}
+}
 #endif#

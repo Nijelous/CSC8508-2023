@@ -18,6 +18,7 @@ set(Header_Files
     "MainMenuScene.h"
     "SoundManager.h"
     "SoundObject.h"
+    "MultiplayerStates.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -68,6 +69,7 @@ set(Source_Files
     "MainMenuScene.cpp"
     "SoundManager.cpp"
     "SoundObject.cpp"
+    "MultiplayerStates.cpp"
 )
 
 if(USE_VULKAN)

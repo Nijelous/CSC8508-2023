@@ -56,7 +56,9 @@ namespace NCL::CSC8503 {
 
 	struct GameEndStatePacket : public GamePacket{
 		bool isGameEnded = false;
-		GameEndStatePacket(bool val);
+		int winningPlayerId;
+
+		GameEndStatePacket(bool val, int winningPlayerId);
 	};
 
 	struct ClientPlayerInputPacket : public GamePacket{

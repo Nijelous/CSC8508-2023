@@ -1,6 +1,11 @@
 #ifdef USEGL
 #include "NetworkBase.h"
 #include "./enet/enet.h"
+
+void NetworkBase::ClearPacketHandlers() {
+	packetHandlers.clear();
+}
+
 NetworkBase::NetworkBase()	{
 	netHandle = nullptr;
 }

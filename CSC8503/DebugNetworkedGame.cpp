@@ -6,10 +6,13 @@
 
 #include "GameServer.h"
 #include "GameClient.h"
+#include "Helipad.h"
 #include "Interactable.h"
 #include "InteractableDoor.h"
+#include "MultiplayerStates.h"
 #include "NetworkObject.h"
 #include "NetworkPlayer.h"
+#include "PushdownMachine.h"
 #include "RenderObject.h"
 #include "Vent.h"
 #include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
@@ -34,6 +37,10 @@ DebugNetworkedGame::DebugNetworkedGame() {
 	NetworkBase::Initialise();
 	mTimeToNextPacket = 0.0f;
 	mPacketsToSnapshot = 0;
+	mWinningPlayerId = -1;
+	mLocalPlayerId = -1;
+
+	InitInGameMenuManager();
 
 	for (int i = 0; i < MAX_PLAYER; i++) {
 		mPlayerList.push_back(-1);
@@ -45,6 +52,39 @@ DebugNetworkedGame::~DebugNetworkedGame() {
 
 bool DebugNetworkedGame::GetIsServer() const {
 	return mIsServer;
+}
+
+bool DebugNetworkedGame::PlayerWonGame() {
+	if (mIsGameFinished && mWinningPlayerId == mLocalPlayerId) {
+		return true;
+	}
+
+	//TODO(erendgrmnc): lots of func calls, optimize it(ex: cache variables).
+	std::tuple<bool, int> helipadCollisionResult = mLevelManager->GetHelipad()->GetCollidingWithPlayer();
+	bool isAnyPlayerOnHelipad = std::get<0>(helipadCollisionResult);
+	if (std::get<0>(helipadCollisionResult)) {
+		int playerIDOnHelipad = std::get<1>(helipadCollisionResult);
+		if (mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag, playerIDOnHelipad)) {
+			if (mIsServer) {
+				SetIsGameFinished(true, playerIDOnHelipad);
+			}
+			if (mLocalPlayerId == playerIDOnHelipad) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool DebugNetworkedGame::PlayerLostGame() {
+	if (mIsGameFinished && mWinningPlayerId != mLocalPlayerId) {
+		return true;
+	}
+	return false;
+}
+
+const bool DebugNetworkedGame::GetIsGameStarted() const {
+	return mIsGameStarted;
 }
 
 void DebugNetworkedGame::StartAsServer() {
@@ -85,27 +125,22 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		}
 		mTimeToNextPacket += 1.0f / 60.0f; //20hz server/client update
 
-		if (mThisServer) {
+		if (mThisServer && !mIsGameFinished) {
 			SyncPlayerList();
 		}
 	}
 
-	if (mIsGameStarted) {
+	if (mPushdownMachine != nullptr) {
+		mPushdownMachine->Update(dt);
+	}
+
+	if (mIsGameStarted && !mIsGameFinished) {
 		//TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
 
 		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
-		if (mIsGameFinished) {
-			Debug::Print("Game Finished.", Vector2(5, 95), Debug::MAGENTA);
-			mLevelManager->GetRenderer()->Render();
-			return;
-		}
 
-		//DEBUG END GAME
 		if (mThisServer) {
 			Debug::Print("SERVER", Vector2(5, 10), Debug::MAGENTA);
-			if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)) {
-				SetIsGameFinished(true);
-			}
 		}
 		else {
 			Debug::Print("CLIENT", Vector2(5, 10), Debug::MAGENTA);
@@ -114,15 +149,6 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 		mLevelManager->Update(dt, mGameState == InitialisingLevelState, false);
 	}
 	else {
-		if (mThisServer) {
-			Debug::Print(" Waiting for player to join ...", Vector2(5, 95), Debug::RED);
-			if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)) {
-				SetIsGameStarted(true);
-			}
-		}
-		else {
-			Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
-		}
 		mLevelManager->GetRenderer()->Render();
 	}
 
@@ -145,8 +171,9 @@ void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
 	}
 }
 
-void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished) {
+void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished, int winningPlayerId) {
 	mIsGameFinished = isGameFinished;
+	mWinningPlayerId = winningPlayerId;
 	if (mThisServer) {
 		SendFinishGameStatusPacket();
 	}
@@ -166,6 +193,9 @@ void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event) {
 }
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
+	if (type == 13){
+		std::cout << "Finish Packet Received! " << '\n';
+	}
 	switch (type) {
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
@@ -184,7 +214,7 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	}
 	case BasicNetworkMessages::GameEndState: {
 		GameEndStatePacket* packet = (GameEndStatePacket*)payload;
-		SetIsGameFinished(packet->isGameEnded);
+		SetIsGameFinished(packet->isGameEnded, packet->winningPlayerId);
 		break;
 	}
 	case BasicNetworkMessages::SyncPlayers: {
@@ -218,6 +248,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	}
 }
 
+void DebugNetworkedGame::InitInGameMenuManager() {
+	MultiplayerLobby* multiplayerLobby = new MultiplayerLobby(this);
+	mPushdownMachine = new PushdownMachine(multiplayerLobby);
+}
+
 void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
 	PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
 	NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
@@ -230,7 +265,25 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 	mThisServer->SendGlobalPacket(packet);
 }
 
-GameClient * DebugNetworkedGame::GetClient() const {
+void DebugNetworkedGame::ClearNetworkGame() {
+	if (mThisClient) {
+		mThisClient->ClearPacketHandlers();
+	}
+	else {
+		mThisServer->ClearPacketHandlers();
+	}
+	
+	mServerPlayers.clear();
+
+	mLevelManager->ClearLevel();
+	
+	mClientSideLastFullID = -1;
+	mClientSideLastFullID = -1;
+	mWinningPlayerId = -1;
+	mNetworkObjectCache = 10;
+}
+
+GameClient* DebugNetworkedGame::GetClient() const {
 	return mThisClient;
 }
 
@@ -255,12 +308,6 @@ void DebugNetworkedGame::UpdateAsServer(float dt) {
 
 void DebugNetworkedGame::UpdateAsClient(float dt) {
 	mThisClient->UpdateClient();
-
-	int peer = GetPlayerPeerID();
-	StringPacket newPacket("Client sends it regards :O ");
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-		mThisClient->SendPacket(newPacket);
-	}
 }
 
 void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
@@ -334,7 +381,7 @@ void DebugNetworkedGame::SendStartGameStatusPacket() {
 }
 
 void DebugNetworkedGame::SendFinishGameStatusPacket() {
-	GameEndStatePacket packet(mIsGameFinished);
+	GameEndStatePacket packet(mIsGameFinished, mWinningPlayerId);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -368,15 +415,16 @@ void DebugNetworkedGame::SpawnPlayers() {
 	}
 
 	int playerPeerId = 0;
-	if (mThisServer) {
-		mLocalPlayer = mServerPlayers[playerPeerId];
-	}
-	else {
+
+	if (!mThisServer) {
 		playerPeerId = GetPlayerPeerID();
-		mLocalPlayer = mServerPlayers[playerPeerId];
 	}
 
-	mServerPlayers[playerPeerId]->SetIsLocalPlayer(true);
+	NetworkPlayer* localPlayer = mServerPlayers[playerPeerId];
+	mLocalPlayer = localPlayer;
+
+	mLocalPlayerId = mServerPlayers[playerPeerId]->GetPlayerID();
+	localPlayer->SetIsLocalPlayer(true);
 	mLevelManager->SetTempPlayer((PlayerObject*)mLocalPlayer);
 	mLocalPlayer->ToggleIsRendered();
 }
