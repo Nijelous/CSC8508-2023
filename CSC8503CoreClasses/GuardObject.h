@@ -59,8 +59,10 @@ namespace NCL {
             void RunAfterPlayer(Vector3 direction);
             void GrabPlayer();
             float* QueryNavmesh(float* endPos);
-
             bool CheckPolyDistance();
+
+            void CheckForDoors();
+            void OpenDoor();
 
             float mDist;
             float* mNextPoly = new float[3];

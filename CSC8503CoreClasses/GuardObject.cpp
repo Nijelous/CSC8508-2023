@@ -49,7 +49,7 @@ void GuardObject::RaycastToPlayer() {
 	if (ang > 2) {
 		RayCollision closestCollision;
 		Ray r = Ray(this->GetTransform().GetPosition(), dir);
-		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this)) {
+		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
 			mSightedObject = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 			if (mSightedObject == mPlayer) {
@@ -222,6 +222,14 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 	default:
 		break;
 	}
+}
+
+void GuardObject::CheckForDoors() {
+
+}
+
+void GuardObject::OpenDoor() {
+
 }
 
 void GuardObject::BehaviourTree() {
