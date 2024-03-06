@@ -19,9 +19,10 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mHasCaughtPlayer = false;
 	mPlayerHasItems = true;
 	mIsStunned = false;
-	BehaviourTree();
 	mDist = 0;
 	mNextPoly = 0;
+
+	BehaviourTree();
 }
 
 GuardObject::~GuardObject() {
@@ -43,7 +44,6 @@ void GuardObject::UpdateObject(float dt) {
 }
 
 void GuardObject::RaycastToPlayer() {
-	mPlayer = dynamic_cast<PlayerObject*>(mPlayer);
 	Vector3 dir = (mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
 	float ang = Vector3::Dot(dir, GuardForwardVector());
 	if (ang > 2) {
@@ -312,8 +312,6 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 				}
 				else {
 					RunAfterPlayer(direction);
-					//float* endPos = new float[3] { mPlayer->GetTransform().GetPosition().x, mPlayer->GetTransform().GetPosition().y, mPlayer->GetTransform().GetPosition().z };
-					//MoveTowardFocalPoint(endPos);
 				}
 			}
 			else {
@@ -337,8 +335,7 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 		else if (state == Ongoing) {
 			float* endPos = new float[3] {mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]};
 			MoveTowardFocalPoint(endPos);
-			Vector3 direction = Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition();
-			float dist = direction.LengthSquared();
+			float dist = (Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition()).LengthSquared();
 			if (mCanSeePlayer == true) {
 				return Failure;
 			}
