@@ -24,13 +24,15 @@ namespace NCL {
             const bool IsServer() const;
             const bool IsClient() const;
             void SetIsForceQuit(bool isForceQuit);
+            void SetIsServer(bool isServer);
 
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
             static SceneManager* GetSceneManager();
         protected:
             bool isForceQuit = false;
-            bool mIsInSingleplayer;
+            bool mIsInSingleplayer = false;
+            bool mIsServer = false;
             SceneManager();
             ~SceneManager();
 

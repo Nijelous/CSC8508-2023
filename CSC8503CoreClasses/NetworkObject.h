@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "GameObject.h"
 #include "NetworkBase.h"
@@ -55,7 +56,9 @@ namespace NCL::CSC8503 {
 
 	struct GameEndStatePacket : public GamePacket{
 		bool isGameEnded = false;
-		GameEndStatePacket(bool val);
+		int winningPlayerId;
+
+		GameEndStatePacket(bool val, int winningPlayerId);
 	};
 
 	struct ClientPlayerInputPacket : public GamePacket{
@@ -119,6 +122,14 @@ namespace NCL::CSC8503 {
 		ClientSyncGlobalSusChangePacket(int changedValue);
 	};
 
+	struct SyncInteractablePacket : public GamePacket {
+		int networkObjId;
+		bool isOpen;
+		int interactableItemType;
+
+		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
@@ -159,3 +170,4 @@ namespace NCL::CSC8503 {
 		int networkID;
 	};
 }
+#endif

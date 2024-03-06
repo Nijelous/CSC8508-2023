@@ -1,10 +1,12 @@
-﻿#pragma once
+﻿#ifdef USEGL
+#pragma once
 #include <functional>
 #include "NetworkBase.h"
 #include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
 namespace NCL::CSC8503 {
+	struct SyncInteractablePacket;
 	struct ClientSyncItemSlotPacket;
 }
 
@@ -29,6 +31,9 @@ namespace NCL{
             ~DebugNetworkedGame();
             
             bool GetIsServer() const;
+            bool PlayerWonGame() override;
+            bool PlayerLostGame() override;
+            const bool GetIsGameStarted() const;
 
             const int GetClientLastFullID() const;
 
@@ -38,15 +43,18 @@ namespace NCL{
             void UpdateGame(float dt) override;
 
             void SetIsGameStarted(bool isGameStarted);
-            void SetIsGameFinished(bool isGameFinished);
+            void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
             void StartLevel();
 
             void AddEventOnGameStarts(std::function<void()> event);
 
             void ReceivePacket(int type, GamePacket* payload, int source) override;
+            void InitInGameMenuManager() override;
 
             void SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
+            void ClearNetworkGame();
+
             void SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const;
             void SendClientSyncLocalSusChangePacket(int playerNo, int changedValue) const;
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
@@ -58,6 +66,9 @@ namespace NCL{
             bool mIsGameStarted = false;
             bool mIsGameFinished = false;
             bool mIsServer = false;
+
+            int mWinningPlayerId;
+            int mLocalPlayerId;
 
             void UpdateAsServer(float dt);
             void UpdateAsClient(float dt);
@@ -74,7 +85,8 @@ namespace NCL{
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
             void SpawnPlayers();
-            NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
+
+        	NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
 
@@ -85,11 +97,14 @@ namespace NCL{
             void HandleAddPlayerScorePacket(AddPlayerScorePacket* packet);
 
             void SyncPlayerList();
-            void SetItemsLeftToZero() override;
+
+        	void SetItemsLeftToZero() override;
 
             void HandlePlayerEquippedItemChange(ClientSyncItemSlotPacket* packet) const;
 
-            void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
+            void HandleInteractablePacket(SyncInteractablePacket* packet) const;
+
+        	void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
 
             void HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const;
             void HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const;
@@ -105,3 +120,4 @@ namespace NCL{
         };
     }
 }
+#endif

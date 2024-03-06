@@ -6,27 +6,25 @@ namespace NCL {
 	namespace CSC8503 {
 		class InteractableDoor : public Door, public Interactable, SuspicionSystem::GlobalSuspicionObserver {
 		public:
-			InteractableDoor(){
-				GameObject::mName = "InteractableDoor";
-				mIsLocked = false;
-				mIsOpen = false;
-				InitStateMachine();
-			}
+			InteractableDoor();
 			~InteractableDoor() {
 
 			}
 
 			void Unlock();
 			void Lock();
-			void Interact(InteractType interactType) override;
+			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
+			void SetIsOpen(bool isOpen, bool isSettedByServer);
 			virtual void InitStateMachine() override;
-		
+#ifdef USEGL
+			void SyncInteractableDoorStatusInMultiplayer();
+#endif
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:
 			bool CanUseItem();
-			const float initDoorTimer = 3.0f;
+			const float initDoorTimer = 60.0f;
 			bool mIsLocked;
 		};
 	}

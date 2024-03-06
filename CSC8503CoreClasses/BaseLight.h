@@ -14,7 +14,7 @@ public:
 		Direction
 	};
 
-	virtual ~Light() = 0 {};
+	virtual ~Light() {};
 	Vector4 GetColour() const { 
 		return mColour; 
 	}
@@ -25,7 +25,7 @@ public:
 	}
 
 
-	void SetColour(const Vector4& val) { 
+	void SetColour(const Vector3& val) { 
 		mColour = val; 
 	}
 	Type GetType() const { 
@@ -33,6 +33,6 @@ public:
 	}
 
 protected:
-	Vector4 mColour;
+	Vector3 mColour;
 	Type mType;
 };

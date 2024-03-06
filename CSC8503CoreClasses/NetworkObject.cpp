@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkObject.h"
 #include "./enet/enet.h"
 using namespace NCL;
@@ -28,11 +29,12 @@ GameStartStatePacket::GameStartStatePacket(bool val) {
 	isGameStarted = val;
 }
 
-GameEndStatePacket::GameEndStatePacket(bool val){
+GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId){
 	type = BasicNetworkMessages::GameEndState;
 	size = sizeof(GameEndStatePacket);
 
-	isGameEnded = val;
+	this->isGameEnded = val;
+	this->winningPlayerId = winningPlayerId;
 }
 
 ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs){
@@ -120,6 +122,15 @@ ClientSyncItemSlotPacket::ClientSyncItemSlotPacket(int playerID, int slotId, int
 	this->slotId = slotId;
 	this->equippedItem = equippedItem;
 	this->usageCount = usageCount;
+}
+
+SyncInteractablePacket::SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) {
+	type = BasicNetworkMessages::SyncInteractable;
+	size = sizeof(SyncInteractablePacket);
+
+	this->networkObjId = networkObjectId;
+	this->isOpen = isOpen;
+	this->interactableItemType = interactableItemType;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
@@ -263,3 +274,4 @@ void NetworkObject::UpdateStateHistory(int minID) {
 			i++;
 	}
 }
+#endif

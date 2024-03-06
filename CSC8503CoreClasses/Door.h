@@ -16,7 +16,7 @@ namespace NCL {
 			virtual void Close();
 			virtual void InitStateMachine();
 			virtual void CountDownTimer(float dt);
-
+			void SetIsOpen(bool isOpen);
 		protected:
 			void SetNavMeshFlags(int flag);
 

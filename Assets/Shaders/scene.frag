@@ -1,17 +1,19 @@
-#version 400 core
+#version 460 core
 
-uniform vec4 		objectColour;
-uniform sampler2D 	mainTex;
-uniform sampler2D   normTex;
-uniform sampler2DShadow shadowTex;
+#extension GL_ARB_bindless_texture : require
 
-uniform vec3	lightPos;
-uniform float	lightRadius;
-uniform vec4	lightColour;
+layout(std140, binding = 6) uniform TextureHandles {
+	sampler2D handles[64];
+} texHandles;
 
-uniform vec3	cameraPos;
-
-uniform bool hasTexture;
+layout(std140, binding = 7) uniform TextureHandleIDs{
+	int albedoIndex;
+	int normalIndex;
+	int depthIndex;
+	int shadowIndex;
+	int albedoLightIndex;
+	int specLightIndex;
+} texIndices;
 
 in Vertex
 {
@@ -30,14 +32,15 @@ void main(void)
 {
 	float shadow = 1.0; // New !
 	mat3 TBN = mat3(normalize(IN.tangent), normalize(IN.binormal), normalize(IN.normal));
-	vec3 bumpNormal = texture(normTex, IN.texCoord).rgb;
+	vec3 bumpNormal = texture(texHandles.handles[texIndices.normalIndex], IN.texCoord).rgb;
 	bumpNormal = normalize(TBN * normalize(bumpNormal * 2.0 - 1.0));
 	
-	if( IN . shadowProj . w > 0.0) { // New !
-		shadow = textureProj ( shadowTex , IN . shadowProj ) * 0.5f;
-	}
+	//Author: B Schwarz - if we put shadow-mapping back in, we will need this. But for now, let's can it. 
+//	if( IN . shadowProj . w > 0.0) { // New !
+//		shadow = textureProj ( texHandles.handles[texIndices.index[shadowIndex]] , IN . shadowProj ) * 0.5f;
+//	}
 	
-	fragColor[0] = texture2D(mainTex,IN.texCoord);
+	fragColor[0] = texture2D(texHandles.handles[texIndices.albedoIndex],IN.texCoord);
 	fragColor[1] = vec4(bumpNormal.xyz * 0.5 + 0.5, 1.0);
 	fragColor[0].a = 1.0;
 	fragColor[1].a = 1.0;

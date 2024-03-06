@@ -116,7 +116,8 @@ void PickupGameObject::ActivatePickup(int playerNo) {
 void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 	//Simulate only in server
 	auto* sceneManager = SceneManager::GetSceneManager();
-	if (!sceneManager->IsServer()) {
+	bool isSinglePlayer = sceneManager->IsInSingleplayer();
+	if (!isSinglePlayer && !sceneManager->IsServer()) {
 		return;
 	}
 	if (mCooldown == 0){
@@ -124,8 +125,8 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 		//TODO(erendgrmnc): add player id here for multiplayer.
 		PlayerObject* playerObj = static_cast<PlayerObject*>(otherObject);
 		const int playerID = playerObj->GetPlayerID();
-		if (playerObj && mIsBuff ||
-			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID)) {
+		if (playerObj && (mIsBuff ||
+			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID))) {
 			ActivatePickup(playerID);
 		}
 	}
