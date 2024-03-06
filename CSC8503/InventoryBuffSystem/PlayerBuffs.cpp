@@ -6,6 +6,8 @@
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
 
+#include <algorithm>
+
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
 
@@ -41,6 +43,7 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	}
 };
 
+#ifdef USEGL
 //returns localPlayerID or 0 if singleplayer
 void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, const bool& toApply) {
 	int localPlayerId = 0;
@@ -55,6 +58,7 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 		}
 	}
 }
+#endif
 
 PlayerBuffs::buff PlayerBuffs::GetRandomBuffFromPool(unsigned int seed, std::vector<buff>* randomBuffPool){
 	std::random_device rd;

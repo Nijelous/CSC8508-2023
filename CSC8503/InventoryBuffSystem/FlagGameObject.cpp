@@ -61,11 +61,13 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 
 void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
 	switch (buffEvent) {
+#ifdef USEGL
 	case BuffEvent::flagSightApplied:
 		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
 		break;
 	case BuffEvent::flagSightRemoved:
 		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
+#endif
 	default:
 		break;
 	}

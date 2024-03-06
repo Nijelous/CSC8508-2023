@@ -26,6 +26,8 @@
 #include "UISystem.h"
 #include <filesystem>
 
+#ifdef USEGL
+
 
 namespace {
 	constexpr int NETWORK_ID_BUFFER_START = 10;
@@ -38,10 +40,17 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
+#ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
+#endif
+#ifdef USEPROSPERO
+	// use ps5 renderer
+#endif
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+#ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld);
+#endif
 	mUi = new UISystem();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
@@ -259,8 +268,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
+#ifdef USEGL
 	else {
-		if (!serverPlayersPtr){
+		if (!serverPlayersPtr) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 			serverPlayersPtr = game->GetServerPlayersPtr();
 		}
@@ -273,6 +283,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 		}
 	}
+#endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
@@ -1177,3 +1188,5 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 FlagGameObject* LevelManager::GetMainFlag() {
 	return mMainFlag;
 }
+
+#endif

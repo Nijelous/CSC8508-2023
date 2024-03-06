@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkState.h"
 
 using namespace NCL;
@@ -9,3 +10,4 @@ NetworkState::NetworkState()	{
 
 NetworkState::~NetworkState()	{
 }
+#endif

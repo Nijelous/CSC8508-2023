@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "GameTechRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -949,3 +951,4 @@ int GameTechRenderer::FindTexHandleIndex(const OGLTexture* tex) {
 	}
 	return -1;
 }
+#endif

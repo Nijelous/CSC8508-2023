@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkedGame.h"
 #include "NetworkPlayer.h"
 #include "NetworkObject.h"
@@ -188,3 +189,4 @@ void NetworkedGame::OnPlayerCollision(NetworkPlayer* a, NetworkPlayer* b) {
 void NetworkedGame::AddNetworkObjectToNetworkObjects(NetworkObject* networkObj) {
 	mNetworkObjects.push_back(networkObj);
 }
+#endif

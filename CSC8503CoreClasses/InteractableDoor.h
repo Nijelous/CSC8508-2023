@@ -17,7 +17,9 @@ namespace NCL {
 			bool CanBeInteractedWith(InteractType interactType) override;
 			void SetIsOpen(bool isOpen, bool isSettedByServer);
 			virtual void InitStateMachine() override;
+#ifdef USEGL
 			void SyncInteractableDoorStatusInMultiplayer();
+#endif
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:
