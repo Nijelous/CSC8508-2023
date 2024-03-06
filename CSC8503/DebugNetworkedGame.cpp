@@ -248,7 +248,7 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 }
 
 void DebugNetworkedGame::InitInGameMenuManager() {
-	auto* multiplayerLobby = new MultiplayerLobby(this);
+	MultiplayerLobby* multiplayerLobby = new MultiplayerLobby(this);
 	mPushdownMachine = new PushdownMachine(multiplayerLobby);
 }
 

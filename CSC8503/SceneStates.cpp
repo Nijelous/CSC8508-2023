@@ -47,7 +47,7 @@ PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownStat
 
 void SingleplayerState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Singleplayer);
-	auto* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
+	GameSceneManager* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
 }
 
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
@@ -55,9 +55,9 @@ PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** ne
 	bool isInMenuState = currentState == MenuState;
 	if (isInMenuState) {
 		*newState = new MainMenuSceneState();
-		auto* networkGame = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+		DebugNetworkedGame* networkGame = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 		if (networkGame->GetIsServer()) {
-			auto* server = networkGame->GetServer();
+			GameServer* server = networkGame->GetServer();
 			server->Shutdown();
 		}
 		return PushdownResult::Push;
@@ -68,7 +68,7 @@ PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** ne
 void ServerState::OnAwake(){
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
 	SceneManager::GetSceneManager()->SetIsServer(true);
-	auto* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
+	DebugNetworkedGame* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
 	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
 	server->StartAsServer();
 }
