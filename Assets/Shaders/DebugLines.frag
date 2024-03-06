@@ -1,6 +1,6 @@
-#version 420 core
+#version 460 core
 
-uniform sampler2D 	mainTex;
+#extension GL_ARB_bindless_texture : require
 
 in Vertex
 {

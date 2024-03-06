@@ -276,10 +276,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
-	mRenderer->FillLightUBO();
+	
 	
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
-
+	mRenderer->FillLightUBO();
+	mRenderer->FillTextureDataUBO();
 	delete[] levelSize;
 
 	mTimer = INIT_TIMER_VALUE;

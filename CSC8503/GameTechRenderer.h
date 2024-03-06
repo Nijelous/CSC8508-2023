@@ -39,6 +39,7 @@ namespace NCL {
 
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
+			Texture* LoadDebugTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
 			MeshAnimation* LoadAnimation(const std::string& name);
 			MeshMaterial* LoadMaterial(const std::string& name);
@@ -55,12 +56,25 @@ namespace NCL {
 				mInstanceTiles.push_back(cornerWallTile);
 			}
 			void FillLightUBO();
-
+			void FillTextureDataUBO();
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}		
 
 		protected:
+
+			enum BufferBlockNames {
+				camUBO,
+				staticDataUBO,
+				lightsUBO,
+				objectsUBO,
+				animFramesUBO,
+				iconUBO,				
+				textureDataUBO,
+				textureIdUBO,
+				cubeTexUBO,
+				MAX_UBO
+			};
 
 			/* (Author: B Schwarz) Data sent to a UBO buffer can be accessed reliably at offsets of 256 bytes, thus this struct is padded to 256.
 			Yes, this means it is 81.25% empty data.
@@ -83,14 +97,18 @@ namespace NCL {
 				float padding[27] = { 0.0f };				
 			};
 
-			enum BufferBlockNames {
-				camUBO,
-				staticDataUBO,
-				lightsUBO,
-				objectsUBO,
-				animFramesUBO,
-				iconUBO,
-				MAX_UBO
+			
+			struct TextureHandleData {
+				GLuint64 handles[128] = { 0 };
+			};
+
+			struct TextureHandleIndices {
+				int albedoIndex = 0;
+				int normalIndex = 0;
+				int depthIndex = 0;
+				int shadowIndex = 0;
+				int albedoLightIndex = 0;
+				int specLightIndex = 0;
 			};
 
 			void InitUBOBlocks();
@@ -102,9 +120,15 @@ namespace NCL {
 			void GenLightDataUBO();
 			void GenObjectDataUBO();
 			void GenAnimFramesUBOs();
-			void FillObjectDataUBO();
+			void FillObjectDataUBO();	
+			void CreateAndFillSkyboxUBO();
 			void NewRenderLines();
 			void NewRenderText();
+			void GenTextureDataUBO();
+			void GenTextureIndexUBO();
+			void UnbindAllTextures();
+			int FindTexHandleIndex(GLuint texId);
+			int FindTexHandleIndex(const OGLTexture* tex);
 
 			void RenderIcons(UISystem::Icon icon);
 			
@@ -136,10 +160,11 @@ namespace NCL {
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
 			void SetUIiconBufferSizes(size_t newVertCount);
-			void BindCommonLightDataToShader(OGLShader* shader);
 
 			vector<const RenderObject*> mActiveObjects;
-			vector<const RenderObject*> mOutlinedObjects;
+			vector<int> mOutlinedObjects;
+
+			vector<std::pair<GLuint, GLuint64>> mTextureHandles;
 
 			OGLShader*  mDebugLineShader;
 			OGLShader* mDebugTextShader;
