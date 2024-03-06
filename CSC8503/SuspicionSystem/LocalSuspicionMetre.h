@@ -12,7 +12,7 @@ namespace SuspicionSystem
 {
     const float DT_UNTIL_LOCAL_RECOVERY = 0.75f;
     class LocalSuspicionMetre :
-        public SuspicionMetre, public PlayerBuffsObserver
+        public SuspicionMetre, public PlayerBuffsObserver, public GlobalSuspicionObserver
     {
     public:
         const enum instantLocalSusCause
@@ -27,6 +27,7 @@ namespace SuspicionSystem
 
         LocalSuspicionMetre(GlobalSuspicionMetre* globalSusMeterPTR) {
             this->mGlobalSusMeterPTR = globalSusMeterPTR;
+            mGlobalSusMeterPTR->Attach(this);
             Init();
         }
 
@@ -39,6 +40,7 @@ namespace SuspicionSystem
         void RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         
 
+        virtual void UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint) override;
         virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent,int playerNo) override;
 
         float GetLocalSusMetreValue(const int &playerNo) {

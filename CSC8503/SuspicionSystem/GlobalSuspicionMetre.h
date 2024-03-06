@@ -58,7 +58,7 @@ namespace SuspicionSystem
 
         std::map<const continuousGlobalSusCause, const float>  mContinuousCauseSusSeverityMap =
         {
-            {passiveRecovery, -0.01f}
+            {passiveRecovery, -1.0f}
         };
 
         float mGlobalSusMeter;

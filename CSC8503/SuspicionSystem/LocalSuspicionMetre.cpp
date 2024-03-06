@@ -60,6 +60,14 @@ void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCau
 }
 
 
+void LocalSuspicionMetre::UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint){
+    for (int i = 0; i < NCL::CSC8503::MAX_PLAYERS; i++)
+    {
+        ChangePlayerLocalSusMetre(i, 0);
+        HandleLocalSusChangeNetworking(mPlayerMeters[i], i);
+    }
+}
+
 void LocalSuspicionMetre::UpdatePlayerBuffsObserver(const BuffEvent buffEvent, const int playerNo){
     switch (buffEvent)
     {

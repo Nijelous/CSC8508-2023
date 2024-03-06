@@ -155,6 +155,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 		}
 
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::N) &&
+			!Window::GetKeyboard()->KeyHeld(KeyCodes::SHIFT) &&
 			DEBUG_MODE) {
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
 		}
@@ -162,6 +163,12 @@ void NetworkPlayer::MovePlayer(float dt) {
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::M) &&
 			DEBUG_MODE) {
 			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::N) &&
+			Window::GetKeyboard()->KeyHeld(KeyCodes::SHIFT) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		}
 
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
