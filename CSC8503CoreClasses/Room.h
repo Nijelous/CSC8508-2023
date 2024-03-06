@@ -3,6 +3,8 @@
 #include "BaseLight.h"
 #include "Transform.h"
 #include "Door.h"
+#include <unordered_map>
+
 using namespace NCL::Maths;
 
 namespace NCL {
