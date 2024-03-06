@@ -3,7 +3,6 @@
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 
 using namespace SuspicionSystem;
 
@@ -14,6 +13,8 @@ void SuspicionSystem::GlobalSuspicionMetre::Init(){
 
 void GlobalSuspicionMetre::AddInstantGlobalSusCause(const instantGlobalSusCause &inCause){
     ChangePlayerGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
+    HandleGlobalSusChangeNetworking(mGlobalSusMeter);
+    Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
 }
 
 void GlobalSuspicionMetre::AddContinuousGlobalSusCause(const continuousGlobalSusCause &inCause){
@@ -35,6 +36,8 @@ void GlobalSuspicionMetre::RemoveContinuousGlobalSusCause(const continuousGlobal
 }
 void GlobalSuspicionMetre::SetMinGlobalSusMetre(const instantGlobalSusCause& inCause){
     SetMinGlobalSusMetre(mInstantCauseSusSeverityMap[inCause]);
+    HandleGlobalSusChangeNetworking(mGlobalSusMeter);
+    Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
 }
 ;
 
@@ -66,6 +69,10 @@ void GlobalSuspicionMetre::UpdateInventoryObserver(InventoryBuffSystem::Inventor
 }
 */
 void GlobalSuspicionMetre::Update(float dt){
+    if (mGlobalSusMeter == 0.0f &&
+        mContinuousGlobalSusCauseVector.size() == 0)
+        return;
+
     float unChangedSusValue = mGlobalSusMeter;
 
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
@@ -87,31 +94,18 @@ void GlobalSuspicionMetre::Update(float dt){
         HandleGlobalSusChangeNetworking(mGlobalSusMeter);
 }
 
-void GlobalSuspicionMetre::SyncSusChange(int localPlayerID, int changedValue){
-    mGlobalSusMeter = changedValue;
-}
-
 void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount){
-    SuspicionMetre::SusBreakpoint tempBreakpoint = SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter);
     mGlobalSusMeter += amount;
     mGlobalSusMeter = std::clamp(mGlobalSusMeter,
         0.0f,
         100.0f);
-    if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
-        Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
-    if (amount > 0)
-        mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
 }
 
 void GlobalSuspicionMetre::SetMinGlobalSusMetre(float amount) {
-    SuspicionMetre::SusBreakpoint tempBreakpoint = SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter);
     mGlobalSusMeter = std::max(amount, mGlobalSusMeter);
-    if (SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter) != tempBreakpoint)
-        Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
-    if (amount > 0)
-        mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
 }
-void HandleGlobalSusChangeNetworking(const int& changedValue){
+
+void GlobalSuspicionMetre::HandleGlobalSusChangeNetworking(const int& changedValue){
     int localPlayerId = 0;
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -124,3 +118,7 @@ void HandleGlobalSusChangeNetworking(const int& changedValue){
         }
     }
 };
+
+void GlobalSuspicionMetre::SyncSusChange(int localPlayerID, int changedValue) {
+    mGlobalSusMeter = changedValue;
+}

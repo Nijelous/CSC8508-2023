@@ -69,6 +69,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d){
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalActiveCause, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalSusChange, this);
+    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt){
