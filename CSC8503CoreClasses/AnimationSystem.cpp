@@ -161,7 +161,6 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh,
 			mAnimTexture = renderer.LoadTexture(path.c_str());
 			texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
 			std::cout << texID << endl;
-			NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
 		}
 		mMatTextures.emplace_back(texID);
 	}	
