@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkPlayer.h"
 
 #include "DebugNetworkedGame.h"
@@ -341,3 +342,4 @@ void NetworkPlayer::ControlInventory() {
 		Debug::Print(itemName, Vector2(10, 80));
 	}
 }
+#endif

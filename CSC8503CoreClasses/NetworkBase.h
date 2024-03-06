@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 //#include "./enet/enet.h"
 struct _ENetHost;
@@ -89,6 +90,8 @@ public:
 	void RegisterPacketHandler(int msgID, PacketReceiver* receiver) {
 		packetHandlers.insert(std::make_pair(msgID, receiver));
 	}
+
+	void ClearPacketHandlers();
 protected:
 	NetworkBase();
 	~NetworkBase();
@@ -112,3 +115,4 @@ protected:
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
+#endif

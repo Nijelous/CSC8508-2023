@@ -211,7 +211,6 @@ namespace NCL {
 
 			//Animation things
 			Shader* mShader;
-			Mesh* mMesh;
 			MeshAnimation* mAnim;
 			MeshMaterial* mMaterial;
 			vector<GLuint*>  mMatTextures;

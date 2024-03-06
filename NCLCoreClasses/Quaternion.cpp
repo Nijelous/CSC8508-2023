@@ -224,3 +224,31 @@ Vector3		Quaternion::operator *(const Vector3 &a)	const {
 	Quaternion newVec = *this * Quaternion(a.x, a.y, a.z, 0.0f) * Conjugate();
 	return Vector3(newVec.x, newVec.y, newVec.z);
 }
+
+Matrix4 Quaternion::RotationMatrix(const Quaternion& quat) {
+	Matrix4 mat;
+
+	float yy = quat.y * quat.y;
+	float zz = quat.z * quat.z;
+	float xy = quat.x * quat.y;
+	float zw = quat.z * quat.w;
+	float xz = quat.x * quat.z;
+	float yw = quat.y * quat.w;
+	float xx = quat.x * quat.x;
+	float yz = quat.y * quat.z;
+	float xw = quat.x * quat.w;
+
+	mat.array[0][0] = 1 - 2 * yy - 2 * zz;
+	mat.array[0][1] = 2 * xy + 2 * zw;
+	mat.array[0][2] = 2 * xz - 2 * yw;
+
+	mat.array[1][0] = 2 * xy - 2 * zw;
+	mat.array[1][1] = 1 - 2 * xx - 2 * zz;
+	mat.array[1][2] = 2 * yz + 2 * xw;
+
+	mat.array[2][0] = 2 * xz + 2 * yw;
+	mat.array[2][1] = 2 * yz - 2 * xw;
+	mat.array[2][2] = 1 - 2 * xx - 2 * yy;
+
+	return mat;
+}

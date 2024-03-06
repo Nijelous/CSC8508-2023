@@ -97,7 +97,7 @@ void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 }
 
 bool InteractableDoor::CanUseItem() {
-	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerObject* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
 	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
 
 	switch (usedItem) {
@@ -167,7 +167,7 @@ void InteractableDoor::InitStateMachine()
 		}
 	));
 }
-
+#ifdef USEGL
 void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
 	auto* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
@@ -181,6 +181,7 @@ void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
 		}
 	}
 }
+#endif
 
 void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) {
 	switch (susBreakpoint)

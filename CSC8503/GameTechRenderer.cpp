@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "GameTechRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -494,21 +496,28 @@ void GameTechRenderer::FillGBuffer() {
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	if (!mInstanceTiles.empty()) DrawWallsFloorsInstanced();
+	OGLShader* activeShader = nullptr;
+	OGLMesh* activeMesh = nullptr;
 
 	for (int i = 0; i < mActiveObjects.size(); i++) {
 		OGLShader* shader = (OGLShader*)mActiveObjects[i]->GetShader();
-		BindShader(*shader);
-		TextureHandleIndices texInds;
-		
+		if (activeShader != shader) {
+			activeShader = shader;
+			BindShader(*shader);
+		}		
+
+		OGLMesh* mesh = (OGLMesh*) mActiveObjects[i]->GetMesh();
+		if (activeMesh != mesh) {
+			BindMesh(*mesh);
+			activeMesh = mesh;
+		}
+		size_t layerCount = mesh->GetSubMeshCount();
+		TextureHandleIndices texInds;		
 
 		glBindBufferRange(GL_UNIFORM_BUFFER, objectsUBO, uBOBlocks[objectsUBO], i * sizeof(ObjectData), sizeof(float));
 		//Animation basic draw
 		if (mActiveObjects[i]->GetAnimationObject()) {
-			BindMesh((OGLMesh&)*mActiveObjects[i]->GetMesh());
-			mMesh = mActiveObjects[i]->GetMesh();
-			size_t layerCount = mMesh->GetSubMeshCount();
-			for (size_t b = 0; b < layerCount; ++b) {
-				
+			for (size_t b = 0; b < layerCount; ++b) {				
 				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
@@ -526,10 +535,7 @@ void GameTechRenderer::FillGBuffer() {
 			texInds.normalIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetNormalTexture());
 			glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
-			BindMesh((OGLMesh&)*mActiveObjects[i]->GetMesh());
-			size_t layerCount = mActiveObjects[i]->GetMesh()->GetSubMeshCount();
-			for (size_t b = 0; b < layerCount; ++b) {
-				
+			for (size_t b = 0; b < layerCount; ++b) {				
 				DrawBoundMesh((uint32_t)b);
 			}
 
@@ -552,13 +558,18 @@ void GameTechRenderer::DrawLightVolumes() {
 	texInds.depthIndex = FindTexHandleIndex(mGBufferDepthTex);
 	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
+	OGLShader* activeShader = nullptr;
+	BindMesh(*mSphereMesh);
 	for (int i = 0; i < mLights.size(); i++) {
+		OGLShader* shader = nullptr;
 		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * sizeof(LightData), sizeof(float));
-		if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
-		if (mLights[i]->GetType() == Light::Direction) BindShader(*((OGLShader*)(mDirLightShader)));
-		if (mLights[i]->GetType() == Light::Spot)BindShader(*((OGLShader*)(mSpotLightShader)));
-
-		BindMesh(*mSphereMesh);
+		if (mLights[i]->GetType() == Light::Point) shader = (OGLShader*) mPointLightShader;
+		if (mLights[i]->GetType() == Light::Direction) shader = (OGLShader*) mDirLightShader;
+		if (mLights[i]->GetType() == Light::Spot) shader = (OGLShader*)mSpotLightShader;
+		if (shader != activeShader) {
+			BindShader(*shader);
+			activeShader = shader;
+		}		
 		DrawBoundMesh();
 	}
 
@@ -949,3 +960,4 @@ int GameTechRenderer::FindTexHandleIndex(const OGLTexture* tex) {
 	}
 	return -1;
 }
+#endif

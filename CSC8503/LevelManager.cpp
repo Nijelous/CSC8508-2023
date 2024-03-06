@@ -26,6 +26,8 @@
 #include "UISystem.h"
 #include <filesystem>
 
+#ifdef USEGL
+
 
 namespace {
 	constexpr int NETWORK_ID_BUFFER_START = 10;
@@ -38,10 +40,17 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
+#ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
+#endif
+#ifdef USEPROSPERO
+	// use ps5 renderer
+#endif
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+#ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld);
+#endif
 	mUi = new UISystem();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
@@ -187,6 +196,7 @@ void LevelManager::ClearLevel() {
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
 	mGuardObjects.clear();
+	mCCTVTransformList.clear();
 
 	ResetEquippedIconTexture();
 }
@@ -212,11 +222,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	std::vector<Vector3> roomItemPositions;
+	std::vector<Transform> cctvPositions;
 	LoadMap((*mLevelList[levelID]).GetTileMap(), Vector3(0, 0, 0));
 	LoadVents((*mLevelList[levelID]).GetVents(), (*mLevelList[levelID]).GetVentConnections(), isMultiplayer);
 	LoadDoors((*mLevelList[levelID]).GetDoors(), Vector3(0, 0, 0), isMultiplayer);
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
-	LoadCCTVs((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
+	LoadCCTVList((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
 	mUpdatableObjects.push_back(prisonDoorPtr);
@@ -230,13 +241,15 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		std::mt19937 g(rd());
 		std::shuffle(mRoomList.begin(), mRoomList.end(), g);
 		switch ((*val).GetType()) {
+		case Small:
 		case Medium:
+		case Large:
 			for (Room* room : mRoomList) {
-				if (room->GetType() == Medium && room->GetDoorConfig() == (*val).GetDoorConfig()) {
+				if (room->GetType() == (*val).GetType() && room->GetDoorConfig() == (*val).GetDoorConfig()) {
 					LoadMap(room->GetTileMap(), key, (*val).GetPrimaryDoor() * 90);
 					LoadLights(room->GetLights(), key, (*val).GetPrimaryDoor() * 90);
 					LoadDoors(room->GetDoors(), key, isMultiplayer, (*val).GetPrimaryDoor() * 90);
-					LoadCCTVs(room->GetCCTVTransforms(), key, (*val).GetPrimaryDoor() * 90);
+					LoadCCTVList(room->GetCCTVTransforms(), key, (*val).GetPrimaryDoor() * 90);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
@@ -258,9 +271,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+		LoadCCTVs();
 	}
+#ifdef USEGL
 	else {
-		if (!serverPlayersPtr){
+		if (!serverPlayersPtr) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 			serverPlayersPtr = game->GetServerPlayersPtr();
 		}
@@ -273,6 +288,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 		}
 	}
+#endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
@@ -502,8 +518,17 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 }
 
 void LevelManager::LoadGuards(int guardCount) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, (*mLevelList[mActiveLevel]).GetGuardPaths().size() - 1);
+	std::set<int> pickedNumbers;
 	for (int i = 0; i < guardCount; i++) {
-		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		int pathIndex;
+		do {
+			pathIndex = dis(gen);
+		} while (pickedNumbers.count(pathIndex) > 0);
+		pickedNumbers.insert(pathIndex);
+		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[pathIndex], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
 		mGuardObjects.push_back(addedGuard);
 	}
 }
@@ -547,13 +572,22 @@ void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& cen
 	}
 }
 
-void LevelManager::LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation) {
+void LevelManager::LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation) {
 	for (int i = 0; i < transforms.size(); i++) {
 		Transform offsetTransform = Transform();
 		offsetTransform.SetPosition(transforms[i].GetPosition()).SetOrientation(transforms[i].GetOrientation());
 		offsetTransform.SetMatrix(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * offsetTransform.GetMatrix());
 		offsetTransform.SetPosition(offsetTransform.GetPosition() + startPosition);
-		AddCCTVToWorld(offsetTransform);
+		mCCTVTransformList.push_back(offsetTransform);
+	}
+}
+
+void LevelManager::LoadCCTVs() {
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(mCCTVTransformList.begin(), mCCTVTransformList.end(), g);
+	for (int i = 0; i < (*mLevelList[mActiveLevel]).GetCCTVCount(); i++) {
+		AddCCTVToWorld(mCCTVTransformList[i]);
 	}
 }
 
@@ -597,6 +631,10 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 	delete[] nearestPoint;
 	delete resultCount;
 	delete filter;
+}
+
+void LevelManager::SetGameState(GameStates state) {
+	mGameState = state;
 }
 
 void LevelManager::InitialiseIcons() {
@@ -1059,7 +1097,9 @@ void LevelManager::ResetEquippedIconTexture() {
 
 GameResults LevelManager::CheckGameWon() {
 	if (mTempPlayer && mHelipad) {
-		if (mHelipad->GetCollidingWithPlayer()) {
+		std::tuple<bool, int> colResult = mHelipad->GetCollidingWithPlayer();
+		bool isPlayerOnHelipad = std::get<0>(colResult);
+		if (isPlayerOnHelipad) {
 			if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(PlayerInventory::flag,0))
 				return GameResults(true, mTempPlayer->GetPoints());
 		}
@@ -1177,3 +1217,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 FlagGameObject* LevelManager::GetMainFlag() {
 	return mMainFlag;
 }
+
+Helipad* LevelManager::GetHelipad() {
+	return mHelipad;
+}
+#endif

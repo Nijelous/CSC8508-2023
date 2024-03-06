@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "NetworkBase.h"
 #include <stdint.h>
@@ -27,6 +28,8 @@ namespace NCL {
 			void WriteAndSendClientInputPacket(int lastId, const PlayerInputs& playerInputs);
 
 			void WriteAndSendClientUseItemPacket(int playerID, int objectID);
+
+			void Disconnect();
 		protected:
 			int mPeerId;
 			
@@ -36,3 +39,4 @@ namespace NCL {
 	}
 }
 
+#endif

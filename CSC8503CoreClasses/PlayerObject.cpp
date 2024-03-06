@@ -562,7 +562,7 @@ void PlayerObject::StartCrouching() {
 }
 
 void PlayerObject::ChangeCharacterSize(float newSize) {
-	dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(newSize);
+	static_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(newSize);
 }
 
 void PlayerObject::EnforceMaxSpeeds() {

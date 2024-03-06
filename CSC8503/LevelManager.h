@@ -1,6 +1,11 @@
 #pragma once
 #include "Level.h"
+#ifdef USEGL
 #include "GameTechRenderer.h"
+#endif
+#ifdef USEPROSPERO
+// include ps5 renderer
+#endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
@@ -72,7 +77,12 @@ namespace NCL {
 
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
+#ifdef USEGL
 			GameTechRenderer* GetRenderer() { return mRenderer; }
+#endif
+#ifdef USEPROSPERO
+			// get PS5 Renderer
+#endif
 
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
@@ -117,7 +127,11 @@ namespace NCL {
 
 			FlagGameObject* GetMainFlag();
 
+			Helipad* GetHelipad(); 
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
+
+			void SetGameState(GameStates state);
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -140,7 +154,9 @@ namespace NCL {
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false, int rotation = 0);
 
-			void LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
+			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
+
+			void LoadCCTVs();
 
 			void LoadDoorsInNavGrid();
 
@@ -180,10 +196,17 @@ namespace NCL {
 			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
+#ifdef USEGL
 			GameTechRenderer* mRenderer;
+#endif
+#ifdef USEPROSPERO
+			// define PS5 renderer
+#endif
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
+#ifdef USEGL // remove when converted to PS5 also
 			AnimationSystem* mAnimation;
+#endif
 
 			SoundManager* mSoundManager;
 
@@ -252,8 +275,13 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 
+#ifdef USEGL
 			vector<GLuint>  mGuardTextures;
 			vector<GLuint> mPlayerTextures;
+#endif
+#ifdef USEPROSPERO
+			// PSSL textures
+#endif
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
@@ -274,6 +302,7 @@ namespace NCL {
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
 			std::vector<GuardObject*> mGuardObjects;
+			std::vector<Transform> mCCTVTransformList;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;

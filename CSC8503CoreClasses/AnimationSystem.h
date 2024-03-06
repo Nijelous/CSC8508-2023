@@ -1,4 +1,7 @@
 #pragma once
+
+#ifdef USEGL
+
 #include "GameWorld.h"
 #include "MeshAnimation.h"
 #include "RenderObject.h"
@@ -53,3 +56,4 @@ namespace NCL {
 		};
 	}
 }
+#endif

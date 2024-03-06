@@ -120,16 +120,17 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
-		if (PlayerObject* playerObj = dynamic_cast<PlayerObject*>(obj)) {
+		if (obj->GetCollisionLayer() == CollisionLayer::Player) {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-		else if (GuardObject* guardObj = dynamic_cast<GuardObject*>(obj)) {
+		else if (obj->GetName() == "Guard") {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
+#ifdef USEGL
 		else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
 			bool isOpen = obj->GetSoundObject()->GetisTiggered();
 			if (isOpen) {
@@ -142,6 +143,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->CloseDoorFinished();
 			}
 		}
+#endif
 	}
 	mSystem->update();
 }

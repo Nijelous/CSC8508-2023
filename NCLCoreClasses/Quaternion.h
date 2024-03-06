@@ -114,6 +114,8 @@ namespace NCL::Maths {
 
 		inline friend std::ostream& operator <<(std::ostream& o, const Quaternion& q);
 		inline friend std::istream& operator >>(std::istream& i, Quaternion &v);
+
+		static Matrix4 RotationMatrix(const Quaternion& quat);
 	};
 
 	std::ostream& operator<<(std::ostream& o, const Quaternion& q) {
