@@ -395,16 +395,16 @@ void PhysicsSystem::BroadPhase() {
 			for (auto j = std::next(i); j != data.end(); j++) {
 				info.a = std::min((*i).object, (*j).object);
 				info.b = std::max((*i).object, (*j).object);
-				if ((info.a->GetCollisionLayer() & Player && info.b->GetCollisionLayer() & Collectable) || 
-					(info.b->GetCollisionLayer() & Player && info.a->GetCollisionLayer() & Collectable)) {
-					int test = 12;
-				}
 				if (info.a->GetCollisionLayer() & NoCollide || info.b->GetCollisionLayer() & NoCollide) {
 					continue;
 				}
 				if (info.a->GetCollisionLayer() & STATIC_COLLISION_LAYERS && info.b->GetCollisionLayer() & STATIC_COLLISION_LAYERS) {
 					continue;
-				}				
+				}
+				if ((info.a->GetCollisionLayer() & Npc && info.b->GetCollisionLayer() & Collectable) ||
+					(info.a->GetCollisionLayer() & Collectable && info.b->GetCollisionLayer() & Npc)) {
+					continue;
+				}
 				mBroadphaseCollisions.insert(info);
 			}
 		}

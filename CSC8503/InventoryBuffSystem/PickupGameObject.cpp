@@ -125,8 +125,8 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 		//TODO(erendgrmnc): add player id here for multiplayer.
 		PlayerObject* playerObj = static_cast<PlayerObject*>(otherObject);
 		const int playerID = playerObj->GetPlayerID();
-		if (playerObj && mIsBuff ||
-			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID)) {
+		if (playerObj && (mIsBuff ||
+			!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID))) {
 			ActivatePickup(playerID);
 		}
 	}
