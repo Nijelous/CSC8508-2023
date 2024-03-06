@@ -109,7 +109,7 @@ void PlayerObject::UpdateObject(float dt) {
 		}
 
 		if (previousObjectState != mObjectState)
-			ChangeActiveSusCausesBasedOnState(previousObjectState);
+			ChangeActiveSusCausesBasedOnState(previousObjectState,mObjectState);
 	}
 
 	AttachCameraToPlayer(mGameWorld);
@@ -167,7 +167,7 @@ void PlayerObject::ShowDebugInfo(float dt)
 	Debug::Print(usesLeft, Vector2(10, 85));
 }
 
-void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState){
+void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState, const GameObjectState& currentState){
 	switch (previousState) {
 	case Walk:
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
@@ -179,7 +179,7 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 		break;
 	}
 
-	switch (mObjectState) {
+	switch (currentState) {
 	case Walk:
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
 		break;

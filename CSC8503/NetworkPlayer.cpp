@@ -181,7 +181,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 		HandleMovement(dt, mPlayerInputs);
 
 		if (previousObjectState != mObjectState)
-			ChangeActiveSusCausesBasedOnState(previousObjectState);
+			ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
 
 		mIsClientInputReceived = false;
 	}
