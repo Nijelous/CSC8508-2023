@@ -14,7 +14,7 @@ public:
 		Direction
 	};
 
-	virtual ~Light() = 0 {};
+	virtual ~Light() = 0;
 	Vector4 GetColour() const { 
 		return mColour; 
 	}
