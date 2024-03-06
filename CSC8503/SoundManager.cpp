@@ -33,18 +33,34 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
+	mResult = mSystem->createSound("../Assets/Sounds/closing-door-2-www.FesliyanStudios.com.mp3", FMOD_3D, 0, &mDoorCloseSound);
 	if (mResult != FMOD_OK) {
-		std::cout<<"Attenuation Setting error" << std::endl;
+		std::cout << "!! Create Door Close Sound Error !!" << std::endl;
 		return;
 	}
 
-	//TO_DO
-	//footStepSound->setMode(FMOD_3D);
+	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mDoorOpenSound->set3DMinMaxDistance(20.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Door Open Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mDoorCloseSound->set3DMinMaxDistance(20.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
+		return;
+	}
 }
 
 SoundManager::~SoundManager() {
 	mDoorOpenSound->release();
+	mDoorCloseSound->release();
 	mFootStepSound->release();
 	mSystem->close();
 	mSystem->release();
@@ -61,18 +77,40 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 	return footStepChannel;
 }
 
-FMOD::Channel* SoundManager::AddDoorOpenSound() {
+void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
 	FMOD::Channel* doorOpenChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mDoorOpenSound, 0, true, &doorOpenChannel);
 	if (mResult != FMOD_OK) {
 		std::cout << "Play Door Open sound error" << std::endl;
-		return nullptr;
+		return;
 	}
-	return doorOpenChannel;
+	mResult = doorOpenChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Open position setting error" << std::endl;
+		return;
+	}
+	doorOpenChannel->setPaused(false);
+}
+
+void SoundManager::PlayDoorCloseSound(Vector3 soundPos) {
+	FMOD::Channel* doorCloseChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mDoorCloseSound, 0, true, &doorCloseChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = doorCloseChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	doorCloseChannel->setPaused(false);
 }
 
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
-	SetListenerAttributes();
+	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		if (PlayerObject* playerObj = dynamic_cast<PlayerObject*>(obj)) {
@@ -85,13 +123,18 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-		//TO DO
-		//else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
-		//	FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
-		//	//bool isOpen;
-		//	//std::cout << isOpen << std::endl;
-		//	//UpdateOpenDoorSound(isOpen, soundPos, channel);
-		//}
+		else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
+			bool isOpen = obj->GetSoundObject()->GetisTiggered();
+			if (isOpen) {
+				PlayDoorOpenSound(soundPos);
+				obj->GetSoundObject()->SetNotTriggered();
+			}
+			bool isClose = obj->GetSoundObject()->GetIsClosed();
+			if (isClose) {
+				PlayDoorCloseSound(soundPos);
+				obj->GetSoundObject()->CloseDoorFinished();
+			}
+		}
 	}
 	mSystem->update();
 }
@@ -133,25 +176,7 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 	}
 }
 
-void SoundManager::UpdateOpenDoorSound(bool isOpen, Vector3 soundPos, FMOD::Channel* channel) {
-	if ((mTempIsOpen != isOpen) && (mTempIsOpen == false)) {
-		FMOD_VECTOR pos = ConvertVector(soundPos);
-		if (channel) {
-			channel->set3DAttributes(&pos, nullptr);
-			//channel->setPosition(0, FMOD_TIMEUNIT_MS);  To Do
-			channel->setPaused(false);
-		}
-		mTempIsOpen = isOpen;
-	}
-	else if (mTempIsOpen != isOpen) {
-		mTempIsOpen = isOpen;
-	}
-	/*channel->setPaused(false);             to do
-	mResult = channel->setLoopCount(2);
-	mSystem->update();*/
-}
-
-void SoundManager::SetListenerAttributes() {
+void SoundManager::UpdateListenerAttributes() {
 	FMOD_VECTOR camPos = ConvertVector(mGameWorld->GetMainCamera().GetPosition());
 	Vector3 forward = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 right = mGameWorld->GetMainCamera().GetRightVector();

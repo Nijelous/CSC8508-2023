@@ -4,15 +4,26 @@
 
 using namespace NCL::CSC8503;
 
-Room::Room(int type) {
+Room::Room(int type, int doorPos, int primaryDoor) {
 	switch (type) {
 	case 0:
+		mType = Small;
+		break;
+	case 1:
 		mType = Medium;
+		break;
+	case 2:
+		mType = Large;
+		break;
+	case 3:
+		mType = LShape;
 		break;
 	default:
 		mType = INVALID;
 		break;
 	}
+	mDoorConfig = doorPos;
+	mPrimaryDoor = primaryDoor;
 }
 
 Room::Room(std::string roomPath) {
