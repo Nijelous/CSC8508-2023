@@ -8,6 +8,8 @@
 
 using namespace NCL::CSC8503;
 
+#ifdef USEGL
+
 void MainMenuSceneState::OnAwake() {	
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
 }
@@ -79,3 +81,4 @@ void ClientState::OnAwake() {
 	//Localhost IP
 	client->StartAsClient(127, 0, 0, 1);
 }
+#endif
