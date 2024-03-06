@@ -36,6 +36,7 @@ namespace NCL{
 			FMOD::Sound* mFootStepSound = nullptr;
 			FMOD::Sound* mDoorOpenSound = nullptr;
 			FMOD::Sound* mDoorCloseSound = nullptr;
+			FMOD::Sound* mSoundEmitterSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

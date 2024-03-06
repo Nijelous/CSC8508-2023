@@ -39,6 +39,12 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mDoorCloseSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Sound Emitter Sound Error !!" << std::endl;
+		return;
+	}
+
 	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
@@ -62,6 +68,7 @@ SoundManager::~SoundManager() {
 	mDoorOpenSound->release();
 	mDoorCloseSound->release();
 	mFootStepSound->release();
+	mSoundEmitterSound->release();
 	mSystem->close();
 	mSystem->release();
 }
