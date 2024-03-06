@@ -113,6 +113,12 @@ namespace NCL::CSC8503 {
 		ClientSyncLocalSusChangePacket(int playerID, int changedValue);
 	};
 
+	struct ClientSyncGlobalSusChangePacket : public GamePacket {
+		int changedValue;
+
+		ClientSyncGlobalSusChangePacket(int changedValue);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

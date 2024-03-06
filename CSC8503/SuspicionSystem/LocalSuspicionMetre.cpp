@@ -20,6 +20,7 @@ void LocalSuspicionMetre::Init(){
 
 void LocalSuspicionMetre::AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo){
     ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
+    HandleLocalSusChangeNetworking(mPlayerMeters[playerNo], playerNo);
 };
 
 bool SuspicionSystem::LocalSuspicionMetre::IsActiveSusCauseForPlayer(const activeLocalSusCause& inCause, const int& playerNo)
@@ -110,8 +111,6 @@ void LocalSuspicionMetre::Update(float dt) {
 }
 
 void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause inCause, bool toApply){
-    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-    const bool isServer = game->GetIsServer();
     if (localPlayerID != playerID)
         return;
 
@@ -142,8 +141,6 @@ void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue
 }
 
 void LocalSuspicionMetre::SyncSusChange(int playerID, int localPlayerID, int changedValue){
-    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-    const bool isServer = game->GetIsServer();
     if (localPlayerID != playerID)
         return;
     mPlayerMeters[playerID] = changedValue;

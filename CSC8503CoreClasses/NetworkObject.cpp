@@ -99,6 +99,13 @@ ClientSyncLocalSusChangePacket::ClientSyncLocalSusChangePacket(int playerID, int
 	this->changedValue = changedValue;
 }
 
+ClientSyncGlobalSusChangePacket::ClientSyncGlobalSusChangePacket(int changedValue) {
+	type = BasicNetworkMessages::ClientSyncGlobalSusChange;
+	size = sizeof(ClientSyncGlobalSusChangePacket);
+
+	this->changedValue = changedValue;
+}
+
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
 	this->firstItemUsage = firstItemUsage;
 	this->secondItemUsage = secondItemUsage;

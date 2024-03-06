@@ -1,5 +1,9 @@
 #include "GlobalSuspicionMetre.h"
 #include <algorithm>
+#include "NetworkObject.h"
+#include "../DebugNetworkedGame.h"
+#include "../SceneManager.h"
+#include "../CSC8503/LevelManager.h"
 
 using namespace SuspicionSystem;
 
@@ -62,20 +66,29 @@ void GlobalSuspicionMetre::UpdateInventoryObserver(InventoryBuffSystem::Inventor
 }
 */
 void GlobalSuspicionMetre::Update(float dt){
+    float unChangedSusValue = mGlobalSusMeter;
 
     for (continuousGlobalSusCause thisCause : mContinuousGlobalSusCauseVector)
     {
         ChangePlayerGlobalSusMetre(mContinuousCauseSusSeverityMap[thisCause]);
     }
 
-    if (mGlobalRecoveryCooldown == DT_UNTIL_GlOBAL_RECOVERY)
-        RemoveContinuousGlobalSusCause(passiveRecovery);
+    if (mGlobalSusMeter <= unChangedSusValue) {
+        if (mGlobalRecoveryCooldown == 0.0f)
+            ChangePlayerGlobalSusMetre(mContinuousCauseSusSeverityMap[passiveRecovery] * dt);
+        else
+            mGlobalRecoveryCooldown = std::max(mGlobalRecoveryCooldown - dt, 0.0f);
+    }
+    else {
+        mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
+    }
 
-    mGlobalRecoveryCooldown -= dt;
-    mGlobalRecoveryCooldown = std::max(mGlobalRecoveryCooldown, 0.0f);
+    if ((int)(mGlobalSusMeter) != (int)(unChangedSusValue))
+        HandleGlobalSusChangeNetworking(mGlobalSusMeter);
+}
 
-    if (mGlobalRecoveryCooldown == 0)
-        AddContinuousGlobalSusCause(passiveRecovery);
+void GlobalSuspicionMetre::SyncSusChange(int localPlayerID, int changedValue){
+    mGlobalSusMeter = changedValue;
 }
 
 void GlobalSuspicionMetre::ChangePlayerGlobalSusMetre(float amount){
@@ -97,4 +110,17 @@ void GlobalSuspicionMetre::SetMinGlobalSusMetre(float amount) {
         Notify(SuspicionMetre::GetSusBreakpoint(mGlobalSusMeter));
     if (amount > 0)
         mGlobalRecoveryCooldown = DT_UNTIL_GlOBAL_RECOVERY;
+}
+void HandleGlobalSusChangeNetworking(const int& changedValue){
+    int localPlayerId = 0;
+    DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+    if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+        const auto* localPlayer = game->GetLocalPlayer();
+        localPlayerId = localPlayer->GetPlayerID();
+
+        const bool isServer = game->GetIsServer();
+        if (isServer) {
+            game->SendClientSyncGlobalSusChangePacket(changedValue);
+        }
+    }
 };
