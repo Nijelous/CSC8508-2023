@@ -6,6 +6,8 @@
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
 
+#include <algorithm>
+
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
 

@@ -951,3 +951,4 @@ int GameTechRenderer::FindTexHandleIndex(const OGLTexture* tex) {
 	}
 	return -1;
 }
+#endif
