@@ -1,7 +1,6 @@
-#version 420 core
+#version 460 core
 
-uniform mat4 modelMatrix 	= mat4(1.0f);
-uniform mat4 shadowMatrix 	= mat4(1.0f);
+#extension GL_ARB_bindless_texture : require
 
 layout(location = 0) in vec3 position;
 

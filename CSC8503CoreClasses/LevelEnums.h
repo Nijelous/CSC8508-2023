@@ -7,7 +7,10 @@ namespace NCL {
 			CornerWall
 		};
 		enum RoomType {
+			Small,
 			Medium,
+			Large,
+			LShape,
 			INVALID
 		};
 

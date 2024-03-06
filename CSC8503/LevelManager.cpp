@@ -226,14 +226,17 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 
 	for (auto const& [key, val] : (*mLevelList[levelID]).GetRooms()) {
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(mRoomList.begin(), mRoomList.end(), g);
 		switch ((*val).GetType()) {
 		case Medium:
 			for (Room* room : mRoomList) {
-				if (room->GetType() == Medium) {
-					LoadMap(room->GetTileMap(), key);
-					LoadLights(room->GetLights(), key);
-					LoadDoors(room->GetDoors(), key, isMultiplayer);
-					LoadCCTVs(room->GetCCTVTransforms(), key);
+				if (room->GetType() == Medium && room->GetDoorConfig() == (*val).GetDoorConfig()) {
+					LoadMap(room->GetTileMap(), key, (*val).GetPrimaryDoor() * 90);
+					LoadLights(room->GetLights(), key, (*val).GetPrimaryDoor() * 90);
+					LoadDoors(room->GetDoors(), key, isMultiplayer, (*val).GetPrimaryDoor() * 90);
+					LoadCCTVs(room->GetCCTVTransforms(), key, (*val).GetPrimaryDoor() * 90);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
@@ -273,10 +276,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
-	mRenderer->FillLightUBO();
+	
 	
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
-
+	mRenderer->FillLightUBO();
+	mRenderer->FillTextureDataUBO();
 	delete[] levelSize;
 
 	mTimer = INIT_TIMER_VALUE;
@@ -423,9 +427,9 @@ void LevelManager::InitialiseAssets() {
 	mSilentRunTex = mRenderer->LoadTexture("Silence.png");
 	mSlowDownTex = mRenderer->LoadTexture("SpeedDown.png");
 	mStunTex = mRenderer->LoadTexture("Stun.png");
-
 	mCrossTex = mRenderer->LoadTexture("Cross.png");
 
+	mAlarmTex = mRenderer->LoadTexture("Alarm.png");
 	
 	mKeyIconTex3 = mRenderer->LoadTexture("key3.png");
 	mKeyIconTex2 = mRenderer->LoadTexture("key2.png");
@@ -454,10 +458,12 @@ void LevelManager::InitialiseAssets() {
 	mSuspicionIndicatorTex = mRenderer->LoadTexture("SuspensionIndicator.png");
 }
 
-void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition) {
+void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
 	for (auto const& [key, val] : tileMap) {
 		Transform offsetKey = Transform();
-		offsetKey.SetPosition(key.GetPosition() + startPosition).SetOrientation(key.GetOrientation());
+		offsetKey.SetPosition(key.GetPosition()).SetOrientation(key.GetOrientation());
+		offsetKey.SetMatrix(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * offsetKey.GetMatrix());
+		offsetKey.SetPosition(offsetKey.GetPosition() + startPosition);
 		switch (val) {
 		case Wall:
 			AddWallToWorld(offsetKey);
@@ -472,16 +478,19 @@ void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMa
 	}
 }
 
-void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre) {
+void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation) {
 	for (int i = 0; i < lights.size(); i++) {
 		if (lights[i]->GetType() == Light::Point) {
 			auto* pl = dynamic_cast<PointLight*>(lights[i]);
-			PointLight* newPL = new PointLight(pl->GetPosition() + centre, pl->GetColour(), pl->GetRadius());
+			PointLight* newPL = new PointLight((Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * (pl->GetPosition())) + centre,
+				pl->GetColour(), pl->GetRadius());
 			mRenderer->AddLight(newPL);
 		}
 		else if (lights[i]->GetType() == Light::Spot) {
 			auto* sl = dynamic_cast<SpotLight*>(lights[i]);
-			SpotLight* newSL = new SpotLight(sl->GetDirection(), sl->GetPosition() + centre, sl->GetColour(), sl->GetRadius(), sl->GetAngle(), 2);
+			SpotLight* newSL = new SpotLight(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * sl->GetDirection(), 
+				(Matrix4::Rotation(rotation, Vector3(0, 1, 0)) * (sl->GetPosition())) + centre,
+				sl->GetColour(), sl->GetRadius(), sl->GetAngle(), 2);
 			mRenderer->AddLight(newSL);
 		}
 		else {
@@ -527,17 +536,23 @@ void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> v
 	}
 }
 
-void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel) {
+void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel, int rotation) {
 	for (int i = 0; i < doors.size(); i++) {
-		InteractableDoor* interactableDoorPtr = AddDoorToWorld(doors[i], centre, isMultiplayerLevel);
+		Transform doorTransform = Transform();
+		doorTransform.SetPosition(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * doors[i]->GetTransform().GetPosition())
+			.SetOrientation(Quaternion::EulerAnglesToQuaternion(0, rotation, 0) * doors[i]->GetTransform().GetOrientation());
+		doorTransform.SetScale((doorTransform.GetOrientation() * Vector3(1, 9, 9)).Abs());
+		InteractableDoor* interactableDoorPtr = AddDoorToWorld(doorTransform, centre, isMultiplayerLevel);
 		mUpdatableObjects.push_back(interactableDoorPtr);
 	}
 }
 
-void LevelManager::LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition) {
+void LevelManager::LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation) {
 	for (int i = 0; i < transforms.size(); i++) {
 		Transform offsetTransform = Transform();
-		offsetTransform.SetPosition(transforms[i].GetPosition() + startPosition).SetOrientation(transforms[i].GetOrientation());
+		offsetTransform.SetPosition(transforms[i].GetPosition()).SetOrientation(transforms[i].GetOrientation());
+		offsetTransform.SetMatrix(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * offsetTransform.GetMatrix());
+		offsetTransform.SetPosition(offsetTransform.GetPosition() + startPosition);
 		AddCCTVToWorld(offsetTransform);
 	}
 }
@@ -606,14 +621,17 @@ void LevelManager::InitialiseIcons() {
 	mUi->SetEquippedItemIcon(SPEED_BUFF_SLOT, *mSpeedIcon);
 
 	//suspicion
-	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspicionBarTex, 0.3);
+	UISystem::Icon* mSuspisionBarIcon = mUi->AddIcon(Vector2(90, 15), 3, 75, mLowSuspicionBarTex, 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_BAR_SLOT, *mSuspisionBarIcon);
 
-	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspicionIndicatorTex, 0.3);
+	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mSuspicionIndicatorTex, 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_INDICATOR_SLOT, *mSuspisionIndicatorIcon);
 
 	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mCrossTex,0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
+
+	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mAlarmTex, 0.0);
+	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
 	mRenderer->SetUIObject(mUi);
 
@@ -803,25 +821,19 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	return newVent;
 }
 
-InteractableDoor* LevelManager::AddDoorToWorld(Door* door, const Vector3& offset, bool isMultiplayerLevel) {
+InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const Vector3& offset, bool isMultiplayerLevel) {
 	InteractableDoor* newDoor = new InteractableDoor();
-	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
-	if (abs(door->GetTransform().GetOrientation().y) == 1 || abs(door->GetTransform().GetOrientation().w) == 1) {
-		AABBVolume* volume = new AABBVolume(size);
-		newDoor->SetBoundingVolume((CollisionVolume*)volume);
-	}
-	else {
-		AABBVolume* volume = new AABBVolume(Vector3(4.5f, 4.5f, 0.5f));
-		newDoor->SetBoundingVolume((CollisionVolume*)volume);
-	}
+
+	AABBVolume* volume = new AABBVolume(transform.GetScale()/2);
+	newDoor->SetBoundingVolume((CollisionVolume*)volume);
 
 	newDoor->GetTransform()
-		.SetPosition(door->GetTransform().GetPosition() + offset)
-		.SetOrientation(door->GetTransform().GetOrientation())
-		.SetScale(size * 2);
+		.SetPosition(transform.GetPosition() + offset)
+		.SetOrientation(transform.GetOrientation())
+		.SetScale(Vector3(1, 9, 9));
 
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mCubeMesh, mBasicTex, mFloorNormal, mBasicShader,
-		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
+		std::sqrt(std::pow(transform.GetScale().y/2, 2) + std::powf(transform.GetScale().z / 2, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
 	newDoor->SetSoundObject(new SoundObject());
 
@@ -1092,10 +1104,10 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
-	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 5));
+
+	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 10));
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
-
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);

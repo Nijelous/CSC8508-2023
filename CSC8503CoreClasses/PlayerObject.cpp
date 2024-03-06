@@ -112,29 +112,32 @@ void PlayerObject::UpdateObject(float dt) {
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
 	MatchCameraRotation(yawValue);
 
-	if (mPlayerSpeedState == SpedUp)
+	if (mPlayerSpeedState == SpedUp) {
 		EnforceSpedUpMaxSpeeds();
-	else
+	}
+	else {
 		EnforceMaxSpeeds();
+	}
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
 
-	if (DEBUG_MODE)
-	{
-		//It have some problem here
-		mUiTime = mUiTime + dt;
-		mUiTime = std::fmod(mUiTime, 1.0f);
-		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-		mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[0];
-		if (mSusValue > 33) {
-			mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[1];
-			if (mSusValue > 66) {
-				mUi->GetIcons()[6]->mTexture = mUi->GetSusBarTexVec()[2];
-			}
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+			mAlarmTime = mAlarmTime + dt;
 		}
-		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-		float iconValue = 100.00 - (mSusValue*0.7+14.00);
-		mLastSusValue = mSusValue;
-		mUi->SetIconPosition(Vector2(90.00, iconValue),*mUi->GetIcons()[7]);
+	}
+	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
+
+	if (DEBUG_MODE){
 		Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
 		), Vector2(70, 90));
@@ -402,27 +405,27 @@ void PlayerObject::ControlInventory() {
 	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
 	Debug::Print(usesLeft, Vector2(10, 85));
 
-	if (mActiveItemSlot == 0) {
+	if (mActiveItemSlot == FIRST_ITEM_SLOT) {
 		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[0];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
 		}
 		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[1];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
 		}
 		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[0]->mTexture = mUi->GetKeyTexVec()[2];
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
 		}
 	}
 
-	if (mActiveItemSlot == 1) {
+	if (mActiveItemSlot == SECOND_ITEM_SLOT) {
 		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[0];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
 		}
 		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[1];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
 		}
 		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[1]->mTexture = mUi->GetKeyTexVec()[2];
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
 		}
 	}
 	
@@ -580,6 +583,24 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+float PlayerObject::SusLinerInterpolation(float dt)
+{
+	if (dt * mUiTime < 0.6) {
+		mUiTime++;
+		tempSusValue = tempSusValue + (mSusValue - mLastSusValue) * 0.016;
+		if (tempSusValue < 0.016) {
+			tempSusValue = 0;
+		}
+	}
+	else {
+		mUiTime = 1;
+		mLastSusValue = tempSusValue;
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+	}
+	float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
+	return iconValue;
 }
 
 bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject){
