@@ -460,7 +460,7 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	default:
 		break;
 	}
-
+	netPlayer->SetPrisonDoor(mLevelManager->GetPrisonDoor());
 	netPlayer->GetRenderObject()->SetColour(colour);
 	return netPlayer;
 }

@@ -227,8 +227,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	LoadCCTVs((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
-	mUpdatableObjects.push_back(prisonDoorPtr);
+	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	mUpdatableObjects.push_back(mPrisonDoor);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
 		itemPositions.push_back(itemPos);
@@ -261,12 +261,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadDoorsInNavGrid();
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 
-		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 	}
 #ifdef USEGL
 	else {
@@ -282,6 +280,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 		}
+
+		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 	}
 #endif
   
@@ -512,9 +512,9 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 	}	
 }
 
-void LevelManager::LoadGuards(int guardCount) {
+void LevelManager::LoadGuards(int guardCount, bool isInMultiplayer) {
 	for (int i = 0; i < guardCount; i++) {
-		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[i], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard", isInMultiplayer);
 		mGuardObjects.push_back(addedGuard);
 	}
 }
@@ -612,6 +612,34 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 
 void LevelManager::SetGameState(GameStates state) {
 	mGameState = state;
+}
+
+PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
+	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
+	PlayerObject* returnObj = &firstPlayer;
+	const Vector3& firstPos = firstPlayer.GetTransform().GetPosition();
+	float minDistance = sqrt((startPos.x - firstPos.x) * (startPos.x - firstPos.x) +
+		(startPos.z - firstPos.z) * (startPos.z - firstPos.z));
+
+	for (int i = 1; i < serverPlayersPtr->size(); i++) {
+		NetworkPlayer* serverPlayer = serverPlayersPtr->at(i);
+		if (serverPlayer != nullptr) {
+			const Vector3& playerPos = serverPlayer->GetTransform().GetPosition();
+
+			float distance = sqrt((startPos.x - playerPos.x) * (startPos.x - playerPos.x) +
+				(startPos.z - playerPos.z) * (startPos.z - playerPos.z));
+			if (distance < minDistance) {
+				minDistance = distance;
+				returnObj = serverPlayer;
+			}
+		}
+		
+	}
+	return returnObj;
+}
+
+PrisonDoor* LevelManager::GetPrisonDoor() const {
+	return mPrisonDoor;
 }
 
 void LevelManager::InitialiseIcons() {
@@ -1106,7 +1134,7 @@ void LevelManager::AddUpdateableGameObject(GameObject& object){
 	mUpdatableObjects.push_back(&object);
 }
 
-GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName) {
+GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer) {
 	GuardObject* guard = new GuardObject(guardName);
 	
 	float meshSize = PLAYER_MESH_SIZE;
@@ -1133,9 +1161,17 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	guard->SetCollisionLayer(Npc);
 
-	guard->SetPlayer(mTempPlayer);
+
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
+
+	if (isInMultiplayer) {
+		AddNetworkObject(*guard);
+	}
+	else {
+		guard->SetPlayer(mTempPlayer);
+	}
+
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
 
