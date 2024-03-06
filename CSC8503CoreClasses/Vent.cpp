@@ -58,7 +58,6 @@ void Vent::HandleItemUse(GameObject* userObj) {
 }
 
 void Vent::SyncVentStatusInMultiplayer() const {
-# ifdef USEGL
 	auto* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 	if (networkedGame) {
@@ -70,7 +69,6 @@ void Vent::SyncVentStatusInMultiplayer() const {
 			networkedGame->GetServer()->SendGlobalPacket(packet);
 		}
 	}
-#endif
 }
 
 void Vent::SetIsOpen(bool isOpen, bool isSettedByServer) {

@@ -134,7 +134,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     ################################################################################
     add_executable(${PROJECT_NAME}  ${ALL_FILES})
 
-    #use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
+    use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
     set(ROOT_NAMESPACE CSC8503)
 
     set_target_properties(${PROJECT_NAME} PROPERTIES

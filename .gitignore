@@ -17,8 +17,6 @@ install_manifest.txt
 compile_commands.json
 CTestTestfile.cmake
 _deps 
-CSC8503/Debug
-CSC8503CoreClasses/Debug
 CSC8503CoreClasses/CSC8503CoreClasses.dir/Debug
 ALL_BUILD.vcxproj
 ALL_BUILD.vcxproj.filters
@@ -54,7 +52,7 @@ OpenGLRendering/OpenGLRendering.dir/Release
 
 x64/Debug/
 x64/Release/
-CSC8508.sln
+CSC8503.sln
 DebugUtils/Debug
 DebugUtils/Release
 DebugUtils/DebugUtils.dir
@@ -78,11 +76,3 @@ Detour/Detour.vcxproj.user
 DetourTileCache/DetourTileCache.vcxproj.user
 INSTALL.vcxproj.user
 Recast/Recast.vcxproj.user
-
-GLTFLoader
-PS5Starter
-PS5Core
-Prospero
-Prospero_Debug
-sce_module
-Generate.bat
