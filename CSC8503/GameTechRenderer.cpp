@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "GameTechRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -505,7 +507,7 @@ void GameTechRenderer::FillGBuffer() {
 			for (size_t b = 0; b < layerCount; ++b) {
 				glActiveTexture(GL_TEXTURE3);
 				GLuint textureID = mActiveObjects[i]->GetMatTextures()[b];
-				glBindTexture(GL_TEXTURE_2D, textureID);				
+				glBindTexture(GL_TEXTURE_2D, textureID);
 				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
@@ -932,3 +934,4 @@ void GameTechRenderer::ClearLights() {
 	mLights.clear();
 }
 
+#endif
