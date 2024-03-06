@@ -5,7 +5,9 @@
 
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
+#ifdef USEGL
 #include <glad/gl.h>
+#endif
 
 #include "Transform.h"
 #include <AnimationObject.h>
