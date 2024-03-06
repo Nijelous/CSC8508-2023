@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkObject.h"
 #include "./enet/enet.h"
 using namespace NCL;
@@ -249,3 +250,4 @@ void NetworkObject::UpdateStateHistory(int minID) {
 			i++;
 	}
 }
+#endif

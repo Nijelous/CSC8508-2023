@@ -1,4 +1,5 @@
-﻿#include "DebugNetworkedGame.h"
+﻿#ifdef USEGL
+#include "DebugNetworkedGame.h"
 
 #include <iostream>
 #include <string>
@@ -547,3 +548,4 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
     const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
     buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
 }
+#endif

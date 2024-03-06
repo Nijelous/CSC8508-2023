@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 
 namespace NCL {
@@ -25,3 +26,4 @@ namespace NCL {
 	}
 }
 
+#endif

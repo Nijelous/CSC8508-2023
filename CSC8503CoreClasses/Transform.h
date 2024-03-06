@@ -34,8 +34,11 @@ namespace NCL {
 
 			void SetMatrix(Matrix4 matrix) {
 				mMatrix = matrix;
+				UpdateVariables();
 			}
 			void UpdateMatrix();
+
+			void UpdateVariables();
 
 			inline bool operator<(const Transform& rhs) const { return this->GetPosition().x == rhs.GetPosition().x ? 
 				(this->GetPosition().y == rhs.GetPosition().y ? this->GetPosition().z < rhs.GetPosition().z : this->GetPosition().y < rhs.GetPosition().y) 

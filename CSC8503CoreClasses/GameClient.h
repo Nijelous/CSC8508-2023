@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "NetworkBase.h"
 #include <stdint.h>
@@ -38,3 +39,4 @@ namespace NCL {
 	}
 }
 
+#endif

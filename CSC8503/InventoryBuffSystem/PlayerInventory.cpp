@@ -57,6 +57,7 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 
 			int localPlayerId = 0;
 
+#ifdef USEGL
 			if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 				DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 				auto* localPlayer = game->GetLocalPlayer();
@@ -67,6 +68,7 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 					game->SendClinentSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
 				}
 			}
+#endif
 
 			OnItemEquipped(playerNo, localPlayerId, invSlot, inItem);
 
@@ -100,6 +102,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 
 	//Potentially move the multiplayer related code below to a function like HandleMultiplayerItemRemoval(...);
 	int localPlayerId = 0;
+#ifdef USEGL
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 		const auto* localPlayer = game->GetLocalPlayer();
@@ -114,6 +117,7 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 	if (localPlayerId == playerNo) {
 		LevelManager::GetLevelManager()->ChangeEquippedIconTexture(invSlot, item::none);
 	}
+#endif
 }
 
 void PlayerInventory::DropItemFromPlayer(const item& inItem, const int& playerNo) {
@@ -146,6 +150,7 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 
 		int localPlayerId = 0;
 
+#ifdef USEGL
 		if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 			auto* localPlayer = game->GetLocalPlayer();
@@ -157,6 +162,7 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 				game->SendClinentSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
 			}
 		}
+#endif
 
 		Notify(mOnItemUsedInventoryEventMap[usedItem], (playerNo), invSlot, isItemRemoved);
 	}

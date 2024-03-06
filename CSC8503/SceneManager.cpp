@@ -3,6 +3,9 @@
 #include "DebugNetworkedGame.h"
 #include "MainMenuScene.h"
 #include "SceneStates.h"
+#include "GameSceneManager.h"
+
+#ifdef USEGL
 
 using namespace NCL::CSC8503;
 
@@ -18,16 +21,20 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::InitScenes() {
-	auto* singlePlayerScene = new GameSceneManager();
-	auto* mainMenuScene = new MainMenuScene();
-	auto* multiplayerScene = new DebugNetworkedGame();
+	GameSceneManager* singlePlayerScene = new GameSceneManager();
+	MainMenuScene* mainMenuScene = new MainMenuScene();
+#ifdef USEGL
+	DebugNetworkedGame* multiplayerScene = new DebugNetworkedGame();
+#endif
 
 	mCurrentSceneType = Scenes::MainMenu;
 
 	gameScenesMap =
 	{
 		{Scenes::Singleplayer, (Scene*)singlePlayerScene},
+#ifdef USEGL
 		{Scenes::Multiplayer, (Scene*)multiplayerScene},
+#endif
 		{Scenes::MainMenu, (Scene*)mainMenuScene}
 	};
 }
@@ -72,8 +79,9 @@ Scene* SceneManager::GetCurrentScene() {
 }
 
 SceneManager* SceneManager::GetSceneManager() {
-	if (instance == nullptr){
+	if (instance == nullptr) {
 		instance = new SceneManager();
 	}
 	return instance;
 }
+#endif

@@ -27,8 +27,9 @@ constexpr ParserVariables LEVEL_VARIABLES[16] = {
 	Doors
 };
 
-constexpr ParserVariables ROOM_VARIABLES[7] = {
+constexpr ParserVariables ROOM_VARIABLES[8] = {
 	SetRoomType,
+	RoomDoorPos,
 	TileMap,
 	CCTVTransforms,
 	Pointlight,
@@ -109,7 +110,10 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 	case SetRoomType:
 		room->mType = (RoomType)keyValuePairs[0]["type"];
 		break;
-
+	case RoomDoorPos:
+		room->mDoorConfig = keyValuePairs[0]["doorPositions"];
+		room->mPrimaryDoor = 0;
+		break;
 	case TileMap:
 	{
 		Transform key = Transform();
@@ -123,7 +127,8 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 
 	case RoomList:
 		if (keyValuePairs.size() == 1) return;
-		level->mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = new Room((int)keyValuePairs[1]["type"]);
+		level->mRoomList[Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"])] = new Room((int)keyValuePairs[1]["type"],
+			(int)keyValuePairs[1]["doorPositions"], (int)keyValuePairs[1]["primaryDoor"]);
 		break;
 
 	case GuardCount:
@@ -198,7 +203,6 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 				keyValuePairs[1]["radius"], keyValuePairs[1]["angle"], 1.0f);
 			if (level) level->mLights.push_back(newLight);
 			else room->mLights.push_back(newLight);
-			std::cout << direction << " | " << keyValuePairs[4]["x"] << " " << keyValuePairs[4]["y"] << " " << keyValuePairs[4]["z"] << "\n\n";
 			c++;
 		}
 		break;

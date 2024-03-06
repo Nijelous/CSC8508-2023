@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "GameObject.h"
 #include "PlayerObject.h"
@@ -71,3 +72,4 @@ namespace NCL {
 	}
 }
 
+#endif

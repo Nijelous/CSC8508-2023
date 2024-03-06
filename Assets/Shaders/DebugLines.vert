@@ -1,4 +1,6 @@
-#version 420 core
+#version 460 core
+
+#extension GL_ARB_bindless_texture : require
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 colour;
@@ -10,6 +12,19 @@ layout(std140, binding = 0) uniform CamBlock{
 	mat4 invProjView;
 	vec3 camPos;
 } camData;
+
+layout(std140, binding = 6) uniform TextureHandles {
+	sampler2D handles[64];
+} texHandles;
+
+layout(std140, binding = 7) uniform TextureHandleIDs{
+	int albedoIndex;
+	int normalIndex;
+	int depthIndex;
+	int shadowIndex;
+	int albedoLightIndex;
+	int specLightIndex;
+} texIndices;
 
 out Vertex
 {

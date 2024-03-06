@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
@@ -12,11 +14,13 @@ AnimationSystem::AnimationSystem(GameWorld& g):gameWorld(g){
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
-
+	mAnimTexture = nullptr;
 	
 }
 
 AnimationSystem::~AnimationSystem(){
+
+
 }
 
 void AnimationSystem::Clear(){
@@ -157,7 +161,6 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh,
 			mAnimTexture = renderer.LoadTexture(path.c_str());
 			texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
 			std::cout << texID << endl;
-			NCL::Rendering::OGLRenderer::SetTextureRepeating(texID, true);
 		}
 		mMatTextures.emplace_back(texID);
 	}	
@@ -181,3 +184,4 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 		}
 	}
 }
+#endif

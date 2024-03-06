@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 //#include "./enet/enet.h"
 struct _ENetHost;
@@ -114,3 +115,4 @@ protected:
 
 	std::multimap<int, PacketReceiver*> packetHandlers;
 };
+#endif

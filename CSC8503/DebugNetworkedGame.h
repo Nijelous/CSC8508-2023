@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifdef USEGL
+#pragma once
 #include <functional>
 #include "NetworkBase.h"
 #include "GameSceneManager.h"
@@ -110,3 +111,4 @@ namespace NCL{
         };
     }
 }
+#endif

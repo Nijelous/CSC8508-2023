@@ -1,6 +1,6 @@
-#version 420 core
+#version 460 core
 
-uniform mat4 modelMatrix;
+#extension GL_ARB_bindless_texture : require
 
 
 layout(std140, binding = 0) uniform CamBlock{

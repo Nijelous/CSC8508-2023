@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "NetworkBase.h"
 #include "./enet/enet.h"
 
@@ -41,3 +42,4 @@ bool NetworkBase::ProcessPacket(GamePacket* packet, int peerID) {
 
 	return false;
 }
+#endif

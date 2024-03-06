@@ -17,6 +17,12 @@ void Transform::UpdateMatrix() {
 		Matrix4::Scale(scale);
 }
 
+void Transform::UpdateVariables() {
+	position = mMatrix.GetPositionVector();
+	scale = mMatrix.GetDiagonal();
+	orientation = Quaternion(mMatrix);
+}
+
 Transform& Transform::SetPosition(const Vector3& worldPos) {
 	position = worldPos;
 	UpdateMatrix();
