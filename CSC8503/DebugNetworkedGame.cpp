@@ -219,6 +219,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
         HandleLocalSusChange(packet);
         break;
     }
+    case BasicNetworkMessages::ClientSyncGlobalSusChange: {
+        ClientSyncGlobalSusChangePacket* packet = (ClientSyncGlobalSusChangePacket*)(payload);
+        HandleGlobalSusChange(packet);
+        break;
+    }
     default:
         std::cout << "Received unknown packet. Type: " << payload->type  << std::endl;
         break;
@@ -513,8 +518,8 @@ void DebugNetworkedGame::HandleLocalSusChange(ClientSyncLocalSusChangePacket* pa
     auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetLocalSuspicionMetre();
     localSusMetre->SyncSusChange(packet->playerID, localPlayerID, packet->changedValue);
 }
-void DebugNetworkedGame::HandleGlobalSusChange(ClientSyncLocalSusChangePacket* packet) const{
 
+void DebugNetworkedGame::HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const{
     const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
     auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
     localSusMetre->SyncSusChange(localPlayerID, packet->changedValue);

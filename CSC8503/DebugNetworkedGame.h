@@ -93,7 +93,7 @@ namespace NCL{
 
             void HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const;
             void HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const;
-            void HandleGlobalSusChange(ClientSyncLocalSusChangePacket* packet) const;
+            void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
