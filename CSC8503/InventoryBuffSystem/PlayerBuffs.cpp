@@ -28,7 +28,6 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	}
 
 	HandleBuffNetworking(inBuff, playerNo,true);
-	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
@@ -39,7 +38,6 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 		mBuffsToRemove[playerNo].push_back(inBuff);
 
 		HandleBuffNetworking(inBuff, playerNo, false);
-		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 	}
 };
 
@@ -57,6 +55,13 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 			game->SendClientSyncBuffPacket(playerNo, inBuff, toApply);
 		}
 	}
+	if (localPlayerId != playerNo)
+		return;
+
+	if(toApply)
+		Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+	else
+		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 }
 #endif
 
