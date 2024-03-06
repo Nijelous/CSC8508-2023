@@ -16,7 +16,7 @@ PhysicsSystem::PhysicsSystem(GameWorld& g) : mGameWorld(g) {
 	mDTOffset = 0.0f;
 	mGlobalDamping = 0.995f;
 	SetGravity(Vector3(0.0f, -9.8f, 0.0f));
-	baseTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
+	mStaticTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
 }
 
 PhysicsSystem::~PhysicsSystem() {
@@ -35,7 +35,7 @@ void PhysicsSystem::SetNewBroadphaseSize(const Vector3& levelSize) {
 	while (levelSize.z > mBroadphaseZ) {
 		mBroadphaseZ *= 2;
 	}
-	baseTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
+	mStaticTree = QuadTree<GameObject*>(Vector2(mBroadphaseX, mBroadphaseZ), 7, 6);
 }
 
 /*
@@ -50,6 +50,7 @@ any collisions they are in.
 */
 void PhysicsSystem::Clear() {
 	mAllCollisions.clear();
+	mDynamicObjectList.clear();
 }
 
 /*
@@ -372,43 +373,43 @@ void PhysicsSystem::BroadPhase() {
 	std::vector<GameObject*>::const_iterator last;
 	mGameWorld.GetObjectIterators(first, last);
 	if (first == last) return;
-	QuadTree<GameObject*> tree;
-	tree.CopyTree(&baseTree, Vector2(mBroadphaseX, mBroadphaseZ));
-	bool populateBase = baseTree.Empty();
-	// add all objects to tree
-	for (auto i = first; i != last; i++) {
-		if (!populateBase && (*i)->GetCollisionLayer() & StaticObj || !(*i)->HasPhysics()) continue;
-		Vector3 halfSizes;
-		if (!(*i)->GetBroadphaseAABB(halfSizes))
-			continue;
-		Vector3 pos = (*i)->GetTransform().GetPosition();
-		tree.Insert(*i, pos, halfSizes, (*i)->GetCollisionLayer() & STATIC_COLLISION_LAYERS);
-		if (populateBase && (*i)->GetCollisionLayer() & StaticObj) {
-			baseTree.Insert(*i, pos, halfSizes, true);
+	if(mStaticTree.Empty()) {
+		for (auto i = first; i != last; i++) {
+			Vector3 halfSizes;
+			if (!(*i)->GetBroadphaseAABB(halfSizes)) continue;
+			if ((*i)->GetCollisionLayer() & STATIC_COLLISION_LAYERS) {
+				Vector3 pos = (*i)->GetTransform().GetPosition() + (*i)->GetBoundingVolume()->GetOffset();
+				mStaticTree.Insert(*i, pos, halfSizes, true);
+			}
+			else {
+				mDynamicObjectList.push_back(*i);
+			}
 		}
 	}
-
-	// find what objects may be colliding
-	tree.OperateOnContents([&](std::list<QuadTreeEntry<GameObject*>>& data) {
-		CollisionDetection::CollisionInfo info;
-		for (auto i = data.begin(); i != data.end(); i++) {
-			for (auto j = std::next(i); j != data.end(); j++) {
-				info.a = std::min((*i).object, (*j).object);
-				info.b = std::max((*i).object, (*j).object);
-				if (info.a->GetCollisionLayer() & NoCollide || info.b->GetCollisionLayer() & NoCollide) {
-					continue;
-				}
-				if (info.a->GetCollisionLayer() & STATIC_COLLISION_LAYERS && info.b->GetCollisionLayer() & STATIC_COLLISION_LAYERS) {
-					continue;
-				}
-				if ((info.a->GetCollisionLayer() & Npc && info.b->GetCollisionLayer() & Collectable) ||
-					(info.a->GetCollisionLayer() & Collectable && info.b->GetCollisionLayer() & Npc)) {
+	for (int i = 0; i < mDynamicObjectList.size(); i++) {
+		Vector3 halfSize;
+		mDynamicObjectList[i]->GetBroadphaseAABB(halfSize);
+		mStaticTree.OperateOnLeaf([&](std::list<QuadTreeEntry<GameObject*>>& data) {
+			CollisionDetection::CollisionInfo info;
+			for (auto j = data.begin(); j != data.end(); j++) {
+				info.a = std::min(mDynamicObjectList[i], (*j).object);
+				info.b = std::max(mDynamicObjectList[i], (*j).object);
+				Vector3 halfSizeA;
+				Vector3 halfSizeB;
+				info.a->GetBroadphaseAABB(halfSizeA);
+				info.b->GetBroadphaseAABB(halfSizeB);
+				halfSizeA.y = 1000.0f;
+				halfSizeB.y = 1000.0f;
+				if (!CollisionDetection::AABBTest(info.a->GetTransform().GetPosition() + info.a->GetBoundingVolume()->GetOffset(), 
+					info.b->GetTransform().GetPosition() + info.b->GetBoundingVolume()->GetOffset(),
+					halfSizeA, halfSizeB)) continue;
+				if (mDynamicObjectList[i]->GetCollisionLayer() & Npc && (*j).object->GetCollisionLayer() & Collectable) {
 					continue;
 				}
 				mBroadphaseCollisions.insert(info);
 			}
-		}
-	});
+			}, mDynamicObjectList[i]->GetTransform().GetPosition(), halfSize);
+	}
 }
 
 
@@ -443,12 +444,8 @@ based on any forces that have been accumulated in the objects during
 the course of the previous game frame.
 */
 void PhysicsSystem::IntegrateAccel(float dt) {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	mGameWorld.GetObjectIterators(first, last);
-
-	for (auto i = first; i != last; i++) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
+	for (int i = 0; i < mDynamicObjectList.size(); i++) {
+		PhysicsObject* object = mDynamicObjectList[i]->GetPhysicsObject();
 		if (object == nullptr)
 			continue;
 		// inverse mass for multiplication instead of division and unmoving object
@@ -486,17 +483,13 @@ throughout a physics update, to slowly move the objects through
 the world, looking for collisions.
 */
 void PhysicsSystem::IntegrateVelocity(float dt) {
-	std::vector<GameObject*>::const_iterator first;
-	std::vector<GameObject*>::const_iterator last;
-	mGameWorld.GetObjectIterators(first, last);
 	float frameLinearDampening = 1.0f - (0.4f * dt);
-
-	for (auto i = first; i != last; i++) {
-		PhysicsObject* object = (*i)->GetPhysicsObject();
+	for (int i = 0; i < mDynamicObjectList.size(); i++) {
+		PhysicsObject* object = mDynamicObjectList[i]->GetPhysicsObject();
 		if (object == nullptr)
 			continue;
 		// determine position
-		Transform& transform = (*i)->GetTransform();
+		Transform& transform = mDynamicObjectList[i]->GetTransform();
 		Vector3 position = transform.GetPosition();
 		Vector3 linearVel = object->GetLinearVelocity();
 		position += linearVel * dt;
