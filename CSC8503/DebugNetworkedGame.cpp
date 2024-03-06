@@ -16,6 +16,7 @@
 #include "RenderObject.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
+#include "Vent.h"
 
 namespace {
 	constexpr int MAX_PLAYER = 4;
@@ -611,3 +612,4 @@ void DebugNetworkedGame::HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* 
     auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
     localSusMetre->SyncSusChange(localPlayerID, packet->changedValue);
 }
+#endif

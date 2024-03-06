@@ -129,6 +129,7 @@ void PlayerObject::UpdateObject(float dt) {
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
+
 	}
 }
 
