@@ -77,7 +77,12 @@ namespace NCL {
 
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
+#ifdef USEGL
 			GameTechRenderer* GetRenderer() { return mRenderer; }
+#endif
+#ifdef USEPROSPERO
+			// get PS5 Renderer
+#endif
 
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
@@ -193,7 +198,9 @@ namespace NCL {
 #endif
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
+#ifdef USEGL // remove when converted to PS5 also
 			AnimationSystem* mAnimation;
+#endif
 
 			SoundManager* mSoundManager;
 
@@ -261,8 +268,13 @@ namespace NCL {
 
 			Shader* mAnimationShader;
 
+#ifdef USEGL
 			vector<GLuint>  mGuardTextures;
 			vector<GLuint> mPlayerTextures;
+#endif
+#ifdef USEPROSPERO
+			// PSSL textures
+#endif
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
