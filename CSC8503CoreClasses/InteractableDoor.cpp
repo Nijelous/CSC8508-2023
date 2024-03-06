@@ -79,12 +79,14 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	mIsOpen = isOpen;
 	if (isOpen) {
+		this->GetSoundObject()->TriggerSoundEvent();
 		SetActive(false);
 		if (isSettedByServer) {
 			mTimer = initDoorTimer;
 		}
 	}
 	else {
+		this->GetSoundObject()->CloseDoorTriggered();
 		SetActive(true);
 	}
 
@@ -165,7 +167,7 @@ void InteractableDoor::InitStateMachine()
 		}
 	));
 }
-
+#ifdef USEGL
 void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
 	auto* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
@@ -179,6 +181,7 @@ void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
 		}
 	}
 }
+#endif
 
 void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) {
 	switch (susBreakpoint)

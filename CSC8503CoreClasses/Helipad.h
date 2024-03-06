@@ -11,9 +11,10 @@ namespace NCL {
 
             virtual void OnCollisionEnd(GameObject* otherObject) override;
 
-            bool GetCollidingWithPlayer() { return mCollidingWithPlayer; }
+            std::tuple<bool, int> GetCollidingWithPlayer() { return std::tuple<bool, int>(mCollidingWithPlayer, mCollidingPlayerID); }
         protected:
             bool mCollidingWithPlayer;
+            int mCollidingPlayerID;
         };
     }
 }

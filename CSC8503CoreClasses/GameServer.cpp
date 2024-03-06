@@ -1,3 +1,4 @@
+#ifdef USEGL
 #include "GameServer.h"
 #include "GameWorld.h"
 #include "./enet/enet.h"
@@ -122,3 +123,4 @@ void GameServer::AddPeer(int peerNumber) const
 		mPeers[emptyIndex] = peerNumber;
 	}
 }
+#endif

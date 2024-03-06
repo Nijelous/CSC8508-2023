@@ -716,4 +716,3 @@ void PlayerObject::StopSliding() {
 		mPhysicsObject->SetLinearVelocity(Vector3(0, fallingSpeed, 0));
 	}
 }
-

@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "GameTechRenderer.h"
 #include "GameObject.h"
 #include "RenderObject.h"
@@ -79,13 +81,15 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	glGenBuffers(1, &iconVertVBO);
 	glGenBuffers(1, &iconTexVBO);
 
-	Debug::CreateDebugFont("PressStart2P.fnt", *LoadTexture("PressStart2P.png"));
+	Debug::CreateDebugFont("PressStart2P.fnt", *LoadDebugTexture("PressStart2P.png"));
 
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
+	FillTextureDataUBO();
 }
 
 GameTechRenderer::~GameTechRenderer() {
+	UnbindAllTextures();
 	glDeleteTextures(1, &shadowTex);
 	glDeleteFramebuffers(1, &shadowFBO);
 
@@ -146,7 +150,16 @@ void GameTechRenderer::LoadSkybox() {
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	CreateAndFillSkyboxUBO();
+	
+}
 
+void GameTechRenderer::CreateAndFillSkyboxUBO() {
+	glGenBuffers(1, &uBOBlocks[cubeTexUBO]);
+	glBindBufferRange(GL_UNIFORM_BUFFER, cubeTexUBO, uBOBlocks[cubeTexUBO], 0, sizeof(GLuint64));
+	const GLuint64 handle = glGetTextureHandleARB(skyboxTex);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(TextureHandleData), &handle, GL_STATIC_DRAW);
+	glMakeTextureHandleResidentARB(handle);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 }
 
@@ -170,12 +183,14 @@ void GameTechRenderer::GenUBOBuffers() {
 	GenObjectDataUBO();
 	GenAnimFramesUBOs();
 	GenIconUBO();
+	GenTextureDataUBO();
+	GenTextureIndexUBO();
 }
 
 void GameTechRenderer::GenIconUBO() {
 	glGenBuffers(1, &uBOBlocks[iconUBO]);
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[iconUBO]);
-	glBufferData(GL_UNIFORM_BUFFER, 2, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(float), NULL, GL_DYNAMIC_DRAW);
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -235,6 +250,36 @@ void GameTechRenderer::GenAnimFramesUBOs() {
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+void GameTechRenderer::GenTextureDataUBO() {
+	glGenBuffers(1, &uBOBlocks[textureDataUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[textureDataUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(TextureHandleData), NULL, GL_STATIC_DRAW);
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::GenTextureIndexUBO() {
+	glGenBuffers(1, &uBOBlocks[textureIdUBO]);
+	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[textureIdUBO]);
+	glBufferData(GL_UNIFORM_BUFFER, sizeof(TextureHandleIndices), NULL, GL_DYNAMIC_DRAW);	
+	glBindBuffer(GL_UNIFORM_BUFFER, 0);
+}
+
+void GameTechRenderer::FillTextureDataUBO() {
+	glBindBufferRange(GL_UNIFORM_BUFFER, textureDataUBO, uBOBlocks[textureDataUBO], 0, sizeof(float));
+	TextureHandleData handlesToUpload;
+	
+	for (int i = 0; i < mTextureHandles.size(); i++) {
+		handlesToUpload.handles[i * 2] = mTextureHandles[i].second;
+	}
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextureHandleData), &handlesToUpload);
+}
+
+void GameTechRenderer::UnbindAllTextures() {
+	for (std::pair<GLuint, GLuint64> handle : mTextureHandles) {
+		glMakeTextureHandleNonResidentARB(handle.second);
+	}
+}
+
 void GameTechRenderer::FillLightUBO() {
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[lightsUBO]);
 	glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], 0, MAX_POSSIBLE_LIGHTS * sizeof(LightData));
@@ -283,8 +328,7 @@ void GameTechRenderer::FillLightUBO() {
 }
 
 void GameTechRenderer::FillObjectDataUBO() {
-	if (mActiveObjects.empty() && mOutlinedObjects.empty()) return;
-	if (mActiveObjects.size() + mOutlinedObjects.size() > MAX_POSSIBLE_OBJECTS) return;
+	if (mActiveObjects.empty()) return;
 	glBindBuffer(GL_UNIFORM_BUFFER, uBOBlocks[objectsUBO]);
 	ObjectData* objectData = new ObjectData[MAX_POSSIBLE_OBJECTS];
 
@@ -294,12 +338,6 @@ void GameTechRenderer::FillObjectDataUBO() {
 		od.shadowMatrix = shadowMatrix * od.modelMatrix;
 		od.objectColour = mActiveObjects[i]->GetColour();
 		od.hasVertexColours = mActiveObjects[i]->GetMesh()->GetColourData().empty() ? 0 : 1;
-		objectData[i] = od;
-	}
-
-	for (int i = mActiveObjects.size(); i < mOutlinedObjects.size(); i++) {
-		ObjectData od;
-		od.modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
 		objectData[i] = od;
 	}
 	glBufferData(GL_UNIFORM_BUFFER,
@@ -352,9 +390,6 @@ void GameTechRenderer::BuildObjectList() {
 				if (rendObj && isInFrustum && !rendObj->IsInstanced()) {
 					rendObj->SetSqDistToCam(gameWorld.GetMainCamera().GetPosition());
 					mActiveObjects.emplace_back(rendObj);
-					if (rendObj->GetOutlined()) {
-						mOutlinedObjects.emplace_back(rendObj);
-					}
 				}
 			}
 		}
@@ -363,6 +398,11 @@ void GameTechRenderer::BuildObjectList() {
 
 void GameTechRenderer::SortObjectList() {
 	std::sort(mActiveObjects.begin(), mActiveObjects.end(), RenderObject::CompareBySqCamDist);
+	for (int i = 0; i < mActiveObjects.size(); i++) {
+		if (mActiveObjects[i]->GetOutlined()) {
+			mOutlinedObjects.emplace_back(i);
+		}
+	}
 }
 
 void GameTechRenderer::RenderShadowMap() {
@@ -411,16 +451,7 @@ void GameTechRenderer::RenderSkybox() {
 	int height = hostWindow.GetScreenSize().y;
 	glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-	Matrix4 viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
-	Matrix4 projMatrix = gameWorld.GetMainCamera().BuildProjectionMatrix(hostWindow.GetScreenAspect());
-
 	BindShader(*mSkyboxShader);
-
-	glUniform1i(glGetUniformLocation(mSkyboxShader->GetProgramID(), "cubeTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTex);
-
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 	BindMesh(*skyboxMesh);
@@ -443,28 +474,15 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 		RenderObject* rendObj = mInstanceTiles[i]->GetRenderObject();
 		OGLShader* shader = (OGLShader*)rendObj->GetShader();
 		BindShader(*shader);
-		if (rendObj->GetAlbedoTexture()) {
-			BindTextureToShader(*(OGLTexture*)rendObj->GetAlbedoTexture(), "mainTex", 0);
-
-		}
-
-		if (rendObj->GetNormalTexture()) {
-			BindTextureToShader(*(OGLTexture*)rendObj->GetNormalTexture(), "normTex", 2);
-		}
-
-		int hasTexLocation = glGetUniformLocation(shader->GetProgramID(), "hasTexture");
-		int shadowTexLocation = glGetUniformLocation(shader->GetProgramID(), "shadowTex");
-
-		Vector3 camPos = gameWorld.GetMainCamera().GetPosition();
-		glUniform1i(shadowTexLocation, 1);
-
-		Vector4 colour = rendObj->GetColour();
-		glUniform1i(hasTexLocation, (OGLTexture*)rendObj->GetAlbedoTexture() ? 1 : 0);
+		TextureHandleIndices texInds;
+		texInds.albedoIndex = FindTexHandleIndex((OGLTexture*)rendObj->GetAlbedoTexture());
+		texInds.normalIndex = FindTexHandleIndex((OGLTexture*)rendObj->GetNormalTexture());
+		glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+		glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 		OGLMesh* mesh = (OGLMesh*)rendObj->GetMesh();
 		BindMesh(*mesh);
 		size_t layerCount = mesh->GetSubMeshCount();
 		for (size_t b = 0; b < layerCount; ++b) {
-
 			DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
 		}
 	}
@@ -478,47 +496,46 @@ void GameTechRenderer::FillGBuffer() {
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilMask(0xFF);
 	if (!mInstanceTiles.empty()) DrawWallsFloorsInstanced();
-
 	OGLShader* activeShader = nullptr;
+	OGLMesh* activeMesh = nullptr;
 
-	glActiveTexture(GL_TEXTURE0 + 1);
-	glBindTexture(GL_TEXTURE_2D, shadowTex);
 	for (int i = 0; i < mActiveObjects.size(); i++) {
 		OGLShader* shader = (OGLShader*)mActiveObjects[i]->GetShader();
-		BindShader(*shader);
-		if (mActiveObjects[i]->GetAlbedoTexture()) {
-			BindTextureToShader(*(OGLTexture*)mActiveObjects[i]->GetAlbedoTexture(), "mainTex", 0);
+		if (activeShader != shader) {
+			activeShader = shader;
+			BindShader(*shader);
+		}		
 
+		OGLMesh* mesh = (OGLMesh*) mActiveObjects[i]->GetMesh();
+		if (activeMesh != mesh) {
+			BindMesh(*mesh);
+			activeMesh = mesh;
 		}
-		if (mActiveObjects[i]->GetNormalTexture()) {
-			BindTextureToShader(*(OGLTexture*)mActiveObjects[i]->GetNormalTexture(), "normTex", 2);
-		}
-		if (mActiveObjects[i]->GetAnimationObject()) {
-			glUniform1i(glGetUniformLocation(shader->GetProgramID(), "mainTex"), 3);
-		}
+		size_t layerCount = mesh->GetSubMeshCount();
+		TextureHandleIndices texInds;		
+
 		glBindBufferRange(GL_UNIFORM_BUFFER, objectsUBO, uBOBlocks[objectsUBO], i * sizeof(ObjectData), sizeof(float));
 		//Animation basic draw
 		if (mActiveObjects[i]->GetAnimationObject()) {
-			BindMesh((OGLMesh&)*mActiveObjects[i]->GetMesh());
-			mMesh = mActiveObjects[i]->GetMesh();
-			size_t layerCount = mMesh->GetSubMeshCount();
-			for (size_t b = 0; b < layerCount; ++b) {
-				glActiveTexture(GL_TEXTURE3);
-				GLuint textureID = mActiveObjects[i]->GetMatTextures()[b];
-				glBindTexture(GL_TEXTURE_2D, textureID);				
+			for (size_t b = 0; b < layerCount; ++b) {				
 				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
 				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4) * 128, frameData);
+				delete[] frameData;
+				texInds.albedoIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[b]);
+				glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 				DrawBoundMesh((uint32_t)b);
 			}
 		}
 		else {
-			BindMesh((OGLMesh&)*mActiveObjects[i]->GetMesh());
-			size_t layerCount = mActiveObjects[i]->GetMesh()->GetSubMeshCount();
-			for (size_t b = 0; b < layerCount; ++b) {
-
+			texInds.albedoIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetAlbedoTexture());
+			texInds.normalIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetNormalTexture());
+			glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
+			for (size_t b = 0; b < layerCount; ++b) {				
 				DrawBoundMesh((uint32_t)b);
 			}
 
@@ -530,59 +547,49 @@ void GameTechRenderer::FillGBuffer() {
 
 void GameTechRenderer::DrawLightVolumes() {
 	glBindFramebuffer(GL_FRAMEBUFFER, mLightFBO);
-	BindCommonLightDataToShader((OGLShader*)mPointLightShader);
-	BindCommonLightDataToShader((OGLShader*)mSpotLightShader);
-	BindCommonLightDataToShader((OGLShader*)mDirLightShader);
+	glClearColor(0.0f, 0.0f, 0.0f, 1);
+	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 	glBlendFunc(GL_ONE, GL_ONE);
 	glCullFace(GL_FRONT);
 	glDepthFunc(GL_ALWAYS);
 	glDepthMask(GL_FALSE);
-
+	TextureHandleIndices texInds;
+	texInds.normalIndex = FindTexHandleIndex(mGBufferNormalTex);
+	texInds.depthIndex = FindTexHandleIndex(mGBufferDepthTex);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
+	OGLShader* activeShader = nullptr;
+	BindMesh(*mSphereMesh);
 	for (int i = 0; i < mLights.size(); i++) {
+		OGLShader* shader = nullptr;
 		glBindBufferRange(GL_UNIFORM_BUFFER, lightsUBO, uBOBlocks[lightsUBO], i * sizeof(LightData), sizeof(float));
-		if (mLights[i]->GetType() == Light::Point)BindShader(*((OGLShader*)(mPointLightShader)));
-		if (mLights[i]->GetType() == Light::Direction) BindShader(*((OGLShader*)(mDirLightShader)));
-		if (mLights[i]->GetType() == Light::Spot)BindShader(*((OGLShader*)(mSpotLightShader)));
-
-		BindMesh(*mSphereMesh);
+		if (mLights[i]->GetType() == Light::Point) shader = (OGLShader*) mPointLightShader;
+		if (mLights[i]->GetType() == Light::Direction) shader = (OGLShader*) mDirLightShader;
+		if (mLights[i]->GetType() == Light::Spot) shader = (OGLShader*)mSpotLightShader;
+		if (shader != activeShader) {
+			BindShader(*shader);
+			activeShader = shader;
+		}		
 		DrawBoundMesh();
 	}
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glCullFace(GL_BACK);
 	glDepthFunc(GL_LEQUAL);
-	glDepthMask(GL_TRUE);
+	glDepthMask(GL_TRUE);	
 	glClearColor(0.2f, 0.2f, 0.2f, 1);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-void GameTechRenderer::BindCommonLightDataToShader(OGLShader* shader) {
-	BindShader(*shader);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "normTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mGBufferNormalTex);
-
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "depthTex"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
 }
 
 void GameTechRenderer::CombineBuffers() {
 	OGLShader* shader = (OGLShader*)mCombineShader;
 	BindShader(*shader);
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "albedoTex"), 0);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, mGBufferColourTex);
-
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "albedoLight"), 2);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, mLightAlbedoTex);
-
-	glUniform1i(glGetUniformLocation(shader->GetProgramID(), "specularLight"), 3);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, mLightSpecularTex);
+	TextureHandleIndices texInds;
+	texInds.albedoIndex = FindTexHandleIndex(mGBufferColourTex);
+	texInds.albedoLightIndex = FindTexHandleIndex(mLightAlbedoTex);
+	texInds.specLightIndex = FindTexHandleIndex(mLightSpecularTex);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 	BindMesh(*mQuad);
 	DrawBoundMesh();
 }
@@ -592,37 +599,21 @@ void GameTechRenderer::DrawOutlinedObjects() {
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
 	glClear(GL_DEPTH_BUFFER_BIT);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, mGBufferDepthTex);
-	BindShader(*mOutlineShader);
-	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
-	BindShader(*mAnimatedOutlineShader);
-	glUniform1i(glGetUniformLocation(mOutlineShader->GetProgramID(), "depthTex"), 2);
+	TextureHandleIndices texInds;
+	texInds.depthIndex = FindTexHandleIndex(mGBufferDepthTex);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 
-	for (int i = 0; i < mOutlinedObjects.size(); i++) {
-
-		//int location = glGetUniformLocation(mOutlineShader->GetProgramID(), "hasAnim");
-		//glUniform1i(location, mOutlinedObjects[i]->GetAnimationObject()? 1 : 0);
-		//Matrix4 modelMatrix = mOutlinedObjects[i]->GetTransform()->GetMatrix();
-		//glUniformMatrix4fv(glGetUniformLocation(mOutlineShader->GetProgramID(), "modelMatrix"), 1, false, (float*)&modelMatrix);
-
-		OGLShader* shader;
-		if (mOutlinedObjects[i]->GetAnimationObject()) shader = mAnimatedOutlineShader;
-		else shader = mOutlineShader;
+	for (int ind : mOutlinedObjects) {
+		OGLShader* shader = (mActiveObjects[ind]->GetAnimationObject()) ? mAnimatedOutlineShader : mOutlineShader;
 		BindShader(*shader);
-
-		OGLMesh* mesh = (OGLMesh*)mOutlinedObjects[i]->GetMesh();
+		OGLMesh* mesh = (OGLMesh*)mActiveObjects[ind]->GetMesh();
 		BindMesh(*mesh);
 		size_t layerCount = mesh->GetSubMeshCount();
-		glBindBufferRange(GL_SHADER_STORAGE_BUFFER, objectsUBO, uBOBlocks[objectsUBO],
-			mActiveObjects.size() + i * sizeof(ObjectData), sizeof(float));
-
+		glBindBufferRange(GL_UNIFORM_BUFFER, objectsUBO, uBOBlocks[objectsUBO],	ind * sizeof(ObjectData), sizeof(float));
 		for (size_t b = 0; b < layerCount; ++b) {
-			glActiveTexture(GL_TEXTURE3);
-			if (mOutlinedObjects[i]->GetAnimationObject()) {
-				GLuint textureID = mOutlinedObjects[i]->GetMatTextures()[b];
-				glBindTexture(GL_TEXTURE_2D, textureID);
-				vector<Matrix4> frameMatrices = mActiveObjects[i]->GetFrameMatricesVec()[b];
+			if (mActiveObjects[ind]->GetAnimationObject()) {
+				vector<Matrix4> frameMatrices = mActiveObjects[ind]->GetFrameMatricesVec()[b];
 				Matrix4* frameData = new Matrix4[128];
 				glBindBufferBase(GL_UNIFORM_BUFFER, animFramesUBO, uBOBlocks[animFramesUBO]);
 				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
@@ -657,7 +648,7 @@ void GameTechRenderer::SetUpFBOs() {
 }
 
 void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
-	glGenTextures(1, &tex);
+	glCreateTextures(GL_TEXTURE_2D, 1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
 
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -668,8 +659,15 @@ void GameTechRenderer::GenerateScreenTexture(GLuint& tex, bool depth) {
 	GLuint internalFormat = depth ? GL_DEPTH24_STENCIL8 : GL_RGBA8;
 	GLuint format = depth ? GL_DEPTH_STENCIL : GL_RGBA;
 	GLuint type = depth ? GL_UNSIGNED_INT_24_8 : GL_UNSIGNED_BYTE;
+	
 
 	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, hostWindow.GetScreenSize().x, hostWindow.GetScreenSize().y, 0, format, type, NULL);
+
+	if (FindTexHandleIndex(tex) == -1) {
+		const GLuint64 handle = glGetTextureHandleARB(tex);
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(std::pair<GLuint, GLuint64>(tex, handle));
+	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
@@ -726,25 +724,17 @@ void GameTechRenderer::RenderIcons(UISystem::Icon i) {
 	UIiconPos.clear();
 	UIiconUVs.clear();
 
-	OGLTexture* t = (OGLTexture*)i.mTexture;
-	BindTextureToShader(*t, "iconTex", t->GetObjectID());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	TextureHandleIndices texInds;
+	texInds.albedoIndex = FindTexHandleIndex((OGLTexture*)i.mTexture);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 
 	mUi->BuildVerticesForIcon(i.mPosition, i.mLength, i.mHeight, UIiconPos, UIiconUVs);
 
-	GLint texSlot = glGetUniformLocation(mIconShader->GetProgramID(), "uTransparency");
-	glUniform1f(texSlot, i.mTransparency);
+	glBindBufferBase(GL_UNIFORM_BUFFER, iconUBO, uBOBlocks[iconUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(float), &i.mTransparency);
 
 	Matrix4 proj = Matrix4::Orthographic(0.0, 100.0f, 100, 0, -1.0f, 1.0f);
-	//0.02, 0, 0, 0
-	//0, 0.02, 0, 0
-	//0, 0, -1, 0;
-	//-1, 1, 0, 1
-
-	int matSlot = glGetUniformLocation(mIconShader->GetProgramID(), "viewProjMatrix");
-	glUniformMatrix4fv(matSlot, 1, false, (float*)proj.array);
-
 	SetUIiconBufferSizes(iconVertCount);
 
 	glBindBuffer(GL_ARRAY_BUFFER, iconVertVBO);
@@ -769,14 +759,10 @@ void GameTechRenderer::NewRenderText() {
 
 	OGLTexture* t = (OGLTexture*)Debug::GetDebugFont()->GetTexture();
 
-	if (t) {
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, t->GetObjectID());
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		BindTextureToShader(*t, "mainTex", 0);
-	}
+	TextureHandleIndices texInds;
+	texInds.albedoIndex = FindTexHandleIndex(t);
+	glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 
 	debugTextPos.clear();
 	debugTextColours.clear();
@@ -806,7 +792,31 @@ void GameTechRenderer::NewRenderText() {
 }
 
 Texture* GameTechRenderer::LoadTexture(const std::string& name) {
-	return OGLTexture::TextureFromFile(name).release();
+	
+	OGLTexture*  tex = OGLTexture::TextureFromFile(name).release();
+	if (FindTexHandleIndex(tex->GetObjectID()) == -1) {
+		const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(std::pair<GLuint, GLuint64>(tex->GetObjectID(), handle));
+	}
+	
+	return tex;
+}
+
+Texture* GameTechRenderer::LoadDebugTexture(const std::string& name) {
+	OGLTexture* tex = OGLTexture::TextureFromFile(name).release();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, tex->GetObjectID());	
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	
+	if (FindTexHandleIndex(tex->GetObjectID()) == -1) {
+		const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
+		glMakeTextureHandleResidentARB(handle);
+		mTextureHandles.push_back(std::pair<GLuint,GLuint64>(tex->GetObjectID(), handle));
+	}
+	return tex;
 }
 
 Shader* GameTechRenderer::LoadShader(const std::string& vertex, const std::string& fragment) {
@@ -932,3 +942,22 @@ void GameTechRenderer::ClearLights() {
 	mLights.clear();
 }
 
+int GameTechRenderer::FindTexHandleIndex(GLuint texId) {
+	for (int i = 0; i < mTextureHandles.size(); i++) {
+		if (texId == mTextureHandles[i].first) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int GameTechRenderer::FindTexHandleIndex(const OGLTexture* tex) {
+	if (!tex) return -1;
+	for (int i = 0; i < mTextureHandles.size(); i++) {
+		if (tex->GetObjectID() == mTextureHandles[i].first) {
+			return i;
+		}
+	}
+	return -1;
+}
+#endif

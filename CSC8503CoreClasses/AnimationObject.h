@@ -15,8 +15,6 @@ namespace NCL {
 
     namespace CSC8503 {
         class Transform;
-        class Maths::Vector3;
-        class Maths::Vector4;
 
         class AnimationObject
         {
