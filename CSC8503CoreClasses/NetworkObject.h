@@ -130,14 +130,6 @@ namespace NCL::CSC8503 {
 		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
 	};
 
-	struct SyncInteractablePacket : public GamePacket {
-		int networkObjId;
-		bool isOpen;
-		int interactableItemType;
-
-		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
-	};
-
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

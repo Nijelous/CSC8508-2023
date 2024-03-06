@@ -245,11 +245,6 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandlePlayerBuffChange(packet);
 		break;
 	}
-	case BasicNetworkMessages::ClientSyncBuffs: {
-		ClientSyncBuffPacket* packet = (ClientSyncBuffPacket*)(payload);
-		HandlePlayerBuffChange(packet);
-		break;
-	}
 	case BasicNetworkMessages::ClientSyncLocalActiveCause: {
 		ClientSyncLocalActiveSusCausePacket* packet = (ClientSyncLocalActiveSusCausePacket*)(payload);
 		HandleLocalActiveSusCauseChange(packet);
@@ -277,10 +272,6 @@ void DebugNetworkedGame::InitInGameMenuManager() {
 }
 
 void DebugNetworkedGame::SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
-    PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
-    NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
-    mThisServer->SendGlobalPacket(packet);
-void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const {
 	PlayerInventory::item itemToEquip = (PlayerInventory::item)(inItem);
 	NCL::CSC8503::ClientSyncItemSlotPacket packet(playerNo, invSlot, itemToEquip, usageCount);
 	mThisServer->SendGlobalPacket(packet);
@@ -308,8 +299,10 @@ void DebugNetworkedGame::SendClientSyncGlobalSusChangePacket(int changedValue) c
     mThisServer->SendGlobalPacket(packet);
 }
 
-GameClient* DebugNetworkedGame::GetClient() const{
-    return mThisClient;
+GameClient* DebugNetworkedGame::GetClient() const {
+	return mThisClient;
+}
+
 void DebugNetworkedGame::ClearNetworkGame() {
 	if (mThisClient) {
 		mThisClient->ClearPacketHandlers();
@@ -326,10 +319,6 @@ void DebugNetworkedGame::ClearNetworkGame() {
 	mClientSideLastFullID = -1;
 	mWinningPlayerId = -1;
 	mNetworkObjectCache = 10;
-}
-
-GameClient* DebugNetworkedGame::GetClient() const {
-	return mThisClient;
 }
 
 GameServer* DebugNetworkedGame::GetServer() const {
