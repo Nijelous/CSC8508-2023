@@ -204,9 +204,11 @@ void GuardObject::ApplyBuffToGuard(PlayerBuffs::buff buffToApply) {
 	case PlayerBuffs::stun:
 		mIsStunned = true;
 		//TODO(erendgrmnc): if we want to add duration when the guard already has the status, handle it here.
+#ifdef USEGL
 		if (!mAppliedBuffs.contains(buffToApply)) {
 			mAppliedBuffs.insert({ PlayerBuffs::buff::stun,  buffDuration });
 		}
+#endif
 		break;
 	default:;
 	}

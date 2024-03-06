@@ -9,14 +9,16 @@ Helipad::Helipad() : GameObject(StaticObj, "Helipad") {
 }
 
 void Helipad::OnCollisionBegin(GameObject* otherObject) {
-	if (PlayerObject* temp = dynamic_cast<PlayerObject*>(otherObject)) {
+	if (otherObject->GetCollisionLayer() == CollisionLayer::Player) {
+		PlayerObject* temp = static_cast<PlayerObject*>(otherObject);
 		mCollidingWithPlayer = true;
 		mCollidingPlayerID = temp->GetPlayerID();
 	}
 }
 
 void Helipad::OnCollisionEnd(GameObject* otherObject) {
-	if (PlayerObject* temp = dynamic_cast<PlayerObject*>(otherObject)) {
+	if (otherObject->GetCollisionLayer() == CollisionLayer::Player) {
+		PlayerObject* temp = static_cast<PlayerObject*>(otherObject);
 		mCollidingWithPlayer = false;
 		mCollidingPlayerID = -1;
 	}

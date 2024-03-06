@@ -97,7 +97,7 @@ void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 }
 
 bool InteractableDoor::CanUseItem() {
-	auto* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
+	PlayerObject* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
 	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
 
 	switch (usedItem) {
