@@ -8,6 +8,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../Detour/Include/DetourNavMeshQuery.h"
 #include "RecastBuilder.h"
+#include "../CSC8503/SceneManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -22,19 +23,34 @@ GuardObject::GuardObject(const std::string& objectName) {
 	BehaviourTree();
 	mDist = 0;
 	mNextPoly = 0;
+
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+
+	const bool isInSinglePlayer = sceneManager->IsInSingleplayer();
+	const bool isServer = sceneManager->IsServer();
+	mIsBTWillBeExecuted = isInSinglePlayer || isServer;
 }
 
 GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
-  delete mSightedObject;
+	delete mSightedObject;
 }
 
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
-		RaycastToPlayer();
-		ExecuteBT();
+		if (mIsBTWillBeExecuted) {
+			if (mPlayer == nullptr) {
+				const Vector3& guardPos = GetTransform().GetPosition();
+				PlayerObject* nearestPlayer = LevelManager::GetLevelManager()->GetNearestPlayer(guardPos);
+
+				SetPlayer(nearestPlayer);
+			}
+			RaycastToPlayer();
+			ExecuteBT();
+		}
+
 	}
 	else {
 		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
