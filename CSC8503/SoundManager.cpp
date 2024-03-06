@@ -39,7 +39,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mDoorCloseSound);
+	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mSoundEmitterSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create Sound Emitter Sound Error !!" << std::endl;
 		return;
