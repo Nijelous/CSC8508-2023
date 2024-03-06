@@ -16,6 +16,9 @@ namespace NCL{
 			~SoundManager();
 			
 			FMOD::Channel* AddWalkSound();
+
+			FMOD::Channel* AddSoundEmitterSound(Vector3 soundPos);
+
 			void PlayDoorOpenSound(Vector3 soudPos);
 
 			void PlayDoorCloseSound(Vector3 soundPos);
@@ -37,6 +40,7 @@ namespace NCL{
 			FMOD::Sound* mDoorOpenSound = nullptr;
 			FMOD::Sound* mDoorCloseSound = nullptr;
 			FMOD::Sound* mSoundEmitterSound = nullptr;
+			FMOD::Sound* mPickUpSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

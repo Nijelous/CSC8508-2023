@@ -1202,6 +1202,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
 
+	soundEmitterObjectPtr->SetSoundObject(new SoundObject(mSoundManager->AddSoundEmitterSound(position)));
+
 	soundEmitterObjectPtr->GetPhysicsObject()->SetInverseMass(0);
 	soundEmitterObjectPtr->GetPhysicsObject()->InitSphereInertia(false);
 

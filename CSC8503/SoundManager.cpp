@@ -39,13 +39,19 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mSoundEmitterSound);
+	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D | FMOD_LOOP_NORMAL, 0, &mSoundEmitterSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create Sound Emitter Sound Error !!" << std::endl;
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 100.0f);
+	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mPickUpSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Pick Up Sound Error !!" << std::endl;
+		return;
+	}
+
+	mResult = mFootStepSound->set3DMinMaxDistance(15.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
 		return;
@@ -62,6 +68,18 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
 		return;
 	}
+
+	mResult = mSoundEmitterSound->set3DMinMaxDistance(60.0f, 150.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Sound Emitter Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mPickUpSound->set3DMinMaxDistance(20.0f, 100.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Pick Up Sound Attenuation Setting error" << std::endl;
+		return;
+	}
 }
 
 SoundManager::~SoundManager() {
@@ -69,6 +87,7 @@ SoundManager::~SoundManager() {
 	mDoorCloseSound->release();
 	mFootStepSound->release();
 	mSoundEmitterSound->release();
+	mPickUpSound->release();
 	mSystem->close();
 	mSystem->release();
 }
@@ -82,6 +101,23 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 	}
 	footStepChannel->setVolume(2.0f);
 	return footStepChannel;
+}
+
+FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
+	FMOD::Channel* soundEmitterChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mSoundEmitterSound, 0, true, &soundEmitterChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Sound Emitter sound error" << std::endl;
+		return nullptr;
+	}
+	mResult = soundEmitterChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Sound Emitter position setting error" << std::endl;
+		return;
+	}
+	soundEmitterChannel->setPaused(false);
+	return soundEmitterChannel;
 }
 
 void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
