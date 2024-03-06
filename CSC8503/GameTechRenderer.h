@@ -25,15 +25,21 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		constexpr int MAX_INSTANCE_MESHES = 3;
+		constexpr short MAX_INSTANCE_MESHES = 3;
+		constexpr short MAX_POSSIBLE_LIGHTS = 256;
+		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer	{
 		public:
+
+			
+
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 
 			Mesh*		LoadMesh(const std::string& name);
 			Texture*	LoadTexture(const std::string& name);
+			Texture* LoadDebugTexture(const std::string& name);
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
 			MeshAnimation* LoadAnimation(const std::string& name);
 			MeshMaterial* LoadMaterial(const std::string& name);
@@ -49,14 +55,80 @@ namespace NCL {
 				mInstanceTiles.push_back(wallTile);
 				mInstanceTiles.push_back(cornerWallTile);
 			}
-
+			void FillLightUBO();
+			void FillTextureDataUBO();
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
-			}
+			}		
 
 		protected:
+
+			enum BufferBlockNames {
+				camUBO,
+				staticDataUBO,
+				lightsUBO,
+				objectsUBO,
+				animFramesUBO,
+				iconUBO,				
+				textureDataUBO,
+				textureIdUBO,
+				cubeTexUBO,
+				MAX_UBO
+			};
+
+			/* (Author: B Schwarz) Data sent to a UBO buffer can be accessed reliably at offsets of 256 bytes, thus this struct is padded to 256.
+			Yes, this means it is 81.25% empty data.
+			No, I am not happy about it. */
+			struct LightData {
+				Vector3 lightDirection = { 0,0,0 };
+				float minDotProd = 0.0f;
+				Vector3 lightPos = { 0,0,0 };
+				float dimDotProd = 0.0f;
+				Vector3 lightColour = { 0,0,0 };
+				float lightRadius = 0.0f;
+				float padding[52] = { 0.0f };
+			};
+
+			struct ObjectData {
+				Matrix4 modelMatrix;
+				Matrix4 shadowMatrix;
+				Vector4 objectColour = { 0,0,0,0 };
+				bool hasVertexColours = 0;
+				float padding[27] = { 0.0f };				
+			};
+
+			
+			struct TextureHandleData {
+				GLuint64 handles[128] = { 0 };
+			};
+
+			struct TextureHandleIndices {
+				int albedoIndex = 0;
+				int normalIndex = 0;
+				int depthIndex = 0;
+				int shadowIndex = 0;
+				int albedoLightIndex = 0;
+				int specLightIndex = 0;
+			};
+
+			void InitUBOBlocks();
+			void GenUBOBuffers();
+			void GenCamMatricesUBOS();
+			void FillCamMatricesUBOs();
+			void GenIconUBO();
+			void GenStaticDataUBO();
+			void GenLightDataUBO();
+			void GenObjectDataUBO();
+			void GenAnimFramesUBOs();
+			void FillObjectDataUBO();	
+			void CreateAndFillSkyboxUBO();
 			void NewRenderLines();
 			void NewRenderText();
+			void GenTextureDataUBO();
+			void GenTextureIndexUBO();
+			void UnbindAllTextures();
+			int FindTexHandleIndex(GLuint texId);
+			int FindTexHandleIndex(const OGLTexture* tex);
 
 			void RenderIcons(UISystem::Icon icon);
 			
@@ -76,37 +148,36 @@ namespace NCL {
 			void GenerateScreenTexture(GLuint &fbo, bool depth = false);
 			void BindTexAttachmentsToBuffers(GLuint& fbo, GLuint& colourAttach0, GLuint& colourAttach1, GLuint* depthTex = nullptr);
 			void LoadDefRendShaders();
-			void FillGBuffer(Matrix4& viewMatrix, Matrix4& projMatrix);
-			void DrawLightVolumes(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void FillGBuffer();
+			void DrawLightVolumes();
 			void CombineBuffers();
 			void DrawOutlinedObjects();
 			void LoadSkybox();
 
-			void DrawWallsFloorsInstanced(Matrix4& viewMatrix, Matrix4& projMatrix);
+			void DrawWallsFloorsInstanced();
 
 			void SetDebugStringBufferSizes(size_t newVertCount);
 			void SetDebugLineBufferSizes(size_t newVertCount);
 
 			void SetUIiconBufferSizes(size_t newVertCount);
-			void BindCommonLightDataToShader(OGLShader* shader, Matrix4& viewMatrix, Matrix4& projMatrix);
-			void BindSpecificLightDataToShader(Light* l);			
-			void SendPointLightDataToShader(OGLShader* shader, PointLight* l);
-			void SendSpotLightDataToShader(OGLShader* shader, SpotLight* l);
-			void SendDirLightDataToShader(OGLShader* shader, DirectionLight* l);
 
 			vector<const RenderObject*> mActiveObjects;
-			vector<const RenderObject*> mOutlinedObjects;
+			vector<int> mOutlinedObjects;
 
-			OGLShader*  debugShader;
-			OGLShader*  skyboxShader;
+			vector<std::pair<GLuint, GLuint64>> mTextureHandles;
+
+			OGLShader*  mDebugLineShader;
+			OGLShader* mDebugTextShader;
+			OGLShader*  mSkyboxShader;
 			OGLShader* mOutlineShader;
-			OGLShader*  iconShader;
+			OGLShader* mAnimatedOutlineShader;
+			OGLShader*  mIconShader;
 
 			OGLMesh*	skyboxMesh;
 			GLuint		skyboxTex;
 
 			//shadow mapping things
-			OGLShader*	shadowShader;
+			OGLShader*	mShadowShader;
 			GLuint		shadowTex;
 			GLuint		shadowFBO;
 			Matrix4     shadowMatrix;
@@ -140,11 +211,11 @@ namespace NCL {
 
 			//Animation things
 			Shader* mShader;
-			Mesh* mMesh;
 			MeshAnimation* mAnim;
 			MeshMaterial* mMaterial;
 			vector<GLuint*>  mMatTextures;
 
+			GLuint uBOBlocks[MAX_UBO];
 
 			GLuint lineVAO;
 			GLuint lineVertVBO;

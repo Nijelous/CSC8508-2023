@@ -23,32 +23,35 @@ source_group("Header Files" FILES ${Header_Files})
 set(Maths
     "Maths.cpp"
     "Maths.h"
-    "Matrix2.cpp"
-    "Matrix2.h"
-    "Matrix3.cpp"
-    "Matrix3.h"
-    "Matrix4.cpp"
-    "Matrix4.h"
+
     "Plane.cpp"
     "Plane.h"
-	"Frustum.cpp"
+    "Frustum.cpp"
     "Frustum.h"
     "Quaternion.cpp"
     "Quaternion.h"
-	"NewVector.h"
+
+    "Vector.h"
     "Vector2.cpp"
     "Vector2.h"
     "Vector3.cpp"
     "Vector3.h"
     "Vector4.cpp"
     "Vector4.h"
-	
-	"Vector2i.cpp"
+    "Vector2i.cpp"
     "Vector2i.h"
     "Vector3i.cpp"
     "Vector3i.h"
     "Vector4i.cpp"
     "Vector4i.h"
+
+    "Matrix.h"
+    "Matrix2.cpp"
+    "Matrix2.h"
+    "Matrix3.cpp"
+    "Matrix3.h"
+    "Matrix4.cpp"
+    "Matrix4.h"
 )
 source_group("Maths" FILES ${Maths})
 
@@ -57,8 +60,10 @@ set(Rendering
     "MeshAnimation.h"
     "Mesh.cpp"
     "Mesh.h"
+
+    "Buffer.h"
 	
-	"MshLoader.cpp"
+    "MshLoader.cpp"
     "MshLoader.h"
 	
     "MeshMaterial.cpp"

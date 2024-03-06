@@ -91,7 +91,7 @@ namespace InventoryBuffSystem
 		};
 
 		std::vector<item> mItemsInMultiplayerRandomPool = {
-			doorKey
+			doorKey, screwdriver
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {

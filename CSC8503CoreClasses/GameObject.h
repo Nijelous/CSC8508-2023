@@ -96,6 +96,7 @@ namespace NCL::CSC8503 {
 			return mSoundObject;
 		}
 
+#ifdef USEGL
 		void SetIsSensed(bool sensed) {
 			mRenderObject->SetOutlined(sensed);
 		}
@@ -103,6 +104,7 @@ namespace NCL::CSC8503 {
 		bool GetIsSensed() {
 			return mRenderObject->GetOutlined();
 		}
+#endif
 
     
         void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
@@ -161,6 +163,10 @@ namespace NCL::CSC8503 {
 
 		GameObjectState GetGameOjbectState() {
 			return mObjectState;
+		}
+
+		void SetName(const std::string& name) {
+			mName = name;
 		}
 
 	protected:

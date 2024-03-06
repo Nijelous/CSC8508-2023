@@ -103,14 +103,16 @@ namespace NCL {
 			void	ChangeToSpedUpSpeeds();
 			void	ChangeToStunned();
 			void	UseItemForInteractable(Interactable* interactable);
-
 			void	EnforceMaxSpeeds();
 
 			UISystem* mUi;
+			float SusLinerInterpolation(float dt);
 
-			float mSusValue;
-			float mUiTime = 0.0;
+			float mSusValue=0.0;
+			int mUiTime = 1;
+			float tempSusValue = 0.0;
 			float mLastSusValue = 0.0;
+			float mAlarmTime=0.0;
 			
 
 			bool	IsSeenByGameObject(GameObject* otherGameObject);

@@ -112,14 +112,19 @@ void PlayerObject::UpdateObject(float dt) {
 	float yawValue = mGameWorld->GetMainCamera().GetYaw();
 	MatchCameraRotation(yawValue);
 
-	if (mPlayerSpeedState == SpedUp)
+	if (mPlayerSpeedState == SpedUp) {
 		EnforceSpedUpMaxSpeeds();
-	else
+	}
+	else {
 		EnforceMaxSpeeds();
+	}
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
 
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
+
 	}
 }
 
@@ -171,39 +176,39 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	switch (buffEvent) {
 	case slowApplied:
 		ChangeToSlowedSpeeds();
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 0.3);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 1.0);
 		break;
 	case slowRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 0.3);
 		break;
 	case speedApplied:
 		ChangeToSpedUpSpeeds();
-		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, false);
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SLOW_BUFF_SLOT, 0.3);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 1.0);
 		break;
 	case speedRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SPEED_BUFF_SLOT, 0.3);
 		break;
 	case stunApplied:
 		ChangeToStunned();
-		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, 1.0);
 		break;
 	case stunRemoved:
 		ChangeToDefaultSpeeds();
-		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(STUN_BUFF_SLOT, 0.3);
 		break;
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, true);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
-		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, false);
+		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
 		mObjectState = Idle;
 
 		break;
@@ -367,20 +372,24 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 }
 
 void PlayerObject::ControlInventory() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
 		mActiveItemSlot = 0;
-
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2))
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.5);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
 		mActiveItemSlot = 1;
-
-	if (Window::GetMouse()->GetWheelMovement() > 0)
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.5);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
+	}
+	if (Window::GetMouse()->GetWheelMovement() > 0) {
 		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
-		? mActiveItemSlot + 1 : 0;
-
-	if (Window::GetMouse()->GetWheelMovement() < 0)
+			? mActiveItemSlot + 1 : 0;
+	}
+	if (Window::GetMouse()->GetWheelMovement() < 0) {
 		mActiveItemSlot = (mActiveItemSlot > 0)
-		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
-
+			? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
+	}
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
@@ -394,6 +403,39 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 
+
+	//Handle Equipped Item Log
+	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+	
+	Debug::Print(itemName, Vector2(10, 80));
+	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
+	Debug::Print(usesLeft, Vector2(10, 85));
+
+	if (mActiveItemSlot == FIRST_ITEM_SLOT) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+
+	if (mActiveItemSlot == SECOND_ITEM_SLOT) {
+		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
+		}
+		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
+		}
+		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
+			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
+		}
+	}
+	
+
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
 	}
@@ -402,6 +444,7 @@ void PlayerObject::ControlInventory() {
 		DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
 	}
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
@@ -525,7 +568,7 @@ void PlayerObject::StartCrouching() {
 }
 
 void PlayerObject::ChangeCharacterSize(float newSize) {
-	dynamic_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(newSize);
+	static_cast<CapsuleVolume*>(mBoundingVolume)->SetHalfHeight(newSize);
 }
 
 void PlayerObject::EnforceMaxSpeeds() {
@@ -546,6 +589,24 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+float PlayerObject::SusLinerInterpolation(float dt)
+{
+	if (dt * mUiTime < 0.6) {
+		mUiTime++;
+		tempSusValue = tempSusValue + (mSusValue - mLastSusValue) * 0.016;
+		if (tempSusValue < 0.016) {
+			tempSusValue = 0;
+		}
+	}
+	else {
+		mUiTime = 1;
+		mLastSusValue = tempSusValue;
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+	}
+	float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
+	return iconValue;
 }
 
 bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject){
@@ -661,4 +722,3 @@ void PlayerObject::StopSliding() {
 		mPhysicsObject->SetLinearVelocity(Vector3(0, fallingSpeed, 0));
 	}
 }
-

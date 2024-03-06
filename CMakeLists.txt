@@ -12,8 +12,12 @@ if(NOT CMAKE_VS_PLATFORM_NAME)
 endif()
 message("${CMAKE_VS_PLATFORM_NAME} architecture in use")
 
-if(NOT ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64"))
-    message(FATAL_ERROR "${CMAKE_VS_PLATFORM_NAME} arch is not supported!")
+if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
+    add_compile_definitions(USEGL)
+endif()
+
+if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
+    add_compile_definitions(USEPROSPERO)
 endif()
 
 ################################################################################
@@ -77,7 +81,17 @@ endif()
 ################################################################################
 add_subdirectory(NCLCoreClasses)
 add_subdirectory(CSC8503CoreClasses)
-add_subdirectory(OpenGLRendering)
+
+if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
+    add_subdirectory(OpenGLRendering)
+endif()
+
+if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
+    add_subdirectory(GLTFLoader)
+    add_subdirectory(PS5Core)
+    add_subdirectory(PS5Starter)
+endif()
+
 add_subdirectory(CSC8503)
 add_subdirectory(Detour)
 add_subdirectory(Recast)

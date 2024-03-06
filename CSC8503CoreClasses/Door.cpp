@@ -30,7 +30,6 @@ void Door::InitStateMachine()
 	mStateMachine->AddTransition(new StateTransition(DoorOpen, DoorClosed,
 		[&]() -> bool
 		{
-			this->GetSoundObject()->TriggerSoundEvent();
 			return !mIsOpen;
 		}
 	));
@@ -44,19 +43,14 @@ void Door::InitStateMachine()
 }
 
 
-void Door::Open()
-{
+void Door::Open() {
 	SetActive(false);
 	mTimer = initDoorTimer;
-	mIsOpen = true;
 	SetNavMeshFlags(1);
-	
 }
 
-void Door::Close()
-{
+void Door::Close() {
 	SetActive(true);
-	mIsOpen = false;
 	SetNavMeshFlags(2);
 }
 
@@ -65,6 +59,15 @@ void Door::CountDownTimer(float dt)
 	mTimer = std::max(mTimer - dt, 0.0f);
 }
 
+void Door::SetIsOpen(bool isOpen) {
+	mIsOpen = isOpen;
+	if(isOpen) {
+		Open();
+	}
+	else {
+		Close();
+	}
+}
 void Door::SetNavMeshFlags(int flag) {
 	float* pos = new float[3] { mTransform.GetPosition().x, mTransform.GetPosition().y, mTransform.GetPosition().z };
 	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
