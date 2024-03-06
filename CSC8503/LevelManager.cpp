@@ -270,7 +270,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		//LoadGuards((*mLevelList[levelID]).GetGuardCount());
+		LoadGuards((*mLevelList[levelID]).GetGuardCount());
 		LoadCCTVs();
 	}
 #ifdef USEGL
