@@ -72,9 +72,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 				frameMatricesVec.clear();
 
 			}
-
-			
-			
 		}
 	
 	
