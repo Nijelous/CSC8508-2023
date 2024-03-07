@@ -48,9 +48,7 @@ LevelManager::LevelManager() {
 #endif
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
-#ifdef USEGL // remove after implemented
-	mAnimation = new AnimationSystem(*mWorld);
-#endif
+
 	mUi = new UISystem();
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
@@ -76,6 +74,17 @@ LevelManager::LevelManager() {
 	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
 
 	InitialiseAssets();
+	mIsLevelInitialised = false;
+
+#ifdef USEGL // remove after implemented
+
+	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
+	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
+	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh, *mGuardMaterial, mPlayerTextures);
+	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);
+
+#endif
+
 	InitialiseIcons();
 
 	mItemTextureMap = {
@@ -179,6 +188,7 @@ LevelManager::~LevelManager() {
 }
 
 void LevelManager::ClearLevel() {
+	mIsLevelInitialised = false;
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
@@ -196,6 +206,7 @@ void LevelManager::ClearLevel() {
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
 	mGuardObjects.clear();
+
 
 	ResetEquippedIconTexture();
 }
@@ -280,9 +291,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 		}
-
-		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 	}
+
+	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+
+
+
 #endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -301,6 +315,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
+
+	mIsLevelInitialised = true;
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -349,8 +365,11 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
-		mPhysics->Update(dt);
-		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
+		if (mIsLevelInitialised) {
+			mPhysics->Update(dt);
+			mAnimation->Update(dt, mUpdatableObjects);
+		}
+		
 		if (mUpdatableObjects.size()>0) {
 			mSoundManager->UpdateSounds(mUpdatableObjects);
 		}
@@ -416,10 +435,6 @@ void LevelManager::InitialiseAssets() {
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
 	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Incentivise.anm");
-	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-
-	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mRigMesh, *mRigMaterial, mGuardTextures);
 
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mRigAnimationStand));
@@ -1148,23 +1163,22 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize));
 
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 10));
-	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial));
-
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
-
-
-
 	guard->SetCollisionLayer(Npc);
 
+	RenderObject* renderObject = new RenderObject(&guard->GetTransform(), mRigMesh, mKeeperAlbedo, mKeeperNormal, mAnimationShader, meshSize);
+	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mRigAnimationStand, mRigMaterial);
+
+	renderObject->SetAnimationObject(animObject);
+	guard->SetRenderObject(renderObject);
+	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
-
+	guard->SetObjectState(GameObject::Idle);
 	if (isInMultiplayer) {
 		AddNetworkObject(*guard);
 	}
@@ -1174,7 +1188,6 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
-
 
 	return guard;
 }

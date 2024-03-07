@@ -92,6 +92,7 @@ namespace NCL {
 
 			UISystem* GetUiSystem() { return mUi; };
 			SoundManager* GetSoundManager() { return mSoundManager; };
+			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
@@ -317,6 +318,8 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+
+			bool mIsLevelInitialised;
 		};
 	}
 }
