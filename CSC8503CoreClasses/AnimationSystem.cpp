@@ -37,26 +37,23 @@ void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects,std:
 }
 
 void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects){
-		for (auto& obj : UpdatableObjects) {
+	for (vector<GameObject*>::iterator it = UpdatableObjects.begin(); it != UpdatableObjects.end(); ++it) {
+		 	GameObject* obj = *it;
 			if (obj->GetRenderObject()->GetAnimationObject()) {
 				AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
 				mShader = obj->GetRenderObject()->GetShader();
-				
+
 				const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 				const Matrix4* frameData = mAnim->GetJointData(currentFrame);
-				
+
 				const int* bindPoseIndices = mMesh->GetBindPoseIndices();
 				std::vector<std::vector<Matrix4>> frameMatricesVec;
 				for (unsigned int i = 0; i < mMesh->GetSubMeshCount(); ++i) {
-
-					
 					Mesh::SubMeshPoses pose;
 					mMesh->GetBindPoseState(i, pose);
-					
-
 					vector<Matrix4> frameMatrices;
 					for (unsigned int i = 0; i < pose.count; ++i) {
 						int jointID = bindPoseIndices[pose.start + i];
@@ -68,28 +65,30 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 				obj->GetRenderObject()->SetCurrentFrame(currentFrame);
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
-				
+
 				frameMatricesVec.clear();
 
 			}
 
-			
-			
+
 		}
 	
 	
 }
 
 void AnimationSystem::UpdateCurrentFrames(float dt){
-	for ( auto& animList : mAnimationList) {
+	
+	for (vector<AnimationObject*>::iterator it = mAnimationList.begin(); it != mAnimationList.end(); ++it) {
+		AnimationObject* animList = *it;
 		animList->Update(dt);
 	}
+
 }
 
 
 void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList){
-	
-	for (auto& obj : mGuardList) {
+	for (vector<GuardObject*>::iterator it = mGuardList.begin(); it != mGuardList.end(); ++it) {
+		GuardObject* obj = *it;
 
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 		
@@ -102,15 +101,15 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			{
 			case GameObject::GameObjectState::Idle:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
-
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(1.0);
 				break;
 			case GameObject::GameObjectState::Walk:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
-
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(1.0);
 				break;
 			case GameObject::GameObjectState::Sprint:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
-
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(2.0);
 				break;
 			}
 
@@ -118,8 +117,8 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			
 	}
 
-	for (auto& obj : mPlayerList) {
-
+	for (vector<PlayerObject*>::iterator it = mPlayerList.begin(); it != mPlayerList.end(); ++it) {
+		PlayerObject* obj = *it;
 		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
 
 		if (mPlayerState != mObjectState) {
@@ -167,7 +166,8 @@ void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh,
 }
 
 void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mPlayerTexture, vector<GLuint>& mGuardTextures) {
-	for (auto& obj : UpdatableObjects) {
+	for (vector<GameObject*>::iterator it = UpdatableObjects.begin(); it != UpdatableObjects.end(); ++it) {
+		GameObject* obj = *it;
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();

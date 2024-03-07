@@ -428,7 +428,7 @@ void LevelManager::InitialiseAssets() {
 
 	mRigAnimationStand = mRenderer->LoadAnimation("Max/Idle.anm");
 	mRigAnimationWalk = mRenderer->LoadAnimation("Max/Walk2.anm");
-	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Run.anm");
+	mRigAnimationSprint = mRenderer->LoadAnimation("Max/Walk2.anm");
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
 
 	mAnimation->PreloadMatTextures(*mRenderer, *mGuardMesh,*mGuardMaterial, mPlayerTextures);

@@ -88,6 +88,7 @@ namespace NCL::Maths {
 			return out;
 		}
 
+
 		Vector3 operator*(const Vector3& v) const;
 		Vector4 operator*(const Vector4& v) const;
 

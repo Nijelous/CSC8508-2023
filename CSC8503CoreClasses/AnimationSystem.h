@@ -37,7 +37,6 @@ namespace NCL {
 
 			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mRigTexture, vector<GLuint>& mGuardTextures);
 
-
 		protected:
 
 
