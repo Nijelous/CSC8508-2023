@@ -16,7 +16,6 @@ InteractableDoor::InteractableDoor() {
 	mInteractableItemType = InteractableItems::InteractableDoors;
 	mIsLocked = false;
 	mIsOpen = false;
-	mName = "Door";
 
 	bool isServer = SceneManager::GetSceneManager()->IsServer();
 	if (isServer) {
