@@ -218,6 +218,8 @@ namespace NCL {
 			std::unordered_map<std::string, MeshMaterial*> mMaterials;
 			std::unordered_map<std::string, MeshAnimation*> mAnimations;
 
+			std::vector<std::string> mShadersToLoad;
+
 			UISystem* mUi;
 
 			FlagGameObject* mMainFlag;

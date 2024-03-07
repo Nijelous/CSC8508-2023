@@ -26,6 +26,7 @@
 #include "UISystem.h"
 #include <filesystem>
 #include <fstream>
+#include <thread>
 
 #ifdef USEGL
 
@@ -39,46 +40,48 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-	mBuilder = new RecastBuilder();
+	mRoomList = std::vector<Room*>();
+	std::thread loadRooms([this] {
+		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
+			Room* newRoom = new Room(entry.path().string());
+			mRoomList.push_back(newRoom);
+		}
+		});
+	mLevelList = std::vector<Level*>();
+	std::thread loadLevels([this] {
+		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
+			Level* newLevel = new Level(entry.path().string());
+			mLevelList.push_back(newLevel);
+		}
+		});
 	mWorld = new GameWorld();
+	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
 #ifdef USEPROSPERO
 	// use ps5 renderer
 #endif
-	mPhysics = new PhysicsSystem(*mWorld);
-	mPhysics->UseGravity(true);
 #ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld);
 #endif
 	mUi = new UISystem();
+	InitialiseAssets();
+	mBuilder = new RecastBuilder();
+	mPhysics = new PhysicsSystem(*mWorld);
+	mPhysics->UseGravity(true);
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
 	mDtSinceLastFixedUpdate = 0;
 
-	mSoundManager = new SoundManager(mWorld);
-
-	mRoomList = std::vector<Room*>();
-	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
-		Room* newRoom = new Room(entry.path().string());
-		mRoomList.push_back(newRoom);
-	}
-	mLevelList = std::vector<Level*>();
-	for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
-		Level* newLevel = new Level(entry.path().string());
-		mLevelList.push_back(newLevel);
-	}
 	mActiveLevel = -1;
 
 	mGameState = MenuState;
 
 	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
 
-	InitialiseAssets();
 	InitialiseIcons();
-
 	mItemTextureMap = {
 	{PlayerInventory::item::none, mTextures["InventorySlot"]},
 	{PlayerInventory::item::disguise, mTextures["Stun"]},
@@ -88,6 +91,9 @@ LevelManager::LevelManager() {
     {PlayerInventory::item::stunItem, mTextures["Stun"]},
     {PlayerInventory::item::screwdriver, mTextures["Stun"]}
 	};
+	loadRooms.join();
+	loadLevels.join();
+	loadSoundManager.join();
 }
 
 LevelManager::~LevelManager() {
@@ -353,34 +359,61 @@ void LevelManager::InitialiseAssets() {
 	std::ifstream assetsFile("../Assets/UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
+	vector<std::string> groupDetails;
+	std::string groupType = "";
+	std::thread animLoadThread;
+	std::thread matLoadThread;
 	while (getline(assetsFile, line)) {
 		for (int i = 0; i < 3; i++) {
 			assetDetails[i] = line.substr(0, line.find(","));
 			line.erase(0, assetDetails[i].length() + 1);
 		}
 		assetDetails[3] = line;
-		if (assetDetails[0] == "msh") {
-			mMeshes[assetDetails[1]] = mRenderer->LoadMesh(assetDetails[2]);
+		if (groupType == "") groupType = assetDetails[0];
+		if (groupType != assetDetails[0]) {
+			if (groupType == "anim") {
+				animLoadThread = std::thread([this, groupDetails] {
+					for (int i = 0; i < groupDetails.size(); i += 3) {
+						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
+					}
+					});
+			}
+			else if (groupType == "mat") {
+				matLoadThread = std::thread([this, groupDetails] {
+					for (int i = 0; i < groupDetails.size(); i += 3) {
+						mMaterials[groupDetails[i]] = mRenderer->LoadMaterial(groupDetails[i + 1]);
+					}
+					});
+			}
+			else if (groupType == "msh") {
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
+				}
+			}
+			else if (groupType == "tex") {
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
+				}
+			}
+			else if (groupType == "sdr") {
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mShaders[groupDetails[i]] = mRenderer->LoadShader(groupDetails[i + 1], groupDetails[i + 2]);
+				}
+			}
+			groupType = assetDetails[0];
+			groupDetails.clear();
 		}
-		else if (assetDetails[0] == "tex") {
-			mTextures[assetDetails[1]] = mRenderer->LoadTexture(assetDetails[2]);
-		}
-		else if (assetDetails[0] == "sdr") {
-			mShaders[assetDetails[1]] = mRenderer->LoadShader(assetDetails[2], assetDetails[3]);
-		}
-		else if (assetDetails[0] == "mat") {
-			mMaterials[assetDetails[1]] = mRenderer->LoadMaterial(assetDetails[2]);
-		}
-		else if (assetDetails[0] == "anim") {
-			mAnimations[assetDetails[1]] = mRenderer->LoadAnimation(assetDetails[2]);
+		for (int i = 1; i < 4; i++) {
+			groupDetails.push_back(assetDetails[i]);
 		}
 	}
 	delete[] assetDetails;
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-
+	matLoadThread.join();
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
 
+	animLoadThread.join();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
