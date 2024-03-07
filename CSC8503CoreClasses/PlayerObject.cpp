@@ -339,6 +339,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 				}
 
 				//Check if object is an item.
+#ifdef USEGL
 				Item* item = dynamic_cast<Item*>(objectHit);
 				if (item != nullptr) {
 					item->OnPlayerInteract(mPlayerID);
@@ -355,6 +356,7 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 
 					return;
 				}
+#endif
 				if (interactType == PickPocket)
 				{
 					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
