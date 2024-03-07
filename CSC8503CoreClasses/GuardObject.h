@@ -13,7 +13,8 @@ namespace NCL {
         class PlayerObject;
         constexpr int MIN_DIST_TO_NEXT_POS = 49;
         constexpr int GUARD_CATCHING_DISTANCE_SQUARED = 36;
-        constexpr float FUMBLE_KEYS_TIME = 1;
+        constexpr float FUMBLE_KEYS_TIME = 0.15;
+        constexpr float RAYCAST_INTERVAL = 0.1;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
