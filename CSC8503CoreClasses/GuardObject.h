@@ -73,6 +73,7 @@ namespace NCL {
             float* mLastKnownPos = new float[3];
             float mDoorRaycastInterval;
 
+
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();
             BehaviourAction* GoToLastKnownLocation();

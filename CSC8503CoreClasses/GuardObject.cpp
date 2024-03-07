@@ -239,9 +239,8 @@ void GuardObject::CheckForDoors(float dt, float fumbleKeysTime) {
 		Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 		float dist = (mSightedDoor->GetTransform().GetPosition() - this->GetTransform().GetPosition()).LengthSquared();
 		if (mSightedDoor->GetName() == "InteractableDoor" && dist < MIN_DIST_TO_NEXT_POS) {
-			float currentTime = fumbleKeysTime - dt;
 			this->GetPhysicsObject()->ClearForces();
-			if (currentTime == 0) {
+			if () {
 				OpenDoor();
 			}
 		}
