@@ -112,6 +112,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
@@ -242,6 +243,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandlePlayerBuffChange(packet);
 		break;
 	}
+	case BasicNetworkMessages::SyncObjectState:
+	{
+		SyncObjectStatePacket* packet = (SyncObjectStatePacket*)(payload);
+		HandleObjectStatePacket(packet);
+		break;
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -262,6 +269,11 @@ void DebugNetworkedGame::SendClinentSyncItemSlotPacket(int playerNo, int invSlot
 void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const {
 	PlayerBuffs::buff buffToSync = (PlayerBuffs::buff)(buffType);
 	NCL::CSC8503::ClientSyncBuffPacket packet(playerNo, buffToSync, toApply);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendObjectStatePacket(int networkId, int state) const {
+	NCL::CSC8503::SyncObjectStatePacket packet(networkId, state);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -460,7 +472,7 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	default:
 		break;
 	}
-
+	netPlayer->SetPrisonDoor(mLevelManager->GetPrisonDoor());
 	netPlayer->GetRenderObject()->SetColour(colour);
 	return netPlayer;
 }
@@ -547,5 +559,20 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
     auto* buffSystem = mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr();
     const PlayerBuffs::buff buffToSync = static_cast<PlayerBuffs::buff>(packet->buffID);
     buffSystem->SyncPlayerBuffs(packet->playerID, localPlayerID, buffToSync, packet->toApply);
+}
+
+void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) const {
+	NetworkObject* objectToChangeState = nullptr;
+	for (NetworkObject* networkObject : mNetworkObjects) {
+		if (networkObject->GetnetworkID() == packet->networkObjId) {
+			objectToChangeState = networkObject;
+			break;
+		}
+	}
+
+	GameObject::GameObjectState state = static_cast<GameObject::GameObjectState>(packet->objectState);
+	if (objectToChangeState != nullptr) {
+		objectToChangeState->GetGameObject().SetObjectState(state);
+	}
 }
 #endif
