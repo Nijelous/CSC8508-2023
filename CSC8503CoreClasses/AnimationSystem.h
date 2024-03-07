@@ -18,13 +18,12 @@ namespace NCL {
 	namespace CSC8503 {
 		class AnimationSystem {
 		public:
-
-			AnimationSystem(GameWorld& g);
+			AnimationSystem(GameWorld& g, std::map<std::string, MeshAnimation*>& preAnimationList);
 			~AnimationSystem();
 
 			void Clear();
 
-			void Update(float dt, vector<GameObject*> mUpdatableObjects , std::map<std::string, MeshAnimation*> preAnimationList);
+			void Update(float dt, vector<GameObject*> mUpdatableObjects);
 
 			void UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects);
 
@@ -36,11 +35,9 @@ namespace NCL {
 
 
 			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mRigTexture, vector<GLuint>& mGuardTextures);
-
+			void SetAnimationState(GameObject* gameObject, GameObject::GameObjectState objState);
 
 		protected:
-
-
 			GameWorld& gameWorld;
 			vector<AnimationObject*> mAnimationList;
 			vector<GuardObject*> mGuardList;
@@ -53,6 +50,13 @@ namespace NCL {
 
 			GameObject::GameObjectState mGuardState;
 			GameObject::GameObjectState mPlayerState;
+			std::map<std::string, MeshAnimation*>& mPreAnimationList;
+
+			std::map<GameObject::GameObjectState, std::string> mGuardStateAnimationMap;
+			std::map<GameObject::GameObjectState, std::string> mPlayerStateAnimationMap;
+
+			void InitGuardStateAnimationMap();
+			void InitPlayerStateAnimationMap();
 		};
 	}
 }
