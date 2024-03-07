@@ -857,7 +857,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Chest"], mTextures["ChestAlbedo"], mTextures["ChestNormal"], mShaders["Basic"], 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetCollisionLayer(Collectable);
@@ -884,7 +884,7 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Present"], mTextures["PresentAlbedo"], mTextures["PresentNormal"], mShaders["Basic"], 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
 	pickup->SetSoundObject(new SoundObject());

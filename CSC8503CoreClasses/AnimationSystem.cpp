@@ -102,15 +102,16 @@ void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> pre
 			{
 			case GameObject::GameObjectState::Idle:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(1.0);
 
 				break;
 			case GameObject::GameObjectState::Walk:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
-
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(1.0);
 				break;
 			case GameObject::GameObjectState::Sprint:
 				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
-
+				obj->GetRenderObject()->GetAnimationObject()->SetRate(2.0);
 				break;
 			}
 
