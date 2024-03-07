@@ -27,7 +27,8 @@ enum BasicNetworkMessages {
 	ClientSyncLocalActiveCause,
 	ClientSyncLocalSusChange,
 	SyncInteractable,
-	ClientSyncGlobalSusChange
+	ClientSyncGlobalSusChange,
+	SyncObjectState
 };
 
 struct GamePacket {

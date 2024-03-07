@@ -102,6 +102,18 @@ namespace NCL {
 				}
 			}
 
+			void OperateOnLeaf(QuadTreeFunc& func, const Vector3& objPos, const Vector3& objSize) {
+				if (!CollisionDetection::AABBTest(objPos, Vector3(position.x, 0, position.y), objSize, Vector3(size.x, 1000.0f, size.y))) return;
+				if (children) {
+					for (int i = 0; i < 4; i++) {
+						children[i].OperateOnLeaf(func, objPos, objSize);
+					}
+				}
+				else {
+					func(contents);
+				}
+			}
+
 		protected:
 			std::list< QuadTreeEntry<T> >	contents;
 
@@ -141,6 +153,10 @@ namespace NCL {
 
 			void OperateOnContents(typename QuadTreeNode<T>::QuadTreeFunc  func) {
 				root.OperateOnContents(func);
+			}
+
+			void OperateOnLeaf(typename QuadTreeNode<T>::QuadTreeFunc func, const Vector3& objPos, const Vector3& objSize) {
+				root.OperateOnLeaf(func, objPos, objSize);
 			}
 
 			void CopyTree(QuadTree<T>* baseTree, Vector2 size) {

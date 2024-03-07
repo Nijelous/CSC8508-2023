@@ -130,6 +130,13 @@ namespace NCL::CSC8503 {
 		SyncInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
 	};
 
+	struct SyncObjectStatePacket : public GamePacket {
+		int networkObjId;
+		int objectState;
+
+		SyncObjectStatePacket(int networkObjId, int objectState);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
@@ -140,7 +147,9 @@ namespace NCL::CSC8503 {
 		//Called by servers
 		virtual bool WritePacket(GamePacket** p, bool deltaFrame, int stateID);
 
-		GameObject GetGameObject() { return object; }
+		GameObject& GetGameObject() { return object; }
+
+		void SetGameObject(GameObject& obj) const { object = obj; }
 
 		int GetnetworkID() { return networkID; }
 
