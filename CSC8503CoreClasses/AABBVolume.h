@@ -21,7 +21,7 @@ namespace NCL {
 			return halfSizes;
 		}
 
-		Vector3 GetOffset() const {
+		Vector3 GetOffset() const override {
 			return offset;
 		}
 
