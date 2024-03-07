@@ -13,7 +13,7 @@ namespace NCL {
         class PlayerObject;
         constexpr int MIN_DIST_TO_NEXT_POS = 49;
         constexpr int GUARD_CATCHING_DISTANCE_SQUARED = 36;
-        constexpr float FUMBLE_KEYS_TIME = 200;
+        constexpr float FUMBLE_KEYS_TIME = 1;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -63,7 +63,7 @@ namespace NCL {
             float* QueryNavmesh(float* endPos);
             bool CheckPolyDistance();
 
-            void CheckForDoors(float dt, float fumbleKeysTime);
+            void CheckForDoors(float dt);
             void OpenDoor();
 
             float mDist;
@@ -72,7 +72,7 @@ namespace NCL {
             int mGuardSpeedMultiplier;
             float* mLastKnownPos = new float[3];
             float mDoorRaycastInterval;
-
+            float mFumbleKeysCurrentTime;
 
             BehaviourAction* Patrol();
             BehaviourAction* ChasePlayerSetup();

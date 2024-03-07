@@ -22,7 +22,8 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mIsStunned = false;
 	mDist = 0;
 	mNextPoly = 0;
-	mDoorRaycastInterval = 16;
+	mDoorRaycastInterval = 1;
+	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 
 	BehaviourTree();
 }
@@ -39,9 +40,12 @@ void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
 		RaycastToPlayer();
 		ExecuteBT();
-		if (mDoorRaycastInterval - dt == 0) {
-			mDoorRaycastInterval = 200;
-			CheckForDoors(dt, FUMBLE_KEYS_TIME);
+		if (mDoorRaycastInterval <= 0) {
+			mDoorRaycastInterval = 1;
+			CheckForDoors(dt);
+		}
+		else {
+			mDoorRaycastInterval -= dt;
 		}
 	}
 	else {
@@ -231,7 +235,7 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 	}
 }
 
-void GuardObject::CheckForDoors(float dt, float fumbleKeysTime) {
+void GuardObject::CheckForDoors(float dt) {
 	RayCollision closestCollision;
 	Ray r = Ray(this->GetTransform().GetPosition(), GuardForwardVector());
 	if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
@@ -240,8 +244,12 @@ void GuardObject::CheckForDoors(float dt, float fumbleKeysTime) {
 		float dist = (mSightedDoor->GetTransform().GetPosition() - this->GetTransform().GetPosition()).LengthSquared();
 		if (mSightedDoor->GetName() == "InteractableDoor" && dist < MIN_DIST_TO_NEXT_POS) {
 			this->GetPhysicsObject()->ClearForces();
-			if () {
+			if (mFumbleKeysCurrentTime <= 0) {
+				mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 				OpenDoor();
+			}
+			else {
+				mFumbleKeysCurrentTime -= dt;
 			}
 		}
 	}
