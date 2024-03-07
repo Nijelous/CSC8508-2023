@@ -1,15 +1,14 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
-#include "RenderObject.h"
 
 using std::vector;
 
 namespace NCL::CSC8503 {
 	class NetworkObject;
-	class RenderObject;
 	class PhysicsObject;
 	class SoundObject;
+	class RenderObject;
 
 	enum CollisionLayer {
 		StaticObj = 1,
@@ -32,7 +31,8 @@ namespace NCL::CSC8503 {
 			Sprint,
 			IdleCrouch,
 			Crouch,
-			Happy
+			Happy,
+			Default
 		};
 
 		void SetBoundingVolume(CollisionVolume* vol) {
@@ -96,17 +96,12 @@ namespace NCL::CSC8503 {
 			return mSoundObject;
 		}
 
-		void SetIsSensed(bool sensed) {
-			mRenderObject->SetOutlined(sensed);
-		}
+		void SetIsSensed(bool sensed);
 
-		bool GetIsSensed() {
-			return mRenderObject->GetOutlined();
-		}
+		bool GetIsSensed();
 
     
-        void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
-    
+		void SetNetworkObject(NetworkObject* netObj);
 	
 
 		void SetRenderObject(RenderObject* newObject) {
@@ -166,6 +161,8 @@ namespace NCL::CSC8503 {
 		void SetName(const std::string& name) {
 			mName = name;
 		}
+
+		void SetObjectState(GameObjectState state);
 
 	protected:
 		Transform			mTransform;
