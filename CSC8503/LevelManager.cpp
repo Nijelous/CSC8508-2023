@@ -966,6 +966,8 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
+	pickup->SetSoundObject(new SoundObject());
+
 	pickup->SetCollisionLayer(Collectable);
 
 	pickup->GetPhysicsObject()->SetInverseMass(0);
@@ -1201,6 +1203,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
+
+	soundEmitterObjectPtr->SetSoundObject(new SoundObject(mSoundManager->AddSoundEmitterSound(position)));
 
 	soundEmitterObjectPtr->GetPhysicsObject()->SetInverseMass(0);
 	soundEmitterObjectPtr->GetPhysicsObject()->InitSphereInertia(false);

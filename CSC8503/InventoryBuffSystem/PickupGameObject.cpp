@@ -28,6 +28,7 @@ PickupGameObject::PickupGameObject(
 	mPlayerObjectToPlayerNoMap = playerObjectToPlayerNoMap;
 	mRandomSeed = randomSeed;
 	mIsMultiplayer = isMultiplayer;
+	mName = "PickupGameObject";
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
 		{
@@ -104,6 +105,7 @@ void PickupGameObject::ChangeToRandomPickup() {
 }
 
 void PickupGameObject::ActivatePickup(int playerNo) {
+	GetSoundObject()->TriggerSoundEvent();
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 
