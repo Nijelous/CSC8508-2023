@@ -90,10 +90,10 @@ void TutorialGame::UpdateGame(float dt) {
 	UpdateKeys();
 
 	if (useGravity) {
-		//Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
+		Debug::Print("(G)ravity on", Vector2(5, 95), Debug::RED);
 	}
 	else {
-		//Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
+		Debug::Print("(G)ravity off", Vector2(5, 95), Debug::RED);
 	}
 
 	RayCollision closestCollision;
@@ -117,9 +117,9 @@ void TutorialGame::UpdateGame(float dt) {
 		}
 	}
 
-	//Debug::DrawLine(Vector3(), Vector3(100, 0, 0), Vector4(1, 0, 0, 1));
-	//Debug::DrawLine(Vector3(), Vector3(0, 100, 0), Vector4(0, 1, 0, 1));
-	//Debug::DrawLine(Vector3(), Vector3(0, 0, 100), Vector4(0, 0, 1, 1));
+	Debug::DrawLine(Vector3(), Vector3(100, 0, 0), Vector4(1, 0, 0, 1));
+	Debug::DrawLine(Vector3(), Vector3(0, 100, 0), Vector4(0, 1, 0, 1));
+	Debug::DrawLine(Vector3(), Vector3(0, 0, 100), Vector4(0, 0, 1, 1));
 
 	SelectObject();
 	MoveSelectedObject();

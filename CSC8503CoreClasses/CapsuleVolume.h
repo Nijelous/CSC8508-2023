@@ -31,7 +31,7 @@ namespace NCL {
             return halfHeight;
         }
 
-        Maths::Vector3 GetOffset() const {
+        Maths::Vector3 GetOffset() const override {
             return offset;
         }
 

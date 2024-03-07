@@ -24,7 +24,8 @@ enum BasicNetworkMessages {
 	ClientSyncItemSlotUsage,
 	ClientSyncItemSlot,
 	SyncInteractable,
-	ClientSyncBuffs
+	ClientSyncBuffs,
+	SyncObjectState
 };
 
 struct GamePacket {

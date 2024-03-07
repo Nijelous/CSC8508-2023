@@ -5,6 +5,7 @@
 #include "PhysicsObject.h"
 #include "Vector3.h"
 #include "map";
+#include "../CSC8503/SoundObject.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -28,6 +29,7 @@ void SoundEmitter::UpdateObject(float dt) {
 		NCL::Maths::Vector3 pos = GetTransform().GetPosition();
 		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos);
 		this->SetActive(false);
+		this->GetSoundObject()->GetChannel()->setPaused(true);
 	}
 }
 
