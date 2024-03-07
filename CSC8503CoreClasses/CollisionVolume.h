@@ -23,6 +23,8 @@ namespace NCL {
 
 		virtual void SetRadius(float radius) {}
 
+		virtual Maths::Vector3 GetOffset() const { return Maths::Vector3(0, 0, 0); }
+
 		VolumeType type;
 		bool applyPhysics;
 	};
