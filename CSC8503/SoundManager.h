@@ -23,6 +23,8 @@ namespace NCL{
 
 			void PlayDoorCloseSound(Vector3 soundPos);
 
+			void PlayPickUpSound(Vector3 soundPos);
+
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);

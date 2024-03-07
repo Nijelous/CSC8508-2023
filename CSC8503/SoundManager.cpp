@@ -45,7 +45,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/ophelia.mp3", FMOD_3D, 0, &mPickUpSound);
+	mResult = mSystem->createSound("../Assets/Sounds/item-pick-up-38258.mp3", FMOD_3D, 0, &mPickUpSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create Pick Up Sound Error !!" << std::endl;
 		return;
@@ -99,7 +99,11 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 		std::cout << "Play Footstep sound error" << std::endl;
 		return nullptr;
 	}
-	footStepChannel->setVolume(2.0f);
+	mResult = footStepChannel->setVolume(4.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Footstep sound Volume Change error" << std::endl;
+		return nullptr;
+	}
 	return footStepChannel;
 }
 
@@ -114,7 +118,7 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 	mResult = soundEmitterChannel->set3DAttributes(&pos, nullptr);
 	if (mResult != FMOD_OK) {
 		std::cout << "Sound Emitter position setting error" << std::endl;
-		return;
+		return nullptr;
 	}
 	soundEmitterChannel->setPaused(false);
 	return soundEmitterChannel;
@@ -152,6 +156,23 @@ void SoundManager::PlayDoorCloseSound(Vector3 soundPos) {
 	doorCloseChannel->setPaused(false);
 }
 
+void SoundManager::PlayPickUpSound(Vector3 soundPos) {
+	FMOD::Channel* pickUpChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mPickUpSound, 0, true, &pickUpChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = pickUpChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	pickUpChannel->setVolume(0.5f);
+	pickUpChannel->setPaused(false);
+}
+
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
@@ -166,8 +187,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-#ifdef USEGL
-		else if (Door* doorObj = dynamic_cast<Door*>(obj)) {
+		else if (obj->GetName() == "Door") {
 			bool isOpen = obj->GetSoundObject()->GetisTiggered();
 			if (isOpen) {
 				PlayDoorOpenSound(soundPos);
@@ -179,7 +199,13 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->CloseDoorFinished();
 			}
 		}
-#endif
+		else if (obj->GetName() == "PickupGameObject") {
+			bool isPlay = obj->GetSoundObject()->GetisTiggered();
+			if (isPlay) {
+				PlayPickUpSound(soundPos);
+				obj->GetSoundObject()->SetNotTriggered();
+			}
+		}
 	}
 	mSystem->update();
 }

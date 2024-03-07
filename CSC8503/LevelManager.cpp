@@ -966,6 +966,8 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mSphereMesh, mFloorAlbedo, mFloorNormal, mBasicShader, 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
+	pickup->SetSoundObject(new SoundObject());
+
 	pickup->SetCollisionLayer(Collectable);
 
 	pickup->GetPhysicsObject()->SetInverseMass(0);
