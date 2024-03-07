@@ -871,6 +871,8 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 
 	mWorld->AddGameObject(flag);
 
+	mUpdatableObjects.push_back(flag);
+
 	return flag;
 
 }
