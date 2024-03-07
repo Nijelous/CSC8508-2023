@@ -2,15 +2,15 @@
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
-
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
-
 #include "Transform.h"
-#include <AnimationObject.h>
+#include "AnimationObject.h"
+#include "Buffer.h"
 
 #ifdef USEGL
 #include <glad/gl.h>
+#endif
 
 namespace NCL {
 	using namespace NCL::Rendering;
@@ -22,20 +22,29 @@ namespace NCL {
 		class RenderObject
 		{
 		public:
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader, float cullSphereRadius);
-			RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedo, Texture* normal, Shader* shader, Vector4 colour, float cullSphereRadius);
-			~RenderObject();
+			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* albedoTex, Texture* normalTex, Shader* inShader, float inCullSphereRadius);
+			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* albedoTex, Texture* normalTex, Shader* inShader, Vector4 inColour, float inCullSphereRadius);
+			~RenderObject() {}
 
 			void SetAlbedoTexture(Texture* t) {
 				mAlbedoTex = t;
 			}
 
-			Texture* GetAlbedoTexture() const {
-				return mAlbedoTex;
-			}
-
 			void SetNormalTexture(Texture* t) {
 				mNormalTex = t;
+			}
+
+			Buffer* GetGPUBuffer() const {
+				return mBuffer;
+			}
+
+			void SetGPUBuffer(Buffer* b) {
+				mBuffer = b;
+			}
+
+			Texture* GetAlbedoTexture() const
+			{
+				return mAlbedoTex;
 			}
 
 			Texture* GetNormalTexture() const {
@@ -62,14 +71,6 @@ namespace NCL {
 				return mColour;
 			}
 
-			float GetCullSphereRadius() const {
-				return mCullSphereRadius;
-			}
-
-			float GetSqDistToCam() const {
-				return mSqDistToCam;
-			}
-
 			void SetSqDistToCam(const Vector3& camPos) {
 				mSqDistToCam = (camPos - mTransform->GetPosition()).LengthSquared();
 			}
@@ -81,7 +82,6 @@ namespace NCL {
 			static bool CompareBySqCamDist(const RenderObject* a, const RenderObject* b) {
 				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
 			}
-
 
 			void SetOutlined(bool outlined) {
 				mOutlined = outlined;
@@ -108,11 +108,11 @@ namespace NCL {
 				return mCurrentFrame;
 			}
 
-			void SetMatTextures(vector<GLuint> matTextures) {
+			void SetMatTextures(vector<uint64_t> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<GLuint>  GetMatTextures() const {
+			vector<uint64_t>  GetMatTextures() const {
 				return mMatTextures;
 			}
 
@@ -132,9 +132,8 @@ namespace NCL {
 				mAnimationObject = newObject;
 			}
 
-
-
 		protected:
+			Buffer* mBuffer;
 			Mesh* mMesh;
 			Texture* mAlbedoTex;
 			Texture* mNormalTex;
@@ -150,101 +149,11 @@ namespace NCL {
 			bool mOutlined = false;
 			bool mIsInstanced = false;
 
-			vector<GLuint>  mMatTextures;
+			vector<uint64_t>  mMatTextures;
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 
 			int		mCurrentFrame;
-
 		};
 	}
 }
-#endif
-
-#ifdef USEPROSPERO
-
-#include "Buffer.h"
-
-namespace NCL {
-	using namespace NCL::Rendering;
-
-	namespace CSC8503 {
-		class Transform;
-		using namespace Maths;
-
-		class RenderObject
-		{
-		public:
-			RenderObject(Transform* inTransform, Mesh* inMesh, Texture* inTex, Shader* inShader) {
-				buffer = nullptr;
-				anim = nullptr;
-
-				transform = inTransform;
-				mesh = inMesh;
-				texture = inTex;
-				shader = inShader;
-				colour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
-			}
-			~RenderObject() {}
-
-			void SetDefaultTexture(Texture* t) {
-				texture = t;
-			}
-
-			Buffer* GetGPUBuffer() const {
-				return buffer;
-			}
-
-			void SetGPUBuffer(Buffer* b) {
-				buffer = b;
-			}
-
-			Texture* GetDefaultTexture() const {
-				return texture;
-			}
-
-			Mesh* GetMesh() const {
-				return mesh;
-			}
-
-			Transform* GetTransform() const {
-				return transform;
-			}
-
-			Shader* GetShader() const {
-				return shader;
-			}
-
-			void SetColour(const Vector4& c) {
-				colour = c;
-			}
-
-			Vector4 GetColour() const {
-				return colour;
-			}
-
-			void SetAnimation(MeshAnimation& inAnim);
-
-			void UpdateAnimation(float dt);
-
-			std::vector<Matrix4>& GetSkeleton() {
-				return skeleton;
-			}
-
-		protected:
-			Buffer* buffer;
-			Mesh* mesh;
-			Texture* texture;
-			Shader* shader;
-			Transform* transform;
-			Vector4			colour;
-
-			MeshAnimation* anim;
-
-			std::vector<Matrix4> skeleton;
-			float	animTime = 0.0f;
-			int currentAnimFrame = 0;
-		};
-	}
-}
-#endif

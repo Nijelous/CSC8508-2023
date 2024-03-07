@@ -19,6 +19,7 @@ AnimationObject::~AnimationObject() {
 }
 
 void AnimationObject::Update(float dt){
+	if (mAnimation == nullptr) return;
 	mFrameTime -= mRate*dt;
 
 	while (mFrameTime < 0.0f) {

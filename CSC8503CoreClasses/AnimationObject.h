@@ -67,8 +67,8 @@ namespace NCL {
            
             
         protected:
-            MeshAnimation* mAnimation;
-            MeshMaterial* mMaterial;
+            MeshAnimation* mAnimation = nullptr;
+            MeshMaterial* mMaterial = nullptr;
             AnimationType mAnimationType;
            
             int		mCurrentFrame;
