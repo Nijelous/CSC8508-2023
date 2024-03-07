@@ -17,6 +17,10 @@ namespace SuspicionSystem
             mValue = 0;
         }
 
+        CantorPair(const int& inValue) {
+            mValue = inValue;
+        }
+
         CantorPair(Vector3 inPos){
             Vector3 shiftedPos;
             shiftedPos.x = int(int(inPos.x) > 0 ? int(inPos.x) * 2 : int(inPos.x) * -2 + 1);
@@ -94,6 +98,9 @@ namespace SuspicionSystem
             return SuspicionMetre::GetSusBreakpoint(GetLocationSusAmount(pos));
         }
 
+        void SyncActiveSusCauses(const activeLocationSusCause& inCause, const int& pairedLocation, const bool& toApply);
+        void SyncSusChange(const int& pairedLocation, const int& changedValue);
+
     private:
 
         std::map<const instantLocationSusCause, const float>  mInstantLocationSusCauseSeverityMap =
@@ -109,6 +116,7 @@ namespace SuspicionSystem
         std::map<Vector3, float> mVec3LocationSusAmountMap;
         std::map<CantorPair, float> mLocationSusAmountMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
+        std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationlSusCausesToRemove;
 
         bool AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
         bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
@@ -121,5 +129,8 @@ namespace SuspicionSystem
         bool IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
 
         float Calculate2DDistance(Vector3 inPos1, Vector3 inPos2) const;
+    
+        void HandleActiveSusCauseNetworking(const activeLocationSusCause& inCause, const CantorPair& pairedLocation, const bool& toApply);
+        void HandleSusChangeNetworking(const int& changedValue, const CantorPair& pairedLocation);
     };
 }

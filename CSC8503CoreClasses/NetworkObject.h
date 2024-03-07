@@ -122,6 +122,21 @@ namespace NCL::CSC8503 {
 		ClientSyncGlobalSusChangePacket(int changedValue);
 	};
 
+	struct ClientSyncLocationActiveSusCausePacket : public GamePacket {
+		int cantorPairedLocation;
+		int activeLocationSusCauseID;
+		bool toApply;
+
+		ClientSyncLocationActiveSusCausePacket(int playerID, int activeLocationSusCauseID, bool toApply);
+	};
+
+	struct ClientSyncLocationSusChangePacket : public GamePacket {
+		int cantorPairedLocation;
+		int changedValue;
+
+		ClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue);
+	};
+
 	struct SyncInteractablePacket : public GamePacket {
 		int networkObjId;
 		bool isOpen;
