@@ -199,7 +199,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->CloseDoorFinished();
 			}
 		}
-		else if (obj->GetName() == "PickupGameObject") {
+		else if (obj->GetName() == "PickupGameObject" || obj->GetName() == "Flag") {
 			bool isPlay = obj->GetSoundObject()->GetisTiggered();
 			if (isPlay) {
 				PlayPickUpSound(soundPos);

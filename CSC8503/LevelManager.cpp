@@ -939,6 +939,8 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mSphereMesh, mBasicTex, mFloorNormal, mBasicShader, 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
+	flag->SetSoundObject(new SoundObject());
+
 	flag->SetCollisionLayer(Collectable);
 
 	flag->GetPhysicsObject()->SetInverseMass(0);
