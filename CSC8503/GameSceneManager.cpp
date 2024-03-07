@@ -72,7 +72,7 @@ void GameSceneManager::InitCamera() {
 }
 
 void GameSceneManager::CreateLevel() {
-	mLevelManager->LoadLevel(1, 0); //Note (Alex): To access Hotel, set level ID to 1. DO NOT DO THIS YET IT IS VERY LAGGY.
+	mLevelManager->LoadLevel(0, 0); //Note (Alex): To access Hotel, set level ID to 1. DO NOT DO THIS YET IT IS VERY LAGGY.
 }
 
 bool GameSceneManager::PlayerWonGame() {
