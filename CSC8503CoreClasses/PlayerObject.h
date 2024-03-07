@@ -50,6 +50,8 @@ namespace NCL {
 				mUi = ui;
 			}
 
+			void SetPrisonDoor(PrisonDoor* prisonDoor);
+
 		protected:
 			bool mIsCrouched;
 

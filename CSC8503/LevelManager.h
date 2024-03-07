@@ -92,6 +92,7 @@ namespace NCL {
 
 			UISystem* GetUiSystem() { return mUi; };
 			SoundManager* GetSoundManager() { return mSoundManager; };
+			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
@@ -132,6 +133,10 @@ namespace NCL {
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
+
+			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
+
+			PrisonDoor* GetPrisonDoor() const;
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -146,7 +151,7 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation = 0);
 
-			void LoadGuards(int guardCount);
+			void LoadGuards(int guardCount, bool isInMultiplayer);
 
 			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
@@ -181,7 +186,7 @@ namespace NCL {
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
-			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer);
 
 			SoundEmitter* AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR);
 
@@ -236,6 +241,7 @@ namespace NCL {
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			PrisonDoor* mPrisonDoor;
 			std::vector<GuardObject*> mGuardObjects;
 			std::vector<Transform> mCCTVTransformList;
 
@@ -250,6 +256,8 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+
+			bool mIsLevelInitialised;
 		};
 	}
 }

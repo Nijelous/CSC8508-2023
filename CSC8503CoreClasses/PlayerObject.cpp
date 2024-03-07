@@ -219,6 +219,10 @@ void PlayerObject::ClosePrisonDoor(){
 	mPrisonDoorPtr->Close();
 }
 
+void PlayerObject::SetPrisonDoor(PrisonDoor* prisonDoor) {
+	mPrisonDoorPtr = prisonDoor;
+}
+
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
 	offset.y += 3;

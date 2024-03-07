@@ -9,6 +9,7 @@
 #include "../Detour/Include/DetourNavMeshQuery.h"
 #include "RecastBuilder.h"
 #include "InteractableDoor.h"
+#include "../CSC8503/SceneManager.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -25,7 +26,14 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mDoorRaycastInterval = RAYCAST_INTERVAL;
 	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 
-	BehaviourTree();
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+
+	const bool isInSinglePlayer = sceneManager->IsInSingleplayer();
+	const bool isServer = sceneManager->IsServer();
+	mIsBTWillBeExecuted = isInSinglePlayer || isServer;
+	if (mIsBTWillBeExecuted) {
+		BehaviourTree();
+	}
 }
 
 GuardObject::~GuardObject() {
@@ -38,14 +46,22 @@ GuardObject::~GuardObject() {
 
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
-		RaycastToPlayer();
-		ExecuteBT();
-		if (mDoorRaycastInterval <= 0) {
-			mDoorRaycastInterval = RAYCAST_INTERVAL;
-			CheckForDoors(dt);
-		}
-		else {
-			mDoorRaycastInterval -= dt;
+		if (mIsBTWillBeExecuted) {
+			if (mPlayer == nullptr) {
+				const Vector3& guardPos = GetTransform().GetPosition();
+				PlayerObject* nearestPlayer = LevelManager::GetLevelManager()->GetNearestPlayer(guardPos);
+
+				SetPlayer(nearestPlayer);
+			}
+			RaycastToPlayer();
+		  ExecuteBT();
+		  if (mDoorRaycastInterval <= 0) {
+			  mDoorRaycastInterval = RAYCAST_INTERVAL;
+			  CheckForDoors(dt);
+		  }
+		  else {
+			  mDoorRaycastInterval -= dt;
+		  }
 		}
 	}
 	else {
@@ -290,7 +306,7 @@ BehaviourAction* GuardObject::Patrol() {
 		if (state == Initialise) {
 			state = Ongoing;
 			mNextNode = mCurrentNode + 1;
-			mObjectState = Walk;
+			SetObjectState(Walk);
 			if (mCurrentNode == mNodes.size() - 1) {
 				mNextNode = 0;
 			}
@@ -332,7 +348,7 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 	BehaviourAction* ChasePlayer = new BehaviourAction("Chase Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
-			mObjectState = Sprint;
+			SetObjectState(Sprint);
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {

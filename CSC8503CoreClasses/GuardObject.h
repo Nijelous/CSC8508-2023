@@ -54,6 +54,7 @@ namespace NCL {
             bool mHasCaughtPlayer;
             bool mPlayerHasItems;
             bool mIsStunned;
+            bool mIsBTWillBeExecuted;
 
             void BehaviourTree();
             void ExecuteBT();

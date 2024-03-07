@@ -3,9 +3,6 @@
 #include "Shader.h"
 #include "Mesh.h"
 
-#include "MeshAnimation.h"
-#include "MeshMaterial.h"
-
 #include "Transform.h"
 #include <AnimationObject.h>
 
@@ -143,7 +140,7 @@ namespace NCL {
 
 
 			Vector4		mColour;
-			AnimationObject* mAnimationObject;
+			AnimationObject* mAnimationObject =nullptr;
 
 			float		mCullSphereRadius;
 			float mSqDistToCam;
