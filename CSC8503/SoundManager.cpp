@@ -223,12 +223,14 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 	case GameObject::GameObjectState::Walk:
 		if (channel) {
 			channel->set3DAttributes(&pos, nullptr);
+			channel->setFrequency(24000);
 			channel->setPaused(false);
 		}
 		break;
 	case GameObject::GameObjectState::Sprint:
 		if (channel) {
 			channel->set3DAttributes(&pos, nullptr);
+			channel->setFrequency(48000);
 			channel->setPaused(false);
 		}
 		break;
