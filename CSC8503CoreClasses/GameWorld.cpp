@@ -3,6 +3,7 @@
 #include "Constraint.h"
 #include "CollisionDetection.h"
 #include "Camera.h"
+#include <algorithm>
 
 
 using namespace NCL;
@@ -65,6 +66,12 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 
 void GameWorld::UpdateWorld(float dt) {
 	auto rng = std::default_random_engine{};
+
+#ifdef USEPROSPERO
+	for (GameObject* g : gameObjects) {
+		g->UpdateObject(dt);
+	}
+#endif
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine e(seed);

@@ -16,11 +16,11 @@ namespace NCL::CSC8503 {
 		Player = 4,
 		Npc = 8,
 		NoCollide = 16,
-		Zone = 32, 
+		Zone = 32,
 		NoSpecialFeatures = 64
 	};
 
-	class GameObject	{
+	class GameObject {
 	public:
 		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
 		~GameObject();
@@ -67,7 +67,7 @@ namespace NCL::CSC8503 {
 			mHasPhysics = !mHasPhysics;
 		}
 
-		void SetActive(bool isActive){
+		void SetActive(bool isActive) {
 			mIsRendered = isActive;
 			mHasPhysics = isActive;
 		}
@@ -96,13 +96,16 @@ namespace NCL::CSC8503 {
 			return mSoundObject;
 		}
 
+
+#ifdef USEGL
 		void SetIsSensed(bool sensed);
 
 		bool GetIsSensed();
+#endif
 
-    
+
 		void SetNetworkObject(NetworkObject* netObj);
-	
+
 
 		void SetRenderObject(RenderObject* newObject) {
 			mRenderObject = newObject;
@@ -130,7 +133,7 @@ namespace NCL::CSC8503 {
 			//std::cout << "OnCollisionEnd event occured!\n";
 		}
 
-		bool GetBroadphaseAABB(Vector3&outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize) const;
 
 		void UpdateBroadphaseAABB();
 
@@ -141,7 +144,7 @@ namespace NCL::CSC8503 {
 		int		GetWorldID() const {
 			return mWorldID;
 		}
-    
+
 		virtual void UpdateObject(float dt);
 
 		bool GetIsPlayer() { return mIsPlayer; }
@@ -167,11 +170,11 @@ namespace NCL::CSC8503 {
 	protected:
 		Transform			mTransform;
 
-		CollisionVolume*	mBoundingVolume;
-		PhysicsObject*		mPhysicsObject;
-		RenderObject*		mRenderObject;
-		NetworkObject*		mNetworkObject;
-		SoundObject*        mSoundObject;
+		CollisionVolume* mBoundingVolume;
+		PhysicsObject* mPhysicsObject;
+		RenderObject* mRenderObject;
+		NetworkObject* mNetworkObject;
+		SoundObject* mSoundObject;
 
 		bool		mIsSensed;
 		bool		mHasPhysics;

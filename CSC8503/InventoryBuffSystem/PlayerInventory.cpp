@@ -6,6 +6,7 @@
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
+#include <algorithm>
 
 namespace {
 	constexpr int DEFAULT_ITEM_USAGE_COUNT = 0;

@@ -159,7 +159,9 @@ namespace NCL {
 
 			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false, int rotation = 0);
 
-			void LoadCCTVs(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
+			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
+
+			void LoadCCTVs();
 
 			void LoadDoorsInNavGrid();
 
@@ -306,6 +308,7 @@ namespace NCL {
 			PlayerObject* mTempPlayer;
 			PrisonDoor* mPrisonDoor;
 			std::vector<GuardObject*> mGuardObjects;
+			std::vector<Transform> mCCTVTransformList;
 
 			InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
 			SuspicionSystemClass* mSuspicionSystemClassPtr = nullptr;

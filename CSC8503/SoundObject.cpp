@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "SoundObject.h"
 #include <fmod.hpp>
 
@@ -55,3 +57,4 @@ bool SoundObject::GetisTiggered(){
 bool SoundObject::GetIsClosed() {
 	return mIsClosed;
 }
+#endif
