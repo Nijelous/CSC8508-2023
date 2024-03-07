@@ -240,10 +240,14 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			break;
 		}
 	}
-	float* levelSize = new float[3];
-	levelSize = mBuilder->BuildNavMesh(mLevelLayout);
-	if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
-	LoadDoorsInNavGrid();
+	
+	std::thread navMeshThread([this] {
+		float* levelSize = new float[3];
+		levelSize = mBuilder->BuildNavMesh(mLevelLayout);
+		if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
+		LoadDoorsInNavGrid();
+		delete[] levelSize;
+		});
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
@@ -278,7 +282,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
-	delete[] levelSize;
 
 	mTimer = INIT_TIMER_VALUE;
 
@@ -287,6 +290,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
+
+	navMeshThread.join();
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
