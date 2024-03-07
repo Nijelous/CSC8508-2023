@@ -105,7 +105,7 @@ namespace NCL {
 
 			void FixedUpdate(float dt);
 
-			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position);
 
 			void AddUpdateableGameObject(GameObject& object);
 
@@ -212,68 +212,15 @@ namespace NCL {
 
 			vector<GameObject*> mUpdatableObjects;
 
-			// meshes
-			Mesh* mCubeMesh;
-			Mesh* mFloorCubeMesh;
-			Mesh* mSphereMesh;
-			Mesh* mCapsuleMesh;
-			Mesh* mCharMesh;
-			Mesh* mEnemyMesh;
-			Mesh* mBonusMesh;
-			Mesh* mStraightWallMesh;
-			Mesh* mCornerWallMesh;
-			Mesh* mCCTVMesh;
-
-			// textures
-			Texture* mBasicTex;
-			Texture* mKeeperAlbedo;
-			Texture* mKeeperNormal;
-			Texture* mFloorAlbedo;
-			Texture* mFloorNormal;
-			Texture* mWallTex;
-			Texture* mWallNormal;
+			std::unordered_map<std::string, Mesh*> mMeshes;
+			std::unordered_map<std::string, Texture*> mTextures;
+			std::unordered_map<std::string, Shader*> mShaders;
+			std::unordered_map<std::string, MeshMaterial*> mMaterials;
+			std::unordered_map<std::string, MeshAnimation*> mAnimations;
 
 			UISystem* mUi;
-			Texture* mInventorySlotTex;
-			Texture* mCrossTex;
-			Texture* mAlarmTex;
-
-			//powerup Icon
-
-			Texture* mSilentRunTex;
-			Texture* mSpeedUpTex;
-			Texture* mSlowDownTex;
-			Texture* mStunTex;
-
-
-			Texture* mLowSuspicionBarTex;
-			Texture* mMidSuspicionBarTex;
-			Texture* mHighSuspicionBarTex;
-
-			Texture* mSuspicionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
-			//item icon
-			Texture* mFlagIconTex;
-			Texture* mKeyIconTex1;
-			Texture* mKeyIconTex2;
-			Texture* mKeyIconTex3;
-			
-
-
-			// shaders
-			Shader* mBasicShader;
-			Shader* mInstanceShader;
-
-			// animation 
-			Mesh* mGuardMesh;
-			Mesh* mPlayerMesh;
-			Mesh* mRigMesh;
-			MeshMaterial* mRigMaterial;
-			MeshMaterial* mGuardMaterial;
-			MeshMaterial* mPlayerMaterial;
-
-			Shader* mAnimationShader;
 
 #ifdef USEGL
 			vector<GLuint>  mGuardTextures;
@@ -285,19 +232,7 @@ namespace NCL {
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
-			MeshAnimation* mGuardAnimationStand;
-			MeshAnimation* mGuardAnimationSprint;
-			MeshAnimation* mGuardAnimationWalk;
 
-
-			MeshAnimation* mPlayerAnimationStand;
-			MeshAnimation* mPlayerAnimationSprint;
-			MeshAnimation* mPlayerAnimationWalk;
-
-			MeshAnimation* mRigAnimationStand;
-			MeshAnimation* mRigAnimationSprint;
-			MeshAnimation* mRigAnimationWalk;
-			
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;

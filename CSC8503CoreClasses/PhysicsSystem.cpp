@@ -387,11 +387,13 @@ void PhysicsSystem::BroadPhase() {
 		}
 	}
 	for (int i = 0; i < mDynamicObjectList.size(); i++) {
+		if (!mDynamicObjectList[i]->HasPhysics()) continue;
 		Vector3 halfSize;
 		mDynamicObjectList[i]->GetBroadphaseAABB(halfSize);
 		mStaticTree.OperateOnLeaf([&](std::list<QuadTreeEntry<GameObject*>>& data) {
 			CollisionDetection::CollisionInfo info;
 			for (auto j = data.begin(); j != data.end(); j++) {
+				if (!(*j).object->HasPhysics()) continue;
 				info.a = std::min(mDynamicObjectList[i], (*j).object);
 				info.b = std::max(mDynamicObjectList[i], (*j).object);
 				Vector3 halfSizeA;
@@ -409,6 +411,22 @@ void PhysicsSystem::BroadPhase() {
 				mBroadphaseCollisions.insert(info);
 			}
 			}, mDynamicObjectList[i]->GetTransform().GetPosition(), halfSize);
+		for (int j = i; j < mDynamicObjectList.size(); j++) {
+			if (!mDynamicObjectList[j]->HasPhysics()) continue;
+			CollisionDetection::CollisionInfo info;
+			info.a = std::min(mDynamicObjectList[i], mDynamicObjectList[j]);
+			info.b = std::max(mDynamicObjectList[i], mDynamicObjectList[j]);
+			Vector3 halfSizeA;
+			Vector3 halfSizeB;
+			info.a->GetBroadphaseAABB(halfSizeA);
+			info.b->GetBroadphaseAABB(halfSizeB);
+			halfSizeA.y = 1000.0f;
+			halfSizeB.y = 1000.0f;
+			if (!CollisionDetection::AABBTest(info.a->GetTransform().GetPosition() + info.a->GetBoundingVolume()->GetOffset(),
+				info.b->GetTransform().GetPosition() + info.b->GetBoundingVolume()->GetOffset(),
+				halfSizeA, halfSizeB)) continue;
+			mBroadphaseCollisions.insert(info);
+		}
 	}
 }
 
