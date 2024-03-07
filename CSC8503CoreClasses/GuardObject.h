@@ -40,7 +40,8 @@ namespace NCL {
             float AngleFromFocalPoint(Vector3 direction);
             void HandleAppliedBuffs(float dt);
 
-            GameObject* mSightedObject;
+            GameObject* mSightedPlayer;
+            GameObject* mSightedDoor;
             PlayerObject* mPlayer;
 
             vector<Vector3> mNodes;

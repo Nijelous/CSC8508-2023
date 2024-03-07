@@ -8,6 +8,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../Detour/Include/DetourNavMeshQuery.h"
 #include "RecastBuilder.h"
+#include "InteractableDoor.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -29,13 +30,17 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
-  delete mSightedObject;
+	delete mSightedPlayer;
+	delete mSightedDoor;
 }
 
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
 		RaycastToPlayer();
 		ExecuteBT();
+		if (int(dt) % 16 == 0) {
+			CheckForDoors();
+		}
 	}
 	else {
 		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
@@ -50,9 +55,9 @@ void GuardObject::RaycastToPlayer() {
 		RayCollision closestCollision;
 		Ray r = Ray(this->GetTransform().GetPosition(), dir);
 		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
-			mSightedObject = (GameObject*)closestCollision.node;
+			mSightedPlayer = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-			if (mSightedObject == mPlayer) {
+			if (mSightedPlayer == mPlayer) {
 				mCanSeePlayer = true;
 			}
 			else {
@@ -65,7 +70,7 @@ void GuardObject::RaycastToPlayer() {
 	}
 	else {
 		mCanSeePlayer = false;
-		mSightedObject = nullptr;
+		mSightedPlayer = nullptr;
 	}
 }
 
@@ -225,11 +230,23 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 }
 
 void GuardObject::CheckForDoors() {
-
+	RayCollision closestCollision;
+	Ray r = Ray(this->GetTransform().GetPosition(), GuardForwardVector());
+	if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
+		mSightedDoor = (GameObject*)closestCollision.node;
+		Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
+		float dist = (mSightedDoor->GetTransform().GetPosition() - this->GetTransform().GetPosition()).LengthSquared();
+		if (mSightedDoor->GetName() == "InteractableDoor" && dist < MIN_DIST_TO_NEXT_POS) {
+			OpenDoor();
+		}
+	}
 }
 
 void GuardObject::OpenDoor() {
-
+	InteractableDoor* interactablePtr = (InteractableDoor*)mSightedDoor;
+	if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(NCL::CSC8503::InteractType::Use)) {
+		interactablePtr->Interact(NCL::CSC8503::InteractType::Use, mSightedDoor);
+	}
 }
 
 void GuardObject::BehaviourTree() {
