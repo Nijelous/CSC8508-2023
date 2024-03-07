@@ -126,6 +126,21 @@ void PlayerObject::UpdateObject(float dt) {
 	//SusBar
 	float iconValue = SusLinerInterpolation(dt);
 
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+			mAlarmTime = mAlarmTime + dt;
+		}
+	}
+	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
