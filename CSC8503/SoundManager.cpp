@@ -187,7 +187,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-		else if (obj->GetName() == "Door") {
+		else if (obj->GetName() == "InteractableDoor") {
 			bool isOpen = obj->GetSoundObject()->GetisTiggered();
 			if (isOpen) {
 				PlayDoorOpenSound(soundPos);
@@ -199,7 +199,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->CloseDoorFinished();
 			}
 		}
-		else if (obj->GetName() == "PickupGameObject") {
+		else if ((obj->GetName() == "PickupGameObject") || (obj->GetName() == "Flag")) {
 			bool isPlay = obj->GetSoundObject()->GetisTiggered();
 			if (isPlay) {
 				PlayPickUpSound(soundPos);

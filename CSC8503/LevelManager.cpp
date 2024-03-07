@@ -860,6 +860,8 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
+	flag->SetSoundObject(new SoundObject());
+
 	flag->SetCollisionLayer(Collectable);
 
 	flag->GetPhysicsObject()->SetInverseMass(0);
@@ -868,6 +870,8 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
 
 	mWorld->AddGameObject(flag);
+
+	mUpdatableObjects.push_back(flag);
 
 	return flag;
 
