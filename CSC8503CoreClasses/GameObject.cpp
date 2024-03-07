@@ -68,5 +68,9 @@ void GameObject::UpdateBroadphaseAABB() {
 }
 
 void GameObject::UpdateObject(float dt) {
-
+#ifdef USEPROSPERO
+	if (mRenderObject && GetRenderObject()->) {
+		mRenderObject->UpdateAnimation(dt);
+	}
+#endif
 }
