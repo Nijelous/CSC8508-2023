@@ -81,64 +81,9 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 }
 
 void AnimationSystem::UpdateCurrentFrames(float dt) {
-	for (auto& animList : mAnimationList) {
+	for (AnimationObject*& animList : mAnimationList) {
 		animList->Update(dt);
 	}
-}
-
-
-void AnimationSystem::UpdateAnimations(std::map<std::string, MeshAnimation*> preAnimationList) {
-
-	for (auto& obj : mGuardList) {
-
-		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
-
-		obj->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();
-
-		switch (mObjectState)
-		{
-		case GameObject::GameObjectState::Idle:
-			obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardStand"]);
-
-			break;
-		case GameObject::GameObjectState::Walk:
-			obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardWalk"]);
-
-			break;
-		case GameObject::GameObjectState::Sprint:
-			obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["GuardSprint"]);
-
-			break;
-		}
-	}
-
-	for (auto& obj : mPlayerList) {
-
-		GameObject::GameObjectState mObjectState = obj->GetGameOjbectState();
-
-		if (mPlayerState != mObjectState) {
-			mPlayerState = (GameObject::GameObjectState)mObjectState;
-			obj->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();
-
-			switch (mObjectState)
-			{
-			case GameObject::GameObjectState::Idle:
-				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerStand"]);
-
-				break;
-			case GameObject::GameObjectState::Walk:
-				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerWalk"]);
-
-				break;
-			case GameObject::GameObjectState::Sprint:
-				obj->GetRenderObject()->GetAnimationObject()->SetAnimation(preAnimationList["PlayerSprint"]);
-
-				break;
-			}
-		}
-
-	}
-
 }
 
 void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& mMatTextures) {

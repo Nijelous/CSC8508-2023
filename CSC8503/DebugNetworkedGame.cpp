@@ -563,7 +563,7 @@ void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) co
 
 void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) const {
 	NetworkObject* objectToChangeState = nullptr;
-	for (auto* networkObject : mNetworkObjects) {
+	for (NetworkObject* networkObject : mNetworkObjects) {
 		if (networkObject->GetnetworkID() == packet->networkObjId) {
 			objectToChangeState = networkObject;
 			break;

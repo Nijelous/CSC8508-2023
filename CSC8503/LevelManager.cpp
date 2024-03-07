@@ -541,7 +541,7 @@ void LevelManager::LoadGuards(int guardCount, bool isInMultiplayer) {
 			pathIndex = dis(gen);
 		} while (pickedNumbers.count(pathIndex) > 0);
 		pickedNumbers.insert(pathIndex);
-		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[pathIndex], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard", isInMultiplayer);
+		GuardObject* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[pathIndex], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard", isInMultiplayer);
 		mGuardObjects.push_back(addedGuard);
 	}
 }
