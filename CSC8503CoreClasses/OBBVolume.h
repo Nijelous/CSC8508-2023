@@ -16,7 +16,7 @@ namespace NCL {
 		Maths::Vector3 GetHalfDimensions() const {
 			return halfSizes;
 		}
-		Maths::Vector3 GetOffset() const {
+		Maths::Vector3 GetOffset() const override {
 			return offset;
 		}
 	protected:

@@ -23,7 +23,7 @@ namespace NCL {
 			return radius;
 		}
 
-		Maths::Vector3 GetOffset() const {
+		Maths::Vector3 GetOffset() const override {
 			return offset;
 		}
 
