@@ -7,6 +7,7 @@ namespace NCL {
 
 	using namespace Maths;
 	using namespace Rendering;
+	using namespace std;
 
 	namespace CSC8503 {
 		constexpr int FIRST_ITEM_SLOT = 0;

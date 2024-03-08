@@ -64,6 +64,7 @@ LevelManager::LevelManager() {
 #ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld);
 #endif
+
 	mUi = new UISystem();
 	InitialiseAssets();
 	mBuilder = new RecastBuilder();
@@ -79,6 +80,8 @@ LevelManager::LevelManager() {
 	mGameState = MenuState;
 
 	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
+  
+	mIsLevelInitialised = false;
 
 	InitialiseIcons();
 	mItemTextureMap = {
@@ -159,6 +162,7 @@ LevelManager::~LevelManager() {
 }
 
 void LevelManager::ClearLevel() {
+	mIsLevelInitialised = false;
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
 	mPhysics->Clear();
@@ -177,6 +181,7 @@ void LevelManager::ClearLevel() {
 	mBaseCornerWall = nullptr;
 	mGuardObjects.clear();
 	mCCTVTransformList.clear();
+
 
 	ResetEquippedIconTexture();
 }
@@ -209,8 +214,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	LoadCCTVList((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	PrisonDoor* prisonDoorPtr = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
-	mUpdatableObjects.push_back(prisonDoorPtr);
+	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	mUpdatableObjects.push_back(mPrisonDoor);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
 		itemPositions.push_back(itemPos);
@@ -249,13 +254,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		});
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
-
-		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		LoadGuards((*mLevelList[levelID]).GetGuardCount());
-		LoadCCTVs();
 	}
 #ifdef USEGL
 	else {
@@ -272,6 +273,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 		}
 	}
+
+	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	LoadCCTVs();
+
+
 #endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -289,10 +295,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
+  
 	while (!mBuilder->HasSetSize()) {
 
 	}
 	mHasStartedGame = true;
+	mIsLevelInitialised = true;
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -341,8 +349,11 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	else {
 		mWorld->UpdateWorld(dt);
 		mRenderer->Update(dt);
-		mPhysics->Update(dt);
-		mAnimation->Update(dt, mUpdatableObjects, mPreAnimationList);
+		if (mIsLevelInitialised) {
+			mPhysics->Update(dt);
+			mAnimation->Update(dt, mUpdatableObjects);
+		}
+		
 		if (mUpdatableObjects.size()>0) {
 			mSoundManager->UpdateSounds(mUpdatableObjects);
 		}
@@ -378,11 +389,13 @@ void LevelManager::InitialiseAssets() {
 		if (groupType == "") groupType = assetDetails[0];
 		if (groupType != assetDetails[0]) {
 			if (groupType == "anim") {
+        #ifdef USEGL // remove after implemented
 				animLoadThread = std::thread([this, groupDetails] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
 					}
 					});
+        #endif
 			}
 			else if (groupType == "mat") {
 				matLoadThread = std::thread([this, groupDetails] {
@@ -414,6 +427,8 @@ void LevelManager::InitialiseAssets() {
 		}
 	}
 	delete[] assetDetails;
+  
+  #ifdef USEGL // remove after implemented
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
 	matLoadThread.join();
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
@@ -429,6 +444,7 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
 	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["GuardWalk"]));
 	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["GuardSprint"]));
+#endif
 
 	//icons
 	vector<Texture*> keyTexVec = { 
@@ -489,7 +505,7 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 	}	
 }
 
-void LevelManager::LoadGuards(int guardCount) {
+void LevelManager::LoadGuards(int guardCount, bool isInMultiplayer) {
 	std::random_device rd;
 	std::mt19937 gen(rd());
 	std::uniform_int_distribution<> dis(0, (*mLevelList[mActiveLevel]).GetGuardPaths().size() - 1);
@@ -500,7 +516,7 @@ void LevelManager::LoadGuards(int guardCount) {
 			pathIndex = dis(gen);
 		} while (pickedNumbers.count(pathIndex) > 0);
 		pickedNumbers.insert(pathIndex);
-		auto* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[pathIndex], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard");
+		GuardObject* addedGuard = AddGuardToWorld((*mLevelList[mActiveLevel]).GetGuardPaths()[pathIndex], (*mLevelList[mActiveLevel]).GetPrisonPosition(), "Guard", isInMultiplayer);
 		mGuardObjects.push_back(addedGuard);
 	}
 }
@@ -598,6 +614,34 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 
 void LevelManager::SetGameState(GameStates state) {
 	mGameState = state;
+}
+
+PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
+	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
+	PlayerObject* returnObj = &firstPlayer;
+	const Vector3& firstPos = firstPlayer.GetTransform().GetPosition();
+	float minDistance = sqrt((startPos.x - firstPos.x) * (startPos.x - firstPos.x) +
+		(startPos.z - firstPos.z) * (startPos.z - firstPos.z));
+
+	for (int i = 1; i < serverPlayersPtr->size(); i++) {
+		NetworkPlayer* serverPlayer = serverPlayersPtr->at(i);
+		if (serverPlayer != nullptr) {
+			const Vector3& playerPos = serverPlayer->GetTransform().GetPosition();
+
+			float distance = sqrt((startPos.x - playerPos.x) * (startPos.x - playerPos.x) +
+				(startPos.z - playerPos.z) * (startPos.z - playerPos.z));
+			if (distance < minDistance) {
+				minDistance = distance;
+				returnObj = serverPlayer;
+			}
+		}
+		
+	}
+	return returnObj;
+}
+
+PrisonDoor* LevelManager::GetPrisonDoor() const {
+	return mPrisonDoor;
 }
 
 void LevelManager::InitialiseIcons() {
@@ -1097,7 +1141,7 @@ void LevelManager::AddUpdateableGameObject(GameObject& object){
 	mUpdatableObjects.push_back(&object);
 }
 
-GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName) {
+GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer) {
 	GuardObject* guard = new GuardObject(guardName);
 	
 	float meshSize = PLAYER_MESH_SIZE;
@@ -1111,25 +1155,32 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		.SetScale(Vector3(meshSize, meshSize, meshSize))
 		.SetPosition(nodes[currentNode] + Vector3(20,-1.5f,20));
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize));
 
 	guard->SetPhysicsObject(new PhysicsObject(&guard->GetTransform(), guard->GetBoundingVolume(), 1, 0, 10));
-	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]));
 
 	guard->GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	guard->GetPhysicsObject()->InitSphereInertia(false);
-
-
-
 	guard->SetCollisionLayer(Npc);
 
-	guard->SetPlayer(mTempPlayer);
+	RenderObject* renderObject = new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize);
+	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]);
+
+	renderObject->SetAnimationObject(animObject);
+	guard->SetRenderObject(renderObject);
+	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
+
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
+	guard->SetObjectState(GameObject::Idle);
+	if (isInMultiplayer) {
+		AddNetworkObject(*guard);
+	}
+	else {
+		guard->SetPlayer(mTempPlayer);
+	}
+
 	mWorld->AddGameObject(guard);
 	mUpdatableObjects.push_back(guard);
-
 
 	return guard;
 }
