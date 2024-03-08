@@ -309,6 +309,9 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 				Debug::Print("LongUse", Vector2(40, 85));
 		}
 	}
+	else {
+		cout << "Press E" << endl;
+	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
 		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
