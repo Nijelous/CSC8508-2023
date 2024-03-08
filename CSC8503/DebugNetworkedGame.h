@@ -5,6 +5,11 @@
 #include "GameSceneManager.h"
 #include "NetworkedGame.h"
 
+namespace NCL::CSC8503
+{
+	struct SyncObjectStatePacket;
+}
+
 namespace NCL::CSC8503 {
 	struct SyncInteractablePacket;
 	struct ClientSyncItemSlotPacket;
@@ -50,6 +55,7 @@ namespace NCL{
 
             void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
+            void SendObjectStatePacket(int networkId, int state) const;
             void ClearNetworkGame();
 
             GameClient* GetClient() const;
@@ -99,6 +105,8 @@ namespace NCL{
             void HandleInteractablePacket(SyncInteractablePacket* packet) const;
 
         	void HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const;
+
+            void HandleObjectStatePacket(SyncObjectStatePacket* packet) const;
 
         	std::vector<std::function<void()>> mOnGameStarts;
 

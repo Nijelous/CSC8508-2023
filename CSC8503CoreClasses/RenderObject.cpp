@@ -16,6 +16,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mColour = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
+	mAnimationObject = nullptr;
 
 	mCurrentFrame = 0;
 

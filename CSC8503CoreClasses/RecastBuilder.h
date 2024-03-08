@@ -31,9 +31,10 @@ namespace NCL {
 		public:
 			RecastBuilder();
 			~RecastBuilder();
-			float* BuildNavMesh(std::vector<GameObject*> objects);
+			void BuildNavMesh(std::vector<GameObject*> objects);
 			dtNavMeshQuery* GetNavMeshQuery() const { return mNavMeshQuery; }
 			dtNavMesh* GetNavMesh() const { return mNavMesh; }
+			bool HasSetSize() { return mSizeSet; }
 		protected:
 			bool InitialiseConfig(const float* bmin, const float* bmax);
 			bool RasterizeInputPolygon(float* verts, const int vertCount, const unsigned int* tris, const int trisCount);
@@ -72,6 +73,8 @@ namespace NCL {
 
 			int mSampleDistance = 6;
 			int mMaxSampleError = 1;
+
+			bool mSizeSet = false;
 
 			void cleanup();
 		};

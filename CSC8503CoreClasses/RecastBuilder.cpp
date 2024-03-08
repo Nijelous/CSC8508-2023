@@ -3,6 +3,8 @@
 #include "GameObject.h"
 #include "../OpenGLRendering/OGLRenderer.h"
 #include "../Detour/Include/DetourNavMeshBuilder.h"
+#include "../CSC8503/LevelManager.h"
+#include <thread>
 
 using namespace NCL::CSC8503;
 
@@ -21,8 +23,9 @@ RecastBuilder::~RecastBuilder() {
 	cleanup();
 }
 
-float* RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
-	if (objects.empty()) return nullptr;
+void RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
+	mSizeSet = false;
+	if (objects.empty()) return;
 
 	cleanup();
 
@@ -66,16 +69,21 @@ float* RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
 		}
 		vertCount += objects[i]->GetRenderObject()->GetMesh()->GetVertexCount();
 	}
-	if (!InitialiseConfig(bmin, bmax)) return nullptr;
-	if (!RasterizeInputPolygon(verts, vertCount, tris, trisCount)) return nullptr;
-	if (!FilterWalkableSurfaces()) return nullptr;
-	if (!PartitionWalkableSurface()) return nullptr;
-	if (!TraceContours()) return nullptr;
-	if (!BuildPoly()) return nullptr;
-	if (!BuildDetailPoly()) return nullptr;
-	if (!CreateDetourData()) return nullptr;
-
-	return new float[3] {bmax[x] - bmin[x], bmax[y] - bmin[y], bmax[z] - bmin[z]};
+	LevelManager::GetLevelManager()->GetPhysics()->SetNewBroadphaseSize(Vector3(bmax[x] - bmin[x], bmax[y] - bmin[y], bmax[z] - bmin[z]));
+	mSizeSet = true;
+	if (!InitialiseConfig(bmin, bmax)) return;
+	if (!RasterizeInputPolygon(verts, vertCount, tris, trisCount)) return;
+	if (!FilterWalkableSurfaces()) return;
+	if (!PartitionWalkableSurface()) return;
+	if (!TraceContours()) return;
+	if (!BuildPoly()) return;
+	if (!BuildDetailPoly()) return;
+	if (!CreateDetourData()) return;
+	delete[] bmin;
+	delete[] bmax;
+	delete[] verts;
+	delete[] tris;
+	return;
 }
 
 bool RecastBuilder::InitialiseConfig(const float* bmin, const float* bmax) {
@@ -128,9 +136,12 @@ bool RecastBuilder::RasterizeInputPolygon(float* verts, const int vertCount, con
 }
 
 bool RecastBuilder::FilterWalkableSurfaces() {
-	rcFilterLowHangingWalkableObstacles(nullptr, mConfig.walkableClimb, *mSolid);
-	rcFilterLedgeSpans(nullptr, mConfig.walkableHeight, mConfig.walkableClimb, *mSolid);
-	rcFilterWalkableLowHeightSpans(nullptr, mConfig.walkableHeight, *mSolid);
+	std::thread lowHangingWalkable([this] {rcFilterLowHangingWalkableObstacles(nullptr, mConfig.walkableClimb, *mSolid); });
+	std::thread ledgeSpans([this] {rcFilterLedgeSpans(nullptr, mConfig.walkableHeight, mConfig.walkableClimb, *mSolid); });
+	std::thread walkableLowHeight([this] {rcFilterWalkableLowHeightSpans(nullptr, mConfig.walkableHeight, *mSolid); });
+	lowHangingWalkable.join();
+	ledgeSpans.join();
+	walkableLowHeight.join();
 	return true;
 }
 

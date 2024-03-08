@@ -99,7 +99,7 @@ PlayerObject::~PlayerObject() {
 void PlayerObject::UpdateObject(float dt) {
 	if (mPlayerSpeedState != Stunned) {
 		MovePlayer(dt);
-		RayCastFromPlayer(mGameWorld, dt);
+		if(LevelManager::GetLevelManager()->HasSetNavMesh()) RayCastFromPlayer(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
@@ -217,6 +217,10 @@ PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 
 void PlayerObject::ClosePrisonDoor(){
 	mPrisonDoorPtr->Close();
+}
+
+void PlayerObject::SetPrisonDoor(PrisonDoor* prisonDoor) {
+	mPrisonDoorPtr = prisonDoor;
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

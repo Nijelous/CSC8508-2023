@@ -4,14 +4,16 @@
 #include "GameTechRenderer.h"
 #endif
 #ifdef USEPROSPERO
-// include ps5 renderer
+#include "../PS5Starter/GameTechAGCRenderer.h"
 #endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
+#include "RendererBase.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
 #include "SoundManager.h"
+#include <thread>
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -77,12 +79,8 @@ namespace NCL {
 
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
-#ifdef USEGL
-			GameTechRenderer* GetRenderer() { return mRenderer; }
-#endif
-#ifdef USEPROSPERO
-			// get PS5 Renderer
-#endif
+			RendererBase* GetRenderer() { return mRenderer; }
+
 
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
@@ -92,6 +90,7 @@ namespace NCL {
 
 			UISystem* GetUiSystem() { return mUi; };
 			SoundManager* GetSoundManager() { return mSoundManager; };
+			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
@@ -132,6 +131,12 @@ namespace NCL {
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
+
+			bool HasSetNavMesh() { return mHasSetNavMesh; }
+
+			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
+
+			PrisonDoor* GetPrisonDoor() const;
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -146,7 +151,7 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation = 0);
 
-			void LoadGuards(int guardCount);
+			void LoadGuards(int guardCount, bool isInMultiplayer);
 
 			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
@@ -181,7 +186,7 @@ namespace NCL {
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
-			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer);
 
 			SoundEmitter* AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR);
 
@@ -196,12 +201,15 @@ namespace NCL {
 			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
+
 #ifdef USEGL
 			GameTechRenderer* mRenderer;
 #endif
+
 #ifdef USEPROSPERO
-			// define PS5 renderer
+			GameTechAGCRenderer* mRenderer;
 #endif
+
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
 #ifdef USEGL // remove when converted to PS5 also
@@ -217,6 +225,8 @@ namespace NCL {
 			std::unordered_map<std::string, Shader*> mShaders;
 			std::unordered_map<std::string, MeshMaterial*> mMaterials;
 			std::unordered_map<std::string, MeshAnimation*> mAnimations;
+
+			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
 
@@ -236,6 +246,7 @@ namespace NCL {
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			PrisonDoor* mPrisonDoor;
 			std::vector<GuardObject*> mGuardObjects;
 			std::vector<Transform> mCCTVTransformList;
 
@@ -250,6 +261,11 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+			bool mHasSetNavMesh = false;
+			bool mHasStartedGame = false;
+			std::thread mNavMeshThread;
+
+			bool mIsLevelInitialised;
 		};
 	}
 }
