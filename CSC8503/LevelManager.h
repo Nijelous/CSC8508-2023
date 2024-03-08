@@ -12,6 +12,7 @@
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
 #include "SoundManager.h"
+#include <thread>
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -132,6 +133,8 @@ namespace NCL {
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
+
+			bool HasSetNavMesh() { return mHasSetNavMesh; }
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -252,6 +255,9 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+			bool mHasSetNavMesh = false;
+			bool mHasStartedGame = false;
+			std::thread mNavMeshThread;
 		};
 	}
 }

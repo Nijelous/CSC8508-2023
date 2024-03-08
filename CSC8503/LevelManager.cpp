@@ -26,7 +26,6 @@
 #include "UISystem.h"
 #include <filesystem>
 #include <fstream>
-#include <thread>
 
 #ifdef USEGL
 
@@ -240,13 +239,13 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			break;
 		}
 	}
-	
-	std::thread navMeshThread([this] {
-		float* levelSize = new float[3];
-		levelSize = mBuilder->BuildNavMesh(mLevelLayout);
-		if (levelSize) mPhysics->SetNewBroadphaseSize(Vector3(levelSize[x], levelSize[y], levelSize[z]));
+	if(mHasStartedGame) mNavMeshThread.join();
+	mHasSetNavMesh = false;
+	mNavMeshThread = std::thread([this] {
+		mBuilder->BuildNavMesh(mLevelLayout);
 		LoadDoorsInNavGrid();
-		delete[] levelSize;
+		mHasSetNavMesh = true;
+		std::cout << "Nav Mesh Set\n";
 		});
 
 	if (!isMultiplayer) {
@@ -290,8 +289,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
+	while (!mBuilder->HasSetSize()) {
 
-	navMeshThread.join();
+	}
+	mHasStartedGame = true;
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
