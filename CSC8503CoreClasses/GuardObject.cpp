@@ -8,6 +8,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../Detour/Include/DetourNavMeshQuery.h"
 #include "RecastBuilder.h"
+#include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
 
 using namespace NCL;
@@ -22,6 +23,8 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mIsStunned = false;
 	mDist = 0;
 	mNextPoly = 0;
+	mDoorRaycastInterval = RAYCAST_INTERVAL;
+	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -37,7 +40,8 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
-	delete mSightedObject;
+	delete mSightedPlayer;
+	delete mSightedDoor;
 }
 
 void GuardObject::UpdateObject(float dt) {
@@ -51,9 +55,15 @@ void GuardObject::UpdateObject(float dt) {
 				SetPlayer(nearestPlayer);
 			}
 			RaycastToPlayer();
-			ExecuteBT();
+		  ExecuteBT();
+		  if (mDoorRaycastInterval <= 0) {
+			  mDoorRaycastInterval = RAYCAST_INTERVAL;
+			  CheckForDoors(dt);
+		  }
+		  else {
+			  mDoorRaycastInterval -= dt;
+		  }
 		}
-    
 	}
 	else {
 		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
@@ -67,10 +77,10 @@ void GuardObject::RaycastToPlayer() {
 	if (ang > 2) {
 		RayCollision closestCollision;
 		Ray r = Ray(this->GetTransform().GetPosition(), dir);
-		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this)) {
-			mSightedObject = (GameObject*)closestCollision.node;
+		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
+			mSightedPlayer = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-			if (mSightedObject == mPlayer) {
+			if (mSightedPlayer == mPlayer) {
 				mCanSeePlayer = true;
 			}
 			else {
@@ -83,7 +93,7 @@ void GuardObject::RaycastToPlayer() {
 	}
 	else {
 		mCanSeePlayer = false;
-		mSightedObject = nullptr;
+		mSightedPlayer = nullptr;
 	}
 }
 
@@ -239,6 +249,32 @@ void GuardObject::RemoveBuffFromGuard(PlayerBuffs::buff removedBuff) {
 		break;
 	default:
 		break;
+	}
+}
+
+void GuardObject::CheckForDoors(float dt) {
+	RayCollision closestCollision;
+	Ray r = Ray(this->GetTransform().GetPosition(), GuardForwardVector());
+	if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
+		mSightedDoor = (GameObject*)closestCollision.node;
+		float dist = (mSightedDoor->GetTransform().GetPosition() - this->GetTransform().GetPosition()).LengthSquared();
+		if (mSightedDoor->GetName() == "InteractableDoor" && dist < MIN_DIST_TO_NEXT_POS) {
+			this->GetPhysicsObject()->ClearForces();
+			if (mFumbleKeysCurrentTime <= 0) {
+				mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
+				OpenDoor();
+			}
+			else {
+				mFumbleKeysCurrentTime -= dt;
+			}
+		}
+	}
+}
+
+void GuardObject::OpenDoor() {
+	InteractableDoor* interactablePtr = (InteractableDoor*)mSightedDoor;
+	if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(NCL::CSC8503::InteractType::Use)) {
+		interactablePtr->Interact(NCL::CSC8503::InteractType::Use, mSightedDoor);
 	}
 }
 

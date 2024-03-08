@@ -85,7 +85,7 @@ void GameWorld::UpdateWorld(float dt) {
 	}
 }
 
-bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, GameObject* ignoreThis) const {
+bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, GameObject* ignoreThis, bool ignoreNotRendered) const {
 	//The simplest raycast just goes through each object and sees if there's a collision
 	RayCollision collision;
 
@@ -98,7 +98,13 @@ bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObje
 		}
 		RayCollision thisCollision;
 		if (CollisionDetection::RayIntersection(r, *i, thisCollision)) {
-				
+			
+			if (ignoreNotRendered) {
+				if (i->IsRendered() == false && !(i->GetIsPlayer() || i->GetName() == "Prison Door")) {
+					continue;
+				}
+			}
+			//std::cout << typeid(i).name();
 			if (!closestObject) {	
 				closestCollision		= collision;
 				closestCollision.node = i;
