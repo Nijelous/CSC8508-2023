@@ -580,7 +580,7 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 	switch (interactableItemType) {
 	case InteractableItems::InteractableDoors: {
 		InteractableDoor* doorObj = reinterpret_cast<InteractableDoor*>(interactedObj);
-		doorObj->SetIsOpen(packet->isOpen, false);
+		doorObj->SyncDoor(packet->isOpen);
 		break;
 	}
 	case InteractableItems::InteractableVents:

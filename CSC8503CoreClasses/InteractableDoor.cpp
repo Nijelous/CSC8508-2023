@@ -18,18 +18,18 @@ InteractableDoor::InteractableDoor() {
 	mIsOpen = false;
 
 	bool isServer = SceneManager::GetSceneManager()->IsServer();
-	if (isServer) {
+	if (true) {
 		InitStateMachine();
 	}
 }
 
 void InteractableDoor::Unlock() {
-	SetIsOpen(false, false);
+	SetIsOpen(false);
 	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock() {
-	SetIsOpen(true, false);
+	SetIsOpen(true);
 	SetNavMeshFlags(4);
 }
 
@@ -41,7 +41,7 @@ void InteractableDoor::Interact(InteractType interactType, GameObject* interacte
 	switch (interactType)
 	{
 	case Use:
-		SetIsOpen(!mIsOpen, true);
+		SetIsOpen(!mIsOpen);
 		break;
 	case LongUse:
 		Unlock();
@@ -76,23 +76,37 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 	}
 }
 
-void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
-	mIsOpen = isOpen;
-	if (isOpen) {
-		this->GetSoundObject()->TriggerSoundEvent();
-		SetActive(false);
-		if (isSettedByServer) {
+void InteractableDoor::SetIsOpen(bool toOpen) {
+
+	auto* sceneManager = SceneManager::GetSceneManager();
+	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+
+	if (toOpen) {
+		if (networkedGame->GetIsServer())
+		{
+			Open();
+			mTimer = initDoorTimer;
+		}
+		else
+		{
+			SetIsRendered(false);
 			mTimer = initDoorTimer;
 		}
 	}
 	else {
-		this->GetSoundObject()->CloseDoorTriggered();
-		SetActive(true);
+		//this->GetSoundObject()->CloseDoorTriggered();
+		if (networkedGame->GetIsServer())
+		{
+			Close();
+		}
+		else
+			SetIsRendered(true);
 	}
 
+	mIsOpen = toOpen;
 	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
-	if (isMultiplayerGame && isSettedByServer) {
-		SyncInteractableDoorStatusInMultiplayer();
+	if (isMultiplayerGame) {
+		SyncInteractableDoorStatusInMultiplayer(toOpen);
 	}
 }
 
@@ -118,7 +132,7 @@ void InteractableDoor::InitStateMachine()
 			this->CountDownTimer(dt);
 
 			if (mTimer == 0)
-				SetIsOpen(false, true);
+				SetIsOpen(false);
 		}
 	);
 
@@ -168,18 +182,23 @@ void InteractableDoor::InitStateMachine()
 	));
 }
 #ifdef USEGL
-void InteractableDoor::SyncInteractableDoorStatusInMultiplayer() {
+void InteractableDoor::SyncInteractableDoorStatusInMultiplayer(bool toOpen) {
 	auto* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 	if (networkedGame) {
 		auto* networkObj = GetNetworkObject();
 		if (networkObj) {
 			const int networkId = networkObj->GetnetworkID();
-
-			SyncInteractablePacket packet(networkId, mIsOpen, mInteractableItemType);
-			networkedGame->GetServer()->SendGlobalPacket(packet);
+			if (networkedGame->GetServer()){
+				SyncInteractablePacket packet(networkId, toOpen, mInteractableItemType);
+				networkedGame->GetServer()->SendGlobalPacket(packet);
+			}
 		}
 	}
+}
+
+void InteractableDoor::SyncDoor(bool toOpen){
+	SetIsRendered(!toOpen);
 }
 #endif
 

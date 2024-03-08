@@ -45,7 +45,6 @@ void Door::InitStateMachine()
 
 void Door::Open() {
 	SetActive(false);
-	mTimer = initDoorTimer;
 	SetNavMeshFlags(1);
 }
 

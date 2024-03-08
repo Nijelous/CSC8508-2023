@@ -15,16 +15,18 @@ namespace NCL {
 			void Lock();
 			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
 			bool CanBeInteractedWith(InteractType interactType) override;
-			void SetIsOpen(bool isOpen, bool isSettedByServer);
+			void SetIsOpen(bool toOpen);
 			virtual void InitStateMachine() override;
 #ifdef USEGL
-			void SyncInteractableDoorStatusInMultiplayer();
+			void SyncInteractableDoorStatusInMultiplayer(bool toOpen);
+			void SyncDoor(bool toOpen);
 #endif
+
 			virtual void UpdateObject(float dt);
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:
 			bool CanUseItem();
-			const float initDoorTimer = 60.0f;
+			const float initDoorTimer = 5.0f;
 			bool mIsLocked;
 		};
 	}
