@@ -3,6 +3,8 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
 
 
 using namespace NCL::CSC8503;
@@ -18,7 +20,6 @@ GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectN
 	mRenderObject	= nullptr;
 	mNetworkObject	= nullptr;
 	mSoundObject = nullptr;
-	
 	mCollisionLayer = collisionLayer;
 	
 	mObjectState = Idle;
@@ -33,6 +34,19 @@ GameObject::~GameObject()	{
 	delete mNetworkObject;
 	delete mSoundObject;
 
+}
+
+void GameObject::SetIsSensed(bool sensed){
+	mRenderObject->SetOutlined(sensed);
+}
+
+bool GameObject::GetIsSensed() {
+	return mRenderObject->GetOutlined();
+}
+
+void GameObject::SetNetworkObject(NetworkObject* netObj) {
+	mNetworkObject = netObj;
+	netObj->SetGameObject(*this);
 }
 
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
@@ -74,4 +88,26 @@ void GameObject::UpdateObject(float dt) {
 			mRenderObject->GetAnimationObject()->Update(dt);
 	}
 #endif
+}
+
+void GameObject::SetObjectState(GameObjectState state) {
+	if (mObjectState == state) {
+		return;
+	}
+	
+	mObjectState = state;
+
+	if (mRenderObject->GetAnimationObject() != nullptr ) {
+		AnimationSystem* animSystem = LevelManager::GetLevelManager()->GetAnimationSystem();
+		animSystem->SetAnimationState(this, mObjectState);
+	}
+
+	if (mNetworkObject) {
+		SceneManager* sceneManager = SceneManager::GetSceneManager();
+		bool isServer = sceneManager->IsServer();
+		if (isServer) {
+			DebugNetworkedGame* scene = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+			scene->SendObjectStatePacket(mNetworkObject->GetnetworkID(), mObjectState);
+		}
+	}
 }

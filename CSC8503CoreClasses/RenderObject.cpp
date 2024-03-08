@@ -15,6 +15,7 @@ RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albe
 	mCullSphereRadius = cullSphereRadius;
 	mSqDistToCam = FLT_MAX;
 	mAnimationObject = nullptr;
+
 	mCurrentFrame = 0;
 
 	vector<uint64_t>  mMatTextures = {};
