@@ -1,10 +1,9 @@
 #include "UISystem.h"
-#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
+#include "Vector3.h"
 
 
 using namespace NCL;
 using namespace CSC8503;
-using namespace InventoryBuffSystem;
 
 namespace {
 
@@ -145,7 +144,6 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 			break;
 		case SECOND_ITEM_SLOT:
 			mSecondEquippedItem = &icon;
-			break;
 			break;
 		case SILENT_BUFF_SLOT:
 			mSilentSprintIcon = &icon;
