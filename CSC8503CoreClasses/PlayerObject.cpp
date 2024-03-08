@@ -99,7 +99,7 @@ PlayerObject::~PlayerObject() {
 void PlayerObject::UpdateObject(float dt) {
 	if (mPlayerSpeedState != Stunned) {
 		MovePlayer(dt);
-		RayCastFromPlayer(mGameWorld, dt);
+		if(LevelManager::GetLevelManager()->HasSetNavMesh()) RayCastFromPlayer(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
@@ -310,7 +310,15 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 		}
 	}
 	else {
-		cout << "Press E" << endl;
+		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+		RayCollision closestCollision;
+		
+		if (world->Raycast(ray, closestCollision, true, this)) {
+			auto* objectHit = (GameObject*)closestCollision.node;
+			if (objectHit->GetName() == "InteractableDoor") {
+				std::cout << "press e to open the door" << endl;
+			};
+		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());

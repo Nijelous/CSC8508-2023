@@ -71,14 +71,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     )
     source_group("Collision Detection" FILES ${Collision_Detection})
 
-    set(Lights
-    "BaseLight.h" 
-    "DirectionalLight.h"
-    "PointLight.h"
-    "SpotLight.h"
-    )
-    source_group("Lights" FILES ${Lights})
-
     set(Level_Creation
         "JsonParser.h"
         "JsonParser.cpp"
@@ -152,7 +144,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.h"
         "AnimationObject.h"
         "AnimationSystem.h"
-        "UISystem.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -165,7 +156,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.cpp"
         "AnimationObject.cpp"
         "AnimationSystem.cpp"
-        "UISystem.cpp"
     )
     source_group("Source Files" FILES ${Source_Files})
 
@@ -205,7 +195,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         ${Networking}
         ${Physics}
         ${enet_Files}
-        ${Lights}
         ${AI_Guard}
         ${AI_CCTV}
     )
@@ -358,14 +347,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     )
     source_group("Collision Detection" FILES ${Collision_Detection})
 
-    set(Lights
-    "BaseLight.h" 
-    "DirectionalLight.h"
-    "PointLight.h"
-    "SpotLight.h"
-    )
-    source_group("Lights" FILES ${Lights})
-
     set(Level_Creation
         "JsonParser.h"
         "JsonParser.cpp"
@@ -492,7 +473,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         ${Networking}
         ${Physics}
         ${enet_Files}
-        ${Lights}
         ${AI_Guard}
         ${AI_CCTV}
     )
