@@ -13,6 +13,7 @@
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
 #include "SoundManager.h"
+#include <thread>
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -131,6 +132,8 @@ namespace NCL {
 
 			void SetGameState(GameStates state);
 
+			bool HasSetNavMesh() { return mHasSetNavMesh; }
+
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
 			PrisonDoor* GetPrisonDoor() const;
@@ -223,6 +226,8 @@ namespace NCL {
 			std::unordered_map<std::string, MeshMaterial*> mMaterials;
 			std::unordered_map<std::string, MeshAnimation*> mAnimations;
 
+			std::vector<std::string> mShadersToLoad;
+
 			UISystem* mUi;
 
 			FlagGameObject* mMainFlag;
@@ -256,6 +261,9 @@ namespace NCL {
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+			bool mHasSetNavMesh = false;
+			bool mHasStartedGame = false;
+			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
 		};
