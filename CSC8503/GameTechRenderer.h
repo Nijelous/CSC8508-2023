@@ -17,8 +17,6 @@
 #include "UISystem.h"
 
 
-
-
 namespace NCL {
 	class Maths::Vector3;
 	class Maths::Vector4;
@@ -29,7 +27,7 @@ namespace NCL {
 		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
-		class GameTechRenderer : public OGLRenderer	{
+		class GameTechRenderer : public OGLRenderer {
 		public:
 
 			
@@ -37,12 +35,12 @@ namespace NCL {
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 
-			Mesh*		LoadMesh(const std::string& name);
-			Texture*	LoadTexture(const std::string& name);
-			Texture* LoadDebugTexture(const std::string& name);
-			Shader*		LoadShader(const std::string& vertex, const std::string& fragment);
-			MeshAnimation* LoadAnimation(const std::string& name);
-			MeshMaterial* LoadMaterial(const std::string& name);
+			Mesh*		LoadMesh(const std::string& name) override;
+			Texture*	LoadTexture(const std::string& name) override;
+			Texture* LoadDebugTexture(const std::string& name) override;
+			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
+			MeshAnimation* LoadAnimation(const std::string& name) override;
+			MeshMaterial* LoadMaterial(const std::string& name) override;
 			
 
 			void AddLight(Light* light);

@@ -69,6 +69,7 @@ void Door::SetIsOpen(bool isOpen) {
 	}
 }
 void Door::SetNavMeshFlags(int flag) {
+	if (!LevelManager::GetLevelManager()->HasSetNavMesh()) return;
 	float* pos = new float[3] { mTransform.GetPosition().x, mTransform.GetPosition().y, mTransform.GetPosition().z };
 	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
 	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };
