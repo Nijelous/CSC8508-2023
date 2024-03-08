@@ -9,6 +9,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Shader.h"
 #include "glad\gl.h"
 
+typedef unsigned int GLuint;
+
 namespace NCL::Rendering {
 	using UniqueOGLShader = std::unique_ptr<class OGLShader>;
 	using SharedOGLShader = std::shared_ptr<class OGLShader>;

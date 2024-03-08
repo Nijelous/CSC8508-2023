@@ -1,7 +1,6 @@
 #pragma once
 #include "Vector2.h"
 #include "SimpleFont.h"
-#include "../CSC8503/InventoryBuffSystem/PlayerInventory.h"
 
 namespace NCL {
 

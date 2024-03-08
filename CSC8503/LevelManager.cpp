@@ -27,9 +27,6 @@
 #include <filesystem>
 #include <fstream>
 
-#ifdef USEGL
-
-
 namespace {
 	constexpr int NETWORK_ID_BUFFER_START = 10;
 }
@@ -41,12 +38,15 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mWorld = new GameWorld();
+
 #ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
+
 #ifdef USEPROSPERO
-	// use ps5 renderer
+	mRenderer = new GameTechAGCRenderer();
 #endif
+
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 
@@ -81,8 +81,9 @@ LevelManager::LevelManager() {
 
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
+	GameTechRenderer* renderer = (GameTechRenderer*) mRenderer;
+	mAnimation->PreloadMatTextures(*renderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
+	mAnimation->PreloadMatTextures(*renderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
 
 #endif
 
@@ -284,6 +285,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
+
 	delete[] levelSize;
 
 	mTimer = INIT_TIMER_VALUE;
@@ -304,7 +306,9 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	wallInstance->SetInstanceMatrices(mLevelWallMatrices);
 	OGLMesh* cornerWallInstance = (OGLMesh*)mMeshes["CornerWall"];
 	cornerWallInstance->SetInstanceMatrices(mLevelCornerWallMatrices);
-	mRenderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+	GameTechRenderer* renderer = (GameTechRenderer*)mRenderer;
+	renderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+
 }
 
 void LevelManager::AddNetworkObject(GameObject& objToAdd) {
@@ -1201,4 +1205,3 @@ FlagGameObject* LevelManager::GetMainFlag() {
 Helipad* LevelManager::GetHelipad() {
 	return mHelipad;
 }
-#endif

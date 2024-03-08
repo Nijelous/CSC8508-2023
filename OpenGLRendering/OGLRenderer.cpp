@@ -35,6 +35,8 @@ static void APIENTRY DebugCallback(GLenum source, GLenum type, GLuint id, GLenum
 #endif;
 
 OGLRenderer::OGLRenderer(Window& w) : RendererBase(w)	{
+	mType = OGL;
+
 	initState = false;
 #ifdef _WIN32
 	InitWithWin32(w);
