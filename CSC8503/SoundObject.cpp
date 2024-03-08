@@ -18,7 +18,7 @@ SoundObject::SoundObject() {
 }
 
 SoundObject::~SoundObject() {
-
+	mChannels.clear();
 }
 
 void SoundObject::AddChannel(Channel* channel) {

@@ -120,6 +120,7 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 		std::cout << "Sound Emitter position setting error" << std::endl;
 		return nullptr;
 	}
+	mSystem->update();
 	soundEmitterChannel->setPaused(false);
 	return soundEmitterChannel;
 }
