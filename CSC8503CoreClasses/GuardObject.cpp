@@ -25,6 +25,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mNextPoly = 0;
 	mDoorRaycastInterval = RAYCAST_INTERVAL;
 	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
+	mPointTimer = POINTING_TIMER;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -53,14 +54,14 @@ void GuardObject::UpdateObject(float dt) {
 				SetPlayer(nearestPlayer);
 			}
 			RaycastToPlayer();
-		  ExecuteBT();
-		  if (mDoorRaycastInterval <= 0) {
-			  mDoorRaycastInterval = RAYCAST_INTERVAL;
-			  CheckForDoors(dt);
-		  }
-		  else {
-			  mDoorRaycastInterval -= dt;
-		  }
+			ExecuteBT();
+			if (mDoorRaycastInterval <= 0) {
+				mDoorRaycastInterval = RAYCAST_INTERVAL;
+				CheckForDoors(dt);
+			}
+			else {
+				mDoorRaycastInterval -= dt;
+			}
 		}
 	}
 	else {
@@ -153,14 +154,14 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0,10, 0));
-		if (angleOfPlayer > -0.1) {
+		this->GetPhysicsObject()->AddTorque(Vector3(0,20, 0));
+		if (angleOfPlayer > -0.15) {
 			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		}
 	}
 	else if (angleOfPlayer > 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0, -10, 0));
-		if (angleOfPlayer < 0.1) {
+		this->GetPhysicsObject()->AddTorque(Vector3(0, -20, 0));
+		if (angleOfPlayer < 0.15) {
 			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		}
 	}
@@ -173,8 +174,7 @@ void GuardObject::RunAfterPlayer(Vector3 dir) {
 }
 
 void GuardObject::GrabPlayer() {
-	Vector3 direction = this->GetTransform().GetPosition() - mPlayer->GetTransform().GetPosition();
-	mPlayer->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
+	mPlayer->GetPhysicsObject()->ClearForces();
 }
 
 float* GuardObject::QueryNavmesh(float* endPos) {
@@ -285,6 +285,7 @@ void GuardObject::BehaviourTree() {
 	FirstSelect->AddChild(Patrol());
 	FirstSelect->AddChild(SeenPlayerSequence);
 	SeenPlayerSequence->AddChild(ChasePlayerSelector);
+	ChasePlayerSelector->AddChild(PointAtPlayer());
 	ChasePlayerSelector->AddChild(ChasePlayerSetup());
 	ChasePlayerSelector->AddChild(GoToLastKnownLocation());
 	SeenPlayerSequence->AddChild(CaughtPlayerSequence);
@@ -316,12 +317,12 @@ BehaviourAction* GuardObject::Patrol() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == false) {
-
 				mGuardSpeedMultiplier = 25;
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
+
 				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
 					if (mCurrentNode == mNodes.size() - 1) {
@@ -343,6 +344,28 @@ BehaviourAction* GuardObject::Patrol() {
 	return Patrol;
 }
 
+BehaviourAction* GuardObject::PointAtPlayer() {
+	BehaviourAction* PointAtPlayer = new BehaviourAction("Point at Player", [&](float dt, BehaviourState state)->BehaviourState {
+		if (state == Initialise) {
+			state = Ongoing;
+			SetObjectState(Sprint);
+		}
+		else if (state == Ongoing) {
+			mPointTimer -= dt;
+			Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+			LookTowardFocalPoint(direction);
+			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
+			if (mPointTimer <= 0) {
+				mPointTimer = POINTING_TIMER;
+				return Failure;
+			}
+		}
+		return state;
+		}
+	);
+	return PointAtPlayer;
+}
+
 BehaviourAction* GuardObject::ChasePlayerSetup() {
 	BehaviourAction* ChasePlayer = new BehaviourAction("Chase Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
@@ -351,15 +374,15 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
-
 				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
-
 				float dist = direction.LengthSquared();
+
 				if (dist < GUARD_CATCHING_DISTANCE_SQUARED) {
 					LookTowardFocalPoint(direction);
 					this->GetPhysicsObject()->AddForce(Vector3(direction.x, 0, direction.z));
 					mHasCaughtPlayer = true;
+					GrabPlayer();
 					return Success;
 				}
 				else {
@@ -387,11 +410,12 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 		else if (state == Ongoing) {
 			float* endPos = new float[3] {mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]};
 			MoveTowardFocalPoint(endPos);
-			float dist = (Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition()).LengthSquared();
+			Vector3 direction = Vector3(mLastKnownPos[0], mLastKnownPos[1], mLastKnownPos[2]) - this->GetTransform().GetPosition();
+			float dist = direction.LengthSquared();
 			if (mCanSeePlayer == true) {
 				return Failure;
 			}
-			else if (dist < MIN_DIST_TO_NEXT_POS) {
+			else if (dist < MIN_DIST_TO_NEXT_POS && GuardForwardVector() == direction.Normalised()) {
 				if (mCanSeePlayer == false) {
 					return Success;
 				}
@@ -406,11 +430,11 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 BehaviourAction* GuardObject::ConfiscateItems() {
 	BehaviourAction* ConfiscateItems = new BehaviourAction("Confiscate Items", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
-			mConfiscateItemsTime = 60;
+			mConfiscateItemsTime = 40;
 			state = Ongoing;
 		}
 		else if (state == Ongoing) {
-			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == true) {
+			if (mHasCaughtPlayer == true && mPlayerHasItems == true) {
 				mConfiscateItemsTime -= dt;
 				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
@@ -418,7 +442,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 					return Success;
 				}
 			}
-			else if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
+			else if (mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mConfiscateItemsTime -= dt;
 				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
@@ -442,7 +466,6 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
-				mPlayer->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
 				mPlayer->ClosePrisonDoor();
 				mHasCaughtPlayer = false;
 				return Success;
