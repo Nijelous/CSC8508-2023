@@ -348,7 +348,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 	BehaviourAction* PointAtPlayer = new BehaviourAction("Point at Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
-			SetObjectState(Sprint);
+			SetObjectState(Point);
 		}
 		else if (state == Ongoing) {
 			mPointTimer -= dt;

@@ -134,7 +134,7 @@ void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::Game
 		mPlayerStateAnimationMap : mGuardStateAnimationMap;
 
 	const std::string& animStr = animMap[objState];
-	
+	cout << animStr << endl;
 	MeshAnimation* anim = mPreAnimationList[animStr];
 	if (animStr == "GuardSprint") {
 		gameObject->GetRenderObject()->GetAnimationObject()->SetRate(2.0);
@@ -151,6 +151,7 @@ void AnimationSystem::InitGuardStateAnimationMap() {
 	{GameObject::GameObjectState::Idle, "GuardStand"},
 	{GameObject::GameObjectState::Walk, "GuardWalk"},
 	{GameObject::GameObjectState::Sprint, "GuardSprint"},
+	{GameObject::GameObjectState::Point, "GuardPoint"},
 	};
 	
 }

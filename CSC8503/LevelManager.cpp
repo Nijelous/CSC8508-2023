@@ -436,6 +436,7 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
 	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["RigSprint"]));
+	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["RigPoint"]));
 	
 
 	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
