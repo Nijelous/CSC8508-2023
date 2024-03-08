@@ -183,7 +183,6 @@ void LevelManager::ClearLevel() {
 	mGuardObjects.clear();
 	mCCTVTransformList.clear();
 
-
 	ResetEquippedIconTexture();
 }
 
@@ -205,6 +204,7 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
+	mStartTimer = 3;
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	std::vector<Vector3> roomItemPositions;
@@ -245,12 +245,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			break;
 		}
 	}
-	if(mHasStartedGame) mNavMeshThread.join();
-	mHasSetNavMesh = false;
 	mNavMeshThread = std::thread([this] {
 		mBuilder->BuildNavMesh(mLevelLayout);
 		LoadDoorsInNavGrid();
-		mHasSetNavMesh = true;
 		std::cout << "Nav Mesh Set\n";
 		});
 
@@ -300,7 +297,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	while (!mBuilder->HasSetSize()) {
 
 	}
-	mHasStartedGame = true;
 	mIsLevelInitialised = true;
 }
 
@@ -330,16 +326,28 @@ void LevelManager::AddNetworkObject(GameObject& objToAdd) {
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
 		mGameState = LevelState;
-		if ((mUpdatableObjects.size() > 0)) {
-			for (GameObject* obj : mUpdatableObjects) {
-				obj->UpdateObject(dt);
+		if (mStartTimer > 0) {
+			if (mStartTimer == 3) {
+				mTempPlayer->UpdateObject(dt);
+			}
+			mStartTimer -= dt;
+			Debug::Print(to_string((int)mStartTimer + 1), Vector2(50, 50), Vector4(1, 1, 1, 1), 40.0f);
+			if (mStartTimer <= 0) {
+				mNavMeshThread.join();
 			}
 		}
-		if (mTempPlayer)
-			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+		else {
+			if ((mUpdatableObjects.size() > 0)) {
+				for (GameObject* obj : mUpdatableObjects) {
+					obj->UpdateObject(dt);
+				}
+			}
+			if (mTempPlayer)
+				Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 
-		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
-		mTimer -= dt;
+			Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+			mTimer -= dt;
+		}
 	}
 	else
 		mGameState = MenuState;

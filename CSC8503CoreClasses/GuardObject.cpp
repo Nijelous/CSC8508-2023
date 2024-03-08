@@ -44,7 +44,7 @@ GuardObject::~GuardObject() {
 
 void GuardObject::UpdateObject(float dt) {
 
-	if (!mIsStunned && LevelManager::GetLevelManager()->HasSetNavMesh()) {
+	if (!mIsStunned) {
 		if (mIsBTWillBeExecuted) {
 			if (mPlayer == nullptr) {
 				const Vector3& guardPos = GetTransform().GetPosition();
