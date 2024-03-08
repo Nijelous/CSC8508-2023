@@ -318,18 +318,28 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 			Vector3 objPos = objectHit->GetTransform().GetPosition();
 			Vector3 playerPos = GetTransform().GetPosition();
 			float distance = (objPos - playerPos).Length();
-			if (objectHit->GetName() == "InteractableDoor"&&objectHit->IsActive()&&distance<10) {
-				if (transparency < 1) {
-					transparency = transparency + 0.05;
+			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10) {
+				if (transparency1 < 1) {
+					transparency1 = transparency1 + 0.05;
 				}
-				
-				mUi->ChangeBuffSlotTransparency(NOTICE, transparency);
-			}
-			else if(transparency>0) {
-				transparency = transparency - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICE, transparency);
-			};
 
+				mUi->ChangeBuffSlotTransparency(NOTICE1, transparency1);
+			}
+			else if (transparency1 > 0) {
+				transparency1 = transparency1 - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICE1, transparency1);
+			}
+			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10&& GetEquippedItem() == PlayerInventory::item::doorKey) {
+				if (transparency2 < 1) {
+					transparency2 = transparency2 + 0.05;
+				}
+				mUi->ChangeBuffSlotTransparency(NOTICE2, transparency2);
+			}
+			else if (transparency2 > 0) {
+				transparency2 = transparency2 - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICE2, transparency2);
+			}
+			
 		}
 	
 		
