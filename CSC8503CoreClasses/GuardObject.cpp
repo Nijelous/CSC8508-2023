@@ -40,8 +40,6 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
-	delete mSightedPlayer;
-	delete mSightedDoor;
 }
 
 void GuardObject::UpdateObject(float dt) {

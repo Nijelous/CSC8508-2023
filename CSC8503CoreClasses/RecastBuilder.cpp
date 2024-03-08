@@ -79,7 +79,10 @@ void RecastBuilder::BuildNavMesh(std::vector<GameObject*> objects) {
 	if (!BuildPoly()) return;
 	if (!BuildDetailPoly()) return;
 	if (!CreateDetourData()) return;
-
+	delete[] bmin;
+	delete[] bmax;
+	delete[] verts;
+	delete[] tris;
 	return;
 }
 
