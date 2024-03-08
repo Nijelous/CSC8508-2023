@@ -61,12 +61,15 @@ LevelManager::LevelManager() {
 #ifdef USEPROSPERO
 	// use ps5 renderer
 #endif
-#ifdef USEGL // remove after implemented
-	mAnimation = new AnimationSystem(*mWorld);
-#endif
-
 	mUi = new UISystem();
 	InitialiseAssets();
+#ifdef USEGL // remove after implemented
+	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
+
+	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
+	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
+	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
+#endif
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
@@ -427,12 +430,6 @@ void LevelManager::InitialiseAssets() {
 		}
 	}
 	delete[] assetDetails;
-  
-  #ifdef USEGL // remove after implemented
-	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-	matLoadThread.join();
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
 
 	animLoadThread.join();
 	//preLoadList
@@ -444,7 +441,6 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
 	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["GuardWalk"]));
 	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["GuardSprint"]));
-#endif
 
 	//icons
 	vector<Texture*> keyTexVec = { 
@@ -460,6 +456,7 @@ void LevelManager::InitialiseAssets() {
 	};
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
+	matLoadThread.join();
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
