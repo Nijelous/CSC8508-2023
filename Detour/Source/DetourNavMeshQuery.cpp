@@ -67,7 +67,7 @@ enum PolyFlags {
 	MAX_FLAGS = 8
 };
 
-constexpr int CLOSED_DOOR_COST = 1000;
+constexpr int CLOSED_DOOR_COST = 10;
 constexpr int LOCKED_DOOR_COST = 100000000;
 
 dtQueryFilter::dtQueryFilter() :
