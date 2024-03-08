@@ -130,6 +130,9 @@ void UISystem::ChangeBuffSlotTransparency(int slotNum, float transparency){
 	case ALARM:
 		mAlarm->mTransparency = transparency;
 		break;
+	case NOTICE:
+		mNotice->mTransparency = transparency;
+		break;
 
 	default:
 		break;
@@ -169,7 +172,9 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 		case ALARM:
 			mAlarm = &icon;
 			break;
-
+		case NOTICE:
+			mNotice = &icon;
+			break;
 	default:
 		break;
 	}

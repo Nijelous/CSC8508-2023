@@ -52,4 +52,5 @@ tex,ChestNormal,Tex_Chest_01_Normal.png,
 sdr,Basic,scene.vert,scene.frag
 sdr,Instance,sceneInstanced.vert,scene.frag
 sdr,Animation,animationScene.vert,scene.frag
+tex,Notice,Notice.png,
 end,,,

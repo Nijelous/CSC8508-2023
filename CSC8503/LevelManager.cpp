@@ -675,6 +675,11 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mTextures["Alarm"], 0.0);
 	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
+	UISystem::Icon* mNotice = mUi->AddIcon(Vector2(55, 50), 5, 5, mTextures["Notice"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICE, *mNotice);
+
+
+
 	mRenderer->SetUIObject(mUi);
 }
 

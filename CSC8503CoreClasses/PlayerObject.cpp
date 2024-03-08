@@ -315,10 +315,24 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 		
 		if (world->Raycast(ray, closestCollision, true, this)) {
 			auto* objectHit = (GameObject*)closestCollision.node;
-			if (objectHit->GetName() == "InteractableDoor") {
-				std::cout << "press e to open the door" << endl;
+			Vector3 objPos = objectHit->GetTransform().GetPosition();
+			Vector3 playerPos = GetTransform().GetPosition();
+			float distance = (objPos - playerPos).Length();
+			if (objectHit->GetName() == "InteractableDoor"&&objectHit->IsActive()&&distance<10) {
+				if (transparency < 1) {
+					transparency = transparency + 0.05;
+				}
+				
+				mUi->ChangeBuffSlotTransparency(NOTICE, transparency);
+			}
+			else if(transparency>0) {
+				transparency = transparency - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICE, transparency);
 			};
+
 		}
+	
+		
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
