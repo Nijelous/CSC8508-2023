@@ -101,7 +101,7 @@ void PlayerObject::UpdateObject(float dt) {
 		const GameObjectState previousObjectState = mObjectState;
 
 		MovePlayer(dt);
-		RayCastFromPlayer(mGameWorld, dt);
+		if(LevelManager::GetLevelManager()->HasSetNavMesh()) RayCastFromPlayer(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {

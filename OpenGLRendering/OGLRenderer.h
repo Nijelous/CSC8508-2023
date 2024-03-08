@@ -19,6 +19,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #define OPENGL_DEBUGGING
 #endif
 
+typedef unsigned int GLuint;
+
 namespace NCL {
 	namespace Maths {
 		class Matrix4;
