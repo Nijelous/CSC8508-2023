@@ -27,9 +27,6 @@
 #include <filesystem>
 #include <fstream>
 
-#ifdef USEGL
-
-
 namespace {
 	constexpr int NETWORK_ID_BUFFER_START = 10;
 }
@@ -58,8 +55,9 @@ LevelManager::LevelManager() {
 #ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
+
 #ifdef USEPROSPERO
-	// use ps5 renderer
+	mRenderer = new GameTechAGCRenderer();
 #endif
 	mUi = new UISystem();
 	InitialiseAssets();
@@ -313,7 +311,9 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	wallInstance->SetInstanceMatrices(mLevelWallMatrices);
 	OGLMesh* cornerWallInstance = (OGLMesh*)mMeshes["CornerWall"];
 	cornerWallInstance->SetInstanceMatrices(mLevelCornerWallMatrices);
-	mRenderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+	GameTechRenderer* renderer = (GameTechRenderer*)mRenderer;
+	renderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+
 }
 
 void LevelManager::AddNetworkObject(GameObject& objToAdd) {
@@ -1240,4 +1240,3 @@ FlagGameObject* LevelManager::GetMainFlag() {
 Helipad* LevelManager::GetHelipad() {
 	return mHelipad;
 }
-#endif

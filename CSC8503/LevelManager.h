@@ -4,10 +4,11 @@
 #include "GameTechRenderer.h"
 #endif
 #ifdef USEPROSPERO
-// include ps5 renderer
+#include "../PS5Starter/GameTechAGCRenderer.h"
 #endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
+#include "RendererBase.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
@@ -78,12 +79,8 @@ namespace NCL {
 
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
-#ifdef USEGL
-			GameTechRenderer* GetRenderer() { return mRenderer; }
-#endif
-#ifdef USEPROSPERO
-			// get PS5 Renderer
-#endif
+			RendererBase* GetRenderer() { return mRenderer; }
+
 
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
@@ -204,12 +201,15 @@ namespace NCL {
 			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
+
 #ifdef USEGL
 			GameTechRenderer* mRenderer;
 #endif
+
 #ifdef USEPROSPERO
-			// define PS5 renderer
+			GameTechAGCRenderer* mRenderer;
 #endif
+
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
 #ifdef USEGL // remove when converted to PS5 also

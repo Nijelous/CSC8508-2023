@@ -9,6 +9,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Texture.h"
 #include "glad\gl.h"
 
+typedef unsigned int GLuint;
+
 namespace NCL::Rendering {		
 	using UniqueOGLTexture = std::unique_ptr<class OGLTexture>;
 	using SharedOGLTexture = std::shared_ptr<class OGLTexture>;
