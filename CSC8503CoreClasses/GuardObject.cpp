@@ -47,47 +47,81 @@ GuardObject::~GuardObject() {
 void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
 		if (mIsBTWillBeExecuted) {
-			if (mPlayer == nullptr) {
-				const Vector3& guardPos = GetTransform().GetPosition();
-				PlayerObject* nearestPlayer = LevelManager::GetLevelManager()->GetNearestPlayer(guardPos);
-
-				SetPlayer(nearestPlayer);
-			}
 			RaycastToPlayer();
-		  ExecuteBT();
-		  if (mDoorRaycastInterval <= 0) {
-			  mDoorRaycastInterval = RAYCAST_INTERVAL;
-			  CheckForDoors(dt);
-		  }
-		  else {
-			  mDoorRaycastInterval -= dt;
-		  }
+			ExecuteBT();
+			if (mDoorRaycastInterval <= 0) {
+				mDoorRaycastInterval = RAYCAST_INTERVAL;
+				CheckForDoors(dt);
+			}
+			else {
+				mDoorRaycastInterval -= dt;
+			}
 		}
 	}
 	else {
 		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
 	}
 	HandleAppliedBuffs(dt);
+	playerDirs.clear();
+}
+
+PlayerObject* GuardObject::GetNearestPlayer(const Vector3& position) const {
+	PlayerObject& firstPlayer = *mPlayerList.at(0);
+	PlayerObject* returnObj = &firstPlayer;
+	const Vector3& firstPos = firstPlayer.GetTransform().GetPosition();
+	float minDistance = sqrt((position.x - firstPos.x) * (position.x - firstPos.x) +
+		(position.z - firstPos.z) * (position.z - firstPos.z));
+
+	for (int i = 1; i < mPlayerList.size(); i++) {
+		PlayerObject* serverPlayer = mPlayerList.at(i);
+		if (serverPlayer != nullptr) {
+			const Vector3& playerPos = serverPlayer->GetTransform().GetPosition();
+
+			float distance = sqrt((position.x - playerPos.x) * (position.x - playerPos.x) +
+				(position.z - playerPos.z) * (position.z - playerPos.z));
+			if (distance < minDistance) {
+				minDistance = distance;
+				returnObj = serverPlayer;
+			}
+		}
+
+	}
+	return returnObj;
+}
+
+bool GuardObject::IsPlayerObject(GameObject& sightedObject) {
+	for (PlayerObject* playerObj : mPlayerList) {
+		const GameObject* gameObjCompOfPlayer = static_cast<GameObject*>(playerObj);
+		if (gameObjCompOfPlayer == &sightedObject) {
+			mPlayer = playerObj;
+			return true;
+		}
+	}
+	return false;
 }
 
 void GuardObject::RaycastToPlayer() {
-	Vector3 dir = (mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
-	float ang = Vector3::Dot(dir, GuardForwardVector());
-	if (ang > 2) {
-		RayCollision closestCollision;
-		Ray r = Ray(this->GetTransform().GetPosition(), dir);
-		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
-			mSightedPlayer = (GameObject*)closestCollision.node;
-			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-			if (mSightedPlayer == mPlayer) {
-				mCanSeePlayer = true;
+	CalculatePlayerDirections();
+
+	if (!playerDirs.empty()) {
+		for (const Vector3& dir : playerDirs)
+		{
+			RayCollision closestCollision;
+			Ray r = Ray(this->GetTransform().GetPosition(), dir);
+			if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
+				mSightedPlayer = (GameObject*)closestCollision.node;
+				Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
+				if (IsPlayerObject(*mSightedPlayer)) {
+					mCanSeePlayer = true;
+					break;
+				}
+				else {
+					mCanSeePlayer = false;
+				}
 			}
 			else {
 				mCanSeePlayer = false;
 			}
-		}
-		else {
-			mCanSeePlayer = false;
 		}
 	}
 	else {
@@ -127,6 +161,16 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 	}
 }
 
+void GuardObject::CalculatePlayerDirections() {
+	for (PlayerObject* player : mPlayerList) {
+		Vector3 dir = (player->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
+		float ang = Vector3::Dot(dir, GuardForwardVector());
+		if(ang > 2) {
+			playerDirs.push_back(dir);
+		}
+	}
+}
+
 bool GuardObject::CheckPolyDistance() {
 	if (mDist < MIN_DIST_TO_NEXT_POS) {
 		return true;
@@ -154,7 +198,7 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0,10, 0));
+		this->GetPhysicsObject()->AddTorque(Vector3(0, 10, 0));
 		if (angleOfPlayer > -0.1) {
 			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		}
@@ -399,7 +443,7 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 			}
 		}
 		return state;
-	}
+		}
 	);
 	return GoToLastKnownLocation;
 }
@@ -443,7 +487,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
-				mPlayer->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
+				mPlayer->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 				mPlayer->ClosePrisonDoor();
 				mHasCaughtPlayer = false;
 				return Success;
