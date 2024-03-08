@@ -416,9 +416,7 @@ void LevelManager::InitialiseAssets() {
 					});
 			}
 			else if (groupType == "msh") {
-				for (int i = 0; i < groupDetails.size(); i += 3) {
-					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
-				}
+				mRenderer->LoadMeshes(mMeshes, groupDetails);
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
