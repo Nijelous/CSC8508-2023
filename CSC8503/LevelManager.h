@@ -132,6 +132,8 @@ namespace NCL {
 
 			void SetGameState(GameStates state);
 
+			void SetPlayersForGuards() const;
+
 			bool HasSetNavMesh() { return mHasSetNavMesh; }
 
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;

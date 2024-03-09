@@ -37,17 +37,26 @@ namespace NCL {
                 mCurrentNode = node;
             }
 
+            void AddPlayer(PlayerObject* player){
+                mPlayerList.push_back(player);
+            }
+
+            bool IsPlayerObject(GameObject& sightedObject);
+
         protected:
             void RaycastToPlayer();
             Vector3 GuardForwardVector();
             float AngleFromFocalPoint(Vector3 direction);
             void HandleAppliedBuffs(float dt);
+            PlayerObject* GetPlayerToChase();
 
             GameObject* mSightedPlayer;
             GameObject* mSightedDoor;
             PlayerObject* mPlayer;
+            std::vector<PlayerObject*> mPlayerList;
 
             vector<Vector3> mNodes;
+
             int mCurrentNode;
             int mNextNode;
         private:

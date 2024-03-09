@@ -613,6 +613,18 @@ void LevelManager::SetGameState(GameStates state) {
 	mGameState = state;
 }
 
+void LevelManager::SetPlayersForGuards() const {
+	//TODO(erendgrmnc): Refactor it
+	for (GuardObject* guard : mGuardObjects) {
+		for (int i = 0; i < serverPlayersPtr->size(); i++) {
+			if (serverPlayersPtr->at(i) != nullptr){
+				guard->AddPlayer(serverPlayersPtr->at(i));
+			}
+		}
+	}
+
+}
+
 PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
 	PlayerObject* returnObj = &firstPlayer;

@@ -405,6 +405,8 @@ void DebugNetworkedGame::InitWorld() {
 	mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
 
 	SpawnPlayers();
+
+	mLevelManager->SetPlayersForGuards();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {

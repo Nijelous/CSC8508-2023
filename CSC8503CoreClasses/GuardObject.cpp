@@ -47,12 +47,6 @@ void GuardObject::UpdateObject(float dt) {
 
 	if (!mIsStunned && LevelManager::GetLevelManager()->HasSetNavMesh()) {
 		if (mIsBTWillBeExecuted) {
-			if (mPlayer == nullptr) {
-				const Vector3& guardPos = GetTransform().GetPosition();
-				PlayerObject* nearestPlayer = LevelManager::GetLevelManager()->GetNearestPlayer(guardPos);
-
-				SetPlayer(nearestPlayer);
-			}
 			RaycastToPlayer();
 			ExecuteBT();
 			if (mDoorRaycastInterval <= 0) {
@@ -70,20 +64,34 @@ void GuardObject::UpdateObject(float dt) {
 	HandleAppliedBuffs(dt);
 }
 
+
+bool GuardObject::IsPlayerObject(GameObject& sightedObject) {
+	for (PlayerObject* playerObj : mPlayerList) {
+		const GameObject* gameObjCompOfPlayer = static_cast<GameObject*>(playerObj);
+		if (gameObjCompOfPlayer == &sightedObject) {
+			mPlayer = playerObj;
+			return true;
+		}
+	}
+	return false;
+}
+
 void GuardObject::RaycastToPlayer() {
-	Vector3 dir = (mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
-	float ang = Vector3::Dot(dir, GuardForwardVector());
-	if (ang > 2) {
+
+	PlayerObject* playerToChase = GetPlayerToChase();
+	if (playerToChase) {
 		RayCollision closestCollision;
-		Ray r = Ray(this->GetTransform().GetPosition(), dir);
+		Vector3 playerToChaseDir = (playerToChase->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
+		Ray r = Ray(this->GetTransform().GetPosition(), playerToChaseDir);
 		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
 			mSightedPlayer = (GameObject*)closestCollision.node;
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-			if (mSightedPlayer == mPlayer) {
+			if (IsPlayerObject(*mSightedPlayer)) {
 				mCanSeePlayer = true;
 			}
 			else {
 				mCanSeePlayer = false;
+				mSightedPlayer = nullptr;
 			}
 		}
 		else {
@@ -127,6 +135,28 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 	}
 }
 
+PlayerObject* GuardObject::GetPlayerToChase() {
+	float minDist = INT_MAX;
+	PlayerObject* playerToChase = nullptr;
+	const Vector3& guardPos = GetTransform().GetPosition();
+
+	for (PlayerObject* player : mPlayerList) {
+		Vector3 dir = (player->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
+		float ang = Vector3::Dot(dir, GuardForwardVector());
+		if (ang > 2) {
+			const Vector3& playerPos = player->GetTransform().GetPosition();
+			float distance = sqrt((guardPos.x - playerPos.x) * (guardPos.x - playerPos.x) +
+				(guardPos.z - playerPos.z) * (guardPos.z - playerPos.z));
+			if (distance < minDist) {
+				minDist = distance;
+				playerToChase = player;
+			}
+		}
+	}
+
+	return playerToChase;
+}
+
 bool GuardObject::CheckPolyDistance() {
 	if (mDist < MIN_DIST_TO_NEXT_POS) {
 		return true;
@@ -154,7 +184,7 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0,20, 0));
+		this->GetPhysicsObject()->AddTorque(Vector3(0, 20, 0));
 		if (angleOfPlayer > -0.15) {
 			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		}
@@ -354,7 +384,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 			mPointTimer -= dt;
 			Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 			LookTowardFocalPoint(direction);
-			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
+			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			if (mPointTimer <= 0) {
 				mPointTimer = POINTING_TIMER;
 				return Failure;
@@ -422,7 +452,7 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 			}
 		}
 		return state;
-	}
+		}
 	);
 	return GoToLastKnownLocation;
 }
