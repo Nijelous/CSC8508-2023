@@ -15,6 +15,7 @@ namespace NCL {
         constexpr int GUARD_CATCHING_DISTANCE_SQUARED = 36;
         constexpr float FUMBLE_KEYS_TIME = 0.15;
         constexpr float RAYCAST_INTERVAL = 0.1;
+        constexpr float POINTING_TIMER = 2;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -87,8 +88,10 @@ namespace NCL {
             float* mLastKnownPos = new float[3];
             float mDoorRaycastInterval;
             float mFumbleKeysCurrentTime;
+            float mPointTimer;
 
             BehaviourAction* Patrol();
+            BehaviourAction* PointAtPlayer();
             BehaviourAction* ChasePlayerSetup();
             BehaviourAction* GoToLastKnownLocation();
             BehaviourAction* ConfiscateItems();
