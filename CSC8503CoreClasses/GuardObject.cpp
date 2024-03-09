@@ -62,32 +62,8 @@ void GuardObject::UpdateObject(float dt) {
 		Debug::Print("Guard Is Stunned! ", Vector2(10, 40));
 	}
 	HandleAppliedBuffs(dt);
-	playerDirs.clear();
 }
 
-PlayerObject* GuardObject::GetNearestPlayer(const Vector3& position) const {
-	PlayerObject& firstPlayer = *mPlayerList.at(0);
-	PlayerObject* returnObj = &firstPlayer;
-	const Vector3& firstPos = firstPlayer.GetTransform().GetPosition();
-	float minDistance = sqrt((position.x - firstPos.x) * (position.x - firstPos.x) +
-		(position.z - firstPos.z) * (position.z - firstPos.z));
-
-	for (int i = 1; i < mPlayerList.size(); i++) {
-		PlayerObject* serverPlayer = mPlayerList.at(i);
-		if (serverPlayer != nullptr) {
-			const Vector3& playerPos = serverPlayer->GetTransform().GetPosition();
-
-			float distance = sqrt((position.x - playerPos.x) * (position.x - playerPos.x) +
-				(position.z - playerPos.z) * (position.z - playerPos.z));
-			if (distance < minDistance) {
-				minDistance = distance;
-				returnObj = serverPlayer;
-			}
-		}
-
-	}
-	return returnObj;
-}
 
 bool GuardObject::IsPlayerObject(GameObject& sightedObject) {
 	for (PlayerObject* playerObj : mPlayerList) {
@@ -101,27 +77,25 @@ bool GuardObject::IsPlayerObject(GameObject& sightedObject) {
 }
 
 void GuardObject::RaycastToPlayer() {
-	CalculatePlayerDirections();
 
-	if (!playerDirs.empty()) {
-		for (const Vector3& dir : playerDirs)
-		{
-			RayCollision closestCollision;
-			Ray r = Ray(this->GetTransform().GetPosition(), dir);
-			if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
-				mSightedPlayer = (GameObject*)closestCollision.node;
-				Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-				if (IsPlayerObject(*mSightedPlayer)) {
-					mCanSeePlayer = true;
-					break;
-				}
-				else {
-					mCanSeePlayer = false;
-				}
+	PlayerObject* playerToChase = GetPlayerToChase();
+	if (playerToChase) {
+		RayCollision closestCollision;
+		Vector3 playerToChaseDir = (playerToChase->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
+		Ray r = Ray(this->GetTransform().GetPosition(), playerToChaseDir);
+		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
+			mSightedPlayer = (GameObject*)closestCollision.node;
+			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
+			if (IsPlayerObject(*mSightedPlayer)) {
+				mCanSeePlayer = true;
 			}
 			else {
 				mCanSeePlayer = false;
+				mSightedPlayer = nullptr;
 			}
+		}
+		else {
+			mCanSeePlayer = false;
 		}
 	}
 	else {
@@ -161,14 +135,26 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 	}
 }
 
-void GuardObject::CalculatePlayerDirections() {
+PlayerObject* GuardObject::GetPlayerToChase() {
+	float minDist = INT_MAX;
+	PlayerObject* playerToChase = nullptr;
+	const Vector3& guardPos = GetTransform().GetPosition();
+
 	for (PlayerObject* player : mPlayerList) {
 		Vector3 dir = (player->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
 		float ang = Vector3::Dot(dir, GuardForwardVector());
-		if(ang > 2) {
-			playerDirs.push_back(dir);
+		if (ang > 2) {
+			const Vector3& playerPos = player->GetTransform().GetPosition();
+			float distance = sqrt((guardPos.x - playerPos.x) * (guardPos.x - playerPos.x) +
+				(guardPos.z - playerPos.z) * (guardPos.z - playerPos.z));
+			if (distance < minDist) {
+				minDist = distance;
+				playerToChase = player;
+			}
 		}
 	}
+
+	return playerToChase;
 }
 
 bool GuardObject::CheckPolyDistance() {
@@ -198,7 +184,7 @@ void GuardObject::LookTowardFocalPoint(Vector3 direction) {
 	float angleOfPlayer = AngleFromFocalPoint(direction);
 
 	if (angleOfPlayer < 0) {
-		this->GetPhysicsObject()->AddTorque(Vector3(0,20, 0));
+		this->GetPhysicsObject()->AddTorque(Vector3(0, 20, 0));
 		if (angleOfPlayer > -0.15) {
 			this->GetPhysicsObject()->SetAngularVelocity(Vector3(0, 0, 0));
 		}
@@ -398,7 +384,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 			mPointTimer -= dt;
 			Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 			LookTowardFocalPoint(direction);
-			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0,0,0));
+			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 			if (mPointTimer <= 0) {
 				mPointTimer = POINTING_TIMER;
 				return Failure;
