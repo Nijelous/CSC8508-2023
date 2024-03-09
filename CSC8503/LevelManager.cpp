@@ -24,6 +24,7 @@
 #include "SceneManager.h"
 #include "NetworkObject.h"
 #include "UISystem.h"
+#include "Assets.h"
 #include <filesystem>
 #include <fstream>
 
@@ -36,26 +37,47 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
+#ifdef USEGL
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
-		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
 			Room* newRoom = new Room(entry.path().string());
 			mRoomList.push_back(newRoom);
 		}
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
-		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
 			Level* newLevel = new Level(entry.path().string());
 			mLevelList.push_back(newLevel);
 		}
 		});
+#endif
+#ifdef USEPROSPERO
+	mRoomList = std::vector<Room*>();
+	std::thread loadRooms([this] {
+		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
+			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
+			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
+		for (int i = 0; i < paths.size(); i++) {
+			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
+			mRoomList.push_back(newRoom);
+		}
+		});
+	mLevelList = std::vector<Level*>();
+	std::thread loadLevels([this] {
+		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
+		for (int i = 0; i < paths.size(); i++) {
+			Level* newLevel = new Level(Assets::LEVELDIR + "Levels/" + paths[i] + ".json");
+			mLevelList.push_back(newLevel);
+		}
+		});
+#endif
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
-
 #ifdef USEPROSPERO
 	mRenderer = new GameTechAGCRenderer();
 #endif
@@ -384,7 +406,9 @@ void LevelManager::FixedUpdate(float dt){
 }
 
 void LevelManager::InitialiseAssets() {
-	std::ifstream assetsFile("../Assets/UsedAssets.csv");
+	Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
+	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
 	vector<std::string> groupDetails;
@@ -417,11 +441,15 @@ void LevelManager::InitialiseAssets() {
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
+				Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -438,6 +466,8 @@ void LevelManager::InitialiseAssets() {
 	delete[] assetDetails;
 
 	animLoadThread.join();
+	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));

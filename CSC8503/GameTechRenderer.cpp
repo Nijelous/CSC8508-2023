@@ -367,8 +367,10 @@ void GameTechRenderer::RenderFrame() {
 	NewRenderLines();
 	NewRenderText();
 	const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
-	for (auto& i : icons) {
-		RenderIcons(*i);
+	if (mUi) {
+		for (auto& i : icons) {
+			RenderIcons(*i);
+		}
 	}
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -701,12 +703,11 @@ void GameTechRenderer::LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMa
 	std::thread fileLoadThreads[4];
 	int loadSplit = details.size() / 12;
 	for (int i = 0; i < 4; i++) {
-		
-		int startPoint = i * loadSplit;
 		fileLoadThreads[i] = std::thread([meshes, details, i, loadSplit] {
 			int endPoint = i == 3 ? details.size() / 3 : loadSplit * (i + 1);
 			for (int j = loadSplit * i; j < endPoint; j++) {
-				MshLoader::LoadMesh(details[j * 3], *meshes[j]);
+				MshLoader::LoadMesh(details[(j * 3) + 1], *meshes[j]);
+				meshes[j]->SetPrimitiveType(GeometryPrimitive::Triangles);
 			}
 			});
 	}
@@ -714,7 +715,6 @@ void GameTechRenderer::LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMa
 		fileLoadThreads[i].join();
 	}
 	for (int i = 0; i < meshes.size(); i++) {
-		meshes[i]->SetPrimitiveType(GeometryPrimitive::Triangles);
 		meshes[i]->UploadToGPU();
 		meshMap[details[i*3]] = meshes[i];
 	}
