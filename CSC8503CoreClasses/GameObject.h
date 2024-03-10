@@ -32,6 +32,7 @@ namespace NCL::CSC8503 {
 			IdleCrouch,
 			Crouch,
 			Happy,
+			Point,
 			Default
 		};
 
