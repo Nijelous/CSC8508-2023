@@ -6,7 +6,6 @@ project(CSC8508 CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 add_compile_options(-std=c++20)
-#add_compile_options(-Wno-pragma-once-outside-header)
 
 if(NOT CMAKE_VS_PLATFORM_NAME)
     set(CMAKE_VS_PLATFORM_NAME "x64")
@@ -19,6 +18,7 @@ endif()
 
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     add_compile_definitions(USEPROSPERO)
+    add_compile_options(-Wno-pragma-once-outside-header)
 endif()
 
 ################################################################################
@@ -46,8 +46,15 @@ add_compile_definitions("USEAGC")
 ################################################################################
 # Sub-projects
 ################################################################################
-add_subdirectory(NCLCoreClasses)
+
+add_subdirectory(CSC8503)
 add_subdirectory(CSC8503CoreClasses)
+add_subdirectory(NCLCoreClasses)
+add_subdirectory(EntryPoint)
+add_subdirectory(Detour)
+add_subdirectory(Recast)
+add_subdirectory(DebugUtils)
+add_subdirectory(DetourTileCache)
 
 if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     add_subdirectory(OpenGLRendering)
@@ -56,16 +63,7 @@ endif()
 if ("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     add_subdirectory(GLTFLoader)
     add_subdirectory(PS5Core)
-    add_subdirectory(PS5Starter)
-    add_subdirectory(EntryPoint)
+    #add_subdirectory(PS5Starter)
 endif()
 
-add_subdirectory(CSC8503)
-add_subdirectory(Detour)
-add_subdirectory(Recast)
-add_subdirectory(DebugUtils)
-add_subdirectory(DetourTileCache)
-
-if(MSVC)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT EntryPoint)
-endif()
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT EntryPoint)

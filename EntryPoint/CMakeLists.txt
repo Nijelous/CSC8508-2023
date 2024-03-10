@@ -7,127 +7,17 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     ################################################################################
     # Source groups
     ################################################################################
-    set(Header_Files
-        "GameTechRenderer.h"
-        "LevelManager.h"
-        "NetworkedGame.h"
-        "NetworkPlayer.h"
-        "StateGameObject.h"
-        "DebugNetworkedGame.h"
-        "GameSceneManager.h"
-        "SinglePlayerStates.h"
-        "Scene.h"
-        "SceneManager.h"
-        "SceneStates.h"
-        "MainMenuScene.h"
-        "SoundManager.h"
-        "SoundObject.h"
-        "MultiplayerStates.h"
-    )
-    source_group("Header Files" FILES ${Header_Files})
-
-    set(Inventory_Buff_System
-        "InventoryBuffSystem/InventoryBuffSystem.h"
-        "InventoryBuffSystem/PlayerInventory.h"
-        "InventoryBuffSystem/PlayerInventory.cpp"
-        "InventoryBuffSystem/PlayerBuffs.h"
-        "InventoryBuffSystem/PlayerBuffs.cpp"
-        "InventoryBuffSystem/PickupGameObject.h"
-        "InventoryBuffSystem/PickupGameObject.cpp"    
-        "InventoryBuffSystem/FlagGameObject.h"
-        "InventoryBuffSystem/FlagGameObject.cpp"
-        "InventoryBuffSystem/SoundEmitter.h"
-        "InventoryBuffSystem/SoundEmitter.cpp"
-        "InventoryBuffSystem/Item.h"
-        "InventoryBuffSystem/Item.cpp"
-    )
-    source_group("Inventory Buff System" FILES ${Inventory_Buff_System})
-
-    set(Suspicion_System
-        "SuspicionSystem/GlobalSuspicionMetre.h"
-        "SuspicionSystem/GlobalSuspicionMetre.cpp"
-        "SuspicionSystem/LocationBasedSuspicion.h"
-        "SuspicionSystem/LocationBasedSuspicion.cpp"
-        "SuspicionSystem/LocalSuspicionMetre.h"
-        "SuspicionSystem/LocalSuspicionMetre.cpp"
-        "SuspicionSystem/SuspicionMetre.h"
-        "SuspicionSystem/SuspicionMetre.cpp"
-        "SuspicionSystem/SuspicionSystem.h"
-        "SuspicionSystem/SuspicionSystem.cpp"
-    )
-    source_group("Suspicion System" FILES ${Suspicion_System})
+    
 
     set(Source_Files
-        "GameTechRenderer.cpp"
-        "LevelManager.cpp"
-        "Main.cpp"
-        "NetworkedGame.cpp"
-        "NetworkPlayer.cpp"
-        "StateGameObject.cpp"
-        "DebugNetworkedGame.cpp"
-        "GameSceneManager.cpp"
-        "SinglePlayerStates.cpp"
-        "Scene.cpp"
-        "SceneManager.cpp"
-        "SceneStates.cpp"
-        "MainMenuScene.cpp"
-        "SoundManager.cpp"
-        "SoundObject.cpp"
-        "MultiplayerStates.cpp"
+        "main.cpp"
     )
-
-
-    file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
 
     source_group("Source Files" FILES ${Source_Files})
 
     set(ALL_FILES
-        ${Header_Files}
         ${Source_Files}
-        ${Inventory_Buff_System}
-        ${Suspicion_System}
     )
-
-    foreach (file ${SHADER_FILES})
-        get_filename_component(file_name ${file} NAME)
-	    get_filename_component(file_ext ${file} EXT)
-	
-	    if(file_ext STREQUAL ".h" OR file_ext STREQUAL ".cpp")
-		    continue()
-	    endif()
-		
-	    if( file_ext STREQUAL  ".vert" OR
-		    file_ext STREQUAL  ".frag" OR
-		    file_ext STREQUAL  ".comp" OR
-		    file_ext STREQUAL  ".geom" OR
-		    file_ext STREQUAL  ".tesc" OR
-		    file_ext STREQUAL  ".tese" OR
-		    file_ext STREQUAL  ".rgen" OR
-		    file_ext STREQUAL  ".rint" OR
-		    file_ext STREQUAL  ".rahit" OR
-		    file_ext STREQUAL  ".rchit" OR
-		    file_ext STREQUAL  ".rmiss" OR
-		    file_ext STREQUAL  ".rcall" OR
-		    file_ext STREQUAL  ".task" OR
-		    file_ext STREQUAL  ".mesh"
-	    )
-		    message("Adding custom command to ${file}")
-		    get_filename_component(file_dir ${file} ABSOLUTE)
-            set(SPIRV_OUTPUT ${file_name}.spv)
-		    set(SPIRV_ABS_INPUT ${file_dir})
-		    set(SPIRV_ABS_OUTPUT ${file_dir}.spv)
-		
-		    add_custom_command(
-			    OUTPUT ${SPIRV_ABS_OUTPUT}
-			
-			    COMMENT "Compiling GLSL shader:"
-			    COMMAND ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V  ${SPIRV_ABS_INPUT} -o ${SPIRV_ABS_OUTPUT}
-                DEPENDS ${file}
-			    VERBATIM
-		    )
-            list(APPEND SPIRV_BINARY_FILES ${SPIRV_OUTPUT})   
-	    endif()
-    endforeach()
 
     ################################################################################
     # Target
@@ -136,7 +26,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     add_executable(${PROJECT_NAME}  ${ALL_FILES})
 
     #use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
-    set(ROOT_NAMESPACE CSC8503)
+    set(ROOT_NAMESPACE EntryPoint)
 #
     set_target_properties(${PROJECT_NAME} PROPERTIES
         VS_GLOBAL_KEYWORD "Win32Proj"
@@ -222,6 +112,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         target_link_libraries(${PROJECT_NAME} LINK_PUBLIC  "Winmm.lib")
     endif()
 
+    include_directories("../CSC8503")
     include_directories("../OpenGLRendering/")
     include_directories("../NCLCoreClasses/")
     include_directories("../CSC8503CoreClasses/")
@@ -231,6 +122,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     include_directories("../DetourTileCache")
     include_directories("../FMODCoreAPI/includes")
 
+    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
@@ -251,7 +143,6 @@ endif()
 
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     message("Ps5555555555555555555555555555555555555555555555555555")
-    message("sh gjkdlnuitn hsf")
 
     ################################################################################
     # Source groups

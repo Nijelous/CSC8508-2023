@@ -23,8 +23,11 @@
 #include "DebugNetworkedGame.h"
 #include "../CSC8503CoreClasses/PushdownMachine.h"
 #include "SceneManager.h"
+
+#ifdef USEPROSPERO
 #include "../PS5Core/PS5Window.h"
 #include "../PS5Core/PS5Controller.h"
+#endif
 
 using namespace NCL;
 using namespace CSC8503;
@@ -41,6 +44,7 @@ namespace {
     constexpr int GAME_WINDOW_HEIGHT = 720;
 }
 
+#ifdef USEPROSPERO
 Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen){
 	PS5::PS5Window* w = new PS5::PS5Window("Hello!", winWidth, winHeight);
 
@@ -74,6 +78,7 @@ void SetUpPS5InputDevices(PS5::PS5Window* w){
     c->MapButton(0, "Up");
     c->MapButton(2, "Down");
 }
+#endif
 
 Window* SetUpPCWindow(float winWidth, float winHeight, bool fullscreen) {
     Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
@@ -140,4 +145,6 @@ int RunGame(){
 
     //Note: B Schwarz - is this necessary/desirable for PS5?
     Window::DestroyGameWindow();
+
+    return 0;
 }

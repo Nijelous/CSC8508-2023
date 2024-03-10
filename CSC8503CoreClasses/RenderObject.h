@@ -11,6 +11,8 @@
 #include <glad/gl.h>
 #endif
 
+typedef unsigned int GLuint;
+
 namespace NCL {
 	using namespace NCL::Rendering;
 
@@ -107,11 +109,11 @@ namespace NCL {
 				return mCurrentFrame;
 			}
 
-			void SetMatTextures(vector<uint64_t> matTextures) {
+			void SetMatTextures(vector<GLuint> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<uint64_t>  GetMatTextures() const {
+			vector<GLuint>  GetMatTextures() const {
 				return mMatTextures;
 			}
 
@@ -131,6 +133,10 @@ namespace NCL {
 				mAnimationObject = newObject;
 			}
 
+			float GetCullSphereRadius() {
+				return mCullSphereRadius;
+			}
+
 		protected:
 			Buffer* mBuffer;
 			Mesh* mMesh;
@@ -148,7 +154,7 @@ namespace NCL {
 			bool mOutlined = false;
 			bool mIsInstanced = false;
 
-			vector<uint64_t>  mMatTextures;
+			vector<GLuint>  mMatTextures;
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 
