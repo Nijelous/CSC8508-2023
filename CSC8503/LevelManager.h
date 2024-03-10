@@ -4,7 +4,7 @@
 #include "GameTechRenderer.h"
 #endif
 #ifdef USEPROSPERO
-#include "../PS5Starter/GameTechAGCRenderer.h"
+#include "GameTechAGCRenderer.h"
 #endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
@@ -89,8 +89,11 @@ namespace NCL {
 			SuspicionSystemClass* GetSuspicionSystem();
 
 			UISystem* GetUiSystem() { return mUi; };
+
+#ifdef USEGL
 			SoundManager* GetSoundManager() { return mSoundManager; };
 			AnimationSystem* GetAnimationSystem() { return mAnimation; }
+#endif
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 

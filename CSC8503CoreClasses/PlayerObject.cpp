@@ -90,6 +90,36 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mInteractHeldDt = 0;
 }
 
+PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	UISystem* UI,
+	const std::string& objName,
+	PrisonDoor* prisonDoorPtr,
+	int playerID, int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
+	mName = objName;
+	mGameWorld = world;
+	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
+	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
+	mPrisonDoorPtr = prisonDoorPtr;
+	SetUIObject(UI);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mWalkSpeed = walkSpeed;
+	mSprintSpeed = sprintSpeed;
+	mCrouchSpeed = crouchSpeed;
+	mMovementSpeed = walkSpeed;
+	mObjectState = Walk;
+	mPlayerSpeedState = Default;
+	mIsCrouched = false;
+	mActiveItemSlot = 0;
+
+	mPlayerID = playerID;
+	mPlayerPoints = 0;
+	mIsPlayer = true;
+	mHasSilentSprintBuff = false;
+	mInteractHeldDt = 0;
+}
+
 PlayerObject::~PlayerObject() {
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Detach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);

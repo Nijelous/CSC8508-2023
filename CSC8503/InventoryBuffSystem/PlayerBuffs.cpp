@@ -26,8 +26,9 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
-
+#ifdef USEGL
 	HandleBuffNetworking(inBuff, playerNo,true);
+#endif
 	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 }
 
@@ -37,8 +38,10 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
 		mBuffsToRemove[playerNo].push_back(inBuff);
-
+#ifdef USEGL
 		HandleBuffNetworking(inBuff, playerNo, false);
+#endif
+
 		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 	}
 };

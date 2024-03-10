@@ -5,7 +5,7 @@
 #include "SceneStates.h"
 #include "GameSceneManager.h"
 
-#ifdef USEGL
+
 
 using namespace NCL::CSC8503;
 
@@ -84,4 +84,3 @@ SceneManager* SceneManager::GetSceneManager() {
 	}
 	return instance;
 }
-#endif

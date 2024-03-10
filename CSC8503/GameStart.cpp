@@ -1,0 +1,143 @@
+#include "../NCLCoreClasses/Window.h"
+
+#include "../CSC8503CoreClasses/Debug.h"
+
+#include "../CSC8503CoreClasses/StateMachine.h"
+#include "../CSC8503CoreClasses/StateTransition.h"
+#include "../CSC8503CoreClasses/State.h"
+
+#include "../CSC8503CoreClasses/GameServer.h"
+#include "../CSC8503CoreClasses/GameClient.h"
+
+#include "../CSC8503CoreClasses/NavigationGrid.h"
+#include "../CSC8503CoreClasses/NavigationMesh.h"
+
+#include "GameSceneManager.h"
+
+#include "NetworkedGame.h"
+
+#include "../CSC8503CoreClasses/BehaviourNode.h"
+#include "../CSC8503CoreClasses/BehaviourSelector.h"
+#include "../CSC8503CoreClasses/BehaviourSequence.h"
+#include "../CSC8503CoreClasses/BehaviourAction.h"
+#include "DebugNetworkedGame.h"
+#include "../CSC8503CoreClasses/PushdownMachine.h"
+#include "SceneManager.h"
+#include "../PS5Core/PS5Window.h"
+#include "../PS5Core/PS5Controller.h"
+
+using namespace NCL;
+using namespace CSC8503;
+
+#include <chrono>
+#include <thread>
+#include <sstream>
+
+namespace {
+    constexpr int NETWORK_TEST_WIDTH = 800;
+    constexpr int NETWORK_TEST_HEIGHT = 600;
+
+    constexpr int GAME_WINDOW_WIDTH = 1280;
+    constexpr int GAME_WINDOW_HEIGHT = 720;
+}
+
+Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen){
+	PS5::PS5Window* w = new PS5::PS5Window("Hello!", winWidth, winHeight);
+
+    return w;
+}
+
+void SetUpPS5InputDevices(PS5::PS5Window* w){
+    PS5::PS5Controller* c = w->GetController();
+
+    c->MapAxis(0, "LeftX");
+    c->MapAxis(1, "LeftY");
+
+    c->MapAxis(2, "RightX");
+    c->MapAxis(3, "RightY");
+
+    c->MapAxis(4, "DX");
+    c->MapAxis(5, "DY");
+
+    c->MapButton(0, "Triangle");
+    c->MapButton(1, "Circle");
+    c->MapButton(2, "Cross");
+    c->MapButton(3, "Square");
+
+    //These are the axis/button aliases the inbuilt camera class reads from:
+    c->MapAxis(0, "XLook");
+    c->MapAxis(1, "YLook");
+
+    c->MapAxis(2, "Sidestep");
+    c->MapAxis(3, "Forward");
+
+    c->MapButton(0, "Up");
+    c->MapButton(2, "Down");
+}
+
+Window* SetUpPCWindow(float winWidth, float winHeight, bool fullscreen) {
+    Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
+
+   
+    return w;
+}
+
+void SetUpPCInputDevices(Window* w, bool isNetworkTestActive) {
+    w->ShowOSPointer(isNetworkTestActive);
+    w->LockMouseToWindow(!isNetworkTestActive);
+}
+
+int RunGame(){
+    bool isNetworkTestActive = false;
+
+    float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
+    float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
+    bool isFullScreen = !isNetworkTestActive;
+    Window* w = nullptr;
+#ifdef USEGL
+    w = SetUpPCWindow(winWidth, winHeight, isFullScreen);
+    SetUpPCInputDevices(w, isNetworkTestActive);
+#endif
+
+#ifdef USEPROSPERO
+    w = SetUpPS5Window(winWidth, winHeight, isFullScreen);
+    SetUpPS5InputDevices((PS5::PS5Window*)w);
+#endif
+
+
+    SceneManager* sceneManager = SceneManager::GetSceneManager();
+    
+    GameSceneManager* gm = nullptr;
+    //erendgrmnc: make the bool below true for network test.   
+
+    w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+    while (w->UpdateWindow() && !sceneManager->GetIsForceQuit()) {
+        float dt = w->GetTimer().GetTimeDeltaSeconds();
+        if (dt > 0.1f) {
+            std::cout << "Skipping large time delta" << std::endl;
+            continue; //must have hit a breakpoint or something to have a 1 second frame time!
+        }
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::PRIOR)) {
+            w->ShowConsole(true);
+        }
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::NEXT)) {
+            w->ShowConsole(false);
+        }
+
+        if (Window::GetKeyboard()->KeyPressed(KeyCodes::T)) {
+            w->SetWindowPosition(0, 0);
+        }
+
+        w->SetTitle("Gametech frame time:" + std::to_string(1000.0f * dt));
+
+        if (sceneManager->GetScenePushdownMachine() != nullptr) {
+            sceneManager->GetScenePushdownMachine()->Update(dt);
+        }
+        if (sceneManager->GetCurrentScene() != nullptr) {
+            sceneManager->GetCurrentScene()->UpdateGame(dt);
+        }
+    }
+
+    //Note: B Schwarz - is this necessary/desirable for PS5?
+    Window::DestroyGameWindow();
+}

@@ -31,11 +31,14 @@ GameObject::~GameObject()	{
 	delete mBoundingVolume;
 	delete mPhysicsObject;
 	delete mRenderObject;
+#ifdef USEGL
 	delete mNetworkObject;
 	delete mSoundObject;
+#endif
 
 }
 
+#ifdef USEGL
 void GameObject::SetIsSensed(bool sensed){
 	mRenderObject->SetOutlined(sensed);
 }
@@ -48,7 +51,7 @@ void GameObject::SetNetworkObject(NetworkObject* netObj) {
 	mNetworkObject = netObj;
 	netObj->SetGameObject(*this);
 }
-
+#endif
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
 	if (!mBoundingVolume) {
 		return false;
@@ -96,7 +99,7 @@ void GameObject::SetObjectState(GameObjectState state) {
 	}
 	
 	mObjectState = state;
-
+#ifdef USEGL
 	if (mRenderObject->GetAnimationObject() != nullptr ) {
 		AnimationSystem* animSystem = LevelManager::GetLevelManager()->GetAnimationSystem();
 		animSystem->SetAnimationState(this, mObjectState);
@@ -110,4 +113,5 @@ void GameObject::SetObjectState(GameObjectState state) {
 			scene->SendObjectStatePacket(mNetworkObject->GetnetworkID(), mObjectState);
 		}
 	}
+#endif
 }

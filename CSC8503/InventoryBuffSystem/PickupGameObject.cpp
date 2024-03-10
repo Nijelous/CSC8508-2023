@@ -105,7 +105,9 @@ void PickupGameObject::ChangeToRandomPickup() {
 }
 
 void PickupGameObject::ActivatePickup(int playerNo) {
+#ifdef USEGL
 	GetSoundObject()->TriggerSoundEvent();
+#endif
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 

@@ -2,7 +2,7 @@
 
 #include "LevelManager.h"
 
-#ifdef USEGL
+
 
 Scene::Scene() : mController(*Window::GetWindow()->GetKeyboard(), *Window::GetWindow()->GetMouse()){
     mLevelManager = LevelManager::GetLevelManager();
@@ -35,4 +35,3 @@ void Scene::InitCamera(){
     mLevelManager->GetGameWorld()->GetMainCamera().SetPosition(Vector3(-60, 40, 60));
 }
 
-#endif

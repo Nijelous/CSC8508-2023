@@ -51,13 +51,14 @@ LevelManager::LevelManager() {
 		}
 		});
 	mWorld = new GameWorld();
-	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
+	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
+
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
 
 #ifdef USEPROSPERO
-	mRenderer = new GameTechAGCRenderer();
+	mRenderer = new GameTechAGCRenderer(*mWorld);
 #endif
 	mUi = new UISystem();
 	InitialiseAssets();
@@ -96,7 +97,9 @@ LevelManager::LevelManager() {
 	};
 	loadRooms.join();
 	loadLevels.join();
+#ifdef USEGL
 	loadSoundManager.join();
+#endif
 }
 
 LevelManager::~LevelManager() {
@@ -153,12 +156,14 @@ LevelManager::~LevelManager() {
 	delete mPhysics;
 	delete mRenderer;
 	delete mWorld;
+#ifdef USEGL
 	delete mAnimation;
-
+	delete mSoundManager;
+#endif
 	delete mInventoryBuffSystemClassPtr;
 	delete mSuspicionSystemClassPtr;
 
-	delete mSoundManager;
+
 
 }
 
@@ -173,7 +178,9 @@ void LevelManager::ClearLevel() {
 	mUpdatableObjects.clear();
 	mLevelLayout.clear();
 	mRenderer->ClearInstanceObjects();
+#ifdef USEGL
 	mAnimation->Clear();
+#endif
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();
@@ -284,8 +291,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
 	
-	
+#ifdef USEGL
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
+#endif
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
 
@@ -305,6 +313,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
+#ifdef USEGL
 	OGLMesh* floorInstance = (OGLMesh*)mMeshes["FloorCube"];
 	floorInstance->SetInstanceMatrices(mLevelFloorMatrices);
 	OGLMesh* wallInstance = (OGLMesh*)mMeshes["StraightWall"];
@@ -313,19 +322,24 @@ void LevelManager::SendWallFloorInstancesToGPU() {
 	cornerWallInstance->SetInstanceMatrices(mLevelCornerWallMatrices);
 	GameTechRenderer* renderer = (GameTechRenderer*)mRenderer;
 	renderer->SetInstanceObjects(mBaseFloor, mBaseWall, mBaseCornerWall);
+#endif
 
 }
 
 void LevelManager::AddNetworkObject(GameObject& objToAdd) {
+#ifdef USEGL
 	auto* networkObj = new NetworkObject(objToAdd, mNetworkIdBuffer);
 	mNetworkIdBuffer++;
 	objToAdd.SetNetworkObject(networkObj);
 
 	auto* sceneManager = SceneManager::GetSceneManager();
 	Scene* currentScene = sceneManager->GetCurrentScene();
+
 	DebugNetworkedGame* networkScene = static_cast<DebugNetworkedGame*>(currentScene);
 	networkScene->AddNetworkObjectToNetworkObjects(networkObj);
+#endif
 }
+
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
@@ -354,12 +368,15 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mRenderer->Update(dt);
 		if (mIsLevelInitialised) {
 			mPhysics->Update(dt);
+#ifdef USEGL
 			mAnimation->Update(dt, mUpdatableObjects);
+#endif
 		}
-		
+#ifdef USEGL
 		if (mUpdatableObjects.size()>0) {
 			mSoundManager->UpdateSounds(mUpdatableObjects);
 		}
+#endif
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
 		mDtSinceLastFixedUpdate += dt;
@@ -480,6 +497,7 @@ void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMa
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation) {
+#ifdef USEGL
 	for (int i = 0; i < lights.size(); i++) {
 		if (lights[i]->GetType() == Light::Point) {
 			PointLight* pl = static_cast<PointLight*>(lights[i]);
@@ -499,7 +517,8 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 			DirectionLight* newDL = new DirectionLight(dl->GetDirection(), dl->GetColour(), dl->GetRadius(), dl->GetCentre());
 			mRenderer->AddLight(newDL);
 		}
-	}	
+	}
+#endif
 }
 
 void LevelManager::LoadGuards(int guardCount, bool isInMultiplayer) {
@@ -615,6 +634,7 @@ void LevelManager::SetGameState(GameStates state) {
 
 void LevelManager::SetPlayersForGuards() const {
 	//TODO(erendgrmnc): Refactor it
+#ifdef USEGL
 	for (GuardObject* guard : mGuardObjects) {
 		for (int i = 0; i < serverPlayersPtr->size(); i++) {
 			if (serverPlayersPtr->at(i) != nullptr){
@@ -622,10 +642,11 @@ void LevelManager::SetPlayersForGuards() const {
 			}
 		}
 	}
-
+#endif
 }
 
 PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
+#ifdef USEGL
 	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
 	PlayerObject* returnObj = &firstPlayer;
 	const Vector3& firstPos = firstPlayer.GetTransform().GetPosition();
@@ -646,7 +667,9 @@ PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 		}
 		
 	}
+
 	return returnObj;
+#endif
 }
 
 PrisonDoor* LevelManager::GetPrisonDoor() const {
@@ -886,8 +909,9 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(transform.GetScale().y/2, 2) + std::powf(transform.GetScale().z / 2, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
+#ifdef USEGL
 	newDoor->SetSoundObject(new SoundObject());
-
+#endif
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
 
@@ -923,8 +947,9 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
+#ifdef USEGL
 	newDoor->SetSoundObject(new SoundObject());
-
+#endif
 	newDoor->GetPhysicsObject()->SetInverseMass(0);
 	newDoor->GetPhysicsObject()->InitCubeInertia();
 
@@ -951,9 +976,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 
 	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
-
+#ifdef USEGL
 	flag->SetSoundObject(new SoundObject());
-
+#endif
 	flag->SetCollisionLayer(Collectable);
 
 	flag->GetPhysicsObject()->SetInverseMass(0);
@@ -982,9 +1007,9 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 
 	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
-
+#ifdef USEGL
 	pickup->SetSoundObject(new SoundObject());
-
+#endif
 	pickup->SetCollisionLayer(Collectable);
 
 	pickup->GetPhysicsObject()->SetInverseMass(0);
@@ -1028,7 +1053,7 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
-	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName, prisonDoor);
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, playerName, prisonDoor);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
@@ -1050,8 +1075,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Farmer"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Basic"],
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+#ifdef USEGL
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-
+#endif
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
 	playerObject.GetPhysicsObject()->InitSphereInertia(false);
 
@@ -1071,7 +1097,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+#ifdef USEGL
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
+#endif
 	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
 
 
@@ -1176,8 +1204,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 
 	renderObject->SetAnimationObject(animObject);
 	guard->SetRenderObject(renderObject);
+#ifdef USEGL
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-
+#endif
 	guard->SetPatrolNodes(nodes);
 	guard->SetCurrentNode(currentNode);
 	guard->SetObjectState(GameObject::Idle);
@@ -1230,9 +1259,9 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
-
+#ifdef USEGL
 	soundEmitterObjectPtr->SetSoundObject(new SoundObject(mSoundManager->AddSoundEmitterSound(position)));
-
+#endif
 	soundEmitterObjectPtr->GetPhysicsObject()->SetInverseMass(0);
 	soundEmitterObjectPtr->GetPhysicsObject()->InitSphereInertia(false);
 

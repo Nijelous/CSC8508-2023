@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\cmake_pch.hxx.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\MinSizeRel\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\RelWithDebInfo\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Alarm.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cross.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_back.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_down.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_front.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_left.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_right.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\FS002_Night_Cubemap_up.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0001.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0002.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0003.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0004.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0005.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Cubemap\skyrender0006.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Default.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBeige.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBlack.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBlack2.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBody.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBrown.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\HighlightAward.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\InventorySlot.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\LightOff.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MakingNoise.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\PressStart2P.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Silence.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SlowDown.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SpeedDown.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SpeedUp.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Stun.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SuspensionBar.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SuspensionIndicator.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\SwapPosition.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Tex_Chest_01_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Tex_Chest_01_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\checkerboard.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\doge.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\flag.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\fleshy_albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\fleshy_normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\highSus.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\key.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\key1.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\key2.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\key3.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\lowSus.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\midSus.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\panel_albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\panel_normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\paper_diffuse1.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\present_Present_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\stunItem.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Skybox.dds">
+      <Filter>Texture Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\DebugLine_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\DebugLine_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\DebugText_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\DebugText_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\PixelShader_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Shadow_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Shadow_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Skybox_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Skybox_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Tech_p.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\Tech_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\VertexShader_vv.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\gamma_c.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+    <WavePsslc Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Shaders\PSSL\skinning_c.pssl">
+      <Filter>Shader Files</Filter>
+    </WavePsslc>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{49956CAB-1B8F-39BF-8F08-35114DF87857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shader Files">
+      <UniqueIdentifier>{149AFD18-5C3C-3134-A7CC-23946E61D990}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{58FFD588-D87B-3063-B453-79F075788691}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture Files">
+      <UniqueIdentifier>{AC58D3AB-A621-3F70-BF90-6ADD3382A2D4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -3,6 +3,7 @@
 
 #include "DebugNetworkedGame.h"
 #include "GameClient.h"
+#include "GameSceneManager.h"
 #include "GameServer.h"
 #include "Window.h"
 #include "SceneManager.h"
@@ -10,7 +11,6 @@
 
 using namespace NCL::CSC8503;
 
-#ifdef USEGL
 
 void MainMenuSceneState::OnAwake() {	
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
@@ -21,7 +21,7 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}
-	
+#ifdef USEGL
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
 		*newState = new ServerState();
 		return PushdownResult::Push;
@@ -31,7 +31,7 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 		*newState = new ClientState();
 		return PushdownResult::Push;
 	}
-
+#endif
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		SceneManager::GetSceneManager()->SetIsForceQuit(true);
 		return PushdownResult::Pop;
@@ -51,7 +51,7 @@ void SingleplayerState::OnAwake() {
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Singleplayer);
 	GameSceneManager* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
 }
-
+#ifdef USEGL
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
 	GameStates currentState = LevelManager::GetLevelManager()->GetGameState();
 	bool isInMenuState = currentState == MenuState;

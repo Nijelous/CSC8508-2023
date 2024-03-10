@@ -137,7 +137,7 @@ void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::Game
 
 	gameObject->GetRenderObject()->GetAnimationObject()->SetAnimation(anim);
 }
-#endif
+
 
 void AnimationSystem::InitGuardStateAnimationMap() {
 	mGuardStateAnimationMap = {
@@ -154,3 +154,4 @@ void AnimationSystem::InitPlayerStateAnimationMap() {
 	{GameObject::GameObjectState::Sprint, "PlayerSprint"},
 	};
 }
+#endif

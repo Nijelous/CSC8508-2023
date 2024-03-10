@@ -30,7 +30,10 @@ FlagGameObject::~FlagGameObject() {
 
 void FlagGameObject::GetFlag(int playerNo) {
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
+#ifdef USEGL
 	GetSoundObject()->TriggerSoundEvent();
+#endif
+
 
 	this->SetActive(false);
 }

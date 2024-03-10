@@ -4,6 +4,7 @@
 using namespace NCL::CSC8503;
 using namespace NCL::Maths;
 
+#ifdef USEGL
 SoundManager::SoundManager(GameWorld* GameWorld) {
 	mGameWorld = GameWorld;
 	mResult = FMOD::System_Create(&mSystem);
@@ -266,3 +267,4 @@ FMOD_VECTOR SoundManager::GetUpVector(Vector3 forward, Vector3 right) {
 	FMOD_VECTOR upVector = { up.x, up.y, up.z };
 	return upVector;
 }
+#endif

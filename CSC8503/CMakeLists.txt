@@ -59,6 +59,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
 
     set(Source_Files
         "GameTechRenderer.cpp"
+        "GameStart.cpp"
         "LevelManager.cpp"
         "Main.cpp"
         "NetworkedGame.cpp"
@@ -75,6 +76,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "SoundObject.cpp"
         "MultiplayerStates.cpp"
     )
+    source_group("Source Files" FILES ${Source_Files})
 
 
     file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
@@ -256,6 +258,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     ################################################################################
     set(Header_Files
         "GameTechRenderer.h"
+        "GameTechAGCRenderer.h"
         "LevelManager.h"
         "NetworkedGame.h"
         "NetworkPlayer.h"
@@ -269,7 +272,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "MainMenuScene.h"
         "SoundManager.h"
         "SoundObject.h"
-        "TutorialGame.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -306,6 +308,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
 
     set(Source_Files
         "GameTechRenderer.cpp"
+         "GameTechAGCRenderer.cpp"
         "LevelManager.cpp"
         "Main.cpp"
         "NetworkedGame.cpp"
@@ -320,7 +323,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "MainMenuScene.cpp"
         "SoundManager.cpp"
         "SoundObject.cpp"
-        "TutorialGame.cpp"
     )
 
     source_group("Source Files" FILES ${Source_Files})
@@ -398,6 +400,5 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Detour)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DebugUtils)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DetourTileCache)
-
 
 endif()

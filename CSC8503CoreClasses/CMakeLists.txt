@@ -419,7 +419,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "Transform.h"
         "AnimationObject.h"
         "AnimationSystem.h"
-        "UISystem.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -432,7 +431,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "Transform.cpp"
         "AnimationObject.cpp"
         "AnimationSystem.cpp"
-        "UISystem.cpp"
     )
     source_group("Source Files" FILES ${Source_Files})
 

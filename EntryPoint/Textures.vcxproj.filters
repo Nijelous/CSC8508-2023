@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Alarm.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Cross.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_back.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_down.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_front.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_left.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_right.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\FS002_Night_Cubemap_up.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0001.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0002.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0003.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0004.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0005.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\516280688a73bc5cadf21e6abc45a427\skyrender0006.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Default.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBeige.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBlack.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBlack2.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBody.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBrown.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\HighlightAward.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\InventorySlot.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\LightOff.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MakingNoise.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\PressStart2P.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Silence.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Skybox.dds.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SlowDown.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SpeedDown.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SpeedUp.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Stun.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SuspensionBar.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SuspensionIndicator.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\SwapPosition.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Tex_Chest_01_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Tex_Chest_01_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\checkerboard.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\doge.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\flag.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\fleshy_albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\fleshy_normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\highSus.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\key.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\key1.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\key2.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\key3.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\lowSus.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\midSus.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\panel_albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\panel_normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\paper_diffuse1.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\present_Present_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\stunItem.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\3e484dd802f4a5b3c25d178f8f14af0a\Textures.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\Textures" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A13F34F3-84B0-3A7A-98D1-9CC7E1E49BC5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
