@@ -38,17 +38,17 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
-		/*for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
+		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
 			Room* newRoom = new Room(entry.path().string());
 			mRoomList.push_back(newRoom);
-		}*/
+		}
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
-		/*for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
+		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
 			Level* newLevel = new Level(entry.path().string());
 			mLevelList.push_back(newLevel);
-		}*/
+		}
 		});
 	mWorld = new GameWorld();
 #ifdef USEGL
@@ -476,7 +476,9 @@ void LevelManager::InitialiseAssets() {
 	};
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
-	//matLoadThread.join();
+#ifdef USEGL
+	matLoadThread.join();
+#endif
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
