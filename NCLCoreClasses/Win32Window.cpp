@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
+
+#include "../CSC8503CoreClasses/imgui/imgui_impl_win32.h"
 using namespace NCL;
 using namespace Win32Code;
 
@@ -212,7 +214,12 @@ void Win32Window::CheckMessages(MSG &msg)	{
 	}
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)	{
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
+
 	Win32Window* thisWindow = (Win32Window*)window;
 
 	bool applyResize = false;
