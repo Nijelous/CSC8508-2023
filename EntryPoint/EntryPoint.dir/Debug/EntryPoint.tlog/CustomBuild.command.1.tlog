@@ -1,6 +1,6 @@
-^C:\BAAAH\CSC8508-2023\ENTRYPOINT\CMAKELISTS.TXT
+^C:\USERS\A8038295\SOURCE\REPOS\CSC8508-2023\ENTRYPOINT\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -SC:/baaah/CSC8508-2023 -BC:/baaah/CSC8508-2023 --check-stamp-file C:/baaah/CSC8508-2023/EntryPoint/CMakeFiles/generate.stamp
+C:\Users\a8038295\source\bin\cmake.exe -SC:/Users/a8038295/source/repos/CSC8508-2023 -BC:/Users/a8038295/source/repos/CSC8508-2023 --check-stamp-file C:/Users/a8038295/source/repos/CSC8508-2023/EntryPoint/CMakeFiles/generate.stamp
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
