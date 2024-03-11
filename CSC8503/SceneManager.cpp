@@ -44,6 +44,17 @@ void SceneManager::InitPushdownMachine() {
 }
 
 void SceneManager::SetCurrentScene(Scenes scene) {
+
+#ifdef USEGL
+
+	GameTechRenderer* renderer = (GameTechRenderer*)(LevelManager::GetLevelManager()->GetRenderer());
+	renderer->SetImguiCanvasFunc([this]
+		{
+			currentScene->DrawCanvas();
+		});
+
+#endif
+
 	mIsInSingleplayer = scene == Scenes::Singleplayer;
 	auto* nextScene = gameScenesMap[scene];
 	currentScene = nextScene;
