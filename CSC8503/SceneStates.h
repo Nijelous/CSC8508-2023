@@ -3,7 +3,8 @@
 
 namespace NCL {
     namespace CSC8503 {
-        class Scene;
+	    class MainMenuScene;
+	    class Scene;
 
         class MainMenuSceneState : public PushdownState {
         public:
@@ -12,6 +13,7 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+            MainMenuScene* mMainMenuScene;
         };
 
         class SingleplayerState : public PushdownState {
@@ -39,6 +41,15 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+        };
+
+        class MultiplayerLobbyState : public PushdownState {
+        public:
+            MultiplayerLobbyState(){}
+            PushdownResult OnUpdate(float dt, PushdownState** pushFunc) override;
+            void OnAwake() override;
+
+            MainMenuScene* mMainMenuScene;
         };
     }
 }

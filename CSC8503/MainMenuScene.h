@@ -9,18 +9,22 @@ namespace NCL {
 
         class MainMenuScene : Scene {
         public:
+            enum MainMenuPanels {
+                LevelSelection,
+                MultiplayerLobby
+            };
+
             MainMenuScene();
             ~MainMenuScene();
 			
             void UpdateGame(float dt) override;
 
             void DrawCanvas() override;
-        protected:
 
-            enum MainMenuPanels {
-	            LevelSelection,
-                MultiplayerLobby
-            };
+            void SetOpenPanel(MainMenuPanels panel);
+
+            MainMenuPanels GetOpenPanel() const;
+        protected:
 
             MainMenuPanels mCurrentOpenPanel;
 

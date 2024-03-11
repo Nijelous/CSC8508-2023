@@ -58,7 +58,6 @@ void SceneManager::SetCurrentScene(Scenes scene) {
 	mIsInSingleplayer = scene == Scenes::Singleplayer;
 	auto* nextScene = gameScenesMap[scene];
 	currentScene = nextScene;
-	mCurrentSceneType = scene;
 }
 
 bool SceneManager::GetIsForceQuit() {
@@ -81,12 +80,20 @@ void SceneManager::SetIsServer(bool isServer) {
 	mIsServer = isServer;
 }
 
+void SceneManager::SetChangeSceneTrigger(Scenes scene) {
+	mCurrentSceneType = scene;
+}
+
 PushdownMachine* SceneManager::GetScenePushdownMachine() {
 	return pushdownMachine;
 }
 
 Scene* SceneManager::GetCurrentScene() {
 	return currentScene;
+}
+
+Scenes SceneManager::GetCurrentSceneType() const {
+	return mCurrentSceneType;
 }
 
 SceneManager* SceneManager::GetSceneManager() {
