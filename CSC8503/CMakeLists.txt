@@ -53,7 +53,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "SuspicionSystem/SuspicionMetre.h"
         "SuspicionSystem/SuspicionMetre.cpp"
         "SuspicionSystem/SuspicionSystem.h"
-        "SuspicionSystem/SuspicionSystem.cpp"
     )
     source_group("Suspicion System" FILES ${Suspicion_System})
 
