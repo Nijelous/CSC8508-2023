@@ -6,6 +6,8 @@ using namespace NCL;
 using namespace NCL::Rendering;
 using std::ifstream;
 
+
+
 MeshMaterial::MeshMaterial(const std::string& filename) {
 	ifstream file(Assets::MESHDIR + filename);
 

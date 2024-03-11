@@ -1,15 +1,14 @@
 #pragma once
 #include "Transform.h"
 #include "CollisionVolume.h"
-#include "RenderObject.h"
 
 using std::vector;
 
 namespace NCL::CSC8503 {
 	class NetworkObject;
-	class RenderObject;
 	class PhysicsObject;
 	class SoundObject;
+	class RenderObject;
 
 	enum CollisionLayer {
 		StaticObj = 1,
@@ -17,11 +16,11 @@ namespace NCL::CSC8503 {
 		Player = 4,
 		Npc = 8,
 		NoCollide = 16,
-		Zone = 32, 
+		Zone = 32,
 		NoSpecialFeatures = 64
 	};
 
-	class GameObject	{
+	class GameObject {
 	public:
 		GameObject(CollisionLayer = NoSpecialFeatures, const std::string& name = "");
 		~GameObject();
@@ -32,7 +31,9 @@ namespace NCL::CSC8503 {
 			Sprint,
 			IdleCrouch,
 			Crouch,
-			Happy
+			Happy,
+			Point,
+			Default
 		};
 
 		void SetBoundingVolume(CollisionVolume* vol) {
@@ -67,7 +68,7 @@ namespace NCL::CSC8503 {
 			mHasPhysics = !mHasPhysics;
 		}
 
-		void SetActive(bool isActive){
+		void SetActive(bool isActive) {
 			mIsRendered = isActive;
 			mHasPhysics = isActive;
 		}
@@ -96,20 +97,16 @@ namespace NCL::CSC8503 {
 			return mSoundObject;
 		}
 
-#ifdef USEGL
-		void SetIsSensed(bool sensed) {
-			mRenderObject->SetOutlined(sensed);
-		}
 
-		bool GetIsSensed() {
-			return mRenderObject->GetOutlined();
-		}
+#ifdef USEGL
+		void SetIsSensed(bool sensed);
+
+		bool GetIsSensed();
 #endif
 
-    
-        void SetNetworkObject(NetworkObject* netObj) { mNetworkObject = netObj; }
-    
-	
+
+		void SetNetworkObject(NetworkObject* netObj);
+
 
 		void SetRenderObject(RenderObject* newObject) {
 			mRenderObject = newObject;
@@ -137,7 +134,7 @@ namespace NCL::CSC8503 {
 			//std::cout << "OnCollisionEnd event occured!\n";
 		}
 
-		bool GetBroadphaseAABB(Vector3&outsize) const;
+		bool GetBroadphaseAABB(Vector3& outsize) const;
 
 		void UpdateBroadphaseAABB();
 
@@ -148,7 +145,7 @@ namespace NCL::CSC8503 {
 		int		GetWorldID() const {
 			return mWorldID;
 		}
-    
+
 		virtual void UpdateObject(float dt);
 
 		bool GetIsPlayer() { return mIsPlayer; }
@@ -169,14 +166,16 @@ namespace NCL::CSC8503 {
 			mName = name;
 		}
 
+		void SetObjectState(GameObjectState state);
+
 	protected:
 		Transform			mTransform;
 
-		CollisionVolume*	mBoundingVolume;
-		PhysicsObject*		mPhysicsObject;
-		RenderObject*		mRenderObject;
-		NetworkObject*		mNetworkObject;
-		SoundObject*        mSoundObject;
+		CollisionVolume* mBoundingVolume;
+		PhysicsObject* mPhysicsObject;
+		RenderObject* mRenderObject;
+		NetworkObject* mNetworkObject;
+		SoundObject* mSoundObject;
 
 		bool		mIsSensed;
 		bool		mHasPhysics;

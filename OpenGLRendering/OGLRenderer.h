@@ -5,6 +5,8 @@ Author:Rich Davison
 Contact:richgdavison@gmail.com
 License: MIT (see LICENSE file at the top of the source tree)
 */////////////////////////////////////////////////////////////////////////////
+#ifdef USEGL
+
 #pragma once
 #include "RendererBase.h"
 
@@ -16,6 +18,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #ifdef _DEBUG
 #define OPENGL_DEBUGGING
 #endif
+
+typedef unsigned int GLuint;
 
 namespace NCL {
 	namespace Maths {
@@ -72,3 +76,4 @@ namespace NCL {
 		};
 	}
 }
+#endif

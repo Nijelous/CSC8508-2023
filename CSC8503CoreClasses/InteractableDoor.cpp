@@ -79,24 +79,31 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 void InteractableDoor::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	mIsOpen = isOpen;
 	if (isOpen) {
+#ifdef USEGL
 		this->GetSoundObject()->TriggerSoundEvent();
+#endif
 		SetActive(false);
 		if (isSettedByServer) {
 			mTimer = initDoorTimer;
 		}
 	}
 	else {
+#ifdef USEGL
 		this->GetSoundObject()->CloseDoorTriggered();
+#endif
 		SetActive(true);
 	}
 
+#ifdef USEGL
 	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
 	if (isMultiplayerGame && isSettedByServer) {
 		SyncInteractableDoorStatusInMultiplayer();
 	}
+#endif
 }
 
 bool InteractableDoor::CanUseItem() {
+#ifdef USEGL
 	PlayerObject* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
 	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
 
@@ -107,6 +114,7 @@ bool InteractableDoor::CanUseItem() {
 	default:
 		return false;
 	}
+#endif
 }
 
 void InteractableDoor::InitStateMachine()

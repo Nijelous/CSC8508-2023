@@ -150,6 +150,14 @@ SyncInteractablePacket::SyncInteractablePacket(int networkObjectId, bool isOpen,
 	this->interactableItemType = interactableItemType;
 }
 
+SyncObjectStatePacket::SyncObjectStatePacket(int networkObjId, int objectState) {
+	type = SyncObjectState;
+	size = sizeof(SyncObjectStatePacket);
+
+	this->networkObjId = networkObjId;
+	this->objectState = objectState;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;

@@ -9,6 +9,8 @@ License: MIT (see LICENSE file at the top of the source tree)
 #include "Mesh.h"
 #include "glad\gl.h"
 
+typedef unsigned int GLuint;
+
 namespace NCL::Rendering {	
 	using UniqueOGLMesh		= std::unique_ptr<class OGLMesh>;
 	using SharedOGLMesh		= std::shared_ptr<class OGLMesh>;
