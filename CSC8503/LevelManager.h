@@ -21,7 +21,7 @@ using namespace SuspicionSystem;
 
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
-	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+	constexpr float PLAYER_INVERSE_MASS = 0.5f; 
 	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.25f;
 	constexpr float INIT_TIMER_VALUE = 1000;
 	namespace CSC8503 {
@@ -36,6 +36,8 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
+		class InventoryBuffSystem::PlayerInventoryObserver;
+		class InventoryBuffSystem::PlayerBuffsObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -268,6 +270,9 @@ namespace NCL {
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+
+			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
+			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;
 		};
 	}
 }
