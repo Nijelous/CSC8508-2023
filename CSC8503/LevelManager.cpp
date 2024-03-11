@@ -723,11 +723,17 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mTextures["Alarm"], 0.0);
 	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
-	UISystem::Icon* mNotice1 = mUi->AddIcon(Vector2(52, 50), 8, 6, mTextures["OpenDoor"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICE1, *mNotice1);
+	UISystem::Icon* mNoticeRight = mUi->AddIcon(Vector2(52, 50), 8, 6, mTextures["OpenDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICERIGHT, *mNoticeRight);
 
-	UISystem::Icon* mNotice2 = mUi->AddIcon(Vector2(39, 50), 8, 6, mTextures["LockDoor"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICE2, *mNotice2);
+	UISystem::Icon* mNoticeLeft = mUi->AddIcon(Vector2(39, 50), 8, 6, mTextures["CloseDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICELEFT, *mNoticeLeft);
+
+	UISystem::Icon* mNoticeTop = mUi->AddIcon(Vector2(45, 43), 8, 6, mTextures["LockDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICETOP, *mNoticeTop);
+
+	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
 
 
 

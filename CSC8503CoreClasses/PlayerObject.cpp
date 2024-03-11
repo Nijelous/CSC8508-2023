@@ -360,28 +360,51 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 			Vector3 objPos = objectHit->GetTransform().GetPosition();
 			Vector3 playerPos = GetTransform().GetPosition();
 			float distance = (objPos - playerPos).Length();
+			//Open Door
 			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10) {
-				if (transparency1 < 1) {
-					transparency1 = transparency1 + 0.05;
+				if (mTransparencyRight < 1) {
+					mTransparencyRight = mTransparencyRight + 0.05;
 				}
 
-				mUi->ChangeBuffSlotTransparency(NOTICE1, transparency1);
+				mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 			}
-			else if (transparency1 > 0) {
-				transparency1 = transparency1 - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICE1, transparency1);
+			else if (mTransparencyRight > 0) {
+				mTransparencyRight = mTransparencyRight - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 			}
-			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10&& GetEquippedItem() == PlayerInventory::item::doorKey) {
-				if (transparency2 < 1) {
-					transparency2 = transparency2 + 0.05;
+			//Close Door
+			if (objectHit->GetName() == "InteractableDoor" && !objectHit->IsActive() && distance < 10) {
+				if (mTransparencyLeft < 1) {
+					mTransparencyLeft = mTransparencyLeft + 0.05;
 				}
-				mUi->ChangeBuffSlotTransparency(NOTICE2, transparency2);
+				mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
 			}
-			else if (transparency2 > 0) {
-				transparency2 = transparency2 - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICE2, transparency2);
+			else if (mTransparencyLeft > 0) {
+				mTransparencyLeft = mTransparencyLeft - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
 			}
-			
+			//Lock Door
+			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10&& GetEquippedItem() == PlayerInventory::item::doorKey) {
+				if (mTransparencyTop < 1) {
+					mTransparencyTop = mTransparencyTop + 0.05;
+				}
+				mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+			}
+			else if (mTransparencyTop > 0) {
+				mTransparencyTop = mTransparencyTop - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+			}
+			//Stop Guard
+			if (objectHit->GetName() == "Guard" && distance < 20 && GetEquippedItem() == PlayerInventory::item::stunItem) {
+				if (mTransparencyBot < 1) {
+					mTransparencyBot = mTransparencyBot + 0.05;
+				}
+				mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+			}
+			else if (mTransparencyBot > 0) {
+				mTransparencyBot = mTransparencyBot - 0.05;
+				mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+			}
 		}
 	
 		

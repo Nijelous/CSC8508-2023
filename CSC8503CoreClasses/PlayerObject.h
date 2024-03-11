@@ -116,8 +116,10 @@ namespace NCL {
 			float tempSusValue = 0.0;
 			float mLastSusValue = 0.0;
 			float mAlarmTime=0.0;
-			float transparency1 = 0.0;
-			float transparency2 = 0.0;
+			float mTransparencyRight = 0.0;
+			float mTransparencyLeft = 0.0;
+			float mTransparencyTop = 0.0;
+			float mTransparencyBot = 0.0;
 			
 
 			bool	IsSeenByGameObject(GameObject* otherGameObject);
