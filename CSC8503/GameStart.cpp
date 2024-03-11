@@ -1,3 +1,4 @@
+#include "AnimationSystem.h"
 #include "../NCLCoreClasses/Window.h"
 
 #include "../CSC8503CoreClasses/Debug.h"
@@ -37,11 +38,20 @@ using namespace CSC8503;
 #include <sstream>
 
 namespace {
+#ifdef USEGL
     constexpr int NETWORK_TEST_WIDTH = 800;
     constexpr int NETWORK_TEST_HEIGHT = 600;
 
     constexpr int GAME_WINDOW_WIDTH = 1280;
     constexpr int GAME_WINDOW_HEIGHT = 720;
+#endif
+#ifdef USEPROSPERO
+    constexpr int NETWORK_TEST_WIDTH = 1920;
+    constexpr int NETWORK_TEST_HEIGHT = 1080;
+
+    constexpr int GAME_WINDOW_WIDTH = 1920;
+    constexpr int GAME_WINDOW_HEIGHT = 1080;
+#endif
 }
 
 #ifdef USEPROSPERO
@@ -52,37 +62,36 @@ Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen){
 }
 
 void SetUpPS5InputDevices(PS5::PS5Window* w){
-    PS5::PS5Controller* c = w->GetController();
+    PS5::PS5Controller* ps5Controller = w->GetController();
 
-    c->MapAxis(0, "LeftX");
-    c->MapAxis(1, "LeftY");
+    ps5Controller->MapAxis(0, "LeftX");
+    ps5Controller->MapAxis(1, "LeftY");
 
-    c->MapAxis(2, "RightX");
-    c->MapAxis(3, "RightY");
+    ps5Controller->MapAxis(2, "RightX");
+    ps5Controller->MapAxis(3, "RightY");
 
-    c->MapAxis(4, "DX");
-    c->MapAxis(5, "DY");
+    ps5Controller->MapAxis(4, "DX");
+    ps5Controller->MapAxis(5, "DY");
 
-    c->MapButton(0, "Triangle");
-    c->MapButton(1, "Circle");
-    c->MapButton(2, "Cross");
-    c->MapButton(3, "Square");
+    ps5Controller->MapButton(0, "Triangle");
+    ps5Controller->MapButton(1, "Circle");
+    ps5Controller->MapButton(2, "Cross");
+    ps5Controller->MapButton(3, "Square");
 
     //These are the axis/button aliases the inbuilt camera class reads from:
-    c->MapAxis(0, "XLook");
-    c->MapAxis(1, "YLook");
+    ps5Controller->MapAxis(0, "XLook");
+    ps5Controller->MapAxis(1, "YLook");
 
-    c->MapAxis(2, "Sidestep");
-    c->MapAxis(3, "Forward");
+    ps5Controller->MapAxis(2, "Sidestep");
+    ps5Controller->MapAxis(3, "Forward");
 
-    c->MapButton(0, "Up");
-    c->MapButton(2, "Down");
+    ps5Controller->MapButton(0, "Up");
+    ps5Controller->MapButton(2, "Down");
 }
 #endif
 
 Window* SetUpPCWindow(float winWidth, float winHeight, bool fullscreen) {
     Window* w = Window::CreateGameWindow("CSC8503 Game technology!", winWidth, winHeight, false);
-
    
     return w;
 }
@@ -111,8 +120,9 @@ int RunGame(){
 
 
     SceneManager* sceneManager = SceneManager::GetSceneManager();
-    
-    GameSceneManager* gm = nullptr;
+    PS5::PS5Window* ps5Window = (PS5::PS5Window*)w;
+    sceneManager->SetPS5Controller(ps5Window->GetController());
+
     //erendgrmnc: make the bool below true for network test.   
 
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!

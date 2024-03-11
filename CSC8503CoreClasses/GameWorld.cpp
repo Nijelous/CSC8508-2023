@@ -5,6 +5,8 @@
 #include "Camera.h"
 #include <algorithm>
 
+#include "../PS5Core/PS5Controller.h"
+
 
 using namespace NCL;
 using namespace NCL::CSC8503;

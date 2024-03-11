@@ -7,6 +7,11 @@
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
 
+namespace NCL::CSC8503
+{
+	class DebugNetworkedGame;
+}
+
 using namespace SuspicionSystem;
 
 void LocalSuspicionMetre::Init(){
@@ -46,6 +51,7 @@ void LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &i
 }
 
 void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply){
+#ifdef USEGEL
     int localPlayerId = 0;
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -57,6 +63,7 @@ void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCau
             game->SendClientSyncLocalActiveSusCausePacket(playerNo, inCause, toApply);
         }
     }
+#endif
 }
 
 
@@ -135,6 +142,7 @@ void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const f
 }
 
 void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo) {
+#ifdef USEGL
     int localPlayerId = 0;
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -146,6 +154,7 @@ void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue
             game->SendClientSyncLocalSusChangePacket(playerNo, changedValue);
         }
     }
+#endif
 }
 
 void LocalSuspicionMetre::SyncSusChange(int playerID, int localPlayerID, int changedValue){

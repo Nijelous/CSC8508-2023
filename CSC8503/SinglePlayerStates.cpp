@@ -1,6 +1,7 @@
 #include "SinglePlayerStates.h"
 
 #include "Window.h"
+#include "SceneManager.h"
 
 using namespace NCL::CSC8503;
 
@@ -12,7 +13,7 @@ PushdownState::PushdownResult Pause::OnUpdate(float dt, PushdownState** newState
 		return PushdownResult::Push;
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
-		*newState = new MainMenu(mGameSceneManager);
+		*newState = new MainMenuPushdownState(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::R)) {
@@ -30,7 +31,7 @@ void Pause::OnAwake() {
 
 PushdownState::PushdownResult Defeat::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-		*newState = new MainMenu(mGameSceneManager);
+		*newState = new MainMenuPushdownState(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -45,7 +46,7 @@ void Defeat::OnAwake() {
 
 PushdownState::PushdownResult Victory::OnUpdate(float dt, PushdownState** newState) {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
-		*newState = new MainMenu(mGameSceneManager);
+		*newState = new MainMenuPushdownState(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
@@ -93,15 +94,15 @@ void InitialisingLevel::OnAwake() {
 
 // main menu
 
-PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE)) {
+PushdownState::PushdownResult MainMenuPushdownState::OnUpdate(float dt, PushdownState** newState) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE) || (SceneManager::GetPS5Controller()->GetNamedButton(("Cross")))) {
 		*newState = new InitialisingLevel(mGameSceneManager);
 		return PushdownResult::Push;
 	}
 	return PushdownResult::NoChange;
 }
 
-void MainMenu::OnAwake() {
+void MainMenuPushdownState::OnAwake() {
 	mGameSceneManager->SetMainMenu();
 	LevelManager::GetLevelManager()->ClearLevel();
 }

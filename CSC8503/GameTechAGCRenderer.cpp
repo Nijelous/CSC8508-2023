@@ -117,6 +117,31 @@ Mesh* GameTechAGCRenderer::LoadMesh(const std::string& name) {
 	return m;
 }
 
+void GameTechAGCRenderer::LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) {
+	std::vector<AGCMesh*> meshes;
+	for (int i = 0; i < details.size(); i += 3) {
+		meshes.push_back(new AGCMesh());
+	}
+	std::thread fileLoadThreads[4];
+	int loadSplit = details.size() / 12;
+	for (int i = 0; i < 4; i++) {
+		fileLoadThreads[i] = std::thread([meshes, details, i, loadSplit] {
+			int endPoint = i == 3 ? details.size() / 3 : loadSplit * (i + 1);
+			for (int j = loadSplit * i; j < endPoint; j++) {
+				MshLoader::LoadMesh(details[(j * 3) + 1], *meshes[j]);
+				meshes[j]->SetPrimitiveType(GeometryPrimitive::Triangles);
+			}
+			});
+	}
+	for (int i = 0; i < 4; i++) {
+		fileLoadThreads[i].join();
+	}
+	for (int i = 0; i < meshes.size(); i++) {
+		meshes[i]->UploadToGPU(this);
+		meshMap[details[i * 3]] = meshes[i];
+	}
+}
+
 NCL::PS5::AGCTexture* GameTechAGCRenderer::CreateFrameBufferTextureSlot(const std::string& name) {
 	uint32_t index = textureMap.size();
 	AGCTexture* t = new AGCTexture(allocator);

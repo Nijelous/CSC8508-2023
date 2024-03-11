@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../CSC8503CoreClasses/GameWorld.h"
 
 
@@ -32,6 +33,7 @@ namespace NCL {
 			~GameTechAGCRenderer();
 
 			virtual Mesh*		LoadMesh(const std::string& name)				override;
+			void		LoadMeshes(unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) override;
 			virtual Texture*	LoadTexture(const std::string& name)			override;
 			virtual Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
 

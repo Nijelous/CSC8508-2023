@@ -36,8 +36,8 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
-		class InventoryBuffSystem::PlayerInventoryObserver;
-		class InventoryBuffSystem::PlayerBuffsObserver;
+		//class InventoryBuffSystem::PlayerInventoryObserver;
+		//class InventoryBuffSystem::PlayerBuffsObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;

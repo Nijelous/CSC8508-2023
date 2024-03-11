@@ -37,42 +37,20 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-#ifdef USEGL
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
+		/*for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
 			Room* newRoom = new Room(entry.path().string());
 			mRoomList.push_back(newRoom);
-		}
+		}*/
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
+		/*for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
 			Level* newLevel = new Level(entry.path().string());
 			mLevelList.push_back(newLevel);
-		}
+		}*/
 		});
-#endif
-#ifdef USEPROSPERO
-	mRoomList = std::vector<Room*>();
-	std::thread loadRooms([this] {
-		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
-			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
-			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
-		for (int i = 0; i < paths.size(); i++) {
-			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
-			mRoomList.push_back(newRoom);
-		}
-		});
-	mLevelList = std::vector<Level*>();
-	std::thread loadLevels([this] {
-		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
-		for (int i = 0; i < paths.size(); i++) {
-			Level* newLevel = new Level(Assets::LEVELDIR + "Levels/" + paths[i] + ".json");
-			mLevelList.push_back(newLevel);
-		}
-		});
-#endif
 	mWorld = new GameWorld();
 #ifdef USEGL
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
@@ -423,7 +401,7 @@ void LevelManager::FixedUpdate(float dt){
 
 void LevelManager::InitialiseAssets() {
 	Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	mRenderer->Render();
+	//mRenderer->Render();
 	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
@@ -449,25 +427,23 @@ void LevelManager::InitialiseAssets() {
         #endif
 			}
 			else if (groupType == "mat") {
-		#ifdef USEGL	
 				matLoadThread = std::thread([this, groupDetails] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mMaterials[groupDetails[i]] = mRenderer->LoadMaterial(groupDetails[i + 1]);
 					}
 					});
-		#endif
 			}
 			else if (groupType == "msh") {
-				mRenderer->LoadMeshes(mMeshes, groupDetails);
+				//mRenderer->LoadMeshes(mMeshes, groupDetails);
 				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				mRenderer->Render();
+				//mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
 				Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				mRenderer->Render();
+				//mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -486,7 +462,7 @@ void LevelManager::InitialiseAssets() {
 	animLoadThread.join();
 #endif
 	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	mRenderer->Render();
+	//mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
@@ -511,9 +487,7 @@ void LevelManager::InitialiseAssets() {
 	};
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
-#ifdef USEGL
 	matLoadThread.join();
-#endif
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {

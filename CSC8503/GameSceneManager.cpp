@@ -59,7 +59,7 @@ void GameSceneManager::UpdateGame(float dt) {
 }
 
 void GameSceneManager::InitInGameMenuManager() {
-	auto* mainMenu = new MainMenu(this);
+	auto* mainMenu = new MainMenuPushdownState(this);
 	mPushdownMachine = new PushdownMachine(mainMenu);
 }
 
@@ -72,7 +72,7 @@ void GameSceneManager::InitCamera() {
 }
 
 void GameSceneManager::CreateLevel() {
-	mLevelManager->LoadLevel(1, 0);
+	mLevelManager->LoadLevel(0, 0);
 }
 
 bool GameSceneManager::PlayerWonGame() {

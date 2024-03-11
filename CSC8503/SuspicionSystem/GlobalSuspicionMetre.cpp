@@ -106,6 +106,7 @@ void GlobalSuspicionMetre::SetMinGlobalSusMetre(float amount) {
 }
 
 void GlobalSuspicionMetre::HandleGlobalSusChangeNetworking(const int& changedValue){
+#ifdef USEGL
     int localPlayerId = 0;
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
@@ -117,6 +118,7 @@ void GlobalSuspicionMetre::HandleGlobalSusChangeNetworking(const int& changedVal
             game->SendClientSyncGlobalSusChangePacket(changedValue);
         }
     }
+#endif
 };
 
 void GlobalSuspicionMetre::SyncSusChange(int localPlayerID, int changedValue) {

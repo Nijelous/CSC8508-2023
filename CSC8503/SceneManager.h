@@ -1,5 +1,7 @@
 ﻿#include <map>
 
+#include "../PS5Core/PS5Controller.h"
+
 namespace NCL {
     namespace CSC8503 {
 		
@@ -29,6 +31,15 @@ namespace NCL {
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
             static SceneManager* GetSceneManager();
+
+        	static PS5::PS5Controller* GetPS5Controller() {
+                return instance->mPS5Controller;
+            }
+
+            void SetPS5Controller(PS5::PS5Controller* ps5Controller) {
+                instance->mPS5Controller = ps5Controller;
+            }
+
         protected:
             bool isForceQuit = false;
             bool mIsInSingleplayer = false;
@@ -43,6 +54,8 @@ namespace NCL {
             PushdownMachine* pushdownMachine = nullptr;
 
             std::map<Scenes, Scene*> gameScenesMap;
+
+            PS5::PS5Controller* mPS5Controller;
         };
     }
 }

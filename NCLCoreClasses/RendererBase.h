@@ -7,6 +7,8 @@ Comments and queries to: richard-gordon.davison AT ncl.ac.uk
 https://research.ncl.ac.uk/game/
 */
 #pragma once
+#include <unordered_map>
+
 #include "Window.h"
 #include "BaseLight.h"
 #include "UISystem.h"
@@ -52,6 +54,7 @@ namespace NCL::Rendering {
 		}
 
 		virtual Mesh* LoadMesh(const std::string& name) { return nullptr; }
+		virtual void LoadMeshes(unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) {}
 		virtual Texture* LoadTexture(const std::string& name) { return nullptr; }
 		virtual Texture* LoadDebugTexture(const std::string& name) { return nullptr; }
 		virtual Shader* LoadShader(const std::string& vertex, const std::string& fragment) { return nullptr; }
