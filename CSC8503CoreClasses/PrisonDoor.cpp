@@ -2,6 +2,7 @@
 #include "StateMachine.h"
 #include "StateTransition.h"
 #include "State.h"
+#include "GameObject.h"
 
 using namespace NCL::CSC8503;
 
@@ -16,43 +17,23 @@ void PrisonDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::
 	}
 }
 
-void PrisonDoor::InitStateMachine()
-{
-	mStateMachine = new StateMachine();
-
-	State* DoorOpen = new State([&](float dt) -> void
-		{
-
-		}
-	);
-
-	State* DoorClosed = new State([&](float dt) -> void
-		{
-			this->CountDownTimer(dt);
-
-			if (mTimer == 0)
-				Open();
-		}
-	);
-
-	mStateMachine->AddState(DoorClosed);
-	mStateMachine->AddState(DoorOpen);
-
-	mStateMachine->AddTransition(new StateTransition(DoorOpen, DoorClosed,
-		[&]() -> bool
-		{
-			return (!this->mIsOpen);
-		}
-	));
-
-	mStateMachine->AddTransition(new StateTransition(DoorClosed, DoorOpen,
-		[&]() -> bool
-		{
-			return this->mIsOpen;
-		}
-	));
+void PrisonDoor::Open() {
+	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, 7.25, 0));
+	mTimer = -1;
+	mIsOpen = true;
 }
 
-void PrisonDoor::UpdateObject(float dt){
-	mStateMachine->Update(dt);
+void PrisonDoor::Close() {
+	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, -7.25, 0));
+	SetNavMeshFlags(2);
+	mTimer = initDoorTimer;
+	mIsOpen = false;
+}
+
+void PrisonDoor::UpdateObject(float dt) {
+	if (!mIsOpen && mTimer > 0)
+		CountDownTimer(dt);
+
+	if (mTimer == 0)
+		SetIsOpen(true);
 }

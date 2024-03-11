@@ -94,7 +94,7 @@ void Vent::Interact(InteractType interactType, GameObject* interactedObject) {
 	}
 }
 
-bool Vent::CanBeInteractedWith(InteractType interactType){
+bool Vent::CanBeInteractedWith(InteractType interactType, GameObject* interactedObject){
 	switch (interactType) {
 	case Use:
 		return mIsOpen;

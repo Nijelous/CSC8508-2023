@@ -53,6 +53,7 @@ namespace NCL{
             void ReceivePacket(int type, GamePacket* payload, int source) override;
             void InitInGameMenuManager() override;
 
+            void SendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) const;
             void SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
             void ClearNetworkGame();

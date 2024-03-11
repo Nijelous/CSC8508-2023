@@ -285,6 +285,11 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 	mThisServer->SendGlobalPacket(packet);
 }
 
+void DebugNetworkedGame::SendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) const {
+	SyncInteractablePacket packet(networkObjectId, isOpen, interactableItemType);
+	mThisServer->SendGlobalPacket(packet);
+}
+
 void DebugNetworkedGame::SendClientSyncLocalActiveSusCausePacket(int playerNo, int activeSusCause, bool toApply) const {
     LocalSuspicionMetre::activeLocalSusCause activeCause = (LocalSuspicionMetre::activeLocalSusCause)(activeSusCause);
     NCL::CSC8503::ClientSyncLocalActiveSusCausePacket packet(playerNo, activeCause, toApply);

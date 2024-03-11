@@ -13,7 +13,7 @@ namespace NCL {
 
             void SetIsOpen(bool isOpen, bool isSettedByServer);
             void Interact(NCL::CSC8503::InteractType interactType, GameObject* interactedObject = nullptr) override;
-            virtual bool CanBeInteractedWith(InteractType interactType);
+            virtual bool CanBeInteractedWith(InteractType interactType, GameObject* interactedObject = nullptr) override;
         protected:
             bool mIsOpen;
             Vent* mConnectedVent;

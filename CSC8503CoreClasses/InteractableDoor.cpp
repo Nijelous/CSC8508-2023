@@ -16,26 +16,24 @@ InteractableDoor::InteractableDoor() {
 	mInteractableItemType = InteractableItems::InteractableDoors;
 	mIsLocked = false;
 	mIsOpen = false;
-
-	bool isServer = SceneManager::GetSceneManager()->IsServer();
-	if (true) {
-		InitStateMachine();
-	}
+	mTimer = -1;
 }
 
 void InteractableDoor::Unlock() {
-	SetIsOpen(false);
+	mIsLocked = false;
+	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock() {
-	SetIsOpen(true);
+	mIsLocked = true;
+	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(4);
 }
 
 void InteractableDoor::Interact(InteractType interactType, GameObject* interactedObject)
 {
-	if (!CanBeInteractedWith(interactType))
+	if (!CanBeInteractedWith(interactType, interactedObject))
 		return;
 
 	switch (interactType)
@@ -57,7 +55,7 @@ void InteractableDoor::Interact(InteractType interactType, GameObject* interacte
 	}
 }
 
-bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
+bool InteractableDoor::CanBeInteractedWith(InteractType interactType, GameObject* interactedObject)
 {
 	switch (interactType)
 	{
@@ -65,10 +63,10 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 		return !mIsLocked;
 		break;
 	case ItemUse:
-		return CanUseItem() && !mIsOpen;
+		return (mLockCooldown == 0 && CanUseItem(interactedObject) && !mIsOpen);
 		break;
 	case LongUse:
-		return (mIsLocked && !mIsOpen);
+		return (mLockCooldown == 0 && mIsLocked && !mIsOpen);
 		break;
 	default:
 		return false;
@@ -76,43 +74,11 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType)
 	}
 }
 
-void InteractableDoor::SetIsOpen(bool toOpen) {
-
-	auto* sceneManager = SceneManager::GetSceneManager();
-	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
-
-	if (toOpen) {
-		if (networkedGame->GetIsServer())
-		{
-			Open();
-			mTimer = initDoorTimer;
-		}
-		else
-		{
-			SetIsRendered(false);
-			mTimer = initDoorTimer;
-		}
-	}
-	else {
-		//this->GetSoundObject()->CloseDoorTriggered();
-		if (networkedGame->GetIsServer())
-		{
-			Close();
-		}
-		else
-			SetIsRendered(true);
-	}
-
-	mIsOpen = toOpen;
-	bool isMultiplayerGame = !SceneManager::GetSceneManager()->IsInSingleplayer();
-	if (isMultiplayerGame) {
-		SyncInteractableDoorStatusInMultiplayer(toOpen);
-	}
-}
-
-bool InteractableDoor::CanUseItem() {
-	PlayerObject* localPlayer = LevelManager::GetLevelManager()->GetTempPlayer();
-	PlayerInventory::item usedItem = localPlayer->GetEquippedItem();
+bool InteractableDoor::CanUseItem(GameObject* userObj) {
+	auto* playerComp = static_cast<PlayerObject*>(userObj);
+	if (playerComp == nullptr)
+		return false;
+	PlayerInventory::item usedItem = playerComp->GetEquippedItem();
 
 	switch (usedItem) {
 	case InventoryBuffSystem::PlayerInventory::doorKey:
@@ -123,64 +89,6 @@ bool InteractableDoor::CanUseItem() {
 	}
 }
 
-void InteractableDoor::InitStateMachine()
-{
-	mStateMachine = new StateMachine();
-
-	State* DoorOpenAndUnlocked = new State([&](float dt) -> void
-		{
-			this->CountDownTimer(dt);
-
-			if (mTimer == 0)
-				SetIsOpen(false);
-		}
-	);
-
-	State* DoorClosedAndUnlocked = new State([&](float dt) -> void
-		{
-
-		}
-	);
-
-
-	State* DoorClosedAndLocked = new State([&](float dt) -> void
-		{
-
-		}
-	);
-
-	mStateMachine->AddState(DoorClosedAndUnlocked);
-	mStateMachine->AddState(DoorOpenAndUnlocked);
-	mStateMachine->AddState(DoorClosedAndLocked);
-
-	mStateMachine->AddTransition(new StateTransition(DoorOpenAndUnlocked, DoorClosedAndUnlocked,
-		[&]() -> bool
-		{
-			return (!this->mIsOpen);
-		}
-	));
-
-	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorOpenAndUnlocked,
-		[&]() -> bool
-		{
-			return this->mIsOpen;
-		}
-	));
-
-	mStateMachine->AddTransition(new StateTransition(DoorClosedAndUnlocked, DoorClosedAndLocked,
-		[&]() -> bool
-		{
-			return this->mIsLocked;
-		}
-	));
-
-	mStateMachine->AddTransition(new StateTransition(DoorClosedAndLocked, DoorClosedAndUnlocked,
-		[&]() -> bool
-		{
-			return !this->mIsLocked;
-		}
-	));
-}
 #ifdef USEGL
 void InteractableDoor::SyncInteractableDoorStatusInMultiplayer(bool toOpen) {
 	auto* sceneManager = SceneManager::GetSceneManager();
@@ -190,31 +98,41 @@ void InteractableDoor::SyncInteractableDoorStatusInMultiplayer(bool toOpen) {
 		if (networkObj) {
 			const int networkId = networkObj->GetnetworkID();
 			if (networkedGame->GetServer()){
-				SyncInteractablePacket packet(networkId, toOpen, mInteractableItemType);
-				networkedGame->GetServer()->SendGlobalPacket(packet);
+				networkedGame->SendInteractablePacket(networkId,toOpen,mInteractableItemType);
 			}
 		}
 	}
 }
 
 void InteractableDoor::SyncDoor(bool toOpen){
-	SetIsRendered(!toOpen);
+	return;
 }
 #endif
+
+void NCL::CSC8503::InteractableDoor::CountDownLockTimer(float dt)
+{
+	mLockCooldown = std::max(mLockCooldown - dt, 0.0f);
+}
 
 void InteractableDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) {
 	switch (susBreakpoint)
 	{
 	case SuspicionSystem::SuspicionMetre::high:
-		Close();
+		SetIsOpen(false);
+		Lock();
+		break;
+	case SuspicionSystem::SuspicionMetre::mid:
+		SetIsOpen(false);
 		break;
 	default:
 		break;
 	}
 }
 
-
-
 void InteractableDoor::UpdateObject(float dt) {
-	mStateMachine->Update(dt);
+	if (mLockCooldown > 0)
+		CountDownLockTimer(dt);
+
+	if (!mIsLocked)
+		Door::UpdateObject(dt);
 }

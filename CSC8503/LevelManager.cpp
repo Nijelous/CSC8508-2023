@@ -52,6 +52,11 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld);
 #endif
 	mUi = new UISystem();
+
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
+
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
@@ -306,6 +311,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	for (const auto buffsObserver : mPlayerBuffsObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 
+	for (const auto globalSuspicionObserver : mGlobalSuspicionObserver)
+		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->Attach(globalSuspicionObserver);
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -885,7 +892,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	}
 
 	mWorld->AddGameObject(newDoor);
-
+	mGlobalSuspicionObserver.push_back(newDoor);
 	return newDoor;
 }
 
@@ -920,6 +927,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
+	mGlobalSuspicionObserver.push_back(newDoor);
 
 	return newDoor;
 }
