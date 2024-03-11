@@ -59,11 +59,11 @@ LevelManager::LevelManager() {
 		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
 			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
 			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
-	    for (int i = 0; i < paths.size(); i++) {
-	    	Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
-	    	mRoomList.push_back(newRoom);
-	    }
-	    	});
+	for (int i = 0; i < paths.size(); i++) {
+		Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
+		mRoomList.push_back(newRoom);
+	}
+		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
 		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
@@ -104,7 +104,7 @@ LevelManager::LevelManager() {
 	mGameState = MenuState;
 
 	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
-	 
+
 	mIsLevelInitialised = false;
 
 	InitialiseIcons();
@@ -199,7 +199,7 @@ void LevelManager::ClearLevel() {
 	mAnimation->Clear();
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
-	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();
+	if (mTempPlayer)mTempPlayer->ResetPlayerPoints();
 	mBaseFloor = nullptr;
 	mBaseWall = nullptr;
 	mBaseCornerWall = nullptr;
@@ -302,11 +302,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 
 #endif
-	 
+
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
-		
-		
+
+
 	mAnimation->SetGameObjectLists(mUpdatableObjects, mPlayerTextures, mGuardTextures);
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
@@ -1247,7 +1247,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 	{
 	case soundEmitterUsed:
 		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
-		mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
 		break;
 	default:
 		break;
