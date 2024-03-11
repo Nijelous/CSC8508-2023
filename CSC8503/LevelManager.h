@@ -136,11 +136,11 @@ namespace NCL {
 
 			void SetPlayersForGuards() const;
 
-			bool HasSetNavMesh() { return mHasSetNavMesh; }
-
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
 			PrisonDoor* GetPrisonDoor() const;
+
+			bool RoundHasStarted() { return mStartTimer <= 0; }
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -261,12 +261,12 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			int mNetworkIdBuffer;
+			float mStartTimer;
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
-			bool mHasSetNavMesh = false;
-			bool mHasStartedGame = false;
+
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;

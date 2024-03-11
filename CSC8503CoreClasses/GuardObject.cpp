@@ -45,7 +45,7 @@ GuardObject::~GuardObject() {
 
 void GuardObject::UpdateObject(float dt) {
 
-	if (!mIsStunned && LevelManager::GetLevelManager()->HasSetNavMesh()) {
+	if (!mIsStunned) {
 		if (mIsBTWillBeExecuted) {
 			RaycastToPlayer();
 			ExecuteBT();
