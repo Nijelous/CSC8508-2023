@@ -67,7 +67,7 @@ PushdownState::PushdownResult PlayingLevel::OnUpdate(float dt, PushdownState** n
 		*newState = new Defeat(mGameSceneManager);
 		return PushdownResult::Push;
 	}
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P)) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && LevelManager::GetLevelManager()->RoundHasStarted()) {
 		*newState = new Pause(mGameSceneManager);
 		return PushdownResult::Push;
 	}

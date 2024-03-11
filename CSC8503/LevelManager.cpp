@@ -24,6 +24,7 @@
 #include "SceneManager.h"
 #include "NetworkObject.h"
 #include "UISystem.h"
+#include "Assets.h"
 #include <filesystem>
 #include <fstream>
 
@@ -36,26 +37,47 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
+#ifdef USEGL
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
-		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Rooms")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
 			Room* newRoom = new Room(entry.path().string());
 			mRoomList.push_back(newRoom);
 		}
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
-		for (const auto& entry : std::filesystem::directory_iterator("../Assets/Levels/Levels")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
 			Level* newLevel = new Level(entry.path().string());
 			mLevelList.push_back(newLevel);
 		}
 		});
+#endif
+#ifdef USEPROSPERO
+	mRoomList = std::vector<Room*>();
+	std::thread loadRooms([this] {
+		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
+			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
+			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
+		for (int i = 0; i < paths.size(); i++) {
+			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
+			mRoomList.push_back(newRoom);
+		}
+		});
+	mLevelList = std::vector<Level*>();
+	std::thread loadLevels([this] {
+		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
+		for (int i = 0; i < paths.size(); i++) {
+			Level* newLevel = new Level(Assets::LEVELDIR + "Levels/" + paths[i] + ".json");
+			mLevelList.push_back(newLevel);
+		}
+		});
+#endif
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
 	mRenderer = new GameTechRenderer(*mWorld);
 #endif
-
 #ifdef USEPROSPERO
 	mRenderer = new GameTechAGCRenderer();
 #endif
@@ -72,8 +94,9 @@ LevelManager::LevelManager() {
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
+	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	mDtSinceLastFixedUpdate = 0;
 
 	mActiveLevel = -1;
@@ -183,7 +206,6 @@ void LevelManager::ClearLevel() {
 	mGuardObjects.clear();
 	mCCTVTransformList.clear();
 
-
 	ResetEquippedIconTexture();
 }
 
@@ -205,6 +227,7 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
+	mStartTimer = 3;
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	std::vector<Vector3> roomItemPositions;
@@ -245,19 +268,18 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			break;
 		}
 	}
-	if (mHasStartedGame) mNavMeshThread.join();
-	mHasSetNavMesh = false;
 	mNavMeshThread = std::thread([this] {
 		mBuilder->BuildNavMesh(mLevelLayout);
 		LoadDoorsInNavGrid();
-		mHasSetNavMesh = true;
 		std::cout << "Nav Mesh Set\n";
 		});
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mTempPlayer);
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mTempPlayer);
+
+		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
+		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+		LoadCCTVs();
 	}
 #ifdef USEGL
 	else {
@@ -269,9 +291,9 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		for (const auto& pair : *serverPlayersPtr)
 		{
 			PlayerInventoryObserver* invObserver = reinterpret_cast<PlayerInventoryObserver*>(pair.second);
-			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+			mPlayerInventoryObservers.push_back(invObserver);
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
-			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
 	}
 
@@ -291,17 +313,12 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	mTimer = INIT_TIMER_VALUE;
 
-	//Temp fix for crash problem
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMainFlag);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(mMainFlag);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
-
-	while (!mBuilder->HasSetSize()) {
-
-	}
-	mHasStartedGame = true;
 	mIsLevelInitialised = true;
+	for (const auto invObserver : mPlayerInventoryObservers)
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
+
+	for (const auto buffsObserver : mPlayerBuffsObservers)
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -330,16 +347,28 @@ void LevelManager::AddNetworkObject(GameObject& objToAdd) {
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
 		mGameState = LevelState;
-		if ((mUpdatableObjects.size() > 0)) {
-			for (GameObject* obj : mUpdatableObjects) {
-				obj->UpdateObject(dt);
+		if (mStartTimer > 0) {
+			if (mStartTimer == 3) {
+				mTempPlayer->UpdateObject(dt);
+			}
+			mStartTimer -= dt;
+			Debug::Print(to_string((int)mStartTimer + 1), Vector2(50, 50), Vector4(1, 1, 1, 1), 40.0f);
+			if (mStartTimer <= 0) {
+				mNavMeshThread.join();
 			}
 		}
-		if (mTempPlayer)
-			Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+		else {
+			if ((mUpdatableObjects.size() > 0)) {
+				for (GameObject* obj : mUpdatableObjects) {
+					obj->UpdateObject(dt);
+				}
+			}
+			if (mTempPlayer)
+				Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 
-		Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
-		mTimer -= dt;
+			Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+			mTimer -= dt;
+		}
 	}
 	else
 		mGameState = MenuState;
@@ -376,7 +405,9 @@ void LevelManager::FixedUpdate(float dt) {
 }
 
 void LevelManager::InitialiseAssets() {
-	std::ifstream assetsFile("../Assets/UsedAssets.csv");
+	Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
+	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
 	vector<std::string> groupDetails;
@@ -408,14 +439,16 @@ void LevelManager::InitialiseAssets() {
 					});
 			}
 			else if (groupType == "msh") {
-				for (int i = 0; i < groupDetails.size(); i += 3) {
-					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
-				}
+				mRenderer->LoadMeshes(mMeshes, groupDetails);
+				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
+				Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -432,6 +465,8 @@ void LevelManager::InitialiseAssets() {
 	delete[] assetDetails;
 
 	animLoadThread.join();
+	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
@@ -611,6 +646,18 @@ void LevelManager::LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags
 
 void LevelManager::SetGameState(GameStates state) {
 	mGameState = state;
+}
+
+void LevelManager::SetPlayersForGuards() const {
+	//TODO(erendgrmnc): Refactor it
+	for (GuardObject* guard : mGuardObjects) {
+		for (int i = 0; i < serverPlayersPtr->size(); i++) {
+			if (serverPlayersPtr->at(i) != nullptr){
+				guard->AddPlayer(serverPlayersPtr->at(i));
+			}
+		}
+	}
+
 }
 
 PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
@@ -948,7 +995,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->GetPhysicsObject()->InitSphereInertia(false);
 
 	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
-
+	
+	mPlayerInventoryObservers.push_back(flag);
+	mPlayerBuffsObservers.push_back(flag);
 	mWorld->AddGameObject(flag);
 
 	mUpdatableObjects.push_back(flag);
@@ -1022,6 +1071,9 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
+	mPlayerInventoryObservers.push_back(mTempPlayer);
+	mPlayerBuffsObservers.push_back(mTempPlayer);
+
 	mTempPlayer->SetIsRendered(false);
 	return mTempPlayer;
 }
@@ -1173,7 +1225,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 		AddNetworkObject(*guard);
 	}
 	else {
-		guard->SetPlayer(mTempPlayer);
+		guard->AddPlayer(mTempPlayer);
 	}
 
 	mWorld->AddGameObject(guard);

@@ -41,6 +41,8 @@ namespace NCL {
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
+			void ShowDebugInfo(float dt);
+			void ChangeActiveSusCausesBasedOnState(const GameObjectState &previousState, const GameObjectState& currentState);
 
 			PlayerInventory::item GetEquippedItem();
 

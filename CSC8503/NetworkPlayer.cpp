@@ -19,12 +19,18 @@ namespace {
 	constexpr int MOVE_BACKWARDS_INDEX = 2;
 	constexpr int MOVE_RIGHT_INDEX = 3;
 
+	constexpr float LONG_INTERACT_WINDOW = 0.1f;
+	constexpr float TIME_UNTIL_LONG_INTERACT = 1.5f;
+	constexpr float TIME_UNTIL_PICKPOCKET = 0.75f;
+
+	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 20;
+
 	constexpr bool DEBUG_MODE = true;
 }
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
 	PlayerObject(game->GetLevelManager()->GetGameWorld(), LevelManager::GetLevelManager()->GetInventoryBuffSystem(),
-	LevelManager::GetLevelManager()->GetSuspicionSystem(), LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
+	LevelManager::GetLevelManager()->GetSuspicionSystem(),new UISystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	//this->game = game;
 	mPlayerID = num;
 }
@@ -69,9 +75,9 @@ void NetworkPlayer::UpdateObject(float dt) {
 	if (mPlayerSpeedState != Stunned) {
 		MovePlayer(dt);
 
-		if (game->GetIsServer()) {
+		//if (game->GetIsServer()) 
 			RayCastFromPlayer(mGameWorld, dt);
-		}
+
 		ResetPlayerInput();
 
 		if (mInventoryBuffSystemClassPtr != nullptr)
@@ -96,44 +102,9 @@ void NetworkPlayer::UpdateObject(float dt) {
 	else
 		EnforceMaxSpeeds();
 
-	if (DEBUG_MODE)
+	if (DEBUG_MODE && mIsLocalPlayer)
 	{
-		//It have some problem here
-		mUiTime = mUiTime + dt;
-		mUiTime = std::fmod(mUiTime, 1.0f);
-
-		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
-
-		mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-		float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-		mLastSusValue = mSusValue;
-
-		mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
-		Debug::Print("Sus:" + std::to_string(
-			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0)
-		), Vector2(70, 90));
-		if (mHasSilentSprintBuff)
-			Debug::Print("HasSilentSprint", Vector2(70, 95));
-		switch (mPlayerSpeedState) {
-		case SpedUp:
-			Debug::Print("Sped Up", Vector2(45, 80));
-			break;
-		case SlowedDown:
-			Debug::Print("Slowed Down", Vector2(45, 80));
-			break;
-		case Stunned:
-			Debug::Print("Stunned", Vector2(45, 80));
-			break;
-		}
-		const PlayerInventory::item equippedItem = GetEquippedItem();
-		//Handle Equipped Item Log
-		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-		Debug::Print(itemName, Vector2(10, 80));
-		const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-		Debug::Print(usesLeft, Vector2(10, 85));
-		Debug::Print(to_string(mGameWorld->GetMainCamera().GetYaw()), Vector2(54, 90));
+		PlayerObject::ShowDebugInfo(dt);
 	}
 }
 
@@ -166,7 +137,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mPlayerInputs.isEquippedItemUsed = true;
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::E))
 			mPlayerInputs.isInteractButtonPressed = true;
-		if (Window::GetKeyboard()->KeyDown(KeyCodes::E))
+		if (Window::GetKeyboard()->KeyHeld(KeyCodes::E))
 			mPlayerInputs.isHoldingInteractButton = true;
 
 		if (mPlayerInputs.isInteractButtonPressed || mPlayerInputs.isEquippedItemUsed || mPlayerInputs.isHoldingInteractButton) {
@@ -184,6 +155,23 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
 		}
 
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::N) &&
+			!Window::GetKeyboard()->KeyHeld(KeyCodes::SHIFT) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::M) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::guardsLOS, mPlayerID);
+		}
+
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::N) &&
+			Window::GetKeyboard()->KeyHeld(KeyCodes::SHIFT) &&
+			DEBUG_MODE) {
+			mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
+		}
+
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 
@@ -196,13 +184,18 @@ void NetworkPlayer::MovePlayer(float dt) {
 		game->GetClient()->WriteAndSendClientInputPacket(game->GetClientLastFullID(), mPlayerInputs);
 	}
 	else {
+		const GameObjectState previousObjectState = mObjectState;
+
 		HandleMovement(dt, mPlayerInputs);
+
+		if (previousObjectState != mObjectState)
+			ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
+
 		mIsClientInputReceived = false;
 	}
 }
 
 void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
-
 	Vector3 fwdAxis;
 	Vector3 rightAxis;
 	if (mIsLocalPlayer) {
@@ -226,7 +219,22 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 	if (playerInputs.movementButtons[MOVE_RIGHT_INDEX])
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 
-	ActivateSprint(playerInputs.isSprinting);
+	bool isIdle = true;
+	for (auto buttonState : mPlayerInputs.movementButtons)
+		if (buttonState)
+			isIdle = false;
+
+	if (isIdle) {
+		if (mIsCrouched)
+			mObjectState = IdleCrouch;
+		else
+			mObjectState = Idle;
+	}
+	else {
+		ActivateSprint(playerInputs.isSprinting);
+		if (mIsCrouched)
+			mObjectState = Crouch;
+	}
 	ToggleCrouch(playerInputs.isCrouching);
 
 	StopSliding();
@@ -238,19 +246,30 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 	NCL::CSC8503::InteractType interactType;
 
 	bool isThereAnyInputFromUser = (Window::GetKeyboard()->KeyPressed(KeyCodes::E) && mIsLocalPlayer) || (mPlayerInputs.isInteractButtonPressed && !mIsLocalPlayer);
-	bool isPlayerHoldingInteract = (mIsLocalPlayer && Window::GetKeyboard()->KeyHeld(KeyCodes::E)) || (!mIsLocalPlayer && mPlayerInputs.isHoldingInteractButton);
+	bool isPlayerHoldingInteract = (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) || (!mIsLocalPlayer && mPlayerInputs.isHoldingInteractButton);
 
 	if (isThereAnyInputFromUser) {
-		isRaycastTriggered = true;
+		isRaycastTriggered = true;   
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
 	}
 	else if (isPlayerHoldingInteract) {
-		mInteractHeldDt += dt;
 		//TODO(erendgrmnc): add config or get from entity for long interact duration.
-		if (mInteractHeldDt >= 5.f) {
+		mInteractHeldDt += dt;
+		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
+		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
+			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
+			isRaycastTriggered = true;
+			interactType = NCL::CSC8503::InteractType::PickPocket;
+			if (DEBUG_MODE)
+				Debug::Print("PickPocket window", Vector2(40, 85));
+		}
+		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
+			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::LongUse;
+			if (DEBUG_MODE)
+				Debug::Print("LongUse", Vector2(40, 85));
 		}
 	}
 
@@ -304,6 +323,16 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 					return;
 				}
 
+				if (interactType == PickPocket)
+				{
+					NetworkPlayer* otherPlayerObject = dynamic_cast<NetworkPlayer*>(objectHit);
+					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
+							TransferItemBetweenInventories(otherPlayerObject->GetPlayerID(),
+								otherPlayerObject->GetActiveItemSlot(), this->GetPlayerID());
+					}
+				}
+
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
@@ -311,6 +340,9 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 }
 
 void NetworkPlayer::ControlInventory() {
+	if (!mIsLocalPlayer)
+		return;
+
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1))
 		mActiveItemSlot = 0;
 
@@ -336,10 +368,9 @@ void NetworkPlayer::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
-	if (mIsLocalPlayer) {
-		//Handle Equipped Item Log
-		const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-		Debug::Print(itemName, Vector2(10, 80));
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
 	}
 }
 #endif
