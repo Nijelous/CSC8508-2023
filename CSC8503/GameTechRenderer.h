@@ -36,6 +36,7 @@ namespace NCL {
 			~GameTechRenderer();
 
 			Mesh*		LoadMesh(const std::string& name) override;
+			void		LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details);
 			Texture*	LoadTexture(const std::string& name) override;
 			Texture* LoadDebugTexture(const std::string& name) override;
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;

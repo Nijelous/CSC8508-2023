@@ -164,9 +164,13 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 
 	case PlayerStartTransforms:
 		if (mPlayerCount < MAX_PLAYERS) {
+			Matrix4 xRot = Matrix4::Rotation(keyValuePairs[3]["x"], Vector3(1, 0, 0));
+			Matrix4 yRot = Matrix4::Rotation(keyValuePairs[3]["y"] - 180, Vector3(0, -1, 0));
+			Matrix4 zRot = Matrix4::Rotation(-keyValuePairs[3]["z"], Vector3(0, 0, 1));
+			Vector3 direction = yRot * xRot * zRot * Vector3(0, 0, 90);
 			Transform newTransform = Transform();
 			newTransform.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
-				.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"]-180, keyValuePairs[3]["z"]));
+				.SetOrientation(Quaternion::EulerAnglesToQuaternion(direction.x, direction.y, direction.z));
 			level->mPlayerStartTransforms[mPlayerCount] = newTransform;
 			mPlayerCount++;
 		}
