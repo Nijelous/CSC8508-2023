@@ -39,17 +39,17 @@ LevelManager* LevelManager::instance = nullptr;
 LevelManager::LevelManager() {
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
-		/*for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
 			Room* newRoom = new Room(entry.path().string());
 			mRoomList.push_back(newRoom);
-		}*/
+		}
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
-		/*for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
+		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
 			Level* newLevel = new Level(entry.path().string());
 			mLevelList.push_back(newLevel);
-		}*/
+		}
 		});
 	mWorld = new GameWorld();
 #ifdef USEGL
@@ -263,7 +263,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+		//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 		LoadCCTVs();
 	}
 #ifdef USEGL
@@ -434,7 +434,7 @@ void LevelManager::InitialiseAssets() {
 					});
 			}
 			else if (groupType == "msh") {
-				//mRenderer->LoadMeshes(mMeshes, groupDetails);
+				mRenderer->LoadMeshes(mMeshes, groupDetails);
 				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
 				//mRenderer->Render();
 			}

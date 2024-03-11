@@ -71,6 +71,7 @@ function(Create_PS5_CSC8503_Files)
         "MainMenuScene.cpp"
         "SoundManager.cpp"
         "SoundObject.cpp"
+        "GameStart.cpp"
     )
 
     source_group("Source Files" FILES ${Source_Files})

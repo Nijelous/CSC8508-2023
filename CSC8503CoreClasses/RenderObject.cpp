@@ -5,6 +5,7 @@ using namespace NCL::CSC8503;
 using namespace NCL;
 
 RenderObject::RenderObject(Transform* parentTransform, Mesh* mesh, Texture* albedoTex, Texture* normalTex, Shader* shader, float cullSphereRadius) {
+	mBuffer = nullptr;
 
 	mTransform = parentTransform;
 	mMesh = mesh;

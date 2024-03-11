@@ -95,7 +95,7 @@ void InitialisingLevel::OnAwake() {
 // main menu
 
 PushdownState::PushdownResult MainMenuPushdownState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE) || (SceneManager::GetPS5Controller()->GetNamedButton(("Cross")))) {
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::SPACE) || (SceneManager::GetPS5Controller()->GetNamedButton(("Triangle")))) {
 		*newState = new InitialisingLevel(mGameSceneManager);
 		return PushdownResult::Push;
 	}
