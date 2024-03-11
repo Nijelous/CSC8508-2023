@@ -117,6 +117,8 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
@@ -262,6 +264,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleGlobalSusChange(packet);
 		break;
 	}
+	case BasicNetworkMessages::SyncObjectState:
+	{
+		SyncObjectStatePacket* packet = (SyncObjectStatePacket*)(payload);
+		HandleObjectStatePacket(packet);
+		break;
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -319,6 +327,11 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 
 GameClient* DebugNetworkedGame::GetClient() const {
 	return mThisClient;
+}
+
+void DebugNetworkedGame::SendObjectStatePacket(int networkId, int state) const {
+	NCL::CSC8503::SyncObjectStatePacket packet(networkId, state);
+	mThisServer->SendGlobalPacket(packet);
 }
 
 void DebugNetworkedGame::ClearNetworkGame() {
@@ -445,6 +458,8 @@ void DebugNetworkedGame::InitWorld() {
 	mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
 
 	SpawnPlayers();
+
+	mLevelManager->SetPlayersForGuards();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {
@@ -512,7 +527,7 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	default:
 		break;
 	}
-
+	netPlayer->SetPrisonDoor(mLevelManager->GetPrisonDoor());
 	netPlayer->GetRenderObject()->SetColour(colour);
 	return netPlayer;
 }
@@ -630,5 +645,20 @@ void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationAc
 void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const{
 	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
 	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) const {
+	NetworkObject* objectToChangeState = nullptr;
+	for (NetworkObject* networkObject : mNetworkObjects) {
+		if (networkObject->GetnetworkID() == packet->networkObjId) {
+			objectToChangeState = networkObject;
+			break;
+		}
+	}
+
+	GameObject::GameObjectState state = static_cast<GameObject::GameObjectState>(packet->objectState);
+	if (objectToChangeState != nullptr) {
+		objectToChangeState->GetGameObject().SetObjectState(state);
+	}
 }
 #endif

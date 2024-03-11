@@ -4,14 +4,16 @@
 #include "GameTechRenderer.h"
 #endif
 #ifdef USEPROSPERO
-// include ps5 renderer
+#include "../PS5Starter/GameTechAGCRenderer.h"
 #endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
+#include "RendererBase.h"
 #include "InventoryBuffSystem/InventoryBuffSystem.h"
 #include "InventoryBuffSystem/PlayerInventory.h"
 #include "SuspicionSystem/SuspicionSystem.h"
 #include "SoundManager.h"
+#include <thread>
 
 using namespace NCL::Maths;
 using namespace InventoryBuffSystem;
@@ -80,12 +82,8 @@ namespace NCL {
 
 			PhysicsSystem* GetPhysics() { return mPhysics; }
 
-#ifdef USEGL
-			GameTechRenderer* GetRenderer() { return mRenderer; }
-#endif
-#ifdef USEPROSPERO
-			// get PS5 Renderer
-#endif
+			RendererBase* GetRenderer() { return mRenderer; }
+
 
 			RecastBuilder* GetBuilder() { return mBuilder; }
 
@@ -95,6 +93,7 @@ namespace NCL {
 
 			UISystem* GetUiSystem() { return mUi; };
 			SoundManager* GetSoundManager() { return mSoundManager; };
+			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
@@ -108,7 +107,7 @@ namespace NCL {
 
 			void FixedUpdate(float dt);
 
-			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) const;
+			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position);
 
 			void AddUpdateableGameObject(GameObject& object);
 
@@ -135,6 +134,14 @@ namespace NCL {
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
+
+			void SetPlayersForGuards() const;
+
+			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
+
+			PrisonDoor* GetPrisonDoor() const;
+
+			bool RoundHasStarted() { return mStartTimer <= 0; }
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -149,7 +156,7 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation = 0);
 
-			void LoadGuards(int guardCount);
+			void LoadGuards(int guardCount, bool isInMultiplayer);
 
 			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
 
@@ -184,7 +191,7 @@ namespace NCL {
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
 
-			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName);
+			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer);
 
 			SoundEmitter* AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR);
 
@@ -199,12 +206,15 @@ namespace NCL {
 			GameObject* mBaseCornerWall;
 
 			RecastBuilder* mBuilder;
+
 #ifdef USEGL
 			GameTechRenderer* mRenderer;
 #endif
+
 #ifdef USEPROSPERO
-			// define PS5 renderer
+			GameTechAGCRenderer* mRenderer;
 #endif
+
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
 #ifdef USEGL // remove when converted to PS5 also
@@ -215,68 +225,17 @@ namespace NCL {
 
 			vector<GameObject*> mUpdatableObjects;
 
-			// meshes
-			Mesh* mCubeMesh;
-			Mesh* mFloorCubeMesh;
-			Mesh* mSphereMesh;
-			Mesh* mCapsuleMesh;
-			Mesh* mCharMesh;
-			Mesh* mEnemyMesh;
-			Mesh* mBonusMesh;
-			Mesh* mStraightWallMesh;
-			Mesh* mCornerWallMesh;
-			Mesh* mCCTVMesh;
+			std::unordered_map<std::string, Mesh*> mMeshes;
+			std::unordered_map<std::string, Texture*> mTextures;
+			std::unordered_map<std::string, Shader*> mShaders;
+			std::unordered_map<std::string, MeshMaterial*> mMaterials;
+			std::unordered_map<std::string, MeshAnimation*> mAnimations;
 
-			// textures
-			Texture* mBasicTex;
-			Texture* mKeeperAlbedo;
-			Texture* mKeeperNormal;
-			Texture* mFloorAlbedo;
-			Texture* mFloorNormal;
-			Texture* mWallTex;
-			Texture* mWallNormal;
+			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
-			Texture* mInventorySlotTex;
-			Texture* mCrossTex;
-			Texture* mAlarmTex;
-
-			//powerup Icon
-
-			Texture* mSilentRunTex;
-			Texture* mSpeedUpTex;
-			Texture* mSlowDownTex;
-			Texture* mStunTex;
-
-
-			Texture* mLowSuspicionBarTex;
-			Texture* mMidSuspicionBarTex;
-			Texture* mHighSuspicionBarTex;
-
-			Texture* mSuspicionIndicatorTex;
 
 			FlagGameObject* mMainFlag;
-			//item icon
-			Texture* mFlagIconTex;
-			Texture* mKeyIconTex1;
-			Texture* mKeyIconTex2;
-			Texture* mKeyIconTex3;
-			
-
-
-			// shaders
-			Shader* mBasicShader;
-			Shader* mInstanceShader;
-
-			// animation 
-			Mesh* mGuardMesh;
-			Mesh* mPlayerMesh;
-			Mesh* mRigMesh;
-			MeshMaterial* mRigMaterial;
-			MeshMaterial* mGuardMaterial;
-			MeshMaterial* mPlayerMaterial;
-
-			Shader* mAnimationShader;
 
 #ifdef USEGL
 			vector<GLuint>  mGuardTextures;
@@ -288,22 +247,11 @@ namespace NCL {
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
-			MeshAnimation* mGuardAnimationStand;
-			MeshAnimation* mGuardAnimationSprint;
-			MeshAnimation* mGuardAnimationWalk;
 
-
-			MeshAnimation* mPlayerAnimationStand;
-			MeshAnimation* mPlayerAnimationSprint;
-			MeshAnimation* mPlayerAnimationWalk;
-
-			MeshAnimation* mRigAnimationStand;
-			MeshAnimation* mRigAnimationSprint;
-			MeshAnimation* mRigAnimationWalk;
-			
 			// game objects
 			Helipad* mHelipad;
 			PlayerObject* mTempPlayer;
+			PrisonDoor* mPrisonDoor;
 			std::vector<GuardObject*> mGuardObjects;
 			std::vector<Transform> mCCTVTransformList;
 
@@ -314,10 +262,15 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			int mNetworkIdBuffer;
+			float mStartTimer;
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
+
+			std::thread mNavMeshThread;
+
+			bool mIsLevelInitialised;
 
 			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
 			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;

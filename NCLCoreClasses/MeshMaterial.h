@@ -8,6 +8,8 @@ https://research.ncl.ac.uk/game/
 */
 #pragma once
 
+#include <map>
+
 using std::string;
 using std::vector;
 using std::map;

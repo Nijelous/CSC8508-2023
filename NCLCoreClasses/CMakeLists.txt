@@ -17,6 +17,7 @@ source_group("Asset Handling" FILES ${Asset_Handling})
 
 set(Header_Files
     "Camera.h"
+    "UISystem.h"
 )
 source_group("Header Files" FILES ${Header_Files})
 
@@ -55,6 +56,14 @@ set(Maths
 )
 source_group("Maths" FILES ${Maths})
 
+set(Lights
+    "BaseLight.h" 
+    "DirectionalLight.h"
+    "PointLight.h"
+    "SpotLight.h"
+    )
+    source_group("Lights" FILES ${Lights})
+
 set(Rendering
     "MeshAnimation.cpp"
     "MeshAnimation.h"
@@ -79,6 +88,7 @@ source_group("Rendering" FILES ${Rendering})
 
 set(Source_Files
     "Camera.cpp"
+    "UISystem.cpp"
 )
 source_group("Source Files" FILES ${Source_Files})
 
@@ -115,6 +125,7 @@ set(ALL_FILES
     ${Rendering}
     ${Source_Files}
     ${Windowing_and_Input}
+    ${Lights}
     ${Windowing_and_Input__Win32}
 )
 
