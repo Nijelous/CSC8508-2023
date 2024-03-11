@@ -59,10 +59,10 @@ LevelManager::LevelManager() {
 		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
 			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
 			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
-		for (int i = 0; i < paths.size(); i++) {
-			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
-			mRoomList.push_back(newRoom);
-		}
+	for (int i = 0; i < paths.size(); i++) {
+		Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
+		mRoomList.push_back(newRoom);
+	}
 		});
 	mLevelList = std::vector<Level*>();
 	std::thread loadLevels([this] {
@@ -652,7 +652,7 @@ void LevelManager::SetPlayersForGuards() const {
 	//TODO(erendgrmnc): Refactor it
 	for (GuardObject* guard : mGuardObjects) {
 		for (int i = 0; i < serverPlayersPtr->size(); i++) {
-			if (serverPlayersPtr->at(i) != nullptr){
+			if (serverPlayersPtr->at(i) != nullptr) {
 				guard->AddPlayer(serverPlayersPtr->at(i));
 			}
 		}
@@ -995,7 +995,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	flag->GetPhysicsObject()->InitSphereInertia(false);
 
 	flag->GetRenderObject()->SetColour(Vector4(1.0f, 1.0f, 1.0f, 1));
-	
+
 	mPlayerInventoryObservers.push_back(flag);
 	mPlayerBuffsObservers.push_back(flag);
 	mWorld->AddGameObject(flag);
