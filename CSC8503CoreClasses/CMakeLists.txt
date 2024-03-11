@@ -264,7 +264,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         )
     include_directories("../NCLCoreClasses/")
     include_directories("./")
-    include_directories("../GLRendering/")
+    include_directories("../OpenGLRendering/")
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
 
