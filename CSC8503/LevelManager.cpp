@@ -1247,7 +1247,7 @@ void LevelManager::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo
 	{
 	case soundEmitterUsed:
 		AddSoundEmitterToWorld(mTempPlayer->GetTransform().GetPosition(),
-			mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion());
 		break;
 	default:
 		break;
