@@ -15,6 +15,7 @@
 #include "MeshMaterial.h"
 
 #include "UISystem.h"
+#include "WindowsUI.h"
 
 
 namespace NCL {
@@ -57,8 +58,9 @@ namespace NCL {
 			void FillTextureDataUBO();
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
-			}		
-
+			}
+			std::function<void()>& GetImguiCanvasFunc();
+			void SetImguiCanvasFunc(std::function<void()> func);
 		protected:
 
 			enum BufferBlockNames {
@@ -234,6 +236,9 @@ namespace NCL {
 			Frustum mFrameFrustum;
 
 			UISystem* mUi;
+			//TODO(erendgrmnc): added after integrating Imgui lib. Refactor UISystem into this logic.
+			std::function<void()> mImguiCanvasFuncToRender = nullptr;
+			WindowsUI* mUIHandler;
 		};
 	}
 }
