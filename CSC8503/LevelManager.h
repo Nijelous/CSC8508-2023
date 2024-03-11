@@ -21,7 +21,7 @@ using namespace SuspicionSystem;
 
 namespace NCL {
 	constexpr float PLAYER_MESH_SIZE = 3.0f;
-	constexpr float PLAYER_INVERSE_MASS = 0.5f;
+	constexpr float PLAYER_INVERSE_MASS = 0.5f; 
 	constexpr float TIME_UNTIL_FIXED_UPDATE = 0.25f;
 	constexpr float INIT_TIMER_VALUE = 1000;
 	namespace CSC8503 {
@@ -36,6 +36,8 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
+		class InventoryBuffSystem::PlayerInventoryObserver;
+		class InventoryBuffSystem::PlayerBuffsObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -137,11 +139,11 @@ namespace NCL {
 
 			void SetPlayersForGuards() const;
 
-			bool HasSetNavMesh() { return mHasSetNavMesh; }
-
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
 			PrisonDoor* GetPrisonDoor() const;
+
+			bool RoundHasStarted() { return mStartTimer <= 0; }
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -262,15 +264,18 @@ namespace NCL {
 			// key variables
 			int mActiveLevel;
 			int mNetworkIdBuffer;
+			float mStartTimer;
 			float mTimer;
 			float mDtSinceLastFixedUpdate;
 			GameStates mGameState;
 			std::map<int, NetworkPlayer*>* serverPlayersPtr = nullptr;
-			bool mHasSetNavMesh = false;
-			bool mHasStartedGame = false;
+
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+
+			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
+			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;
 		};
 	}
 }

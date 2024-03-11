@@ -26,6 +26,9 @@ namespace NCL{
         struct ClientPlayerInputPacket;
         struct ClientSyncBuffPacket;
         struct AddPlayerScorePacket;
+        struct ClientSyncLocalActiveSusCausePacket;
+        struct ClientSyncLocalSusChangePacket;
+        struct ClientSyncGlobalSusChangePacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -53,11 +56,14 @@ namespace NCL{
             void ReceivePacket(int type, GamePacket* payload, int source) override;
             void InitInGameMenuManager() override;
 
-            void SendClinentSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
+            void SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
             void SendObjectStatePacket(int networkId, int state) const;
             void ClearNetworkGame();
 
+            void SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const;
+            void SendClientSyncLocalSusChangePacket(int playerNo, int changedValue) const;
+            void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             GameClient* GetClient() const;
             GameServer* GetServer() const;
             NetworkPlayer* GetLocalPlayer() const;
@@ -108,7 +114,10 @@ namespace NCL{
 
             void HandleObjectStatePacket(SyncObjectStatePacket* packet) const;
 
-        	std::vector<std::function<void()>> mOnGameStarts;
+            void HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const;
+            void HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const;
+            void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
+            std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
 
