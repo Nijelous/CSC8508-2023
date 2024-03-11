@@ -670,16 +670,16 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mTextures["SusIndicator"], 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_INDICATOR_SLOT, *mSuspisionIndicatorIcon);
 
-	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mTextures["Cross"],0.0);
+	UISystem::Icon* mCross = mUi->AddIcon(Vector2(48, 50), 3, 5, mTextures["Cross"],0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
 
 	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mTextures["Alarm"], 0.0);
 	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
 
-	UISystem::Icon* mNotice1 = mUi->AddIcon(Vector2(55, 50), 5, 5, mTextures["Notice"], 0.0);
+	UISystem::Icon* mNotice1 = mUi->AddIcon(Vector2(52, 50), 8, 6, mTextures["OpenDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICE1, *mNotice1);
 
-	UISystem::Icon* mNotice2 = mUi->AddIcon(Vector2(45, 50), 5, 5, mTextures["Notice"], 0.0);
+	UISystem::Icon* mNotice2 = mUi->AddIcon(Vector2(39, 50), 8, 6, mTextures["LockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICE2, *mNotice2);
 
 
