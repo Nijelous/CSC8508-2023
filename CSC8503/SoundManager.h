@@ -1,11 +1,8 @@
 #pragma once
 #include "Vector3.h"
-#include "../FMODCoreAPI/includes/fmod.hpp"
-#include "../CSC8503CoreClasses/GameObject.h"
-#include "../CSC8503CoreClasses/GuardObject.h"
-#include "../CSC8503CoreClasses/GameWorld.h"
-#include "../CSC8503CoreClasses/PlayerObject.h"
 #include "SoundObject.h"
+#include "../CSC8503CoreClasses/GameObject.h"
+#include "../CSC8503CoreClasses/GameWorld.h"
 
 namespace NCL{
 	using namespace Maths;

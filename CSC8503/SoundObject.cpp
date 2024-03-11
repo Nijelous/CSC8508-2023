@@ -1,7 +1,6 @@
 #ifdef USEGL
 
 #include "SoundObject.h"
-#include <fmod.hpp>
 
 using namespace NCL::CSC8503;
 using namespace FMOD;
@@ -18,7 +17,7 @@ SoundObject::SoundObject() {
 }
 
 SoundObject::~SoundObject() {
-
+	mChannels.clear();
 }
 
 void SoundObject::AddChannel(Channel* channel) {
