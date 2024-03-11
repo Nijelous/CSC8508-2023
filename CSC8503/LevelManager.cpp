@@ -282,10 +282,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		});
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", prisonDoorPtr);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		LoadGuards((*mLevelList[levelID]).GetGuardCount());
+		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 		LoadCCTVs();
 	}
 #ifdef USEGL
