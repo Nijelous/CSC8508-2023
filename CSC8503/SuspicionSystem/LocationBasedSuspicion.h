@@ -1,10 +1,7 @@
 #pragma once
 #include "SuspicionMetre.h"
-#include <cmath>
 #include <vector>
 #include "../NCLCoreClasses/Vector3.h"
-#include "../NCLCoreClasses/Vector2.h"
-#include <limits>
 
 using namespace NCL::Maths;
 

@@ -1,8 +1,5 @@
 #include "Door.h"
-#include "State.h"
-#include "StateTransition.h"
 #include "../CSC8503/LevelManager.h"
-#include "NetworkObject.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
 

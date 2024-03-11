@@ -1,6 +1,6 @@
 #include "LocationBasedSuspicion.h"
 #include <algorithm>
-#include "NetworkObject.h"
+#include <limits>
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
@@ -228,9 +228,6 @@ void LocationBasedSuspicion::HandleActiveSusCauseNetworking(const activeLocation
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		const auto* localPlayer = game->GetLocalPlayer();
-		localPlayerId = localPlayer->GetPlayerID();
-
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncLocationActiveSusCausePacket(pairedLocation, inCause, toApply);
@@ -242,9 +239,6 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		const auto* localPlayer = game->GetLocalPlayer();
-		localPlayerId = localPlayer->GetPlayerID();
-
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncLocationSusChangePacket(pairedLocation, changedValue);

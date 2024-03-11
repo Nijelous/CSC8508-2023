@@ -1,10 +1,5 @@
 #include "Door.h"
 #include "InteractableDoor.h"
-
-#include "GameServer.h"
-#include "StateMachine.h"
-#include "StateTransition.h"
-#include "State.h"
 #include "NetworkObject.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"

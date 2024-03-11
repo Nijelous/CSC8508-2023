@@ -1,7 +1,4 @@
 #include "PrisonDoor.h"
-#include "StateMachine.h"
-#include "StateTransition.h"
-#include "State.h"
 #include "GameObject.h"
 
 using namespace NCL::CSC8503;

@@ -630,9 +630,8 @@ void DebugNetworkedGame::HandleLocalSusChange(ClientSyncLocalSusChangePacket* pa
 }
 
 void DebugNetworkedGame::HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const{
-    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
-    auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
-    localSusMetre->SyncSusChange(localPlayerID, packet->changedValue);
+    auto* globalSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
+	globalSusMetre->SyncSusChange(packet->changedValue);
 }
 
 void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const{

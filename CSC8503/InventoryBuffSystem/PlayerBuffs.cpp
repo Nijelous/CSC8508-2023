@@ -1,10 +1,6 @@
 #include "PlayerBuffs.h"
-#include "Level.h"
-#include "GameServer.h"
-#include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 
 #include <algorithm>
 
@@ -47,8 +43,6 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		const auto* localPlayer = game->GetLocalPlayer();
-		localPlayerId = localPlayer->GetPlayerID();
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
