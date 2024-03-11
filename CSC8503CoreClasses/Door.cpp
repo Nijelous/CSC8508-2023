@@ -8,7 +8,7 @@ using namespace NCL::CSC8503;
 void Door::Open() {
 	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, 7.25, 0));
 	SetNavMeshFlags(1);
-	this->GetSoundObject()->CloseDoorTriggered();
+	this->GetSoundObject()->TriggerSoundEvent();
 	mTimer = initDoorTimer;
 	mIsOpen = true;
 }
