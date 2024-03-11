@@ -1,7 +1,6 @@
 #ifdef USEGL
 
 #include "SoundObject.h"
-#include <fmod.hpp>
 
 using namespace NCL::CSC8503;
 using namespace FMOD;

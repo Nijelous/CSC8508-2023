@@ -1,5 +1,4 @@
 #include "SoundManager.h"
-#include "Vector3.h"
 
 using namespace NCL::CSC8503;
 using namespace NCL::Maths;
@@ -217,34 +216,29 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 
 	switch (state) {
 	case GameObject::GameObjectState::Idle:
-		if (channel) {
-			channel->setPaused(true);
-		}
+		channel->setPaused(true);
 		break;
+
 	case GameObject::GameObjectState::Walk:
-		if (channel) {
-			channel->set3DAttributes(&pos, nullptr);
-			channel->setFrequency(24000);
-			channel->setPaused(false);
-		}
+		channel->set3DAttributes(&pos, nullptr);
+		channel->setFrequency(24000);
+		channel->setPaused(false);
 		break;
+
 	case GameObject::GameObjectState::Sprint:
-		if (channel) {
-			channel->set3DAttributes(&pos, nullptr);
-			channel->setFrequency(48000);
-			channel->setPaused(false);
-		}
+		channel->set3DAttributes(&pos, nullptr);
+		channel->setFrequency(48000);
+		channel->setPaused(false);
 		break;
+
 	case GameObject::GameObjectState::IdleCrouch:
-		if (channel) {
-			channel->setPaused(true);
-		}
+		channel->setPaused(true);
 		break;
+
 	case GameObject::GameObjectState::Crouch:
-		if (channel) {
-			channel->setPaused(true);
-		}
+		channel->setPaused(true);
 		break;
+
 	case GameObject::GameObjectState::Happy:
 		break;
 	}
