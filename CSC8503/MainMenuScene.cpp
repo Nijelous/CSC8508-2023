@@ -1,21 +1,67 @@
 ﻿#include "MainMenuScene.h"
 
+#include <imgui/imgui.h>
+
 #include "Debug.h"
+#include "Keyboard.h"
+#include "Window.h"
+#include "imgui/imgui_internal.h"
 
 using namespace NCL::CSC8503;
 
 MainMenuScene::MainMenuScene() : Scene() {
-    Scene::InitCamera();
+	mCurrentOpenPanel = LevelSelection;
+	ImGuiIO& imguiIO = ImGui::GetIO();
+	mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	InitPanelDrawFuncMap();
+	Scene::InitCamera();
+
 }
 
 MainMenuScene::~MainMenuScene() {
 }
 
 void MainMenuScene::UpdateGame(float dt) {
+	Scene::UpdateGame(dt);
+}
 
-    Debug::Print("1-) Start Single Player", Vector2(30, 70));
-    Debug::Print("2-) Start Multi Player (Server)", Vector2(30, 75));
-    Debug::Print("3-) Start Multi Player (Client)", Vector2(30, 80));
+void MainMenuScene::DrawCanvas() {
 
-    Scene::UpdateGame(dt);
+	mPanelDrawFuncMap[mCurrentOpenPanel]();
+}
+
+void MainMenuScene::InitPanelDrawFuncMap() {
+	mPanelDrawFuncMap = {
+		{ MainMenuPanels::LevelSelection, [this]() { DrawLevelSelectionPanel(); }}
+	};
+}
+
+void MainMenuScene::DrawLevelSelectionPanel() {
+	ImVec2 windowSize = ImGui::GetWindowSize();
+
+
+	ImGui::PushFont(mButtonFont);
+
+	ImGui::PushFont(mHeaderFont);
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .2f, windowSize.y * .1f));
+	ImGui::TextColored(ImVec4(1, 0, 0, 1), "Let's name our game!");
+	ImGui::PopFont();
+
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .4f, windowSize.y * .5f));
+	if (ImGui::Button("Single-player", ImVec2(windowSize.x * .3f, windowSize.y * .1f))) {
+		// Open single player scene.
+	}
+
+
+
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .4f, windowSize.y * .65f));
+	if (ImGui::Button("Multi-player", ImVec2(windowSize.x * .3f, windowSize.y * .1f))) {
+		// Open single player scene.
+	}
+	ImGui::PopFont();
+}
+
+void MainMenuScene::DrawMultiplayerLobby() {
+
 }
