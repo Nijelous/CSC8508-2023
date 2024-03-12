@@ -93,6 +93,11 @@ LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
+
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
@@ -933,7 +938,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	}
 
 	mWorld->AddGameObject(newDoor);
-
+	mGlobalSuspicionObserver.push_back(newDoor);
 	return newDoor;
 }
 
@@ -968,6 +973,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
+	mGlobalSuspicionObserver.push_back(newDoor);
 
 	return newDoor;
 }

@@ -22,7 +22,7 @@ namespace NCL {
 				if (!CanBeInteractedWith(interactType))
 					return; 
 			};
-			virtual bool CanBeInteractedWith(InteractType interactType) { return mInteractable; } ;
+			virtual bool CanBeInteractedWith(InteractType interactType, GameObject* interactingObject = nullptr) { return mInteractable; } ;
 
 			//virtual InventoryBuffSystem::PlayerInventory::item* GetRelatedItem() { return &mRelatedItem; };
 		protected:
