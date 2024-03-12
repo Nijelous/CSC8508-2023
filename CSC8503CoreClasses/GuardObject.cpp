@@ -91,6 +91,7 @@ void GuardObject::RaycastToPlayer() {
 	else {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
+		//mPlayer = nullptr;
 	}
 }
 
@@ -128,7 +129,6 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 PlayerObject* GuardObject::GetPlayerToChase() {
 	float minDist = INT_MAX;
 	PlayerObject* playerToChase = nullptr;
-	const Vector3& guardPos = GetTransform().GetPosition();
 
 	for (PlayerObject* player : mPlayerList) {
 		Vector3 dir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
@@ -434,7 +434,7 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 			if (mCanSeePlayer == true) {
 				return Failure;
 			}
-			else if (dist < MIN_DIST_TO_NEXT_POS && GuardForwardVector() == direction.Normalised()) {
+			else if (dist < MIN_DIST_TO_NEXT_POS) {
 				if (mCanSeePlayer == false) {
 					return Success;
 				}
