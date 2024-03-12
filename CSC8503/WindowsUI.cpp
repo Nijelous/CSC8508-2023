@@ -16,13 +16,15 @@ WindowsUI::WindowsUI() {
 	ImGui::StyleColorsDark();
 
 	// Setup Platform/Renderer backends
-	HWND windowHandle = NCL::Win32Code::Win32Window::windowHandle;
+	const HWND windowHandle = NCL::Win32Code::Win32Window::windowHandle;
 	ImGui_ImplWin32_InitForOpenGL(windowHandle);
 	ImGui_ImplOpenGL3_Init();
 }
 
 WindowsUI::~WindowsUI() {
-
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 
