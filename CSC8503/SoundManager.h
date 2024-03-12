@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector3.h"
-#include "SoundObject.h"
+#include "../CSC8503CoreClasses/SoundObject.h"
 #include "../CSC8503CoreClasses/GameObject.h"
 #include "../CSC8503CoreClasses/GameWorld.h"
 
@@ -22,6 +22,8 @@ namespace NCL{
 
 			void PlayPickUpSound(Vector3 soundPos);
 
+			void PlayLockDoorSound(Vector3 soundPos);
+
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
@@ -33,13 +35,14 @@ namespace NCL{
 			FMOD_VECTOR GetUpVector(Vector3 forward, Vector3 right);
 
 		protected:
-			GameWorld* mGameWorld;
+			GameWorld* mGameWorld = nullptr;
 			FMOD::System* mSystem = nullptr;
 			FMOD::Sound* mFootStepSound = nullptr;
 			FMOD::Sound* mDoorOpenSound = nullptr;
 			FMOD::Sound* mDoorCloseSound = nullptr;
 			FMOD::Sound* mSoundEmitterSound = nullptr;
 			FMOD::Sound* mPickUpSound = nullptr;
+			FMOD::Sound* mLockDoorSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

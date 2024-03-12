@@ -50,6 +50,12 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mResult = mSystem->createSound("../Assets/Sounds/door-lock-82542.mp3", FMOD_3D, 0, &mLockDoorSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Lock Door Sound Error !!" << std::endl;
+		return;
+	}
+
 	mResult = mFootStepSound->set3DMinMaxDistance(15.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
@@ -77,6 +83,12 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 	mResult = mPickUpSound->set3DMinMaxDistance(20.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Pick Up Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mLockDoorSound->set3DMinMaxDistance(15.0f, 80.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Lock Door Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 }
@@ -173,6 +185,22 @@ void SoundManager::PlayPickUpSound(Vector3 soundPos) {
 	pickUpChannel->setPaused(false);
 }
 
+void SoundManager::PlayLockDoorSound(Vector3 soundPos) {
+	FMOD::Channel* lockDoorChannel;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mLockDoorSound, 0, true, &lockDoorChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = lockDoorChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	lockDoorChannel->setPaused(false);
+}
+
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
@@ -197,6 +225,11 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			if (isClose) {
 				PlayDoorCloseSound(soundPos);
 				obj->GetSoundObject()->CloseDoorFinished();
+			}
+			bool isLocked = obj->GetSoundObject()->GetIsLocked();
+			if (isLocked) {
+				PlayLockDoorSound(soundPos);
+				obj->GetSoundObject()->LockDoorFinished();
 			}
 		}
 		else if ((obj->GetName() == "PickupGameObject") || (obj->GetName() == "Flag")) {

@@ -9,11 +9,13 @@ SoundObject::SoundObject(Channel* channel) {
 	mChannel = channel;
 	mIsTriggered = false;
 	mIsClosed = false;
+	mIsLocked = false;
 	mChannels.emplace_back(channel);
 }
 SoundObject::SoundObject() {
 	mIsTriggered = false;
 	mIsClosed = false;
+	mIsLocked = false;
 }
 
 SoundObject::~SoundObject() {
@@ -40,13 +42,20 @@ void SoundObject::CloseDoorTriggered() {
 	mIsClosed = true;
 }
 
+void SoundObject::LockDoorTriggered() {
+	mIsLocked = true;
+}
+
 void SoundObject::SetNotTriggered() {
 	mIsTriggered = false;
-
 }
 
 void SoundObject::CloseDoorFinished() {
 	mIsClosed = false;
+}
+
+void SoundObject::LockDoorFinished() {
+	mIsLocked = false;
 }
 
 bool SoundObject::GetisTiggered(){
@@ -55,5 +64,9 @@ bool SoundObject::GetisTiggered(){
 
 bool SoundObject::GetIsClosed() {
 	return mIsClosed;
+}
+
+bool SoundObject::GetIsLocked() {
+	return mIsLocked;
 }
 #endif
