@@ -32,6 +32,8 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+
+            bool mHostedSuccessfully;
         };
 
         class ClientState : public PushdownState {
@@ -41,6 +43,9 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+
+            bool mIsClientConnected;
+            int ipToConnect[4];
         };
 
         class MultiplayerLobbyState : public PushdownState {
