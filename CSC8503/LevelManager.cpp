@@ -284,7 +284,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
-		LoadCCTVs();
+		LoadCCTVs(isMultiplayer);
 	}
 #ifdef USEGL
 	else {
@@ -300,12 +300,11 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
 			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
+
+		LoadCCTVs(isMultiplayer);
 	}
 
 	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
-	LoadCCTVs();
-
-
 #endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -607,12 +606,12 @@ void LevelManager::LoadCCTVList(const std::vector<Transform>& transforms, const 
 	}
 }
 
-void LevelManager::LoadCCTVs() {
+void LevelManager::LoadCCTVs(const bool isMultiplayerLevel) {
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::shuffle(mCCTVTransformList.begin(), mCCTVTransformList.end(), g);
 	for (int i = 0; i < (*mLevelList[mActiveLevel]).GetCCTVCount(); i++) {
-		AddCCTVToWorld(mCCTVTransformList[i]);
+		AddCCTVToWorld(mCCTVTransformList[i], isMultiplayerLevel);
 	}
 }
 
@@ -830,8 +829,8 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	return floor;
 }
 
-CCTV* LevelManager::AddCCTVToWorld(const Transform& transform) {
-	CCTV* camera = new CCTV();
+CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel) {
+	CCTV* camera = new CCTV(transform.GetPosition() + Vector3(0,-7.5,20), 20);
 
 	Vector3 wallSize = Vector3(1, 1, 1);
 	camera->GetTransform()
@@ -848,6 +847,16 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform) {
 
 	camera->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
+	camera->GenerateViewPyramid();
+	if (!isMultiplayerLevel)
+	{
+		camera->SetPlayerObjectPtr(mTempPlayer);
+	}
+	else
+	{
+		camera->SetServerPlayersPtr(serverPlayersPtr);
+	}
+	mUpdatableObjects.push_back(camera);
 	mWorld->AddGameObject(camera);
 
 	return camera;

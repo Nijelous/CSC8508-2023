@@ -166,7 +166,7 @@ namespace NCL {
 
 			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
 
-			void LoadCCTVs();
+			void LoadCCTVs(const bool isMultiplayerLevel = false);
 
 			void LoadDoorsInNavGrid();
 
@@ -177,7 +177,7 @@ namespace NCL {
 			GameObject* AddWallToWorld(const Transform& transform);
 			GameObject* AddCornerWallToWorld(const Transform& transform);
 			GameObject* AddFloorToWorld(const Transform& transform);
-			CCTV* AddCCTVToWorld(const Transform& transform);
+			CCTV* AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel = false);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
 			InteractableDoor* AddDoorToWorld(const Transform& transform, const Vector3& offset, bool isMultiplayerLevel = false);
