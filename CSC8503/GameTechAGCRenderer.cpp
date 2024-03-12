@@ -617,3 +617,10 @@ void GameTechAGCRenderer::UpdateObjectList() {
 	bufSpec.initAsRegularBuffer(dataPos, sizeof(ObjectState), at);
 	sce::Agc::Core::initialize(&currentFrame->objectBuffer, &bufSpec);
 }
+
+void GameTechAGCRenderer::FillLightUBO() {
+	//get all the lights from level
+	//iterate through them and fill in the data into the LightData struct in the psslh
+	//I *think* bytes written in the BumpAllocator struct handles subsequent writes not overwriting??
+	//init and initialize as a regular buffer, and never reset it :)	
+}

@@ -24,7 +24,6 @@ namespace NCL {
 		class RenderObject;
 
 		constexpr short MAX_INSTANCE_MESHES = 3;
-		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer {
@@ -229,8 +228,6 @@ namespace NCL {
 			GLuint iconVAO;
 			GLuint iconVertVBO;
 			GLuint iconTexVBO;
-
-			vector<Light*> mLights;
 
 			Frustum mFrameFrustum;
 

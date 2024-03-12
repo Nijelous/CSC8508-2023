@@ -18,6 +18,9 @@ https://research.ncl.ac.uk/game/
 #include "MeshMaterial.h"
 
 namespace NCL::Rendering {
+
+	constexpr short MAX_POSSIBLE_LIGHTS = 256;
+
 	enum RendererType {
 		OGL,
 		AGC
@@ -61,13 +64,24 @@ namespace NCL::Rendering {
 		virtual MeshAnimation* LoadAnimation(const std::string& name) { return nullptr; }
 		virtual MeshMaterial* LoadMaterial(const std::string& name) { return nullptr; }
 
-		virtual void AddLight(Light* light) {}
-		virtual void ClearLights() {}
 		virtual void ClearInstanceObjects() {}
 		virtual void FillLightUBO() {}
 		virtual void FillTextureDataUBO() {}
 
 		virtual void SetUIObject(CSC8503::UISystem* uiSystem) {}
+
+		void AddLight(Light* lightPtr) {
+			if (mLights.size() >= MAX_POSSIBLE_LIGHTS) return;
+			mLights.push_back(lightPtr);
+
+		}
+
+		void ClearLights() {
+			for (int i = 0; i < mLights.size(); i++) {
+				delete(mLights[i]);
+			}
+			mLights.clear();
+		}
 
 	protected:
 		virtual void OnWindowResize(int w, int h) = 0;
@@ -83,5 +97,7 @@ namespace NCL::Rendering {
 		Window& hostWindow;
 
 		Vector2i windowSize;
+
+		vector<Light*> mLights;
 	};
 }
