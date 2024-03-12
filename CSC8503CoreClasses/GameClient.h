@@ -30,7 +30,11 @@ namespace NCL {
 			void WriteAndSendClientUseItemPacket(int playerID, int objectID);
 
 			void Disconnect();
+
+			bool GetIsConnected() const;
 		protected:
+			bool mIsConnected;
+
 			int mPeerId;
 			
 			_ENetPeer*	mNetPeer;

@@ -12,6 +12,7 @@ GameClient::GameClient()	{
 	netHandle = enet_host_create(nullptr, 1, 1, 0, 0);
 	mTimerSinceLastPacket = 0.0f;
 	mPeerId = -1;
+	mIsConnected = false;
 }
 
 GameClient::~GameClient()	{
@@ -46,6 +47,7 @@ bool GameClient::UpdateClient() {
 		if (event.type == ENET_EVENT_TYPE_CONNECT) {
 			//erendgrmnc: I remember +1 is needed because when counting server as a player, outgoing peer Id is not increasing.
 			mPeerId = mNetPeer->outgoingPeerID + 1;
+			mIsConnected = true;
 			std::cout << "Connected to server!" << std::endl;
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
@@ -98,5 +100,10 @@ void GameClient::Disconnect() {
 		// Reset the peer to nullptr after disconnecting
 		mNetPeer = nullptr;
 	}
+	mIsConnected = false;
+}
+
+bool GameClient::GetIsConnected() const {
+	return mIsConnected;
 }
 #endif#
