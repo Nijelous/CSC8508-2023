@@ -46,6 +46,33 @@
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Default.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_BodyHands_Guard_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_BodyHands_Guard_Metallic.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_BodyHands_Guard_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Hair_Sweptback_Albedo 1.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Hair_Sweptback_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Hair_Sweptback_Normal 1.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Hair_Sweptback_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Head_White01_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\FB_Head_White01_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\GoatBeige.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
@@ -70,7 +97,28 @@
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\LightOff.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MA_Hands_White_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MB_BodyNone_Guard_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MB_BodyNone_Guard_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MB_Head_White01_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MB_Head_White01_Normal.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\MakingNoise.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Maximilian_BodyHands_Albedo.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\Maximilian_Head_Albedo.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\PressStart2P.png.gnf.rule">
@@ -110,6 +158,12 @@
       <Filter>CMake Rules</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\checkerboard.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\corridor_wall_c.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\corridor_wall_n.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\doge.png.gnf.rule">
@@ -158,6 +212,12 @@
       <Filter>CMake Rules</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\stunItem.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\wall_C.png.gnf.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\b05ace25e39e0a2b7fb590ec89f42bf2\wall_N.png.gnf.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
     <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\CMakeFiles\3e484dd802f4a5b3c25d178f8f14af0a\Textures.rule">

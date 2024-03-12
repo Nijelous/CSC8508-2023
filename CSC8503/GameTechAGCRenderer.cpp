@@ -156,7 +156,7 @@ NCL::PS5::AGCTexture* GameTechAGCRenderer::CreateFrameBufferTextureSlot(const st
 Texture* GameTechAGCRenderer::LoadTexture(const std::string& name) {
 	auto found = textureMap.find(name);
 	if (found != textureMap.end()) {
-		return (Texture*)found->second;
+		return found->second;
 	}
 	AGCTexture* t = new AGCTexture(name, allocator);
 
@@ -165,7 +165,7 @@ Texture* GameTechAGCRenderer::LoadTexture(const std::string& name) {
 
 	bindlessTextures[t->GetAssetID()] = *t->GetAGCPointer();
 
-	return (Texture*)t;
+	return t;
 }
 
 Shader* GameTechAGCRenderer::LoadShader(const std::string& vertex, const std::string& fragment) {
@@ -570,7 +570,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 					state.index[0] = 0; //Default Texture
 					state.index[1] = 0; //Skinning buffer
 
-					Texture*t = g->GetAlbedoTexture();
+					Texture* t = g->GetAlbedoTexture();
 					if (t) {			
 						state.index[0] = t->GetAssetID();
 					}

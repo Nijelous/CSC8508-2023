@@ -71,6 +71,33 @@
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Default.png">
       <Filter>Texture Files</Filter>
     </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_BodyHands_Guard_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_BodyHands_Guard_Metallic.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_BodyHands_Guard_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Hair_Sweptback_Albedo 1.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Hair_Sweptback_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Hair_Sweptback_Normal 1.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Hair_Sweptback_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Head_White01_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\FB_Head_White01_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\GoatBeige.png">
       <Filter>Texture Files</Filter>
     </Image>
@@ -95,7 +122,28 @@
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\LightOff.png">
       <Filter>Texture Files</Filter>
     </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MA_Hands_White_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MB_BodyNone_Guard_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MB_BodyNone_Guard_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MB_Head_White01_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MB_Head_White01_Normal.png">
+      <Filter>Texture Files</Filter>
+    </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\MakingNoise.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Maximilian_BodyHands_Albedo.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\Maximilian_Head_Albedo.png">
       <Filter>Texture Files</Filter>
     </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\PressStart2P.png">
@@ -132,6 +180,12 @@
       <Filter>Texture Files</Filter>
     </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\checkerboard.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\corridor_wall_c.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\corridor_wall_n.png">
       <Filter>Texture Files</Filter>
     </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\doge.png">
@@ -180,6 +234,12 @@
       <Filter>Texture Files</Filter>
     </Image>
     <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\stunItem.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\wall_C.png">
+      <Filter>Texture Files</Filter>
+    </Image>
+    <Image Include="C:\Users\a8038295\source\repos\CSC8508-2023\Assets\Textures\wall_N.png">
       <Filter>Texture Files</Filter>
     </Image>
   </ItemGroup>
