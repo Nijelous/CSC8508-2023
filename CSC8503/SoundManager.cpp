@@ -104,7 +104,7 @@ SoundManager::~SoundManager() {
 }
 
 FMOD::Channel* SoundManager::AddWalkSound() {
-	FMOD::Channel* footStepChannel;
+	FMOD::Channel* footStepChannel = nullptr;
 	mResult = mSystem->playSound(mFootStepSound, 0, true, &footStepChannel);
 	if (mResult != FMOD_OK) {
 		std::cout << "Play Footstep sound error" << std::endl;
@@ -119,7 +119,7 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 }
 
 FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
-	FMOD::Channel* soundEmitterChannel;
+	FMOD::Channel* soundEmitterChannel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mSoundEmitterSound, 0, true, &soundEmitterChannel);
 	if (mResult != FMOD_OK) {
@@ -137,7 +137,7 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 }
 
 void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
-	FMOD::Channel* doorOpenChannel;
+	FMOD::Channel* doorOpenChannel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mDoorOpenSound, 0, true, &doorOpenChannel);
 	if (mResult != FMOD_OK) {
@@ -153,7 +153,7 @@ void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
 }
 
 void SoundManager::PlayDoorCloseSound(Vector3 soundPos) {
-	FMOD::Channel* doorCloseChannel;
+	FMOD::Channel* doorCloseChannel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mDoorCloseSound, 0, true, &doorCloseChannel);
 	if (mResult != FMOD_OK) {
@@ -169,7 +169,7 @@ void SoundManager::PlayDoorCloseSound(Vector3 soundPos) {
 }
 
 void SoundManager::PlayPickUpSound(Vector3 soundPos) {
-	FMOD::Channel* pickUpChannel;
+	FMOD::Channel* pickUpChannel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mPickUpSound, 0, true, &pickUpChannel);
 	if (mResult != FMOD_OK) {
@@ -186,7 +186,7 @@ void SoundManager::PlayPickUpSound(Vector3 soundPos) {
 }
 
 void SoundManager::PlayLockDoorSound(Vector3 soundPos) {
-	FMOD::Channel* lockDoorChannel;
+	FMOD::Channel* lockDoorChannel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mLockDoorSound, 0, true, &lockDoorChannel);
 	if (mResult != FMOD_OK) {
