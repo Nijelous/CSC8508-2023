@@ -29,6 +29,7 @@ namespace NCL {
 
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
+            Scene* GetScene(Scenes sceneType);
             Scenes GetCurrentSceneType() const;
             static SceneManager* GetSceneManager();
         protected:

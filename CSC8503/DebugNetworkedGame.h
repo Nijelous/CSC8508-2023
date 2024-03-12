@@ -39,8 +39,8 @@ namespace NCL{
 
             const int GetClientLastFullID() const;
 
-            void StartAsServer();
-            void StartAsClient(char a, char b, char c, char d);
+            bool StartAsServer();
+            bool StartAsClient(char a, char b, char c, char d);
 
             void UpdateGame(float dt) override;
 

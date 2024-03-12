@@ -92,6 +92,10 @@ Scene* SceneManager::GetCurrentScene() {
 	return currentScene;
 }
 
+Scene* SceneManager::GetScene(Scenes sceneType) {
+	return gameScenesMap[sceneType];
+}
+
 Scenes SceneManager::GetCurrentSceneType() const {
 	return mCurrentSceneType;
 }

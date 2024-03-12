@@ -87,32 +87,38 @@ const bool DebugNetworkedGame::GetIsGameStarted() const {
 	return mIsGameStarted;
 }
 
-void DebugNetworkedGame::StartAsServer() {
+bool DebugNetworkedGame::StartAsServer() {
 	mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
 	mIsServer = true;
 
 	mThisServer->RegisterPacketHandler(Received_State, this);
 	mThisServer->RegisterPacketHandler(String_Message, this);
 	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
+	return mThisServer;
 }
 
-void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
+bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient = new GameClient();
-	bool isConnected = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
+	const bool isConnected = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
-	mThisClient->RegisterPacketHandler(Delta_State, this);
-	mThisClient->RegisterPacketHandler(Full_State, this);
-	mThisClient->RegisterPacketHandler(Player_Connected, this);
-	mThisClient->RegisterPacketHandler(Player_Disconnected, this);
-	mThisClient->RegisterPacketHandler(String_Message, this);
-	mThisClient->RegisterPacketHandler(GameStartState, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
+	if (isConnected) {
+		mIsServer = false;
+		mThisClient->RegisterPacketHandler(Delta_State, this);
+		mThisClient->RegisterPacketHandler(Full_State, this);
+		mThisClient->RegisterPacketHandler(Player_Connected, this);
+		mThisClient->RegisterPacketHandler(Player_Disconnected, this);
+		mThisClient->RegisterPacketHandler(String_Message, this);
+		mThisClient->RegisterPacketHandler(GameStartState, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
+	}
+
+	return isConnected;
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
