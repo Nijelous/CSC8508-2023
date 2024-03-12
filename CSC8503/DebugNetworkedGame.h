@@ -29,6 +29,8 @@ namespace NCL{
         struct ClientSyncLocalActiveSusCausePacket;
         struct ClientSyncLocalSusChangePacket;
         struct ClientSyncGlobalSusChangePacket;
+        struct ClientSyncLocationActiveSusCausePacket;
+        struct ClientSyncLocationSusChangePacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -56,14 +58,17 @@ namespace NCL{
             void ReceivePacket(int type, GamePacket* payload, int source) override;
             void InitInGameMenuManager() override;
 
+            void SendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) const;
             void SendClientSyncItemSlotPacket(int playerNo, int invSlot, int inItem, int usageCount) const;
             void SendClientSyncBuffPacket(int playerNo, int buffType, bool toApply) const;
             void SendObjectStatePacket(int networkId, int state) const;
             void ClearNetworkGame();
 
-            void SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const;
+            void SendClientSyncLocalActiveSusCausePacket(int playerNo, int activeSusCause, bool toApply) const;
             void SendClientSyncLocalSusChangePacket(int playerNo, int changedValue) const;
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
+            void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
+            void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
             GameClient* GetClient() const;
             GameServer* GetServer() const;
             NetworkPlayer* GetLocalPlayer() const;
@@ -117,6 +122,8 @@ namespace NCL{
             void HandleLocalActiveSusCauseChange(ClientSyncLocalActiveSusCausePacket* packet) const;
             void HandleLocalSusChange(ClientSyncLocalSusChangePacket* packet) const;
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
+            void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
+            void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;

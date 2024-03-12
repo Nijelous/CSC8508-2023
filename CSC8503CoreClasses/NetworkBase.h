@@ -26,6 +26,8 @@ enum BasicNetworkMessages {
 	ClientSyncBuffs,
 	ClientSyncLocalActiveCause,
 	ClientSyncLocalSusChange,
+	ClientSyncLocationActiveCause,
+	ClientSyncLocationSusChange,
 	SyncInteractable,
 	ClientSyncGlobalSusChange,
 	SyncObjectState

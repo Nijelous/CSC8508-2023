@@ -114,6 +114,8 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalActiveCause, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalSusChange, this);
     mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
@@ -291,8 +293,13 @@ void DebugNetworkedGame::SendClientSyncBuffPacket(int playerNo, int buffType, bo
 	mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::SendClientSyncLocalActiveSusCausePacket(int playerNo, int buffType, bool toApply) const {
-    LocalSuspicionMetre::activeLocalSusCause activeCause = (LocalSuspicionMetre::activeLocalSusCause)(buffType);
+void DebugNetworkedGame::SendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) const {
+	SyncInteractablePacket packet(networkObjectId, isOpen, interactableItemType);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncLocalActiveSusCausePacket(int playerNo, int activeSusCause, bool toApply) const {
+    LocalSuspicionMetre::activeLocalSusCause activeCause = (LocalSuspicionMetre::activeLocalSusCause)(activeSusCause);
     NCL::CSC8503::ClientSyncLocalActiveSusCausePacket packet(playerNo, activeCause, toApply);
     mThisServer->SendGlobalPacket(packet);
 }
@@ -305,6 +312,17 @@ void DebugNetworkedGame::SendClientSyncLocalSusChangePacket(int playerNo, int ch
 void DebugNetworkedGame::SendClientSyncGlobalSusChangePacket(int changedValue) const{
     NCL::CSC8503::ClientSyncGlobalSusChangePacket packet(changedValue);
     mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const{
+	LocationBasedSuspicion::activeLocationSusCause activeCause = (LocationBasedSuspicion::activeLocationSusCause)(activeSusCause);
+	NCL::CSC8503::ClientSyncLocationActiveSusCausePacket packet(cantorPairedLocation, activeCause, toApply);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const{
+	NCL::CSC8503::ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
+	mThisServer->SendGlobalPacket(packet);
 }
 
 GameClient* DebugNetworkedGame::GetClient() const {
@@ -582,7 +600,7 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 	switch (interactableItemType) {
 	case InteractableItems::InteractableDoors: {
 		InteractableDoor* doorObj = reinterpret_cast<InteractableDoor*>(interactedObj);
-		doorObj->SetIsOpen(packet->isOpen, false);
+		doorObj->SyncDoor(packet->isOpen);
 		break;
 	}
 	case InteractableItems::InteractableVents:
@@ -612,9 +630,20 @@ void DebugNetworkedGame::HandleLocalSusChange(ClientSyncLocalSusChangePacket* pa
 }
 
 void DebugNetworkedGame::HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const{
-    const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
-    auto* localSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
-    localSusMetre->SyncSusChange(localPlayerID, packet->changedValue);
+    auto* globalSusMetre = mLevelManager->GetSuspicionSystem()->GetGlobalSuspicionMetre();
+	globalSusMetre->SyncSusChange(packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const{
+	const int localPlayerID = static_cast<NetworkPlayer*>(mLocalPlayer)->GetPlayerID();
+	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
+	const LocationBasedSuspicion::activeLocationSusCause activeCause = static_cast<LocationBasedSuspicion::activeLocationSusCause>(packet->activeLocationSusCauseID);
+	locationSusMetre->SyncActiveSusCauses( activeCause, packet->cantorPairedLocation, packet->toApply);
+}
+
+void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const{
+	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
+	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
 }
 
 void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) const {
