@@ -2,7 +2,6 @@
 #include <functional>
 #include <random>
 #include <map>
-#include "Level.h"
 #include "PlayerInventory.h"
 
 using namespace NCL::CSC8503;

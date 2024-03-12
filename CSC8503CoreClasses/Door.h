@@ -1,6 +1,5 @@
 #pragma once
 #include "GameObject.h"
-#include "StateMachine.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -9,19 +8,17 @@ namespace NCL {
 		public:
 			Door(){
 				mName = "Door";
-				InitStateMachine();
 			}	
 
 			virtual void Open();
 			virtual void Close();
-			virtual void InitStateMachine();
 			virtual void CountDownTimer(float dt);
-			void SetIsOpen(bool isOpen);
+			virtual void UpdateObject(float dt) override;
+			virtual void SetIsOpen(bool isOpen);
 		protected:
 			void SetNavMeshFlags(int flag);
 
 			const float initDoorTimer = 10.0f;
-			StateMachine* mStateMachine;
 			float mTimer;
 			bool mIsOpen;
 		};

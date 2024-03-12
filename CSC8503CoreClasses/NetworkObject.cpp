@@ -84,6 +84,47 @@ ClientSyncBuffPacket::ClientSyncBuffPacket(int playerID, int buffID, bool toAppl
 	this->toApply = toApply;
 }
 
+ClientSyncLocalActiveSusCausePacket::ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncLocalActiveCause;
+	size = sizeof(ClientSyncLocalActiveSusCausePacket);
+
+	this->playerID = playerID;
+	this->activeLocalSusCauseID = activeLocalSusCauseID;
+	this->toApply = toApply;
+}
+
+ClientSyncLocalSusChangePacket::ClientSyncLocalSusChangePacket(int playerID, int changedValue) {
+	type = BasicNetworkMessages::ClientSyncLocalSusChange;
+	size = sizeof(ClientSyncLocalSusChangePacket);
+
+	this->playerID = playerID;
+	this->changedValue = changedValue;
+}
+
+ClientSyncGlobalSusChangePacket::ClientSyncGlobalSusChangePacket(int changedValue) {
+	type = BasicNetworkMessages::ClientSyncGlobalSusChange;
+	size = sizeof(ClientSyncGlobalSusChangePacket);
+
+	this->changedValue = changedValue;
+}
+
+ClientSyncLocationActiveSusCausePacket::ClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeLocationSusCauseID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncLocationActiveCause;
+	size = sizeof(ClientSyncLocationActiveSusCausePacket);
+
+	this->cantorPairedLocation = cantorPairedLocation;
+	this->activeLocationSusCauseID = activeLocationSusCauseID;
+	this->toApply = toApply;
+}
+
+ClientSyncLocationSusChangePacket::ClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) {
+	type = BasicNetworkMessages::ClientSyncLocationSusChange;
+	size = sizeof(ClientSyncLocationSusChangePacket);
+
+	this->cantorPairedLocation = cantorPairedLocation;
+	this->changedValue = changedValue;
+}
+
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
 	this->firstItemUsage = firstItemUsage;
 	this->secondItemUsage = secondItemUsage;

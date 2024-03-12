@@ -49,6 +49,7 @@ namespace SuspicionSystem
         void Notify(const SuspicionMetre::SusBreakpoint susBreakpoint);
 
         void Update(float dt);
+        void SyncSusChange(int changedValue);
     private:
         std::map<const instantGlobalSusCause, const float>  mInstantCauseSusSeverityMap =
         {
@@ -57,7 +58,7 @@ namespace SuspicionSystem
 
         std::map<const continuousGlobalSusCause, const float>  mContinuousCauseSusSeverityMap =
         {
-            {passiveRecovery, -0.01f}
+            {passiveRecovery, -1.0f}
         };
 
         float mGlobalSusMeter;
@@ -66,7 +67,8 @@ namespace SuspicionSystem
         std::list<GlobalSuspicionObserver*> mGlobalSuspicionObserverList;
 
         void ChangePlayerGlobalSusMetre(const float amount);
-        void SetMinGlobalSusMetre(const float amount);
+        void SetMinGlobalSusMetre(const float amount); 
+        void HandleGlobalSusChangeNetworking(const int& changedValue);
     };
 }
 

@@ -2,7 +2,6 @@
 #include "SuspicionMetre.h"
 #include "GlobalSuspicionMetre.h"
 #include <vector>
-#include "Level.h"
 #include "../InventoryBuffSystem/PlayerBuffs.h"
 
 using namespace NCL::CSC8503;
@@ -12,7 +11,7 @@ namespace SuspicionSystem
 {
     const float DT_UNTIL_LOCAL_RECOVERY = 0.75f;
     class LocalSuspicionMetre :
-        public SuspicionMetre, public PlayerBuffsObserver
+        public SuspicionMetre, public PlayerBuffsObserver, public GlobalSuspicionObserver
     {
     public:
         const enum instantLocalSusCause
@@ -27,6 +26,7 @@ namespace SuspicionSystem
 
         LocalSuspicionMetre(GlobalSuspicionMetre* globalSusMeterPTR) {
             this->mGlobalSusMeterPTR = globalSusMeterPTR;
+            mGlobalSusMeterPTR->Attach(this);
             Init();
         }
 
@@ -34,9 +34,12 @@ namespace SuspicionSystem
 
         void AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo);
 
-        bool AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
-        bool RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
+        bool IsActiveSusCauseForPlayer(const activeLocalSusCause& inCause, const int& playerNo);
+        void AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
+        void RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
+        
 
+        virtual void UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint) override;
         virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent,int playerNo) override;
 
         float GetLocalSusMetreValue(const int &playerNo) {
@@ -48,7 +51,8 @@ namespace SuspicionSystem
         }
 
         void Update(float dt);
-
+        void SyncActiveSusCauses(int playerID, int localPlayerID, activeLocalSusCause buffToSync, bool toApply);
+        void SyncSusChange(int playerID, int localPlayerID, int changedValue);
     private:
         std::map<const instantLocalSusCause, const float>  mInstantLocalSusCauseSeverityMap =
         {
@@ -65,8 +69,11 @@ namespace SuspicionSystem
         GlobalSuspicionMetre* mGlobalSusMeterPTR = nullptr;
 
         std::vector<activeLocalSusCause> mActiveLocalSusCauseVector[NCL::CSC8503::MAX_PLAYERS];
+        std::vector<activeLocalSusCause> mActiveLocalSusCausesToRemove[NCL::CSC8503::MAX_PLAYERS];
 
         void ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount);
+        void HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply);
+        void HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo);
     };
 }
 

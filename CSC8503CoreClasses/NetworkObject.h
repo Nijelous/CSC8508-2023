@@ -101,6 +101,42 @@ namespace NCL::CSC8503 {
 		ClientSyncItemSlotPacket(int playerID, int slotId, int equippedItem, int usageCount);
 	};
 
+	struct ClientSyncLocalActiveSusCausePacket : public GamePacket {
+		int playerID;
+		int activeLocalSusCauseID;
+		bool toApply;
+
+		ClientSyncLocalActiveSusCausePacket(int playerID, int activeLocalSusCauseID, bool toApply);
+	};
+
+	struct ClientSyncLocalSusChangePacket : public GamePacket {
+		int playerID;
+		int changedValue;
+
+		ClientSyncLocalSusChangePacket(int playerID, int changedValue);
+	};
+
+	struct ClientSyncGlobalSusChangePacket : public GamePacket {
+		int changedValue;
+
+		ClientSyncGlobalSusChangePacket(int changedValue);
+	};
+
+	struct ClientSyncLocationActiveSusCausePacket : public GamePacket {
+		int cantorPairedLocation;
+		int activeLocationSusCauseID;
+		bool toApply;
+
+		ClientSyncLocationActiveSusCausePacket(int playerID, int activeLocationSusCauseID, bool toApply);
+	};
+
+	struct ClientSyncLocationSusChangePacket : public GamePacket {
+		int cantorPairedLocation;
+		int changedValue;
+
+		ClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue);
+	};
+
 	struct SyncInteractablePacket : public GamePacket {
 		int networkObjId;
 		bool isOpen;

@@ -23,8 +23,13 @@ enum BasicNetworkMessages {
 	ClientPlayerInputState,
 	ClientSyncItemSlotUsage,
 	ClientSyncItemSlot,
-	SyncInteractable,
 	ClientSyncBuffs,
+	ClientSyncLocalActiveCause,
+	ClientSyncLocalSusChange,
+	ClientSyncLocationActiveCause,
+	ClientSyncLocationSusChange,
+	SyncInteractable,
+	ClientSyncGlobalSusChange,
 	SyncObjectState
 };
 
