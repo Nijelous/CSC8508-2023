@@ -22,6 +22,7 @@ void InteractableDoor::Unlock() {
 
 void InteractableDoor::Lock() {
 	mIsLocked = true;
+	this->GetSoundObject()->LockDoorTriggered();
 	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(4);
 }
