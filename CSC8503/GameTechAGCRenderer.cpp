@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "RenderObject.h"
 #include "Camera.h"
+#include "DirectionalLight.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
 #include "../PS5Core/AGCMesh.h"
@@ -10,6 +11,8 @@
 
 #include "../CSC8503CoreClasses/Debug.h"
 
+class PointLight;
+class DirectionLight;
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -619,8 +622,29 @@ void GameTechAGCRenderer::UpdateObjectList() {
 }
 
 void GameTechAGCRenderer::FillLightUBO() {
+
+	LightData lightData;
+
+
+	for(Light* l : mLights) {
+		lightData.lightColour = l->GetColour();
+
+		switch(l->GetType)	{
+		case Light::Direction:
+			DirectionLight* ld = (DirectionLight*)l;			
+			lightData.lightDirection = ld->GetDirection();
+			lightData.lightPos = ld->GetCentre();
+			break;
+		case Light::Point:
+			PointLight* pd = (PointLight*)l;
+			break;
+		case Light::Spot:
+			break;
+		}
+	}
 	//get all the lights from level
 	//iterate through them and fill in the data into the LightData struct in the psslh
 	//I *think* bytes written in the BumpAllocator struct handles subsequent writes not overwriting??
-	//init and initialize as a regular buffer, and never reset it :)	
+	//init and initialize as a regular buffer, and never reset it :)
+	
 }
