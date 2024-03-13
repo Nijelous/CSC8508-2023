@@ -32,6 +32,12 @@ Scene::Scene() : mController(static_cast<NCL::PS5::PS5Window*>(Window::GetWindow
     mController->MapButton(1, "Circle");
     mController->MapButton(2, "Cross");
     mController->MapButton(3, "Square");
+    mController->MapButton(4, "L2");
+    mController->MapButton(5, "R2");
+    mController->MapButton(6, "L1");
+    mController->MapButton(7, "R1");
+    mController->MapButton(8, "L3");
+    mController->MapButton(9, "R3");
 
     //These are the axis/button aliases the inbuilt camera class reads from:
     mController->MapAxis(2, "XLook");
