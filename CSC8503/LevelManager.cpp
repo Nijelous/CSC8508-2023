@@ -37,7 +37,6 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-#ifdef USEGL
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
 		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
@@ -52,27 +51,6 @@ LevelManager::LevelManager() {
 			mLevelList.push_back(newLevel);
 		}
 		});
-#endif
-#ifdef USEPROSPERO
-	mRoomList = std::vector<Room*>();
-	std::thread loadRooms([this] {
-		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
-			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
-			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
-		for (int i = 0; i < paths.size(); i++) {
-			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
-			mRoomList.push_back(newRoom);
-		}
-		});
-	mLevelList = std::vector<Level*>();
-	std::thread loadLevels([this] {
-		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
-		for (int i = 0; i < paths.size(); i++) {
-			Level* newLevel = new Level(Assets::LEVELDIR + "Levels/" + paths[i] + ".json");
-			mLevelList.push_back(newLevel);
-		}
-		});
-#endif
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
