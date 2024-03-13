@@ -25,7 +25,10 @@ const int SHADOW_SIZE = 8192;
 const int FRAMES_IN_FLIGHT = 2;
 
 const int BINDLESS_TEX_COUNT = 128;
-const int BINDLESS_BUFFER_COUNT = 128;
+const int SKINNED_MESH_COUNT = 128;
+const int LIGHT_BUFFER_COUNT = 1;
+constexpr int BINDLESS_BUFFER_COUNT = SKINNED_MESH_COUNT + LIGHT_BUFFER_COUNT;
+
 
 const size_t LINE_STRIDE = sizeof(Vector4) + sizeof(Vector4);
 const size_t TEXT_STRIDE = sizeof(Vector2) + sizeof(Vector2) + sizeof(Vector4);
@@ -43,6 +46,7 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	buffSpec.initAsRegularBuffer(bindlessBuffers, sizeof(sce::Agc::Core::Buffer), BINDLESS_BUFFER_COUNT);
 	error = sce::Agc::Core::initialize(&arrayBuffer, &buffSpec);
 	bufferCount = 1; //We skip over index 0, makes some selection logic easier later
+
 
 	defaultTexture = (AGCTexture*)LoadTexture("doge.png");
 
@@ -123,30 +127,6 @@ Mesh* GameTechAGCRenderer::LoadMesh(const std::string& name) {
 	return m;
 }
 
-void GameTechAGCRenderer::LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) {
-	std::vector<AGCMesh*> meshes;
-	for (int i = 0; i < details.size(); i += 3) {
-		meshes.push_back(new AGCMesh());
-	}
-	std::thread fileLoadThreads[4];
-	int loadSplit = details.size() / 12;
-	for (int i = 0; i < 4; i++) {
-		fileLoadThreads[i] = std::thread([meshes, details, i, loadSplit] {
-			int endPoint = i == 3 ? details.size() / 3 : loadSplit * (i + 1);
-			for (int j = loadSplit * i; j < endPoint; j++) {
-				MshLoader::LoadMesh(details[(j * 3) + 1], *meshes[j]);
-				meshes[j]->SetPrimitiveType(GeometryPrimitive::Triangles);
-			}
-			});
-	}
-	for (int i = 0; i < 4; i++) {
-		fileLoadThreads[i].join();
-	}
-	for (int i = 0; i < meshes.size(); i++) {
-		meshes[i]->UploadToGPU(this);
-		meshMap[details[i * 3]] = meshes[i];
-	}
-}
 
 NCL::PS5::AGCTexture* GameTechAGCRenderer::CreateFrameBufferTextureSlot(const std::string& name) {
 	uint32_t index = textureMap.size();
@@ -573,12 +553,17 @@ void GameTechAGCRenderer::UpdateObjectList() {
 					state.modelMatrix = g->GetTransform()->GetMatrix();
 
 					state.colour = g->GetColour();
-					state.index[0] = 0; //Default Texture
-					state.index[1] = 0; //Skinning buffer
+					state.index[0] = 0; //Albedo texture
+					state.index[1] = 0; //Normal texture
+					state.index[2] = 0; //skinning buffer
 
-					Texture* t = g->GetAlbedoTexture();
-					if (t) {
-						state.index[0] = t->GetAssetID();
+					Texture* tex = g->GetAlbedoTexture();
+					if (tex) {
+						state.index[0] = tex->GetAssetID();
+					}
+					tex = g->GetNormalTexture();
+					if(tex)	{
+						state.index[1] = tex->GetAssetID();
 					}
 
 					AGCMesh* m = (AGCMesh*)g->GetMesh();
@@ -607,7 +592,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 							bindlessBuffers[bufferID] = vBuffer;
 						}
-						state.index[1] = b->GetAssetID();
+						state.index[2] = b->GetAssetID();
 
 						frameJobs.push_back({ g, b->GetAssetID() });
 					}
@@ -627,15 +612,16 @@ void GameTechAGCRenderer::UpdateObjectList() {
 void GameTechAGCRenderer::FillLightUBO() {
 
 	LightData lightData;
-
-
+	vector<LightData> allData;
+	lightData.lightCount = mLights.size();
+	uint32_t bufferID = SKINNED_MESH_COUNT;
 	for (Light* l : mLights) {
 		lightData.lightColour = l->GetColour();
 		Light::Type type = l->GetType();
 		switch (type) {
 		case Light::Direction:
 		{
-			DirectionLight* dl = (DirectionLight*)l;
+			DirectionLight* dl = static_cast<DirectionLight*> (l);
 			lightData.lightDirection = dl->GetDirection();
 			lightData.lightPos = dl->GetCentre();
 			lightData.lightRadius = dl->GetRadius();
@@ -643,14 +629,14 @@ void GameTechAGCRenderer::FillLightUBO() {
 		break;
 		case Light::Point:
 		{
-			PointLight* pl = (PointLight*)l;
+			PointLight* pl = static_cast<PointLight*>(l);			
 			lightData.lightPos = pl->GetPosition();
 			lightData.lightRadius = pl->GetRadius();
 		}
 		break;
 		case Light::Spot:
 		{
-			SpotLight* sl = (SpotLight*)l;
+			SpotLight* sl = static_cast<SpotLight*>(l);
 			lightData.lightPos = sl->GetPosition();
 			lightData.lightDirection = sl->GetDirection();
 			lightData.dimDotProd = sl->GetDimProdMin();
@@ -661,10 +647,25 @@ void GameTechAGCRenderer::FillLightUBO() {
 		default:
 			break;
 		}
-	}
-	//get all the lights from level
-	//iterate through them and fill in the data into the LightData struct in the psslh
-	//I *think* bytes written in the BumpAllocator struct handles subsequent writes not overwriting??
-	//init and initialize as a regular buffer, and never reset it :)
 
+		allData.push_back(lightData);
+
+		
+	}
+	size_t lightSize = sizeof(LightData);
+	size_t lightCount = allData.size();
+	size_t bufferSize = lightSize * lightCount;
+
+	char* lightDataPtr = (char*)allocator.Allocate((uint64_t)(bufferSize), sce::Agc::Alignment::kBuffer);
+
+	sce::Agc::Core::BufferSpec bufSpec;
+	bufSpec.initAsRegularBuffer(lightDataPtr, lightSize, lightCount);
+
+	sce::Agc::Core::Buffer lBuffer;
+	SceError error = sce::Agc::Core::initialize(&lBuffer, &bufSpec);
+
+	lightDataPtr = (char*) &allData[0];
+	AGCBuffer* b = new AGCBuffer(lBuffer, lightDataPtr);
+
+	bindlessBuffers[bufferID] = lBuffer;
 }
