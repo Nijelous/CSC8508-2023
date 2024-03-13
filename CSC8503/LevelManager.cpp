@@ -1232,6 +1232,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	if (isInMultiplayer) {
 		AddNetworkObject(*guard);
 	}
+
 	else {
 		guard->AddPlayer(mTempPlayer);
 	}
