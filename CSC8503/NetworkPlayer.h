@@ -64,8 +64,8 @@ namespace NCL {
 			PlayerInputs mPlayerInputs;
 			
 			void HandleMovement(float dt, const PlayerInputs& playerInputs);
-
-			void RayCastFromPlayer(GameWorld* world, float dt) override;
+			bool GotRaycastInput(NCL::CSC8503::InteractType& interactType,const float dt) override;
+			void RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::InteractType& interactType, const float dt) override;
 
 			void ControlInventory() override;
 		};

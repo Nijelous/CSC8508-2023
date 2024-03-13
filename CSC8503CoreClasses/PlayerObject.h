@@ -79,7 +79,8 @@ namespace NCL {
 
 			virtual void MovePlayer(float dt);
 			
-			virtual void RayCastFromPlayer(GameWorld* world, float dt);
+			virtual bool GotRaycastInput(NCL::CSC8503::InteractType &interactType,const float dt);
+			virtual void RayCastFromPlayer(GameWorld* world,const NCL::CSC8503::InteractType& interactType,const float dt);
 
 			virtual void ControlInventory();
 
