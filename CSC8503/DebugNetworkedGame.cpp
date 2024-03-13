@@ -40,7 +40,7 @@ DebugNetworkedGame::DebugNetworkedGame() {
 	mWinningPlayerId = -1;
 	mLocalPlayerId = -1;
 
-	bool isEmpty = packetQueue.empty();
+	bool isEmpty = mPacketToSendQueue.empty();
 	mTimeToNextPacket = 0.0f;
 	mPacketsToSnapshot = -1;
 	InitInGameMenuManager();
@@ -331,12 +331,12 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
-		if (packetQueue.size() != 0) {
-			std::lock_guard<std::mutex> lock(packetQueueMutex);
-			GamePacket* packet = packetQueue.front();
+		if (mPacketToSendQueue.size() != 0) {
+			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
+			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
 				mThisServer->SendGlobalPacket(*packet);
-				packetQueue.pop();
+				mPacketToSendQueue.pop();
 			}
 		}
 	}
@@ -412,9 +412,8 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)) {
 			if (newPacket != nullptr) {
-				packetQueue.push(newPacket);
+				mPacketToSendQueue.push(newPacket);
 			}
-			//mThisServer->SendGlobalPacket(*newPacket);
 		}
 	}
 }

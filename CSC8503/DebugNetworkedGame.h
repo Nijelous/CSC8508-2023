@@ -138,8 +138,8 @@ namespace NCL{
             int mClientSideLastFullID;
             int mServerSideLastFullID;
 
-            std::queue<GamePacket*> packetQueue;
-            std::mutex packetQueueMutex;
+            std::queue<GamePacket*> mPacketToSendQueue;
+            std::mutex mPacketToSendQueueMutex;
         private:
         };
     }
