@@ -120,14 +120,9 @@ int RunGame(){
 #ifdef USEPROSPERO
     PS5::PS5Window* w = nullptr;
     w = SetUpPS5Window(winWidth, winHeight, isFullScreen);
-    SetUpPS5InputDevices(ps5Window);
-#endif
-
-    SceneManager* sceneManager = SceneManager::GetSceneManager();
-
+    sceneManager = SceneManager::GetSceneManager();
     sceneManager->GetControllerInterface()->SetPS5Controller(w->GetController());
-
-    sceneManager->SetPS5Controller(ps5Window->GetController());
+#endif
 
     //erendgrmnc: make the bool below true for network test.   
 
