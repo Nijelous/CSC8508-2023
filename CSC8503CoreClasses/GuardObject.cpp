@@ -289,9 +289,10 @@ void GuardObject::CheckForDoors(float dt) {
 }
 
 void GuardObject::OpenDoor() {
-	InteractableDoor* interactablePtr = (InteractableDoor*)mSightedDoor;
-	if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(NCL::CSC8503::InteractType::Use)) {
-		interactablePtr->Interact(NCL::CSC8503::InteractType::Use, mSightedDoor);
+	Interactable* interactablePtr = static_cast<Interactable*>(mSightedDoor);
+	InteractableDoor* interactableDoorPtr = static_cast<InteractableDoor*>(interactablePtr);
+	if (interactableDoorPtr != nullptr && interactableDoorPtr->CanBeInteractedWith(NCL::CSC8503::InteractType::Use)) {
+		interactableDoorPtr->Interact(NCL::CSC8503::InteractType::Use, mSightedDoor);
 	}
 }
 

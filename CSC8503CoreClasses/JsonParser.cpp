@@ -2,7 +2,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
-#include "Door.h"
+#include "InteractableDoor.h"
 #include "PrisonDoor.h"
 #include "Vent.h"
 
@@ -235,7 +235,7 @@ void JsonParser::WriteVariable(std::vector<std::unordered_map<std::string, float
 	case Doors:
 		if (keyValuePairs.size() == 1) return;
 		{
-			Door* door = new Door();
+			InteractableDoor* door = new InteractableDoor();
 			door->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
 				.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
 			if (level) level->mDoors.push_back(door);

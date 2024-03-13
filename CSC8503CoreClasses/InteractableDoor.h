@@ -10,7 +10,8 @@ namespace NCL {
 			~InteractableDoor() {
 
 			}
-
+			void Open()override;
+			void Close()override;
 			void Unlock();
 			void Lock();
 			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
@@ -21,6 +22,7 @@ namespace NCL {
 #endif
 			void CountDownLockTimer(float dt);
 
+			virtual void SetNavMeshFlags(int flag);
 			virtual void UpdateObject(float dt) override;
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;
 		protected:

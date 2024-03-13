@@ -4,7 +4,7 @@
 
 namespace NCL {
     namespace CSC8503 {
-        class Vent : public GameObject, public Interactable {
+        class Vent : public Interactable {
         public:
             Vent();
             void ConnectVent(Vent* vent);
@@ -21,7 +21,8 @@ namespace NCL {
             void HandleItemUse(GameObject* userObj = nullptr);
             void HandlePlayerUse(GameObject* userObj = nullptr);
             void SyncVentStatusInMultiplayer() const;
-            bool CanUseItem();
+            bool CanUseItem(); 
+            GameObjectType mGameObjectType = GameObjectType::InteractableObjectType;
         };
     }
 }

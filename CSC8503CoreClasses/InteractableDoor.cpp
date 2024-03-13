@@ -8,10 +8,27 @@ using namespace NCL::CSC8503;
 
 InteractableDoor::InteractableDoor() {
 	GameObject::mName = "InteractableDoor";
-	mInteractableItemType = InteractableItems::InteractableDoors;
+	Interactable::mInteractableItemType = InteractableItems::InteractableDoors;
+	GameObject::mGameObjectType = GameObject::InteractableObjectType;
 	mIsLocked = false;
 	mIsOpen = false;
 	mTimer = -1;
+}
+
+void InteractableDoor::Open() {
+	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, 7.25, 0));
+	SetNavMeshFlags(1);
+	GetSoundObject()->TriggerSoundEvent();
+	mTimer = initDoorTimer;
+	mIsOpen = true;
+}
+
+void InteractableDoor::Close() {
+	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, -7.25, 0));
+	SetNavMeshFlags(2);
+	GetSoundObject()->CloseDoorTriggered();
+	mTimer = -1;
+	mIsOpen = false;
 }
 
 void InteractableDoor::Unlock() {
@@ -128,6 +145,16 @@ void InteractableDoor::UpdateObject(float dt) {
 	if (mLockCooldown > 0)
 		CountDownLockTimer(dt);
 
-	if (!mIsLocked)
-		Door::UpdateObject(dt);
+	if (mIsOpen && mTimer > 0)
+		CountDownTimer(dt);
+
+	if (mTimer == 0)
+		SetIsOpen(false);
+}
+
+void InteractableDoor::SetNavMeshFlags(int flag) {
+	float* pos = new float[3] { mTransform.GetPosition().x, mTransform.GetPosition().y, mTransform.GetPosition().z };
+	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
+	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };
+	LevelManager::GetLevelManager()->LoadDoorInNavGrid(pos, halfSize, (PolyFlags)flag);
 }
