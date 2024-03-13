@@ -94,4 +94,5 @@ EntryPoint\Debug
 EntryPoint.dir
 /EntryPoint/Textures.vcxproj.filters
 /EntryPoint/EntryPoint.vcxproj.filters
+/EntryPoint/Shaders.vcxproj.filters
 /EntryPoint/EntryPoint.vcxproj.user
