@@ -92,3 +92,6 @@ Generate.bat
 
 EntryPoint\Debug
 EntryPoint.dir
+/EntryPoint/Textures.vcxproj.filters
+/EntryPoint/EntryPoint.vcxproj.filters
+/EntryPoint/EntryPoint.vcxproj.user
