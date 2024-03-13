@@ -70,13 +70,13 @@ namespace NCL::Rendering {
 
 		virtual void SetUIObject(CSC8503::UISystem* uiSystem) {}
 
-		void AddLight(Light* lightPtr) {
+		virtual void AddLight(Light* lightPtr) {
 			if (mLights.size() >= MAX_POSSIBLE_LIGHTS) return;
 			mLights.push_back(lightPtr);
 
 		}
 
-		void ClearLights() {
+		virtual void ClearLights() {
 			for (int i = 0; i < mLights.size(); i++) {
 				delete(mLights[i]);
 			}

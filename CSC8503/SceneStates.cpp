@@ -8,7 +8,9 @@
 #include "Window.h"
 #include "SceneManager.h"
 #include "MainMenuScene.h"
+#ifdef USEPROSPERO
 #include "PS5Window.h"
+#endif
 
 using namespace NCL::CSC8503;
 
@@ -18,7 +20,15 @@ void MainMenuSceneState::OnAwake() {
 }
 
 PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1) || (SceneManager::GetPS5Controller()->GetNamedButton(("Cross")))) {
+	if (
+#ifdef USEGL
+		Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)
+#endif
+
+#ifdef USEPROSPERO
+		(SceneManager::GetPS5Controller()->GetNamedButton(("Cross")))
+#endif
+		) {
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}

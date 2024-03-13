@@ -1,7 +1,7 @@
 ﻿#include <map>
-
+#ifdef USEPROSPERO
 #include "../PS5Core/PS5Controller.h"
-
+#endif
 namespace NCL {
     namespace CSC8503 {
 		
@@ -31,7 +31,7 @@ namespace NCL {
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
             static SceneManager* GetSceneManager();
-
+#ifdef USEPROSPERO
         	static PS5::PS5Controller* GetPS5Controller() {
                 return instance->mPS5Controller;
             }
@@ -39,6 +39,7 @@ namespace NCL {
             void SetPS5Controller(PS5::PS5Controller* ps5Controller) {
                 instance->mPS5Controller = ps5Controller;
             }
+#endif
 
         protected:
             bool isForceQuit = false;
@@ -55,7 +56,9 @@ namespace NCL {
 
             std::map<Scenes, Scene*> gameScenesMap;
 
+#ifdef USEPROSPERO
             PS5::PS5Controller* mPS5Controller;
+#endif
         };
     }
 }

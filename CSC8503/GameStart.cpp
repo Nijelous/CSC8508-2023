@@ -108,21 +108,22 @@ int RunGame(){
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
     bool isFullScreen = !isNetworkTestActive;
     Window* w = nullptr;
+    SceneManager* sceneManager = nullptr;
+   
 #ifdef USEGL
     w = SetUpPCWindow(winWidth, winHeight, isFullScreen);
     SetUpPCInputDevices(w, isNetworkTestActive);
+    sceneManager = SceneManager::GetSceneManager();
 #endif
 
 #ifdef USEPROSPERO
     w = SetUpPS5Window(winWidth, winHeight, isFullScreen);
-    SetUpPS5InputDevices((PS5::PS5Window*)w);
-#endif
-
-
-    SceneManager* sceneManager = SceneManager::GetSceneManager();
     PS5::PS5Window* ps5Window = (PS5::PS5Window*)w;
+    SetUpPS5InputDevices(ps5Window);
+    sceneManager = SceneManager::GetSceneManager();
     sceneManager->SetPS5Controller(ps5Window->GetController());
-
+#endif
+   
     //erendgrmnc: make the bool below true for network test.   
 
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
