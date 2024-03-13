@@ -315,33 +315,6 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->LockDoorFinished();
 			}
 		}
-	/*	else if (obj->GetName() == "InteractableDoor") {
-			bool isOpen = obj->GetSoundObject()->GetisTiggered();
-			if (isOpen) {
-				PlayDoorOpenSound(soundPos);
-				obj->GetSoundObject()->SetNotTriggered();
-			}
-			bool isClose = obj->GetSoundObject()->GetIsClosed();
-			if (isClose) {
-				PlayDoorCloseSound(soundPos);
-				obj->GetSoundObject()->CloseDoorFinished();
-			}
-			bool isLocked = obj->GetSoundObject()->GetIsLocked();
-			if (isLocked) {
-				PlayLockDoorSound(soundPos);
-				obj->GetSoundObject()->LockDoorFinished();
-			}
-		}
-		else if (obj->GetName() == "PickupGameObject") {
-			bool isPlay = obj->GetSoundObject()->GetisTiggered();
-			if (isPlay) {
-				PlayPickUpSound(soundPos);
-				obj->GetSoundObject()->SetNotTriggered();
-			}
-		}
-		else if(obj->GetName() == "Flag"){
-
-		}*/
 	}
 	mSystem->update();
 }
