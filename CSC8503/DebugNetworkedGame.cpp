@@ -40,6 +40,9 @@ DebugNetworkedGame::DebugNetworkedGame() {
 	mWinningPlayerId = -1;
 	mLocalPlayerId = -1;
 
+	bool isEmpty = mPacketToSendQueue.empty();
+	mTimeToNextPacket = 0.0f;
+	mPacketsToSnapshot = -1;
 	InitInGameMenuManager();
 
 	for (int i = 0; i < MAX_PLAYER; i++) {
@@ -94,6 +97,8 @@ void DebugNetworkedGame::StartAsServer() {
 	mThisServer->RegisterPacketHandler(Received_State, this);
 	mThisServer->RegisterPacketHandler(String_Message, this);
 	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
+	std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
+	senderThread.detach();
 }
 
 void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
@@ -122,6 +127,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
+
 	mTimeToNextPacket -= dt;
 	if (mTimeToNextPacket < 0) {
 		if (mThisServer) {
@@ -200,9 +206,7 @@ void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event) {
 }
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-	if (type == 13){
-		std::cout << "Finish Packet Received! " << '\n';
-	}
+
 	switch (type) {
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
@@ -325,6 +329,19 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 	mThisServer->SendGlobalPacket(packet);
 }
 
+void DebugNetworkedGame::SendPacketsThread() {
+	while (mThisServer) {
+		if (mPacketToSendQueue.size() != 0) {
+			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
+			GamePacket* packet = mPacketToSendQueue.front();
+			if (packet) {
+				mThisServer->SendGlobalPacket(*packet);
+				mPacketToSendQueue.pop();
+			}
+		}
+	}
+}
+
 GameClient* DebugNetworkedGame::GetClient() const {
 	return mThisClient;
 }
@@ -394,8 +411,9 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		int playerState = o->GetLatestNetworkState().stateID;
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)) {
-			mThisServer->SendGlobalPacket(*newPacket);
-			delete newPacket;
+			if (newPacket != nullptr) {
+				mPacketToSendQueue.push(newPacket);
+			}
 		}
 	}
 }
@@ -554,6 +572,7 @@ void DebugNetworkedGame::HandleClientPlayerInputPacket(ClientPlayerInputPacket* 
 
 	playerToHandle->SetPlayerInput(clientPlayerInputPacket->playerInputs);
 	mServerSideLastFullID = clientPlayerInputPacket->lastId;
+	UpdateMinimumState();
 }
 
 void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet) {
