@@ -8,7 +8,7 @@ namespace NCL {
 		constexpr int MAX_PLAYERS = 4;
 
 		class Vent;
-
+		class InteractableDoor;
 		class Level {
 		public:
 			Level(std::string levelPath);
@@ -26,7 +26,7 @@ namespace NCL {
 			std::vector<Vent*> GetVents() const { return mVents; }
 			std::vector<int> GetVentConnections() const { return mVentConnections; }
 			Vector3 GetHelipadPosition() const { return mHelipadPosition; }
-			std::vector<Door*> GetDoors() const { return mDoors; }
+			std::vector<InteractableDoor*> GetDoors() const { return mDoors; }
 			PrisonDoor* GetPrisonDoor() const { return mPrisonDoor; }
 
 			friend class JsonParser;
@@ -45,7 +45,7 @@ namespace NCL {
 			std::vector<Vent*> mVents;
 			std::vector<int> mVentConnections;
 			Vector3 mHelipadPosition;
-			std::vector<Door*> mDoors;
+			std::vector<InteractableDoor*> mDoors;
 			PrisonDoor* mPrisonDoor;
 		};
 	}

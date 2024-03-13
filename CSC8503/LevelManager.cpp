@@ -278,7 +278,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		LoadCCTVs(isMultiplayer);
 	}
 
-	//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	LoadCCTVs();
+
+
 #endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -559,7 +562,7 @@ void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> v
 	}
 }
 
-void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel, int rotation) {
+void LevelManager::LoadDoors(const std::vector<InteractableDoor*>& doors, const Vector3& centre, bool isMultiplayerLevel, int rotation) {
 	for (int i = 0; i < doors.size(); i++) {
 		Transform doorTransform = Transform();
 		doorTransform.SetPosition(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * doors[i]->GetTransform().GetPosition())

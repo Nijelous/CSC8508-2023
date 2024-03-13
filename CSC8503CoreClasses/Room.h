@@ -10,7 +10,7 @@ using namespace NCL::Maths;
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
-
+		class InteractableDoor;
 		class Room {
 		public:
 			Room() { mType = INVALID; }
@@ -23,7 +23,7 @@ namespace NCL {
 			std::vector<Light*> GetLights() const { return mLights; }
 			std::vector<Transform> GetCCTVTransforms() const { return mCCTVTransforms; }
 			std::vector<Vector3> GetItemPositions() const { return mItemPositions; }
-			std::vector<Door*> GetDoors() const { return mDoors; }
+			std::vector<InteractableDoor*> GetDoors() const { return mDoors; }
 			int GetDoorConfig() const { return mDoorConfig; }
 			int GetPrimaryDoor() const { return mPrimaryDoor; }
 			friend class JsonParser;
@@ -36,7 +36,7 @@ namespace NCL {
 			std::vector<Light*> mLights;
 			std::vector<Transform> mCCTVTransforms;
 			std::vector<Vector3> mItemPositions;
-			std::vector<Door*> mDoors;
+			std::vector<InteractableDoor*> mDoors;
 		};
 	}
 }

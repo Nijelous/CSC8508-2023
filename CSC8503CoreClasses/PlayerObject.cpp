@@ -5,6 +5,10 @@
 #include "CapsuleVolume.h"
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
+#include "Vent.h"
+#include "InteractableDoor.h"
+
+#include "Interactable.h"
 #include "../CSC8503/LevelManager.h"
 
 #include "Window.h"
@@ -99,7 +103,10 @@ void PlayerObject::UpdateObject(float dt) {
 		const GameObjectState previousObjectState = mObjectState;
 
 		MovePlayer(dt);
-		RayCastFromPlayer(mGameWorld, dt);
+
+		NCL::CSC8503::InteractType interactType;
+		if(GotRaycastInput(interactType,dt))
+			RayCastFromPlayer(mGameWorld, interactType, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
@@ -209,6 +216,15 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 	}
 }
 
+void PlayerObject::HandleInteractable(Interactable* interactablePtr, InteractType interactType){
+	if (interactablePtr->CanBeInteractedWith(interactType, this)) {
+		interactablePtr->Interact(interactType, this);
+		if (interactType == ItemUse) {
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
+		}
+	}
+}
+
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	if (mPlayerID != playerNo)
 		return;
@@ -313,92 +329,89 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
-	bool isRaycastTriggered = false;
-	NCL::CSC8503::InteractType interactType;
-
+bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt)
+{
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
-		isRaycastTriggered = true;
+		
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
+		return true;
 	}
 	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
 		mInteractHeldDt += dt;
 		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if(DEBUG_MODE)
+			if (DEBUG_MODE)
 				Debug::Print("PickPocket window", Vector2(40, 85));
+			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::LongUse;
 			if (DEBUG_MODE)
 				Debug::Print("LongUse", Vector2(40, 85));
+			return true;
 		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
 		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
-			return;
-		isRaycastTriggered = true;
+			return false;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
+		return true;
 	}
+	return false;
+}
 
-	if (isRaycastTriggered)
-	{
-		std::cout << "Ray fired" << std::endl;
-		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
-		RayCollision closestCollision;
+void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::InteractType& interactType, const float dt) {
+	std::cout << "Ray fired" << std::endl;
+	Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+	RayCollision closestCollision;
 
-		if (world->Raycast(ray, closestCollision, true, this)) {
-			auto* objectHit = (GameObject*)closestCollision.node;
-			if (objectHit) {
-				Vector3 objPos = objectHit->GetTransform().GetPosition();
-				Vector3 playerPos = GetTransform().GetPosition();
+	if (world->Raycast(ray, closestCollision, true, this)) {
+		auto* objectHit = (GameObject*)closestCollision.node;
+		if (objectHit) {
+			Vector3 objPos = objectHit->GetTransform().GetPosition();
+			Vector3 playerPos = GetTransform().GetPosition();
 
-				float distance = (objPos - playerPos).Length();
+			float distance = (objPos - playerPos).Length();
 
-				if (distance > 17.5f) {
-					std::cout << "Nothing hit in range" << std::endl;
-					return;
-				}
-
-				//Check if object is an item.
-#ifdef USEGL
-				Item* item = dynamic_cast<Item*>(objectHit);
-				if (item != nullptr) {
-					item->OnPlayerInteract(mPlayerID);
-					return;
-				}
-
-				//Check if object is an interactable.
-				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType,this)) {
-					interactablePtr->Interact(interactType, this);
-					if (interactType == ItemUse) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
-					}
-
-					return;
-				}
-#endif
-				if (interactType == PickPocket)
-				{
-					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
-					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
-							TransferItemBetweenInventories(1,
-								0, this->GetPlayerID());
-					}
-				}
-
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+			if (distance > 17.5f) {
+				std::cout << "Nothing hit in range" << std::endl;
+				return;
 			}
+
+			//Check if object is an item.
+#ifdef USEGL
+			/*
+			Item* item = dynamic_cast<Item*>(objectHit);
+			if (item != nullptr) {
+				item->OnPlayerInteract(mPlayerID);
+				return;
+			}
+			*/
+
+			//Check if object is an interactable.
+			if (objectHit->GetGameObjectType() == GameObject::InteractableObjectType) {
+				Interactable* interactablePtr = static_cast<Interactable*> (objectHit);
+				InteractableDoor* interactableDoorPtr = static_cast<InteractableDoor*> (interactablePtr);
+				if (typeid(interactableDoorPtr) == typeid(InteractableDoor*)) {
+					HandleInteractable(interactableDoorPtr, interactType);
+					return;
+				}
+				Vent* ventPtr = static_cast<Vent*> (interactablePtr);
+				if (typeid(ventPtr) == typeid(Vent*))
+				{
+					HandleInteractable(interactableDoorPtr, interactType);
+					return;
+				}
+			}
+#endif			
+			std::cout << "Object hit " << objectHit->GetName() << std::endl;
+				
 		}
 	}
 }

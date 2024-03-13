@@ -13,7 +13,8 @@ Vent::Vent() {
 	mIsOpen = false;
 	mConnectedVent = nullptr;
 	mInteractable = true;
-	mInteractableItemType = InteractableItems::InteractableVents;
+	Interactable::mInteractableItemType = InteractableItems::InteractableVents;
+	GameObject::mGameObjectType = GameObject::InteractableObjectType;
 }
 
 void Vent::ConnectVent(Vent* vent) {

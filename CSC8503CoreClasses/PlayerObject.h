@@ -9,6 +9,7 @@ namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
 		class Interactable;
+		enum InteractType;
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 
@@ -43,7 +44,7 @@ namespace NCL {
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 			void ShowDebugInfo(float dt);
 			void ChangeActiveSusCausesBasedOnState(const GameObjectState &previousState, const GameObjectState& currentState);
-
+			void HandleInteractable(Interactable* interactablePtr, InteractType interactType);
 			PlayerInventory::item GetEquippedItem();
 
 			void SetUIObject(UISystem* ui) {
@@ -73,7 +74,8 @@ namespace NCL {
 
 			virtual void MovePlayer(float dt);
 			
-			virtual void RayCastFromPlayer(GameWorld* world, float dt);
+			virtual bool GotRaycastInput(NCL::CSC8503::InteractType &interactType,const float dt);
+			virtual void RayCastFromPlayer(GameWorld* world,const NCL::CSC8503::InteractType& interactType,const float dt);
 
 			virtual void ControlInventory();
 
