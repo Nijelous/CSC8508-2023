@@ -243,7 +243,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	LoadCCTVList((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor(),isMultiplayer);
 	mUpdatableObjects.push_back(mPrisonDoor);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -280,7 +280,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		});
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
 		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
@@ -304,7 +304,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		LoadCCTVs(isMultiplayer);
 	}
 
-	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 #endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
@@ -830,7 +830,7 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 }
 
 CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel) {
-	CCTV* camera = new CCTV(transform.GetPosition() + Vector3(0,-7.5,20), 20);
+	CCTV* camera = new CCTV(25);
 
 	Vector3 wallSize = Vector3(1, 1, 1);
 	camera->GetTransform()
@@ -851,10 +851,6 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 	if (!isMultiplayerLevel)
 	{
 		camera->SetPlayerObjectPtr(mTempPlayer);
-	}
-	else
-	{
-		camera->SetServerPlayersPtr(serverPlayersPtr);
 	}
 	mUpdatableObjects.push_back(camera);
 	mWorld->AddGameObject(camera);
@@ -951,7 +947,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	return newDoor;
 }
 
-PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
+PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultiplayerLevel) {
 	PrisonDoor* newDoor = new PrisonDoor();
 
 	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
@@ -980,6 +976,11 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
+
+
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*newDoor);
+	}
 
 	mWorld->AddGameObject(newDoor);
 	mGlobalSuspicionObserver.push_back(newDoor);
@@ -1079,8 +1080,8 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 	return pointObject;
 }
 
-PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
-	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName, prisonDoor);
+PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 

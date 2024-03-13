@@ -63,13 +63,11 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
 	UISystem* UI, SoundObject* soundObject,
 	const std::string& objName,
-	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
-	mPrisonDoorPtr = prisonDoorPtr;
 	SetUIObject(UI);
 	SetSoundObject(soundObject);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
@@ -261,14 +259,6 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 
 PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mPlayerID, mActiveItemSlot);
-}
-
-void PlayerObject::ClosePrisonDoor(){
-	mPrisonDoorPtr->Close();
-}
-
-void PlayerObject::SetPrisonDoor(PrisonDoor* prisonDoor) {
-	mPrisonDoorPtr = prisonDoor;
 }
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {

@@ -496,7 +496,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
-				mPlayer->ClosePrisonDoor();
+				LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 				mHasCaughtPlayer = false;
 				return Success;
 			}

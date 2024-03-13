@@ -377,5 +377,12 @@ void NetworkPlayer::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
 	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::O) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(true);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
+	}
 }
 #endif

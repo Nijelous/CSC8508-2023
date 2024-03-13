@@ -181,7 +181,7 @@ namespace NCL {
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
 			InteractableDoor* AddDoorToWorld(const Transform& transform, const Vector3& offset, bool isMultiplayerLevel = false);
-			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
+			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door, bool isMultiplayerLevel);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
 
@@ -189,7 +189,7 @@ namespace NCL {
 
 			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
 
-			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
 			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer);
 
