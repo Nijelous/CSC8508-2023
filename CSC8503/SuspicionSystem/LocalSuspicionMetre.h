@@ -2,7 +2,6 @@
 #include "SuspicionMetre.h"
 #include "GlobalSuspicionMetre.h"
 #include <vector>
-#include "Level.h"
 #include "../InventoryBuffSystem/PlayerBuffs.h"
 
 using namespace NCL::CSC8503;

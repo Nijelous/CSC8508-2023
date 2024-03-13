@@ -72,6 +72,11 @@ LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
+
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
@@ -261,10 +266,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
-
-		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
-		LoadCCTVs();
 	}
 #ifdef USEGL
 	else {
@@ -860,7 +861,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -936,7 +937,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	}
 
 	mWorld->AddGameObject(newDoor);
-
+	mGlobalSuspicionObserver.push_back(newDoor);
 	return newDoor;
 }
 
@@ -972,6 +973,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
+	mGlobalSuspicionObserver.push_back(newDoor);
 
 	return newDoor;
 }

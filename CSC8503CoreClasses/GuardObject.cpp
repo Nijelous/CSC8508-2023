@@ -64,18 +64,6 @@ void GuardObject::UpdateObject(float dt) {
 	HandleAppliedBuffs(dt);
 }
 
-
-bool GuardObject::IsPlayerObject(GameObject& sightedObject) {
-	for (PlayerObject* playerObj : mPlayerList) {
-		const GameObject* gameObjCompOfPlayer = static_cast<GameObject*>(playerObj);
-		if (gameObjCompOfPlayer == &sightedObject) {
-			mPlayer = playerObj;
-			return true;
-		}
-	}
-	return false;
-}
-
 void GuardObject::RaycastToPlayer() {
 
 	PlayerObject* playerToChase = GetPlayerToChase();
@@ -85,8 +73,10 @@ void GuardObject::RaycastToPlayer() {
 		Ray r = Ray(this->GetTransform().GetPosition(), playerToChaseDir);
 		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
 			mSightedPlayer = (GameObject*)closestCollision.node;
+			
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
-			if (IsPlayerObject(*mSightedPlayer)) {
+			if (mSightedPlayer->GetCollisionLayer() == CollisionLayer::Player) {
+				mPlayer = static_cast<PlayerObject*>(mSightedPlayer);
 				mCanSeePlayer = true;
 			}
 			else {
@@ -141,12 +131,11 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 	const Vector3& guardPos = GetTransform().GetPosition();
 
 	for (PlayerObject* player : mPlayerList) {
-		Vector3 dir = (player->GetTransform().GetPosition() - this->GetTransform().GetPosition()).Normalised();
-		float ang = Vector3::Dot(dir, GuardForwardVector());
+		Vector3 dir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+		Vector3 dirNorm = dir.Normalised();
+		float ang = Vector3::Dot(dirNorm, GuardForwardVector());
 		if (ang > 2) {
-			const Vector3& playerPos = player->GetTransform().GetPosition();
-			float distance = sqrt((guardPos.x - playerPos.x) * (guardPos.x - playerPos.x) +
-				(guardPos.z - playerPos.z) * (guardPos.z - playerPos.z));
+			float distance = dir.LengthSquared();
 			if (distance < minDist) {
 				minDist = distance;
 				playerToChase = player;
