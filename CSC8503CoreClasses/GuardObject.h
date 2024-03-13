@@ -74,6 +74,7 @@ namespace NCL {
             void GrabPlayer();
             float* QueryNavmesh(float* endPos);
             bool CheckPolyDistance();
+            void GuardSpeedMultiplier();
 
             void CheckForDoors(float dt);
             void OpenDoor();
