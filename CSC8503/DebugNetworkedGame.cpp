@@ -574,6 +574,7 @@ void DebugNetworkedGame::HandleClientPlayerInputPacket(ClientPlayerInputPacket* 
 
 	playerToHandle->SetPlayerInput(clientPlayerInputPacket->playerInputs);
 	mServerSideLastFullID = clientPlayerInputPacket->lastId;
+	UpdateMinimumState();
 }
 
 void DebugNetworkedGame::HandleAddPlayerScorePacket(AddPlayerScorePacket* packet) {
