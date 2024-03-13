@@ -1,6 +1,10 @@
 #include "PrisonDoor.h"
 #include "GameObject.h"
 #include "../CSC8503/LevelManager.h"
+#include "NetworkObject.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
+#include "Interactable.h"
 using namespace NCL::CSC8503;
 
 void PrisonDoor::UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint){
