@@ -100,7 +100,6 @@ void GuardObject::RaycastToPlayer() {
 }
 
 void GuardObject::GuardSpeedMultiplier() {
-	cout << mGuardSpeedMultiplier << " ";
 	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 && mCanSeePlayer == true) {
 		mGuardSpeedMultiplier = 45;
 		}
@@ -151,7 +150,9 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 		Vector3 dir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 		Vector3 dirNorm = dir.Normalised();
 		float ang = Vector3::Dot(dirNorm, GuardForwardVector());
-		if (ang > 2) {
+		int minAng = 0;
+		minAng = AngleValue(minAng);
+		if (ang > minAng) {
 			float distance = dir.LengthSquared();
 			if (distance < minDist) {
 				minDist = distance;
@@ -161,6 +162,16 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 	}
 
 	return playerToChase;
+}
+
+int GuardObject::AngleValue(int minAng) {
+	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 && mCanSeePlayer == true) {
+		minAng = 1.5;
+	}
+	else {
+		minAng = 2;
+	}
+	return minAng;
 }
 
 bool GuardObject::CheckPolyDistance() {

@@ -75,6 +75,7 @@ namespace NCL {
             float* QueryNavmesh(float* endPos);
             bool CheckPolyDistance();
             void GuardSpeedMultiplier();
+            int AngleValue(int minAng);
 
             void CheckForDoors(float dt);
             void OpenDoor();
