@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Vector3.h"
-
 #ifdef USEPROSPERO
 #include "../PS5Core/PS5Window.h"
 #endif
@@ -16,6 +14,9 @@ namespace NCL {
 		~ControllerInterface() {}
 
 		bool MoveForward();
+		bool MoveBackwards();
+		bool MoveRight();
+		bool MoveLeft();
 
 		bool GetSelectPressed();
 

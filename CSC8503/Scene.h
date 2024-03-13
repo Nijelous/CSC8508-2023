@@ -26,7 +26,9 @@ namespace NCL{
             LevelManager* mLevelManager;
 
             virtual void InitCamera();
-            //KeyboardMouseController mController;
+#ifdef USEGL
+            KeyboardMouseController mController;
+#endif
 
 #ifdef USEPROSPERO
         public:

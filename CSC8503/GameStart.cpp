@@ -61,34 +61,6 @@ PS5::PS5Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen)
 
     return w;
 }
-
-void SetUpPS5InputDevices(PS5::PS5Window* w, SceneManager* sceneManager){
-    PS5::PS5Controller* ps5Controller = w->GetController();
-
-    ps5Controller->MapAxis(0, "LeftX");
-    ps5Controller->MapAxis(1, "LeftY");
-
-    ps5Controller->MapAxis(2, "RightX");
-    ps5Controller->MapAxis(3, "RightY");
-
-    ps5Controller->MapAxis(4, "DX");
-    ps5Controller->MapAxis(5, "DY");
-
-    ps5Controller->MapButton(0, "Triangle");
-    ps5Controller->MapButton(1, "Circle");
-    ps5Controller->MapButton(2, "Cross");
-    ps5Controller->MapButton(3, "Square");
-
-    //These are the axis/button aliases the inbuilt camera class reads from:
-    ps5Controller->MapAxis(0, "XLook");
-    ps5Controller->MapAxis(1, "YLook");
-
-    ps5Controller->MapAxis(2, "Sidestep");
-    ps5Controller->MapAxis(3, "Forward");
-
-    ps5Controller->MapButton(0, "Up");
-    ps5Controller->MapButton(2, "Down");
-}
 #endif
 
 Window* SetUpPCWindow(float winWidth, float winHeight, bool fullscreen) {

@@ -318,17 +318,17 @@ void PlayerObject::MovePlayer(float dt) {
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)){
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveBackwards()){
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)){
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveRight()){
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)){
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveLeft()){
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
