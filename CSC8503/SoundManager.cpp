@@ -56,6 +56,18 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mResult = mSystem->createSound("../Assets/Sounds/emergency-alarm-with-reverb-29431.mp3", FMOD_3D, 0, &mAlarmSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Alarm Sound Error !!" << std::endl;
+		return;
+	}
+
+	mResult = mSystem->createSound("../Assets/Sounds/heater-vent-hit-higher-part-103305.mp3", FMOD_3D, 0, &mVentSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Alarm Sound Error !!" << std::endl;
+		return;
+	}
+
 	mResult = mFootStepSound->set3DMinMaxDistance(15.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
@@ -89,6 +101,18 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 	mResult = mLockDoorSound->set3DMinMaxDistance(15.0f, 80.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Lock Door Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mAlarmSound->set3DMinMaxDistance(1000.0f, 2000.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
+		return;
+	}
+
+	mResult = mVentSound->set3DMinMaxDistance(15.0f, 60.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 }
@@ -201,6 +225,54 @@ void SoundManager::PlayLockDoorSound(Vector3 soundPos) {
 	lockDoorChannel->setPaused(false);
 }
 
+void SoundManager::PlayAlarmSound(Vector3 soundPos) {
+	FMOD::Channel* alarmChannel = nullptr;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mAlarmSound, 0, true, &alarmChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = alarmChannel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	alarmChannel->setPaused(false);
+}
+
+void SoundManager::PlayVentSound(Vector3 soundPos) {
+	Channel* channel = nullptr;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mVentSound, 0, true, &channel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = channel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	channel->setPaused(false);
+}
+
+void SoundManager::PlaySound(Vector3 soundPos, Sound* sound) {
+	Channel* channel = nullptr;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(sound, 0, true, &channel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close sound error" << std::endl;
+		return;
+	}
+	mResult = channel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Door Close position setting error" << std::endl;
+		return;
+	}
+	channel->setPaused(false);
+}
+
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
@@ -215,7 +287,35 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
-		else if (obj->GetName() == "InteractableDoor") {
+		else {
+			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
+			if (isTrigger) {
+				if (obj->GetName() == "InteractableDoor") {
+					PlayDoorOpenSound(soundPos);
+				}
+				else if (obj->GetName() == "PickupGameObject") {
+					PlayPickUpSound(soundPos);
+				}
+				else if (obj->GetName() == "Flag") {
+					PlayAlarmSound(soundPos);
+				}
+				else if (obj->GetName() == "Vent") {
+					PlayVentSound(soundPos);
+				}
+				obj->GetSoundObject()->SetNotTriggered();
+			}
+			bool isClose = obj->GetSoundObject()->GetIsClosed();
+			if (isClose && obj->GetName() == "InteractableDoor") {
+				PlayDoorCloseSound(soundPos);
+				obj->GetSoundObject()->CloseDoorFinished();
+			}
+			bool isLocked = obj->GetSoundObject()->GetIsLocked();
+			if (isLocked && obj->GetName() == "InteractableDoor") {
+				PlayLockDoorSound(soundPos);
+				obj->GetSoundObject()->LockDoorFinished();
+			}
+		}
+	/*	else if (obj->GetName() == "InteractableDoor") {
 			bool isOpen = obj->GetSoundObject()->GetisTiggered();
 			if (isOpen) {
 				PlayDoorOpenSound(soundPos);
@@ -232,13 +332,16 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->LockDoorFinished();
 			}
 		}
-		else if ((obj->GetName() == "PickupGameObject") || (obj->GetName() == "Flag")) {
+		else if (obj->GetName() == "PickupGameObject") {
 			bool isPlay = obj->GetSoundObject()->GetisTiggered();
 			if (isPlay) {
 				PlayPickUpSound(soundPos);
 				obj->GetSoundObject()->SetNotTriggered();
 			}
 		}
+		else if(obj->GetName() == "Flag"){
+
+		}*/
 	}
 	mSystem->update();
 }
@@ -253,12 +356,12 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 		break;
 	case GameObject::GameObjectState::Walk:
 		channel->set3DAttributes(&pos, nullptr);
-		channel->setFrequency(24000);
+		channel->setFrequency(48000);
 		channel->setPaused(false);
 		break;
 	case GameObject::GameObjectState::Sprint:
 		channel->set3DAttributes(&pos, nullptr);
-		channel->setFrequency(48000);
+		channel->setFrequency(48000*1.5);
 		channel->setPaused(false);
 		break;
 	case GameObject::GameObjectState::IdleCrouch:

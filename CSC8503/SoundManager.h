@@ -24,6 +24,12 @@ namespace NCL{
 
 			void PlayLockDoorSound(Vector3 soundPos);
 
+			void PlayAlarmSound(Vector3 soundPos);
+
+			void PlayVentSound(Vector3 soundpos);
+
+			void PlaySound(Vector3 soundPos, FMOD::Sound* sound);
+
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
@@ -43,6 +49,8 @@ namespace NCL{
 			FMOD::Sound* mSoundEmitterSound = nullptr;
 			FMOD::Sound* mPickUpSound = nullptr;
 			FMOD::Sound* mLockDoorSound = nullptr;
+			FMOD::Sound* mAlarmSound = nullptr;
+			FMOD::Sound* mVentSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}
