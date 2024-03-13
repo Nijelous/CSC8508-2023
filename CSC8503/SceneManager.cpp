@@ -5,8 +5,6 @@
 #include "SceneStates.h"
 #include "GameSceneManager.h"
 
-
-
 using namespace NCL::CSC8503;
 
 SceneManager* SceneManager::instance = nullptr;
@@ -15,6 +13,7 @@ SceneManager::SceneManager() {
 	currentScene = nullptr;
 	InitScenes();
 	InitPushdownMachine();
+	mControllerInterface = new ControllerInterface();
 }
 
 SceneManager::~SceneManager() {

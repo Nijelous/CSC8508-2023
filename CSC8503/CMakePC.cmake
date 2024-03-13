@@ -21,6 +21,7 @@ function(Create_PC_CSC8503_Files)
         "SoundManager.h"
         "SoundObject.h"
         "MultiplayerStates.h"
+        "ControllerInterface.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -72,6 +73,7 @@ function(Create_PC_CSC8503_Files)
         "SoundManager.cpp"
         "SoundObject.cpp"
         "MultiplayerStates.cpp"
+        "ControllerInterface.cpp"
     )
     source_group("Source Files" FILES ${Source_Files})
 

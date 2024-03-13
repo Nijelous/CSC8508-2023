@@ -14,8 +14,6 @@ namespace NCL {
 		typedef std::function<void(GameObject*)> GameObjectFunc;
 		typedef std::vector<GameObject*>::const_iterator GameObjectIterator;
 
-		class PS5Controller;
-
 		class GameWorld	{
 		public:
 			GameWorld();
@@ -59,8 +57,6 @@ namespace NCL {
 			int GetWorldStateID() const {
 				return worldStateCounter;
 			}
-
-			static PS5Controller* mController;
 
 		protected:
 			std::vector<GameObject*> gameObjects;

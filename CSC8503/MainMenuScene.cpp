@@ -4,7 +4,7 @@
 
 using namespace NCL::CSC8503;
 
-MainMenuScene::MainMenuScene() : Scene() {
+MainMenuScene::MainMenuScene() {
     Scene::InitCamera();
 }
 
