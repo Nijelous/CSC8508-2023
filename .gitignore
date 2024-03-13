@@ -18,6 +18,8 @@ compile_commands.json
 CTestTestfile.cmake
 _deps 
 CSC8503/Debug
+EntryPoint/Debug
+EntryPoint/Release
 CSC8503CoreClasses/Debug
 CSC8503CoreClasses/CSC8503CoreClasses.dir/Debug
 ALL_BUILD.vcxproj
@@ -51,6 +53,7 @@ OpenGLRendering/Debug
 OpenGLRendering/OpenGLRendering.dir/Debug
 OpenGLRendering/Release
 OpenGLRendering/OpenGLRendering.dir/Release
+EntryPoint/EntryPoint.dir
 
 x64/Debug/
 x64/Release/

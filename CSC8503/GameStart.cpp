@@ -108,21 +108,26 @@ int RunGame(){
     float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
     bool isFullScreen = !isNetworkTestActive;
-
+    SceneManager* sceneManager = nullptr;
+   
 #ifdef USEGL
     Window* w = nullptr;
     w = SetUpPCWindow(winWidth, winHeight, isFullScreen);
     SetUpPCInputDevices(w, isNetworkTestActive);
+    sceneManager = SceneManager::GetSceneManager();
 #endif
 
 #ifdef USEPROSPERO
     PS5::PS5Window* w = nullptr;
     w = SetUpPS5Window(winWidth, winHeight, isFullScreen);
+    SetUpPS5InputDevices(ps5Window);
 #endif
 
     SceneManager* sceneManager = SceneManager::GetSceneManager();
 
     sceneManager->GetControllerInterface()->SetPS5Controller(w->GetController());
+
+    sceneManager->SetPS5Controller(ps5Window->GetController());
 
     //erendgrmnc: make the bool below true for network test.   
 

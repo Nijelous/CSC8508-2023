@@ -10,6 +10,7 @@
 #include "../Assets/Shaders/PSSL/Interop.h"		//Always include this before any PSSL headers
 #include "../Assets/Shaders/PSSL/ShaderConstants.psslh"
 #include "../Assets/Shaders/PSSL/TechObject.psslh"
+#include "../Assets/Shaders/PSSL/LightData.psslh"
 
 namespace NCL {
 	namespace Rendering {
@@ -36,6 +37,7 @@ namespace NCL {
 			void		LoadMeshes(unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) override;
 			virtual Texture*	LoadTexture(const std::string& name)			override;
 			virtual Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
+			virtual void FillLightUBO() override;
 
 		protected:
 			void RenderFrame()	override;
@@ -68,7 +70,7 @@ namespace NCL {
 			Handling buffers in AGC isn't too bad, as they are a small wrapper around an existing
 			memory allocation. Here I have a small struct that will fill out a memory allocation with
 			all of the data required by the frame. We can then make Buffers out of this at any
-			offset we want to send to our shaders - in this case we're going to use one bug allocation
+			offset we want to send to our shaders - in this case we're going to use one big allocation
 			to hold both the constants used by shaders, as well as all of the debug vertices, and object
 			matrices. No fancy suballocations here, the allocator is as simple as it gets - it just 
 			advances or 'bumps' a pointer along. Perfect for recording a frame's data to memory!

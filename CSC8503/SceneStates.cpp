@@ -8,6 +8,7 @@
 #include "Window.h"
 #include "SceneManager.h"
 #include "MainMenuScene.h"
+#endif
 
 using namespace NCL::CSC8503;
 

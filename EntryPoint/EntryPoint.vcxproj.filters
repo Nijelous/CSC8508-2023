@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\cmake_pch.cxx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\Debug\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\Release\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\MinSizeRel\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeFiles\EntryPoint.dir\RelWithDebInfo\cmake_pch.hxx">
+      <Filter>Precompile Header File</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\a8038295\source\repos\CSC8508-2023\EntryPoint\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Precompile Header File">
+      <UniqueIdentifier>{49956CAB-1B8F-39BF-8F08-35114DF87857}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{58FFD588-D87B-3063-B453-79F075788691}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

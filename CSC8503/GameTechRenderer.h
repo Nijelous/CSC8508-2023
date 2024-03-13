@@ -24,7 +24,6 @@ namespace NCL {
 		class RenderObject;
 
 		constexpr short MAX_INSTANCE_MESHES = 3;
-		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer {
@@ -42,10 +41,6 @@ namespace NCL {
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
 			MeshMaterial* LoadMaterial(const std::string& name) override;
-			
-
-			void AddLight(Light* light);
-			void ClearLights();
 
 			void ClearInstanceObjects() { mInstanceTiles.clear(); }
 
@@ -229,8 +224,6 @@ namespace NCL {
 			GLuint iconVAO;
 			GLuint iconVertVBO;
 			GLuint iconTexVBO;
-
-			vector<Light*> mLights;
 
 			Frustum mFrameFrustum;
 
