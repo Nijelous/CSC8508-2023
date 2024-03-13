@@ -44,6 +44,7 @@ namespace {
 
     constexpr int GAME_WINDOW_WIDTH = 1280;
     constexpr int GAME_WINDOW_HEIGHT = 720;
+
 #endif
 #ifdef USEPROSPERO
     constexpr int NETWORK_TEST_WIDTH = 1920;
@@ -55,13 +56,13 @@ namespace {
 }
 
 #ifdef USEPROSPERO
-Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen){
+PS5::PS5Window* SetUpPS5Window(float winWidth, float winHeight, bool fullscreen){
 	PS5::PS5Window* w = new PS5::PS5Window("Hello!", winWidth, winHeight);
 
     return w;
 }
 
-void SetUpPS5InputDevices(PS5::PS5Window* w){
+void SetUpPS5InputDevices(PS5::PS5Window* w, SceneManager* sceneManager){
     PS5::PS5Controller* ps5Controller = w->GetController();
 
     ps5Controller->MapAxis(0, "LeftX");
@@ -107,21 +108,21 @@ int RunGame(){
     float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
     bool isFullScreen = !isNetworkTestActive;
-    Window* w = nullptr;
+
 #ifdef USEGL
+    Window* w = nullptr;
     w = SetUpPCWindow(winWidth, winHeight, isFullScreen);
     SetUpPCInputDevices(w, isNetworkTestActive);
 #endif
 
 #ifdef USEPROSPERO
+    PS5::PS5Window* w = nullptr;
     w = SetUpPS5Window(winWidth, winHeight, isFullScreen);
-    SetUpPS5InputDevices((PS5::PS5Window*)w);
 #endif
 
-
     SceneManager* sceneManager = SceneManager::GetSceneManager();
-    PS5::PS5Window* ps5Window = (PS5::PS5Window*)w;
-    sceneManager->SetPS5Controller(ps5Window->GetController());
+
+    sceneManager->GetControllerInterface()->SetPS5Controller(w->GetController());
 
     //erendgrmnc: make the bool below true for network test.   
 

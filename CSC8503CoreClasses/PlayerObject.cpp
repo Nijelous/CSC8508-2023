@@ -10,6 +10,7 @@
 #include "Window.h"
 #include "GameWorld.h"
 #include "UISystem.h"
+#include "../CSC8503/SceneManager.h"
 
 
 using namespace NCL::CSC8503;
@@ -311,7 +312,8 @@ void PlayerObject::MovePlayer(float dt) {
 	Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
 	bool isIdle = true;
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)){
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveForward()){
+		Vector3 force = fwdAxis * mMovementSpeed;
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
