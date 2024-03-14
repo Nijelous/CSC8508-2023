@@ -74,6 +74,7 @@ namespace NCL {
 
             void InitIpAddress();
             void TranslateIpAddress();
+            void TranslatePlayerName();
         };
     }
 }

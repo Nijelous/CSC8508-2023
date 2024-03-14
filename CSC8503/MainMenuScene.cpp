@@ -145,6 +145,7 @@ void MainMenuScene::DrawMultiplayerLobby() {
 	if (ImGui::Button("Enter", ImVec2(windowSize.x * .3f, windowSize.y * .2f))) {
 		if (!mIsMultiplayerLobbyOnHost) {
 			TranslateIpAddress();
+			mPlayerName = std::string(mNameInputBuffer);
 		}
 		mMultiplayerLobbyState = mIsMultiplayerLobbyOnHost ? MultiplayerLobbyPanelStates::StartAsServer : MultiplayerLobbyPanelStates::StartAsClient;
 	}
@@ -180,4 +181,8 @@ void MainMenuScene::TranslateIpAddress() {
 		token = strtok_s(NULL, ".", &nextToken);
 		index++;
 	}
+}
+
+void MainMenuScene::TranslatePlayerName() {
+	
 }

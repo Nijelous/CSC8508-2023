@@ -123,7 +123,7 @@ void ClientState::OnAwake() {
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetScene(Scenes::Multiplayer);
 
-	mIsClientConnected = client->StartAsClient(ipToConnect[0], ipToConnect[1], ipToConnect[2], ipToConnect[3], "");
+	mIsClientConnected = client->StartAsClient(ipToConnect[0], ipToConnect[1], ipToConnect[2], ipToConnect[3], mPlayerName);
 	if (mIsClientConnected) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
