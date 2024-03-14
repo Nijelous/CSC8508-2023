@@ -108,6 +108,23 @@ ClientSyncGlobalSusChangePacket::ClientSyncGlobalSusChangePacket(int changedValu
 	this->changedValue = changedValue;
 }
 
+ClientSyncLocationActiveSusCausePacket::ClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeLocationSusCauseID, bool toApply) {
+	type = BasicNetworkMessages::ClientSyncLocationActiveCause;
+	size = sizeof(ClientSyncLocationActiveSusCausePacket);
+
+	this->cantorPairedLocation = cantorPairedLocation;
+	this->activeLocationSusCauseID = activeLocationSusCauseID;
+	this->toApply = toApply;
+}
+
+ClientSyncLocationSusChangePacket::ClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) {
+	type = BasicNetworkMessages::ClientSyncLocationSusChange;
+	size = sizeof(ClientSyncLocationSusChangePacket);
+
+	this->cantorPairedLocation = cantorPairedLocation;
+	this->changedValue = changedValue;
+}
+
 ClientSyncItemSlotUsagePacket::ClientSyncItemSlotUsagePacket(int playerID, int firstItemUsage, int secondItemUsage) {
 	this->firstItemUsage = firstItemUsage;
 	this->secondItemUsage = secondItemUsage;

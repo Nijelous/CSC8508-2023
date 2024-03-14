@@ -37,7 +37,6 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-#ifdef USEGL
 	mRoomList = std::vector<Room*>();
 	std::thread loadRooms([this] {
 		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
@@ -52,27 +51,6 @@ LevelManager::LevelManager() {
 			mLevelList.push_back(newLevel);
 		}
 		});
-#endif
-#ifdef USEPROSPERO
-	mRoomList = std::vector<Room*>();
-	std::thread loadRooms([this] {
-		std::vector<std::string> paths = { "HotelLargeRoomNoWalls", "HotelLargeRoomWalls", "NewMediumDemoRoom1DoorPurple",
-			"NewMediumDemoRoom1DoorTeal", "NewMediumDemoRoom2DoorsBlue", "NewMediumDemoRoom2DoorsGreen", "NewMediumRoom1", "NewMediumRoom2",
-			"NewMediumRoomWithCamera", "Shed", "ShedCamera" };
-		for (int i = 0; i < paths.size(); i++) {
-			Room* newRoom = new Room(Assets::LEVELDIR + "Rooms/" + paths[i] + ".json");
-			mRoomList.push_back(newRoom);
-		}
-		});
-	mLevelList = std::vector<Level*>();
-	std::thread loadLevels([this] {
-		std::vector<std::string> paths = { "DemoLevel", "Hotel" };
-		for (int i = 0; i < paths.size(); i++) {
-			Level* newLevel = new Level(Assets::LEVELDIR + "Levels/" + paths[i] + ".json");
-			mLevelList.push_back(newLevel);
-		}
-		});
-#endif
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
@@ -93,6 +71,11 @@ LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
+
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
@@ -276,10 +259,6 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
-
-		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
-		LoadCCTVs();
 	}
 #ifdef USEGL
 	else {
@@ -873,7 +852,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -948,7 +927,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	}
 
 	mWorld->AddGameObject(newDoor);
-
+	mGlobalSuspicionObserver.push_back(newDoor);
 	return newDoor;
 }
 
@@ -983,6 +962,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
+	mGlobalSuspicionObserver.push_back(newDoor);
 
 	return newDoor;
 }

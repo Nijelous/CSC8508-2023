@@ -1,12 +1,11 @@
 #include "PlayerInventory.h"
 
 #include "GameServer.h"
-#include "Level.h"
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 #include <algorithm>
+#include <random>
 
 namespace {
 	constexpr int DEFAULT_ITEM_USAGE_COUNT = 0;

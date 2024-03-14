@@ -1,10 +1,6 @@
 #include "PlayerBuffs.h"
-#include "Level.h"
-#include "GameServer.h"
-#include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 
 #include <algorithm>
 
@@ -28,7 +24,6 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	}
 
 	HandleBuffNetworking(inBuff, playerNo,true);
-	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
@@ -39,7 +34,6 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 		mBuffsToRemove[playerNo].push_back(inBuff);
 
 		HandleBuffNetworking(inBuff, playerNo, false);
-		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 	}
 };
 
@@ -49,14 +43,19 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		const auto* localPlayer = game->GetLocalPlayer();
-		localPlayerId = localPlayer->GetPlayerID();
 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncBuffPacket(playerNo, inBuff, toApply);
 		}
 	}
+	if (localPlayerId != playerNo)
+		return;
+
+	if(toApply)
+		Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
+	else
+		Notify(mOnBuffRemovedBuffEventMap[inBuff], playerNo);
 }
 #endif
 
