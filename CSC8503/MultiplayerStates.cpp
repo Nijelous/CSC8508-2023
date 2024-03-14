@@ -23,9 +23,9 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 	else {
 		bool isConnected = mGameSceneManager->GetClient()->GetIsConnected();
 		if (isConnected) {
-
-			Debug::Print("Connected Successfully! Waiting for server to start...", Vector2(5, 95), Debug::RED);
-			if (bool isGameStarted = mGameSceneManager->GetIsGameStarted()) {
+			Debug::ClearStringEntries();
+			Debug::Print("Connected Successfully! Waiting for server to start...", Vector2(5, 95), Debug::RED, 15.f);
+;			if (bool isGameStarted = mGameSceneManager->GetIsGameStarted()) {
 				*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
 				return PushdownResult::Push;
 			}
