@@ -648,9 +648,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			break;
 		}
 
-		allData.push_back(lightData);
-
-		
+		allData.push_back(lightData);		
 	}
 	size_t lightSize = sizeof(LightData);
 	size_t lightCount = allData.size();

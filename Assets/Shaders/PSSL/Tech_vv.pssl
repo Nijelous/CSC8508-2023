@@ -10,9 +10,8 @@ struct VS_OUTPUT
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
 	float4 Colour		: TEXCOORD1;	
-	int	texID			: TEXCOORD2;
-
-	float4 ShadowClip	: TEXCOORD2;
+	int	albedoTexID		: TEXCOORD2;
+	int normalTexID		: TEXCOORD3;
 };
 
 [CxxSymbol("TestShader::gs")]
@@ -34,9 +33,8 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	Output.Position = TransformWorldToClip(position);
 	Output.UV		= TextureCoords[vertID];
 	Output.Colour	= s.colour;
-	Output.texID	= s.index[0];
-
-	Output.ShadowClip = mul(Constants.shadowMatrix, position);
+	Output.albedoTexID	= s.index[0];
+	Output.normalTexID = s.index[1];
 
 	return Output;
 }
