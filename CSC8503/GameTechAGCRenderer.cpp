@@ -309,7 +309,7 @@ void GameTechAGCRenderer::GPUSkinningPass() {
 		}
 		char* offset = currentFrame->data.data;
 
-		std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[i];
+		std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[0];
 		currentFrame->data.WriteData(skeleton.data(), sizeof(Matrix4) * skeleton.size());
 
 		sce::Agc::Core::BufferSpec bufSpec;
