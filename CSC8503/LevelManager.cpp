@@ -282,12 +282,13 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
 	}
+#endif
 
-	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 	LoadCCTVs();
 
 
-#endif
+
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
@@ -435,7 +436,14 @@ void LevelManager::InitialiseAssets() {
 					});
 			}
 			else if (groupType == "msh") {
+#ifdef USEGL
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+#endif
+#ifdef USEPROSPERO
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
+				}
+#endif
 				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
 				mRenderer->Render();
 			}
