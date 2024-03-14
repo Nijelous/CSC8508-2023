@@ -231,11 +231,13 @@ void GameTechAGCRenderer::DrawObjects() {
 	AGCMesh* prevMesh = (AGCMesh*)activeObjects[0]->GetMesh();
 	int instanceCount = 0;
 
+	bool skipInstance = false;
+
 	for (int i = 0; i < activeObjects.size(); ++i) {
 		AGCMesh* objectMesh = (AGCMesh*)activeObjects[i]->GetMesh();
 
 		//The new mesh is different than previous meshes, flush out the old list
-		if (prevMesh != objectMesh) {
+		if (prevMesh != objectMesh || skipInstance) {
 			prevMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
 
 			uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
