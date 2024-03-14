@@ -150,7 +150,7 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 		Vector3 dir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 		Vector3 dirNorm = dir.Normalised();
 		float ang = Vector3::Dot(dirNorm, GuardForwardVector());
-		int minAng = 0;
+		float minAng = 0;
 		minAng = AngleValue(minAng);
 		if (ang > minAng) {
 			float distance = dir.LengthSquared();
@@ -164,7 +164,7 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 	return playerToChase;
 }
 
-int GuardObject::AngleValue(int minAng) {
+int GuardObject::AngleValue(float minAng) {
 	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 && mCanSeePlayer == true) {
 		minAng = 1.5;
 	}
