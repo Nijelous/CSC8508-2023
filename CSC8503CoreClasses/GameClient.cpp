@@ -23,12 +23,13 @@ int GameClient::GetPeerID() const {
 	return mPeerId;
 }
 
-bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum) {
+bool GameClient::Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum, const std::string& playerName) {
 	ENetAddress address;
 	address.port = portNum;
 	address.host = (d << 24) | (c << 16) | (b << 8) | (a);
 
 	mNetPeer = enet_host_connect(netHandle, &address, 2, 0);
+	mPlayerName = playerName;
 
 	// returm false if net peer is null
 	return mNetPeer != nullptr;
@@ -49,6 +50,9 @@ bool GameClient::UpdateClient() {
 			mPeerId = mNetPeer->outgoingPeerID + 1;
 			mIsConnected = true;
 			std::cout << "Connected to server!" << std::endl;
+
+			//TODO(eren.degirmenci): send player init packet.
+			SendClientInitPacket();
 		}
 		else if (event.type == ENET_EVENT_TYPE_RECEIVE) {
 			//std::cout << "Client Packet recieved..." << std::endl;
@@ -105,5 +109,10 @@ void GameClient::Disconnect() {
 
 bool GameClient::GetIsConnected() const {
 	return mIsConnected;
+}
+
+void GameClient::SendClientInitPacket() {
+	ClientInitPacket packet(mPlayerName);
+	SendPacket(packet);
 }
 #endif#
