@@ -80,6 +80,6 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		plObj->AddPlayerPoints(mPoints);
-		GetFlag(0);
+		GetFlag(plObj->GetPlayerID());
 	}
 }
