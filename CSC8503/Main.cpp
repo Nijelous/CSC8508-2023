@@ -39,7 +39,7 @@ namespace {
 }
 
 int main(){
-    bool isNetworkTestActive = true;
+    bool isNetworkTestActive = false;
 
     float winWidth = isNetworkTestActive ? NETWORK_TEST_WIDTH : GAME_WINDOW_WIDTH;
     float winHeight = isNetworkTestActive ? NETWORK_TEST_HEIGHT : GAME_WINDOW_HEIGHT;
@@ -60,6 +60,7 @@ int main(){
     w->LockMouseToWindow(!isNetworkTestActive);
 
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
+
     while (w->UpdateWindow() && !sceneManager->GetIsForceQuit()) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
         if (dt > 0.1f) {
