@@ -152,6 +152,18 @@ namespace NCL::CSC8503 {
 		SyncObjectStatePacket(int networkObjId, int objectState);
 	};
 
+	struct ClientInitPacket : public GamePacket {
+		std::string playerName;
+
+		ClientInitPacket(const std::string& playerName);
+	};
+
+	struct SyncPlayerIdNameMapPacket : public GamePacket {
+		std::map<int, std::string> playerIdNameMap;
+
+		SyncPlayerIdNameMapPacket(std::map<int, string> playerIdNameMap);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);
