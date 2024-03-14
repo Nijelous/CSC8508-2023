@@ -1,4 +1,7 @@
 #include "LocalSuspicionMetre.h"
+
+#include <algorithm>
+
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
