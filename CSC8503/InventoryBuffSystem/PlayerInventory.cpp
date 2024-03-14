@@ -3,6 +3,7 @@
 #include "GameServer.h"
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
+#include "../LevelManager.h"
 #include "../SceneManager.h"
 #include <algorithm>
 #include <random>
@@ -12,9 +13,7 @@ namespace {
 	
 }
 
-namespace NCL::CSC8503 {
-	class DebugNetworkedGame;
-}
+
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
@@ -95,7 +94,7 @@ int PlayerInventory::RemoveItemFromPlayer(const item& inItem, const int& playerN
 	return -1;
 }
 
-void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
+void PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
 	ResetItemUsageCount(playerNo, invSlot);
 	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	mPlayerInventory[playerNo][invSlot] = none;

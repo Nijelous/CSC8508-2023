@@ -25,7 +25,9 @@ void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inC
 	}
 
 	ChangeSusLocationSusAmount(nearbyPairedLocation, mInstantLocationSusCauseSeverityMap[inCause]);
+#ifdef USEGL
 	HandleSusChangeNetworking(mLocationSusAmountMap[nearbyPairedLocation], nearbyPairedLocation);
+#endif
 }
 
 bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause inCause, Vector3 pos){
@@ -35,14 +37,18 @@ bool LocationBasedSuspicion::AddActiveLocationSusCause(activeLocationSusCause in
 	{
 		AddNewLocation(pairedLocation);
 		mActiveLocationSusCauseMap[pairedLocation].push_back(inCause);
+#ifdef USEGL
 		HandleActiveSusCauseNetworking(inCause, nearbyPairedLocation, true);
+#endif
 		return true;
 	}
 
 	if (!IsActiveLocationsSusCause(inCause, nearbyPairedLocation))
 	{
 		mActiveLocationSusCauseMap[nearbyPairedLocation].push_back(inCause);
+#ifdef USEGL
 		HandleActiveSusCauseNetworking(inCause, nearbyPairedLocation, true);
+#endif
 		return true;
 	}
 
@@ -56,7 +62,9 @@ bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause
 		IsActiveLocationsSusCause(inCause, nearbyPairedLocation))
 	{
 		mActiveLocationlSusCausesToRemove[nearbyPairedLocation].push_back(inCause);
+#ifdef USEGL
 		HandleActiveSusCauseNetworking(inCause,nearbyPairedLocation,false);
+#endif
 		return true;
 	}
 
@@ -94,7 +102,9 @@ void LocationBasedSuspicion::Update(float dt){
 
 		if (tempSusAmount != 0){
 			ChangeSusLocationSusAmount(pairedLocation, tempSusAmount * dt);
+#ifdef USEGL
 			HandleSusChangeNetworking(mLocationSusAmountMap[pairedLocation], pairedLocation);
+#endif
 		}
 
 		std::vector<activeLocationSusCause> susCausesToRemoveVector = mActiveLocationlSusCausesToRemove[pairedLocation];
@@ -224,6 +234,7 @@ float LocationBasedSuspicion::Calculate2DDistance(Vector3 inPos1, Vector3 inPos2
 	return outVector.Length();
 }
 
+#ifdef USEGL
 void LocationBasedSuspicion::HandleActiveSusCauseNetworking(const activeLocationSusCause& inCause, const CantorPair& pairedLocation, const bool& toApply){
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
@@ -247,4 +258,4 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 }
 
 
-
+#endif

@@ -3,6 +3,9 @@
 #include "NetworkObject.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
+#include "PlayerObject.h"
+
+
 
 using namespace NCL::CSC8503;
 
@@ -70,10 +73,11 @@ bool InteractableDoor::CanBeInteractedWith(InteractType interactType, GameObject
 }
 
 bool InteractableDoor::CanUseItem(GameObject* userObj) {
-	auto* playerComp = static_cast<PlayerObject*>(userObj);
+
+	PlayerObject* playerComp = (PlayerObject*)userObj;
 	if (playerComp == nullptr)
 		return false;
-	PlayerInventory::item usedItem = playerComp->GetEquippedItem();
+	InventoryBuffSystem::PlayerInventory::item usedItem = playerComp->GetEquippedItem();
 
 	switch (usedItem) {
 	case InventoryBuffSystem::PlayerInventory::doorKey:
