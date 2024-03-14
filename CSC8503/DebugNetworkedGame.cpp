@@ -331,7 +331,7 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
-		if (mPacketToSendQueue.size() != 0) {
+		if (mPacketToSendQueue.size() > 1) {
 			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
