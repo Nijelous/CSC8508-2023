@@ -177,7 +177,6 @@ void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::Game
 	gameObject->GetRenderObject()->GetAnimationObject()->SetAnimation(anim);
 }
 
-
 void AnimationSystem::InitGuardStateAnimationMap() {
 	mGuardStateAnimationMap = {
 	{GameObject::GameObjectState::Idle, "GuardStand"},

@@ -293,9 +293,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
 	
-#ifdef USEGL
 	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
-#endif
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
 
