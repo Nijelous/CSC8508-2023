@@ -123,7 +123,7 @@ void ClientState::OnAwake() {
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetScene(Scenes::Multiplayer);
 
-	mIsClientConnected = client->StartAsClient(ipToConnect[0], ipToConnect[1], ipToConnect[2], ipToConnect[3]);
+	mIsClientConnected = client->StartAsClient(ipToConnect[0], ipToConnect[1], ipToConnect[2], ipToConnect[3], "");
 	if (mIsClientConnected) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
@@ -152,6 +152,7 @@ PushdownState::PushdownResult MultiplayerLobbyState::OnUpdate(float dt, Pushdown
 		for (int i = 0; i < 4; i++) {
 			clientState->ipToConnect[i] = ip[i];
 		}
+		clientState->mPlayerName = mMainMenuScene->GetPlayerName();
 
 		return PushdownResult::Push;
 	}
