@@ -159,9 +159,9 @@ namespace NCL::CSC8503 {
 	};
 
 	struct SyncPlayerIdNameMapPacket : public GamePacket {
-		std::map<int, std::string> playerIdNameMap;
+		std::map<int, string> playerIdNameMap;
 
-		SyncPlayerIdNameMapPacket(std::map<int, string> playerIdNameMap);
+		SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap);
 	};
 
 	class NetworkObject	{
