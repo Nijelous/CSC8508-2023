@@ -1,9 +1,13 @@
-﻿#ifdef USEGL
-#pragma once
+﻿#pragma once
+
+#ifdef USEGL
+#include <queue>
+#include <mutex>
 #include <functional>
 #include "NetworkBase.h"
 #include "GameSceneManager.h"
 #include "NetworkedGame.h"
+
 
 namespace NCL::CSC8503
 {
@@ -69,6 +73,9 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendPacketsThread();
+
             GameClient* GetClient() const;
             GameServer* GetServer() const;
             NetworkPlayer* GetLocalPlayer() const;
@@ -131,6 +138,8 @@ namespace NCL{
             int mClientSideLastFullID;
             int mServerSideLastFullID;
 
+            std::queue<GamePacket*> mPacketToSendQueue;
+            std::mutex mPacketToSendQueueMutex;
         private:
         };
     }
