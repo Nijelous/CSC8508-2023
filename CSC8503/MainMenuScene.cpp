@@ -27,6 +27,12 @@ MainMenuScene::~MainMenuScene() {
 }
 
 void MainMenuScene::UpdateGame(float dt) {
+#ifdef USEPRESPERO
+	Debug::Print("1-) Start Single Player", Vector2(30, 70));
+	Debug::Print("2-) Start Multi Player (Server)", Vector2(30, 75));
+	Debug::Print("3-) Start Multi Player (Client)", Vector2(30, 80));
+#endif
+
 	Scene::UpdateGame(dt);
 }
 
