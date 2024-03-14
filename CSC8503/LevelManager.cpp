@@ -258,7 +258,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		});
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	}
 #ifdef USEGL
 	else {

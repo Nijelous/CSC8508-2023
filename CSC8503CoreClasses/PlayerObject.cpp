@@ -699,6 +699,9 @@ void PlayerObject::ChangeToStunned(){
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent)
 	{
+	case InventoryBuffSystem::flagAdded:
+		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
+		break;
 	case InventoryBuffSystem::flagDropped:
 		break;
 	case InventoryBuffSystem::disguiseItemUsed:
