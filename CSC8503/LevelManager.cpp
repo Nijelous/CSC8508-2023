@@ -870,6 +870,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	newVent->SetRenderObject(new RenderObject(&newVent->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
 	newVent->SetPhysicsObject(new PhysicsObject(&newVent->GetTransform(), newVent->GetBoundingVolume(), 1, 1, 5));
+	newVent->SetSoundObject(new SoundObject());
 
 
 	newVent->GetPhysicsObject()->SetInverseMass(0);
