@@ -219,9 +219,8 @@ namespace NCL {
 
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
-#ifdef USEGL // remove when converted to PS5 also
+
 			AnimationSystem* mAnimation;
-#endif
 
 			SoundManager* mSoundManager;
 
@@ -243,8 +242,10 @@ namespace NCL {
 			vector<GLuint>  mGuardTextures;
 			vector<GLuint> mPlayerTextures;
 #endif
+
 #ifdef USEPROSPERO
-			// PSSL textures
+			vector<sce::Agc::Core::Texture*> mGuardTextures;
+			vector<sce::Agc::Core::Texture*> mPlayerTextures;
 #endif
 
 			//animation guard

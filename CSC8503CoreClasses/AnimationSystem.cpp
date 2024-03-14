@@ -1,5 +1,3 @@
-#ifdef USEGL
-
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
@@ -73,7 +71,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 
 				frameMatricesVec.clear();
-
 			}
 			
 		}
@@ -86,6 +83,7 @@ void AnimationSystem::UpdateCurrentFrames(float dt) {
 	}
 }
 
+#ifdef USEGL
 void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& mMatTextures) {
 
 	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
@@ -123,6 +121,47 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 		}
 	}
 }
+#endif
+
+#ifdef USEPROSPERO
+void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& mMatTextures) {
+
+	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
+		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
+		const string* filename = nullptr;
+		matEntry->GetEntry("Diffuse", &filename);
+		sce::Agc::Core::Texture* texID = nullptr;
+
+		if (filename) {
+			string path = *filename;
+			std::cout << path << std::endl;
+			mAnimTexture = renderer.LoadTexture(path.c_str());
+			texID = ((PS5::AGCTexture*)mAnimTexture)->GetAGCPointer();
+			std::cout << texID << endl;
+		}
+		mMatTextures.emplace_back(texID);
+	}
+}
+
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> mPlayerTexture, vector<sce::Agc::Core::Texture*>& mGuardTextures) {
+	for (auto& obj : UpdatableObjects) {
+		if (obj->GetName() == "Guard") {
+			mGuardList.emplace_back((GuardObject*)obj);
+			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
+			//obj->GetRenderObject()->SetMatTextures(mGuardTextures);
+
+		}
+		if (obj->GetName() == "Player") {
+			mPlayerList.emplace_back((PlayerObject*)obj);
+			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
+			mAnimationList.emplace_back(animObj);
+			//obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
+
+		}
+	}
+}
+#endif
 
 void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::GameObjectState objState) {
 	gameObject->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();
@@ -154,4 +193,3 @@ void AnimationSystem::InitPlayerStateAnimationMap() {
 	{GameObject::GameObjectState::Sprint, "PlayerSprint"},
 	};
 }
-#endif

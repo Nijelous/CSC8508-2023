@@ -62,13 +62,13 @@ LevelManager::LevelManager() {
 #endif
 	mUi = new UISystem();
 	InitialiseAssets();
-#ifdef USEGL // remove after implemented
+
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
 
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
-#endif
+	//mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
+	//mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
+
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
@@ -263,7 +263,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
 
 		//TODO(erendgrmnc): after implementing ai to multiplayer move out from this if block
-		//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+		LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 		LoadCCTVs();
 	}
 #ifdef USEGL
@@ -375,9 +375,8 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		mRenderer->Update(dt);
 		if (mIsLevelInitialised) {
 			mPhysics->Update(dt);
-#ifdef USEGL
+
 			mAnimation->Update(dt, mUpdatableObjects);
-#endif
 		}
 #ifdef USEGL
 		if (mUpdatableObjects.size()>0) {
