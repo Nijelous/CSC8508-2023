@@ -52,7 +52,7 @@ function(Create_PC_CSC8503_Files)
         "SuspicionSystem/SuspicionMetre.h"
         "SuspicionSystem/SuspicionMetre.cpp"
         "SuspicionSystem/SuspicionSystem.h"
-        "SuspicionSystem/SuspicionSystem.cpp"
+        #"SuspicionSystem/SuspicionSystem.cpp"
     )
     source_group("Suspicion System" FILES ${Suspicion_System})
 
