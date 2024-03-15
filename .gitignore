@@ -86,3 +86,10 @@ Prospero
 Prospero_Debug
 sce_module
 Generate.bat
+
+/EntryPoint/Debug
+/EntryPoint/EntryPoint.dir
+/EntryPoint/Textures.vcxproj.filters
+/EntryPoint/EntryPoint.vcxproj.filters
+/EntryPoint/Shaders.vcxproj.filters
+/EntryPoint/EntryPoint.vcxproj.user
