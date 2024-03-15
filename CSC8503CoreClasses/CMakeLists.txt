@@ -144,6 +144,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.h"
         "AnimationObject.h"
         "AnimationSystem.h"
+        "SoundObject.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -156,6 +157,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.cpp"
         "AnimationObject.cpp"
         "AnimationSystem.cpp"
+        "SoundObject.cpp"
     )
     source_group("Source Files" FILES ${Source_Files})
 
@@ -287,8 +289,16 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     include_directories("../NCLCoreClasses/")
     include_directories("./")
     include_directories("../OpenGLRendering/")
+    include_directories("../FMODCoreAPI/includes")
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
+    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
+
+    file(GLOB DLLS "../FMODCoreAPI/dlls/*.dll")
+    foreach(DLL ${DLLS})
+          add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    endforeach(DLL)
 
     if(MSVC)
         target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")
@@ -555,7 +565,10 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     include_directories("./")
     if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         include_directories("../OpenGLRendering/")
+        include_directories("../FMODCoreAPI/includes")
         target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
+        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
     endif()
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 

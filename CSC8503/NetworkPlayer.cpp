@@ -341,6 +341,7 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 			}
 		}
 	}
+	
 }
 
 void NetworkPlayer::ControlInventory() {

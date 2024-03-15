@@ -107,6 +107,9 @@ namespace NCL {
 			void	ChangeToStunned();
 			void	UseItemForInteractable(Interactable* interactable);
 			void	EnforceMaxSpeeds();
+			void    ChangeTransparency(bool isUp,float& transparency);
+			void    RayCastIcon(GameObject* objectHit, float distance);
+			void    ResetRayCastIcon();
 
 			UISystem* mUi;
 			float SusLinerInterpolation(float dt);
@@ -116,6 +119,10 @@ namespace NCL {
 			float tempSusValue = 0.0;
 			float mLastSusValue = 0.0;
 			float mAlarmTime=0.0;
+			float mTransparencyRight = 0.0;
+			float mTransparencyLeft = 0.0;
+			float mTransparencyTop = 0.0;
+			float mTransparencyBot = 0.0;
 			
 
 			bool	IsSeenByGameObject(GameObject* otherGameObject);

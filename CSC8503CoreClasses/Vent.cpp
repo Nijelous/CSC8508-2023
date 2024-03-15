@@ -10,6 +10,7 @@
 using namespace NCL::CSC8503;
 
 Vent::Vent() {
+	mName = "Vent";
 	mIsOpen = false;
 	mConnectedVent = nullptr;
 	mInteractable = true;
@@ -34,6 +35,8 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 
 		playerTransform.SetPosition(newPlayerPos);
 		playerTransform.SetOrientation(teleportOrient);
+		this->GetSoundObject()->TriggerSoundEvent();
+		mConnectedVent->GetSoundObject()->TriggerSoundEvent();
 		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().SetYaw(mTransform.GetOrientation().ToEuler().y);
 		SetIsOpen(false, true);
 	}
