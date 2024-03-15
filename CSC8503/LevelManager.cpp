@@ -1001,6 +1001,8 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 	camera->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
 	camera->GenerateViewPyramid();
+	camera->SetSoundObject(new SoundObject());
+
 	if (!isMultiplayerLevel)
 	{
 		camera->SetPlayerObjectPtr(mTempPlayer);
