@@ -15,6 +15,7 @@ namespace NCL {
 			void Lock();
 			void Interact(InteractType interactType, GameObject* interactedObject = nullptr) override;
 			bool CanBeInteractedWith(InteractType interactType, GameObject* interactedObject = nullptr) override;
+			
 #ifdef USEGL
 			void SyncInteractableDoorStatusInMultiplayer(bool toOpen);
 			void SyncDoor(bool toOpen);

@@ -357,57 +357,16 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 		
 		if (world->Raycast(ray, closestCollision, true, this)) {
 			auto* objectHit = (GameObject*)closestCollision.node;
-			Vector3 objPos = objectHit->GetTransform().GetPosition();
-			Vector3 playerPos = GetTransform().GetPosition();
-			float distance = (objPos - playerPos).Length();
-			//Open Door
-			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10) {
-				if (mTransparencyRight < 1) {
-					mTransparencyRight = mTransparencyRight + 0.05;
-				}
 
-				mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
-			}
-			else if (mTransparencyRight > 0) {
-				mTransparencyRight = mTransparencyRight - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
-			}
-			//Close Door
-			if (objectHit->GetName() == "InteractableDoor" && !objectHit->IsActive() && distance < 10) {
-				if (mTransparencyLeft < 1) {
-					mTransparencyLeft = mTransparencyLeft + 0.05;
-				}
-				mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
-			}
-			else if (mTransparencyLeft > 0) {
-				mTransparencyLeft = mTransparencyLeft - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
-			}
-			//Lock Door
-			if (objectHit->GetName() == "InteractableDoor" && objectHit->IsActive() && distance < 10&& GetEquippedItem() == PlayerInventory::item::doorKey) {
-				if (mTransparencyTop < 1) {
-					mTransparencyTop = mTransparencyTop + 0.05;
-				}
-				mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
-			}
-			else if (mTransparencyTop > 0) {
-				mTransparencyTop = mTransparencyTop - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
-			}
-			//Stop Guard
-			if (objectHit->GetName() == "Guard" && distance < 20 && GetEquippedItem() == PlayerInventory::item::stunItem) {
-				if (mTransparencyBot < 1) {
-					mTransparencyBot = mTransparencyBot + 0.05;
-				}
-				mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
-			}
-			else if (mTransparencyBot > 0) {
-				mTransparencyBot = mTransparencyBot - 0.05;
-				mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
-			}
+			Vector2 objPos = {objectHit->GetTransform().GetPosition().x, objectHit->GetTransform().GetPosition().z};
+			Vector2 playerPos = {GetTransform().GetPosition().x ,GetTransform().GetPosition().z};
+			float distance = (objPos - playerPos).Length();
+			RayCastIcon(objectHit, distance);
+
 		}
-	
-		
+		else {
+			ResetRayCastIcon();
+		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
@@ -464,8 +423,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 								0, this->GetPlayerID());
 					}
 				}
-
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}
 	}
@@ -651,6 +608,95 @@ void PlayerObject::EnforceMaxSpeeds() {
 			mPhysicsObject->SetLinearVelocity(velocityDirection * MAX_SPRINT_SPEED);
 		break;
 	}
+}
+
+void PlayerObject::ChangeTransparency(bool isUp, float& transparency)
+{
+	if (isUp == true && transparency<1) {
+		transparency = transparency + 0.05;
+	}
+	if (isUp == false && transparency > 0) {
+		transparency = transparency - 0.05;
+	}
+	
+}
+
+void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
+{
+	//Open Door
+	if (objectHit->GetName() == "InteractableDoor" && distance < 15) {
+		auto* DoorHit = (Door*)objectHit;
+		if (!DoorHit->GetIsOpen()) {
+			ChangeTransparency(true, mTransparencyRight);
+			mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyRight);
+			mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyRight);
+		mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
+	}
+	//Close Door
+	if (objectHit->GetName() == "InteractableDoor" && distance < 15) {
+		auto* DoorHit = (Door*)objectHit;
+		if (DoorHit->GetIsOpen()) {
+			ChangeTransparency(true, mTransparencyLeft);
+			mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyLeft);
+			mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
+		}
+	}
+	else if (mTransparencyLeft > 0) {
+		ChangeTransparency(false, mTransparencyLeft);
+		mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
+	}
+	//Lock Door
+	if (objectHit->GetName() == "InteractableDoor" && distance < 15 && GetEquippedItem() == PlayerInventory::item::doorKey) {
+		auto* DoorHit = (Door*)objectHit;
+		if (!DoorHit->GetIsOpen()) {
+			ChangeTransparency(true, mTransparencyTop);
+			mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyTop);
+			mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyTop);
+		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+	}
+	//Stop Guard
+	if (objectHit->GetName() == "Guard" && distance < 100 && GetEquippedItem() == PlayerInventory::item::stunItem) {
+		if (mTransparencyBot < 1) {
+			mTransparencyBot = mTransparencyBot + 0.1;
+		}
+		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+	}
+	else {
+		if (mTransparencyBot > 0) {
+			mTransparencyBot = mTransparencyBot - 0.02;
+		}
+		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+	}
+}
+
+void NCL::CSC8503::PlayerObject::ResetRayCastIcon()
+{
+	ChangeTransparency(false, mTransparencyTop);
+	ChangeTransparency(false, mTransparencyBot);
+	ChangeTransparency(false, mTransparencyLeft);
+	ChangeTransparency(false, mTransparencyRight);
+
+	mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
+	mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+	mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
+	mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 }
 
 float PlayerObject::SusLinerInterpolation(float dt)

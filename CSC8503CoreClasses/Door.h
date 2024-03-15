@@ -15,6 +15,10 @@ namespace NCL {
 			virtual void CountDownTimer(float dt);
 			virtual void UpdateObject(float dt) override;
 			virtual void SetIsOpen(bool isOpen);
+			virtual bool GetIsOpen() {
+				return mIsOpen;
+			}
+			
 		protected:
 			void SetNavMeshFlags(int flag);
 

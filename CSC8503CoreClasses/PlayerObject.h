@@ -107,6 +107,9 @@ namespace NCL {
 			void	ChangeToStunned();
 			void	UseItemForInteractable(Interactable* interactable);
 			void	EnforceMaxSpeeds();
+			void    ChangeTransparency(bool isUp,float& transparency);
+			void    RayCastIcon(GameObject* objectHit, float distance);
+			void    ResetRayCastIcon();
 
 			UISystem* mUi;
 			float SusLinerInterpolation(float dt);
