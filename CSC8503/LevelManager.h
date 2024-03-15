@@ -97,12 +97,6 @@ namespace NCL {
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 
-			const std::vector<Matrix4>& GetLevelFloorMatrices() { return mLevelFloorMatrices; }
-
-			const std::vector<Matrix4>& GetLevelWallMatrices() { return mLevelWallMatrices; }
-
-			const std::vector<Matrix4>& GetLevelCornerWallMatrices() { return mLevelCornerWallMatrices; }
-
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
 
 			void DebugUpdate(float dt, bool isUpdatingObjects, bool isPaused);
@@ -208,12 +202,8 @@ namespace NCL {
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
 			std::vector<GameObject*> mLevelLayout;
-			std::vector<Matrix4> mLevelFloorMatrices;
-			std::vector<Matrix4> mLevelWallMatrices;
-			std::vector<Matrix4> mLevelCornerWallMatrices;
-			GameObject* mBaseFloor;
-			GameObject* mBaseWall;
-			GameObject* mBaseCornerWall;
+			std::unordered_map<std::string, std::vector<Matrix4>> mInstanceMatrices;
+			std::unordered_map<std::string, GameObject*> mBaseObjects;
 
 			RecastBuilder* mBuilder;
 

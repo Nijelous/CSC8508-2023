@@ -24,9 +24,8 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		constexpr short MAX_INSTANCE_MESHES = 3;
 		constexpr short MAX_POSSIBLE_LIGHTS = 256;
-		constexpr short MAX_POSSIBLE_OBJECTS = 8192;
+		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
 		class GameTechRenderer : public OGLRenderer {
 		public:
@@ -47,10 +46,10 @@ namespace NCL {
 
 			void ClearInstanceObjects() { mInstanceTiles.clear(); }
 
-			void SetInstanceObjects(GameObject* floorTile, GameObject* wallTile, GameObject* cornerWallTile) {
-				mInstanceTiles.push_back(floorTile);
-				mInstanceTiles.push_back(wallTile);
-				mInstanceTiles.push_back(cornerWallTile);
+			void SetInstanceObjects(std::unordered_map<std::string, GameObject*>& baseObjects) {
+				for (auto const& [key, val] : baseObjects) {
+					mInstanceTiles.push_back(val);
+				}
 			}
 			void FillLightUBO();
 			void FillTextureDataUBO();

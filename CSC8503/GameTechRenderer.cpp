@@ -486,8 +486,7 @@ void GameTechRenderer::RenderCamera() {
 }
 
 void GameTechRenderer::DrawWallsFloorsInstanced() {
-	for (int i = 0; i < MAX_INSTANCE_MESHES; i++) {
-		if (!mInstanceTiles[i]) continue;
+	for (int i = 0; i < mInstanceTiles.size(); i++) {
 		RenderObject* rendObj = mInstanceTiles[i]->GetRenderObject();
 		OGLShader* shader = (OGLShader*)rendObj->GetShader();
 		BindShader(*shader);
