@@ -563,6 +563,7 @@ void LevelManager::InitialiseAssets() {
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
 	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["RigSprint"]));
+	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["RigPoint"]));
 	
 
 	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
@@ -871,11 +872,25 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mTextures["SusIndicator"], 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_INDICATOR_SLOT, *mSuspisionIndicatorIcon);
 
-	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mTextures["Cross"],0.0);
+	UISystem::Icon* mCross = mUi->AddIcon(Vector2(48, 50), 3, 5, mTextures["Cross"],0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
 
 	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mTextures["Alarm"], 0.0);
 	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
+
+	UISystem::Icon* mNoticeRight = mUi->AddIcon(Vector2(52, 50), 8, 6, mTextures["OpenDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICERIGHT, *mNoticeRight);
+
+	UISystem::Icon* mNoticeLeft = mUi->AddIcon(Vector2(39, 50), 8, 6, mTextures["CloseDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICELEFT, *mNoticeLeft);
+
+	UISystem::Icon* mNoticeTop = mUi->AddIcon(Vector2(45, 43), 8, 6, mTextures["LockDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICETOP, *mNoticeTop);
+
+	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
+
+
 
 	mRenderer->SetUIObject(mUi);
 }
@@ -1141,7 +1156,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Chest"], mTextures["ChestAlbedo"], mTextures["ChestNormal"], mShaders["Basic"], 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetSoundObject(new SoundObject());
@@ -1174,7 +1189,7 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Present"], mTextures["PresentAlbedo"], mTextures["PresentNormal"], mShaders["Basic"], 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
 	pickup->SetSoundObject(new SoundObject());
