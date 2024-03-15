@@ -19,6 +19,11 @@ namespace NCL {
 		constexpr int SUSPISION_INDICATOR_SLOT = 7;
 		constexpr int CROSS = 8;
 		constexpr int ALARM = 9;
+		constexpr int NOTICERIGHT = 10;
+		constexpr int NOTICELEFT = 11;
+		constexpr int NOTICETOP = 12;
+		constexpr int NOTICEBOT = 13;
+
 
 		class UISystem {
 		public:
@@ -90,6 +95,10 @@ namespace NCL {
 			Icon* mSuspensionIndicatorIcon;
 			Icon* mCross;
 			Icon* mAlarm;
+			Icon* mNoticeRight;
+			Icon* mNoticeLeft;
+			Icon* mNoticeTop;
+			Icon* mNoticeBot;
 			std::vector<Icon*> mIconsVec;
 			std::vector<Texture*> mKeyTexVec;
 			std::vector<Texture*> mSusBarTexVec;

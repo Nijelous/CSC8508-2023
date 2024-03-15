@@ -11,6 +11,16 @@
 
 namespace NCL::CSC8503
 {
+	struct SyncPlayerIdNameMapPacket;
+}
+
+namespace NCL::CSC8503
+{
+	struct ClientInitPacket;
+}
+
+namespace NCL::CSC8503
+{
 	struct SyncObjectStatePacket;
 }
 
@@ -48,8 +58,8 @@ namespace NCL{
 
             const int GetClientLastFullID() const;
 
-            void StartAsServer();
-            void StartAsClient(char a, char b, char c, char d);
+            bool StartAsServer(const std::string& playerName);
+            bool StartAsClient(char a, char b, char c, char d, const std::string& playerName);
 
             void UpdateGame(float dt) override;
 
@@ -131,6 +141,15 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
+            void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
+
+            void WriteAndSendSyncPlayerIdNameMapPacket() const;
+            void HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet);
+
+            void ShowPlayerList() const;
+
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
@@ -140,6 +159,8 @@ namespace NCL{
 
             std::queue<GamePacket*> mPacketToSendQueue;
             std::mutex mPacketToSendQueueMutex;
+
+            std::map<int, std::string> mPlayerPeerNameMap;
         private:
         };
     }
