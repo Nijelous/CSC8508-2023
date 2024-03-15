@@ -19,8 +19,8 @@ namespace NCL::CSC8503 {
 	};
 
 	struct DeltaPacket : public GamePacket {
-		int		fullID		= -1;
-		int		objectID	= -1;
+		int		fullID = -1;
+		int		objectID = -1;
 		char	pos[3];
 		char	orientation[4];
 
@@ -38,13 +38,13 @@ namespace NCL::CSC8503 {
 		ClientPacket() {
 			type = Received_State;
 			size = sizeof(ClientPacket) - sizeof(GamePacket);
-			cameraPosition = Vector3(0,0,0);
+			cameraPosition = Vector3(0, 0, 0);
 		}
 	};
-	
+
 	struct SyncPlayerListPacket : public GamePacket {
 		int playerList[4];
-		
+
 		SyncPlayerListPacket(std::vector<int>& serverPlayers);
 		void SyncPlayerList(std::vector<int>& clientPlayerList) const;
 	};
@@ -54,19 +54,19 @@ namespace NCL::CSC8503 {
 		GameStartStatePacket(bool val);
 	};
 
-	struct GameEndStatePacket : public GamePacket{
+	struct GameEndStatePacket : public GamePacket {
 		bool isGameEnded = false;
 		int winningPlayerId;
 
 		GameEndStatePacket(bool val, int winningPlayerId);
 	};
 
-	struct ClientPlayerInputPacket : public GamePacket{
+	struct ClientPlayerInputPacket : public GamePacket {
 		int lastId;
 		PlayerInputs playerInputs;
 		float mouseXLook = 0.0f;
-		
-		ClientPlayerInputPacket(int lastId,  const PlayerInputs& playerInputs);
+
+		ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs);
 	};
 
 	struct ClientUseItemPacket : public GamePacket {
@@ -159,12 +159,13 @@ namespace NCL::CSC8503 {
 	};
 
 	struct SyncPlayerIdNameMapPacket : public GamePacket {
-		std::map<int, string> playerIdNameMap;
+		int playerIds[4] = { -1 , -1, -1,-1 };
+		std::string playerNames[4];
 
 		SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap);
 	};
 
-	class NetworkObject	{
+	class NetworkObject {
 	public:
 		NetworkObject(GameObject& o, int id);
 		virtual ~NetworkObject();
@@ -188,11 +189,11 @@ namespace NCL::CSC8503 {
 
 		bool GetNetworkState(int frameID, NetworkState& state);
 
-		virtual bool ReadDeltaPacket(DeltaPacket &p);
-		virtual bool ReadFullPacket(FullPacket &p);
+		virtual bool ReadDeltaPacket(DeltaPacket& p);
+		virtual bool ReadFullPacket(FullPacket& p);
 
-		virtual bool WriteDeltaPacket(GamePacket**p, int stateID);
-		virtual bool WriteFullPacket(GamePacket**p);
+		virtual bool WriteDeltaPacket(GamePacket** p, int stateID);
+		virtual bool WriteFullPacket(GamePacket** p);
 
 		GameObject& object;
 

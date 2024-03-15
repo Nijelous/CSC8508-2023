@@ -59,7 +59,8 @@ PushdownState::PushdownResult InitialisingMultiplayerLevel::OnUpdate(float dt, P
 }
 
 void InitialisingMultiplayerLevel::OnAwake() {
-
+	auto* levelManager = LevelManager::GetLevelManager();
+	levelManager->GetRenderer()->SetIsGameStarted(true);
 }
 
 PushdownState::PushdownResult PlayingMultiplayerLevel::OnUpdate(float dt, PushdownState** newState) {
@@ -91,7 +92,9 @@ PushdownState::PushdownResult MultiplayerVictory::OnUpdate(float dt, PushdownSta
 }
 
 void MultiplayerVictory::OnAwake() {
+	auto* levelManager = LevelManager::GetLevelManager();
 	mGameSceneManager->ClearNetworkGame();
+	levelManager->GetRenderer()->SetIsGameStarted(false);
 }
 
 
@@ -111,5 +114,7 @@ PushdownState::PushdownResult MultiplayerDefeat::OnUpdate(float dt, PushdownStat
 }
 
 void MultiplayerDefeat::OnAwake() {
-	LevelManager::GetLevelManager()->ClearLevel();
+	auto* levelManager = LevelManager::GetLevelManager();
+	mGameSceneManager->ClearNetworkGame();
+	levelManager->GetRenderer()->SetIsGameStarted(false);
 }

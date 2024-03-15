@@ -378,10 +378,12 @@ void GameTechRenderer::RenderFrame() {
 
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
-	if (mUi) {
-		for (auto& i : icons) {
-			RenderIcons(*i);
+	if (mIsGameStarted) {
+		const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
+		if (mUi) {
+			for (auto& i : icons) {
+				RenderIcons(*i);
+			}
 		}
 	}
 	glDisable(GL_BLEND);

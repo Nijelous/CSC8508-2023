@@ -21,8 +21,15 @@
 namespace {
 	constexpr int MAX_PLAYER = 4;
 	constexpr int LEVEL_NUM = 0;
+	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
+
+	//PLAYER MENU
+	constexpr Vector4 LOCAL_PLAYER_COLOUR(0, 0, 1, 1);
+	constexpr Vector4 DEFAULT_PLAYER_COLOUR(1, 1, 1, 1);
+
+	constexpr float VERTICAL_MARGIN_BETWEEN_PLAYER_NAMES = 5.f;
 
 }
 
@@ -90,18 +97,22 @@ const bool DebugNetworkedGame::GetIsGameStarted() const {
 	return mIsGameStarted;
 }
 
-bool DebugNetworkedGame::StartAsServer() {
+bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 	mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
-	mIsServer = true;
+	if (mThisServer) {
 
-	mThisServer->RegisterPacketHandler(Received_State, this);
-	mThisServer->RegisterPacketHandler(String_Message, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+		mIsServer = true;
 
-	std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
-	senderThread.detach();
+		mThisServer->RegisterPacketHandler(Received_State, this);
+		mThisServer->RegisterPacketHandler(String_Message, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
 
+		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
+
+		std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
+		senderThread.detach();
+	}
 	return mThisServer;
 }
 
@@ -159,6 +170,9 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 	}
 
 	if (mIsGameStarted && !mIsGameFinished) {
+
+		ShowPlayerList();
+
 		//TODO(erendgrmnc): rewrite this logic after end-game conditions are decided.
 
 		mLevelManager->GetGameWorld()->GetMainCamera().UpdateCamera(dt);
@@ -286,15 +300,13 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	}
 	case BasicNetworkMessages::ClientInit: {
 		ClientInitPacket* packet = (ClientInitPacket*)(payload);
-		const int playerID = GetPlayerPeerID(source);
-
-		HandleClientInitPacket(packet, playerID);
+		const int playerPeer = source + 1;
+		HandleClientInitPacket(packet, playerPeer);
 		break;
 	}
 	case BasicNetworkMessages::SyncPlayerIdNameMap: {
-		SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
-
-
+		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
+		HandleSyncPlayerIdNameMapPacket(packet);
 	}
 
 	default:
@@ -704,11 +716,28 @@ void DebugNetworkedGame::WriteAndSendSyncPlayerIdNameMapPacket() const {
 	mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::HandleSyncPlayerIdNameMapPacket(SyncPlayerIdNameMapPacket* packet) const {
-	for (std::pair<int, std::string> playerIdName: packet->playerIdNameMap) {
-		//TODO(erendgrmnc): sync the coming map to local one. 14.03.2024 18:17
+void DebugNetworkedGame::HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet) {
+	mPlayerPeerNameMap.clear();
+	for (int i = 0; i < 4; i++) {
+		if (packet->playerIds[i] != -1) {
+			std::pair<int, std::string> playerIdNamePair(packet->playerIds[i], packet->playerNames[i]);
+			mPlayerPeerNameMap.insert(playerIdNamePair);
+		}
+	}
+}
 
-		//std::string name = mPlayerPeerNameMap[]
+void DebugNetworkedGame::ShowPlayerList() const {
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::TAB)) {
+		Vector2 position(15, 20);
+
+		for (const std::pair<int, std::string>& playerIdNamePair : mPlayerPeerNameMap) {
+			const Vector4& textColour = playerIdNamePair.first == mLocalPlayerId ? LOCAL_PLAYER_COLOUR : DEFAULT_PLAYER_COLOUR;
+
+			std::stringstream ss;
+			ss << playerIdNamePair.second << " ------- (" << playerIdNamePair.first << ")";
+			Debug::Print(ss.str(), position, textColour);
+			position.y += VERTICAL_MARGIN_BETWEEN_PLAYER_NAMES;
+		}
 	}
 }
 

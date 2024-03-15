@@ -34,6 +34,7 @@ namespace NCL {
             void OnAwake() override;
 
             bool mHostedSuccessfully;
+            std::string mPlayerName;
         };
 
         class ClientState : public PushdownState {

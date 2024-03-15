@@ -30,9 +30,6 @@ namespace NCL {
 
 		class GameTechRenderer : public OGLRenderer {
 		public:
-
-			
-
 			GameTechRenderer(GameWorld& world);
 			~GameTechRenderer();
 

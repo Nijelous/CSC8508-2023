@@ -169,7 +169,13 @@ SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>
 	type = SyncPlayerIdNameMap;
 	size = sizeof(SyncPlayerIdNameMapPacket);
 
-	this->playerIdNameMap = playerIdNameMap;
+	int counter = 0;
+	for (std::pair<int, std::string> playerIdName : playerIdNameMap) {
+		playerIds[counter] = playerIdName.first;
+		playerNames[counter] = playerIdName.second;
+		counter++;
+	}
+
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {

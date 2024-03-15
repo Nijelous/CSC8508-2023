@@ -58,7 +58,7 @@ namespace NCL{
 
             const int GetClientLastFullID() const;
 
-            bool StartAsServer();
+            bool StartAsServer(const std::string& playerName);
             bool StartAsClient(char a, char b, char c, char d, const std::string& playerName);
 
             void UpdateGame(float dt) override;
@@ -146,7 +146,9 @@ namespace NCL{
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
 
             void WriteAndSendSyncPlayerIdNameMapPacket() const;
-            void HandleSyncPlayerIdNameMapPacket(SyncPlayerIdNameMapPacket* packet) const;
+            void HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet);
+
+            void ShowPlayerList() const;
 
             std::vector<std::function<void()>> mOnGameStarts;
 

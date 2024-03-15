@@ -89,10 +89,11 @@ void ServerState::OnAwake(){
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 	DebugNetworkedGame* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetScene(Scenes::Multiplayer);
 
-	mHostedSuccessfully = server->StartAsServer();
+	mHostedSuccessfully = server->StartAsServer(mPlayerName);
 	if (mHostedSuccessfully) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
+		w->LockMouseToWindow(true);
 
 		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
 		sceneManager->SetIsServer(true);
@@ -127,6 +128,7 @@ void ClientState::OnAwake() {
 	if (mIsClientConnected) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
+		w->LockMouseToWindow(true);
 
 		sceneManager->SetCurrentScene(Scenes::Multiplayer);
 		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
@@ -158,6 +160,8 @@ PushdownState::PushdownResult MultiplayerLobbyState::OnUpdate(float dt, Pushdown
 	}
 	if (multiplayerLobbyState == MainMenuScene::MultiplayerLobbyPanelStates::StartAsServer) {
 		*newState = new ServerState();
+		ServerState* serverState = static_cast<ServerState*>(*newState);
+		serverState->mPlayerName = mMainMenuScene->GetPlayerName();
 		return PushdownResult::Push;
 	}
 
