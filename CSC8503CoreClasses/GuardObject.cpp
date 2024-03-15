@@ -330,6 +330,7 @@ void GuardObject::BehaviourTree() {
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
+	FirstSelect->AddChild(CheckSusLocation());
 	FirstSelect->AddChild(SeenPlayerSequence);
 	SeenPlayerSequence->AddChild(ChasePlayerSelector);
 	ChasePlayerSelector->AddChild(PointAtPlayer());
@@ -381,7 +382,6 @@ BehaviourAction* GuardObject::Patrol() {
 			}
 			else if (mCanSeePlayer == true) {
 				return Failure;
-
 			}
 		}
 		return state;
@@ -397,10 +397,17 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 			SetObjectState(Walk);
 		}
 		else if (state == Ongoing) {
-
+			if (mCanSeePlayer == true) {
+				return Failure;
+			}
+			else {
+				cout << "Big butty";
+			}
 		}
+		return state;
 		}
 	);
+	return CheckSusLocation;
 }
 
 
@@ -420,6 +427,9 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 					mPointTimer = POINTING_TIMER;
 					return Failure;
 				}
+			}
+			else {
+				return Success;
 			}
 		}
 		return state;
