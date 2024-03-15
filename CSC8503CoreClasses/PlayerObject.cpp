@@ -131,15 +131,22 @@ void PlayerObject::UpdateObject(float dt) {
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
 		if (mSusValue > 66) {
 			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
-			mAlarmTime = mAlarmTime + dt;
+		
 		}
 	}
-	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+	
+	//globle sus
+	float globleSusValue = mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter();
+	if (globleSusValue > 33) {
+		mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+		mAlarmTime = mAlarmTime + dt;
+	}
+	if (globleSusValue < 33 && mUi->GetIcons()[ALARM]->mTransparency>0) {
 		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
 		mAlarmTime = 0;
 	}
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+
 
 	if (DEBUG_MODE)
 	{
@@ -150,22 +157,15 @@ void PlayerObject::UpdateObject(float dt) {
 
 void PlayerObject::ShowDebugInfo(float dt)
 {
-	//It have some problem here
-	mUiTime = mUiTime + dt;
-	mUiTime = std::fmod(mUiTime, 1.0f);
 
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
-
-	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-	float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-	mLastSusValue = mSusValue;
-
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
 	Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)
 	), Vector2(70, 90));
+
+	Debug::Print("Sus:" + std::to_string(
+		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter()
+	), Vector2(70, 80));
+
 	if (mHasSilentSprintBuff)
 		Debug::Print("HasSilentSprint", Vector2(70, 95));
 	switch (mPlayerSpeedState) {
@@ -672,7 +672,7 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	}
 	//Stop Guard
-	if (objectHit->GetName() == "Guard" && distance < 100 && GetEquippedItem() == PlayerInventory::item::stunItem) {
+	if (objectHit->GetName() == "Guard" && distance < 100 && GetEquippedItem() == PlayerInventory::item::screwdriver) {
 		if (mTransparencyBot < 1) {
 			mTransparencyBot = mTransparencyBot + 0.1;
 		}
