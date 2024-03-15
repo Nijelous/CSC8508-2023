@@ -2,21 +2,12 @@ MeshMat
 1
 3
 3
-Bed Wood
-3
-Diffuse:/AK STUDIO ART/Bed/Models/Textures/Bed_Wood_AlbedoTransparency.png
-Bump:/AK STUDIO ART/Bed/Models/Textures/Bed_Wood_Normal.png
-Metallic:/AK STUDIO ART/Bed/Models/Textures/Bed_Wood_MetallicSmoothness.png
-Bed Cloth
-3
-Diffuse:/AK STUDIO ART/Bed/Models/Textures/Bed_Cloth_AlbedoTransparency.png
-Bump:/AK STUDIO ART/Bed/Models/Textures/Bed_Cloth_Normal.png
-Metallic:/AK STUDIO ART/Bed/Models/Textures/Bed_Cloth_MetallicSmoothness.png
-Bed Leather
-3
-Diffuse:/AK STUDIO ART/Bed/Models/Textures/Bed_Leather_AlbedoTransparency.png
-Bump:/AK STUDIO ART/Bed/Models/Textures/Bed_Leather_Normal.png
-Metallic:/AK STUDIO ART/Bed/Models/Textures/Bed_Leather_MetallicSmoothness.png
+White_metal_material
+0
+White_duvet_material
+0
+Blue_material
+0
 0
 1
 2

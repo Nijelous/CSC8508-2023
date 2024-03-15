@@ -1,16 +1,11 @@
 MeshMat
 1
-3
-3
-Wood_chair
 1
-Diffuse:/Wood_texture.png
-Default-Material
-0
-Textile_chair
-2
-Diffuse:/Texture_textile.png
-Bump:/Texture_NRM.png
-0
 1
-2
+Chair_01_mat
+4
+Diffuse:/GeniusCrate_Games/Chair_sofa_set(interior)/Texture Maps/Chair_sofa_set/Chair_01/Chair_BaseColor.png
+Bump:/GeniusCrate_Games/Chair_sofa_set(interior)/Texture Maps/Chair_sofa_set/Chair_01/Chair_Normal.png
+Metallic:/GeniusCrate_Games/Chair_sofa_set(interior)/Texture Maps/Chair_sofa_set/Chair_01/Chair_Metallic.png
+Height:/GeniusCrate_Games/Chair_sofa_set(interior)/Texture Maps/Chair_sofa_set/Chair_01/Chair_Height.png
+0
