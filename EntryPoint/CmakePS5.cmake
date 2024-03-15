@@ -163,4 +163,4 @@ function(Create_PS5_EntryPoint_Files)
     )
 
     include_directories(${COMPILE_ASSET_ROOT}) 
-    endfunction()
+endfunction()
