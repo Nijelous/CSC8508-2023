@@ -246,7 +246,7 @@ void GameTechAGCRenderer::DrawObjects() {
 
 			DrawBoundMeshInstanced(*frameContext, *prevMesh, instanceCount);
 			prevMesh = objectMesh;
-			instanceCount = 1;
+			instanceCount = 0;
 			startingIndex = i;
 		}
 		if (i == activeObjects.size() - 1) {
