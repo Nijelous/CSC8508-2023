@@ -22,19 +22,26 @@ namespace NCL {
 
 			void CloseDoorTriggered();
 
+			void LockDoorTriggered();
+
 			bool GetisTiggered();
 
 			bool GetIsClosed();
+
+			bool GetIsLocked();
 
 			void SetNotTriggered();
 
 			void CloseDoorFinished();
 
-		private:
+			void LockDoorFinished();
+
+		protected:
 			Channel* mChannel = nullptr;
 			std::vector<Channel*> mChannels;
 			bool mIsTriggered;
 			bool mIsClosed;
+			bool mIsLocked;
 		};
     }
 }

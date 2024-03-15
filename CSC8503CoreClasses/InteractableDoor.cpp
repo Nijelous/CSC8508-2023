@@ -33,12 +33,14 @@ void InteractableDoor::Close() {
 
 void InteractableDoor::Unlock() {
 	mIsLocked = false;
+	this->GetSoundObject()->LockDoorTriggered();
 	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock() {
 	mIsLocked = true;
+	this->GetSoundObject()->LockDoorTriggered();
 	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(4);
 }

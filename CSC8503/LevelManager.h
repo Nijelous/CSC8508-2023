@@ -105,6 +105,8 @@ namespace NCL {
 
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
 
+			void DebugUpdate(float dt, bool isUpdatingObjects, bool isPaused);
+
 			void FixedUpdate(float dt);
 
 			void CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position);
@@ -149,6 +151,10 @@ namespace NCL {
 			static LevelManager* instance;
 
 			virtual void InitialiseAssets();
+
+			void InitialiseDebug();
+
+			void PrintDebug(float dt);
 
 			void InitialiseIcons();
 
@@ -271,6 +277,13 @@ namespace NCL {
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+			bool mShowDebug = false;
+
+			ULARGE_INTEGER mLastCPU, mLastSysCPU, mLastUserCPU;
+			int mNumProcessors;
+			HANDLE mSelf;
+			double mUpdateObjectsTime, mRenderTime, mWorldTime, mPhysicsTime, mAnimationTime;
+			float mTakeNextTime = 0;
 
 			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
 			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;

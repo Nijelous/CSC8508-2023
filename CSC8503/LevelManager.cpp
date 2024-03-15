@@ -1,4 +1,6 @@
 #include "LevelManager.h"
+#include "Windows.h"
+#include "Psapi.h"
 
 #include "GameWorld.h"
 #include "RecastBuilder.h"
@@ -91,6 +93,7 @@ LevelManager::LevelManager() {
 	mIsLevelInitialised = false;
 
 	InitialiseIcons();
+	InitialiseDebug();
 	mItemTextureMap = {
 	{PlayerInventory::item::none, mTextures["InventorySlot"]},
 	{PlayerInventory::item::disguise, mTextures["Stun"]},
@@ -326,6 +329,14 @@ void LevelManager::AddNetworkObject(GameObject& objToAdd) {
 }
 
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
+	if (mShowDebug) {
+		mTakeNextTime -= dt;
+		if (mTakeNextTime < 0) {
+			DebugUpdate(dt, isPlayingLevel, isPaused);
+			mTakeNextTime = 0.1f;
+			return;
+		}
+	}
 	if (isPlayingLevel) {
 		mGameState = LevelState;
 		if (mStartTimer > 0) {
@@ -354,6 +365,12 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	else
 		mGameState = MenuState;
 
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F3)) {
+		mShowDebug = !mShowDebug;
+	}
+	if (mShowDebug) {
+		PrintDebug(dt);
+	}
 
 	if (isPaused) {
 		mRenderer->Render();
@@ -371,6 +388,102 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			mSoundManager->UpdateSounds(mUpdatableObjects);
 		}
 		mRenderer->Render();
+		Debug::UpdateRenderables(dt);
+		mDtSinceLastFixedUpdate += dt;
+		if (mDtSinceLastFixedUpdate >= TIME_UNTIL_FIXED_UPDATE) {
+			FixedUpdate(mDtSinceLastFixedUpdate);
+			mDtSinceLastFixedUpdate = 0;
+		}
+	}
+}
+
+void NCL::CSC8503::LevelManager::DebugUpdate(float dt, bool isPlayingLevel, bool isPaused) {
+	std::chrono::steady_clock::time_point start;
+	std::chrono::steady_clock::time_point end;
+	std::chrono::duration<double, std::milli> timeTaken;
+	if (isPlayingLevel) {
+		mGameState = LevelState;
+		if (mStartTimer > 0) {
+			if (mStartTimer == 3) {
+				mTempPlayer->UpdateObject(dt);
+			}
+			mStartTimer -= dt;
+			Debug::Print(to_string((int)mStartTimer + 1), Vector2(50, 50), Vector4(1, 1, 1, 1), 40.0f);
+			if (mStartTimer <= 0) {
+				mNavMeshThread.join();
+			}
+		}
+		else {
+			if ((mUpdatableObjects.size() > 0)) {
+				start = std::chrono::high_resolution_clock::now();
+				for (GameObject* obj : mUpdatableObjects) {
+					obj->UpdateObject(dt);
+				}
+				end = std::chrono::high_resolution_clock::now();
+				timeTaken = end - start;
+				mUpdateObjectsTime = timeTaken.count();
+			}
+			if (mTempPlayer)
+				Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
+
+			Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
+			mTimer -= dt;
+		}
+	}
+	else
+		mGameState = MenuState;
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F3)) {
+		mShowDebug = !mShowDebug;
+	}
+	if (mShowDebug) {
+		PrintDebug(dt);
+	}
+	if (isPaused) {
+		start = std::chrono::high_resolution_clock::now();
+		mRenderer->Render();
+		end = std::chrono::high_resolution_clock::now();
+		timeTaken = end - start;
+		mRenderTime = timeTaken.count();
+		mGameState = PauseState;
+		mPhysicsTime = 0;
+		mAnimationTime = 0;
+		mWorldTime = 0;
+	}
+	else {
+		start = std::chrono::high_resolution_clock::now();
+		mWorld->UpdateWorld(dt);
+		end = std::chrono::high_resolution_clock::now();
+		timeTaken = end - start;
+		mWorldTime = timeTaken.count();
+		mRenderer->Update(dt);
+		if (mIsLevelInitialised) {
+			start = std::chrono::high_resolution_clock::now();
+			mPhysics->Update(dt);
+			end = std::chrono::high_resolution_clock::now();
+			timeTaken = end - start;
+			mPhysicsTime = timeTaken.count();
+
+			start = std::chrono::high_resolution_clock::now();
+			mAnimation->Update(dt, mUpdatableObjects);
+			end = std::chrono::high_resolution_clock::now();
+			timeTaken = end - start;
+			mAnimationTime = timeTaken.count();
+		}
+		else {
+			mPhysicsTime = 0;
+			mAnimationTime = 0;
+		}
+
+		if (mUpdatableObjects.size() > 0) {
+			mSoundManager->UpdateSounds(mUpdatableObjects);
+		}
+		start = std::chrono::high_resolution_clock::now();
+		mRenderer->Render();
+		end = std::chrono::high_resolution_clock::now();
+		timeTaken = end - start;
+		mRenderTime = timeTaken.count();
+
 		Debug::UpdateRenderables(dt);
 		mDtSinceLastFixedUpdate += dt;
 		if (mDtSinceLastFixedUpdate >= TIME_UNTIL_FIXED_UPDATE) {
@@ -473,6 +586,69 @@ void LevelManager::InitialiseAssets() {
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
 	matLoadThread.join();
+}
+
+void LevelManager::InitialiseDebug() {
+	SYSTEM_INFO sysInfo;
+	FILETIME ftime, fsys, fuser;
+
+	GetSystemInfo(&sysInfo);
+	mNumProcessors = sysInfo.dwNumberOfProcessors;
+
+	GetSystemTimeAsFileTime(&ftime);
+	memcpy(&mLastCPU, &ftime, sizeof(FILETIME));
+
+	mSelf = GetCurrentProcess();
+	GetProcessTimes(mSelf, &ftime, &ftime, &fsys, &fuser);
+	memcpy(&mLastSysCPU, &fsys, sizeof(FILETIME));
+	memcpy(&mLastUserCPU, &fuser, sizeof(FILETIME));
+
+	mUpdateObjectsTime = 0;
+	mRenderTime = 0;
+	mWorldTime = 0;
+	mPhysicsTime = 0;
+	mAnimationTime = 0;
+}
+
+void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
+	MEMORYSTATUSEX statex;
+	statex.dwLength = sizeof(statex);
+	GlobalMemoryStatusEx(&statex);
+
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+
+	FILETIME ftime, fsys, fuser;
+	ULARGE_INTEGER now, sys, user;
+	double percent;
+	GetSystemTimeAsFileTime(&ftime);
+	memcpy(&now, &ftime, sizeof(FILETIME));
+
+	mSelf = GetCurrentProcess();
+	GetProcessTimes(mSelf, &ftime, &ftime, &fsys, &fuser);
+	memcpy(&sys, &fsys, sizeof(FILETIME));
+	memcpy(&user, &fuser, sizeof(FILETIME));
+	percent = (sys.QuadPart - mLastSysCPU.QuadPart) + (user.QuadPart - mLastUserCPU.QuadPart);
+	percent /= (now.QuadPart - mLastCPU.QuadPart);
+	percent /= mNumProcessors;
+	mLastCPU = now;
+	mLastUserCPU = user;
+	mLastSysCPU = sys;
+	percent *= 100;
+
+	Debug::Print(std::format("FPS: {:.0f}", 1000.0f / dt), Vector2(1, 6), Vector4(1, 1, 1, 1), 15.0f);
+	Debug::Print(std::format("Physical Memory Used: {} MB", pmc.WorkingSetSize / 1048576), Vector2(1, 9), Vector4(1, 0, 0, 1), 15.0f);
+	Debug::Print(std::format("Total Physical Memory: {} MB", statex.ullTotalPhys / 1048576), Vector2(1, 12), Vector4(1, 0, 0, 1), 15.0f);
+	Debug::Print(std::format("Virtual Memory Used: {} MB", pmc.PrivateUsage / 1048576), Vector2(1, 15), Vector4(1, 0, 0, 1), 15.0f);
+	Debug::Print(std::format("Total Virtual Memory: {} MB", statex.ullTotalVirtual / 1048576), Vector2(1, 18), Vector4(1, 0, 0, 1), 15.0f);
+	Debug::Print(std::format("Percentage Memory Used: {:.5f}%", (float)pmc.WorkingSetSize / statex.ullTotalPhys), Vector2(1, 21), Vector4(0, 1, 0, 1), 15.0f);
+	Debug::Print(std::format("Percentage CPU Used: {:.2f}%", percent), Vector2(1, 24), Vector4(0, 0, 1, 1), 15.0f);
+	Debug::Print("Key Function Time:", Vector2(1, 40), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("UpdateObjects: {:.2f}ms", mUpdateObjectsTime), Vector2(1, 43), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("Render: {:.2f}ms", mRenderTime), Vector2(1, 46), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("Update World: {:.2f}ms", mWorldTime), Vector2(1, 49), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("Physics Update: {:.2f}ms", mPhysicsTime), Vector2(1, 52), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("Animation Update: {:.2f}ms", mAnimationTime), Vector2(1, 55), Vector4(1, 1, 1, 1), 12.5f);
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
@@ -878,6 +1054,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	newVent->SetRenderObject(new RenderObject(&newVent->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
 	newVent->SetPhysicsObject(new PhysicsObject(&newVent->GetTransform(), newVent->GetBoundingVolume(), 1, 1, 5));
+	newVent->SetSoundObject(new SoundObject());
 
 
 	newVent->GetPhysicsObject()->SetInverseMass(0);
