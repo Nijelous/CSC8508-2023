@@ -121,7 +121,7 @@ namespace NCL {
 				mFrameMatricesVec = frameMatrices;
 			}
 
-			std::vector<std::vector<Matrix4>>  GetFrameMatricesVec() const {
+			std::vector<std::vector<Matrix4>> const&  GetFrameMatricesVec() const {
 				return mFrameMatricesVec;
 			}
 

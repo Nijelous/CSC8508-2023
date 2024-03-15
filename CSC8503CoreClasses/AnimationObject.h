@@ -24,7 +24,7 @@ namespace NCL {
                 guardAnimation
             };
 
-            AnimationObject(AnimationType animationType,MeshAnimation* animation, MeshMaterial* material);
+            AnimationObject(AnimationType animationType,MeshAnimation* animation, MeshMaterial* material = nullptr);
             ~AnimationObject();
 
             void Update(float dt);
@@ -67,8 +67,8 @@ namespace NCL {
            
             
         protected:
-            MeshAnimation* mAnimation = nullptr;
-            MeshMaterial* mMaterial = nullptr;
+            MeshAnimation* mAnimation;
+            MeshMaterial* mMaterial;
             AnimationType mAnimationType;
            
             int		mCurrentFrame;

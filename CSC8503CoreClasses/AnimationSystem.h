@@ -11,7 +11,7 @@
 #endif
 
 #ifdef USEPROSPERO
-#include "../CSC8503//GameTechAGCRenderer.h"
+#include "../CSC8503/GameTechAGCRenderer.h"
 #include "AGCRenderer.h"
 #include "AGCTexture.h"
 #endif

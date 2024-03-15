@@ -158,6 +158,10 @@ Shader* GameTechAGCRenderer::LoadShader(const std::string& vertex, const std::st
 	return nullptr;
 }
 
+MeshAnimation* GameTechAGCRenderer::LoadAnimation(const std::string& name) {
+	return new MeshAnimation(name);
+}
+
 void GameTechAGCRenderer::RenderFrame() {
 	currentFrame = &allFrames[currentFrameIndex];
 
@@ -291,8 +295,8 @@ void GameTechAGCRenderer::GPUSkinningPass() {
 		}
 		char* offset = currentFrame->data.data;
 
-		std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[0];
-		currentFrame->data.WriteData(skeleton.data(), sizeof(Matrix4) * skeleton.size());
+		const std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[0];
+		currentFrame->data.WriteData((void*)skeleton.data(), sizeof(Matrix4) * skeleton.size());
 
 		sce::Agc::Core::BufferSpec bufSpec;
 		bufSpec.initAsRegularBuffer(offset, sizeof(Matrix4), skeleton.size());

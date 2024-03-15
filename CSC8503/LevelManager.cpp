@@ -164,8 +164,9 @@ LevelManager::~LevelManager() {
 	delete mPhysics;
 	delete mRenderer;
 	delete mWorld;
-#ifdef USEGL
+
 	delete mAnimation;
+#ifdef USEGL
 	delete mSoundManager;
 #endif
 	delete mInventoryBuffSystemClassPtr;
@@ -290,7 +291,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	}
 #endif
 
-	//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 	LoadCCTVs();
 
 
@@ -423,13 +424,11 @@ void LevelManager::InitialiseAssets() {
 		if (groupType == "") groupType = assetDetails[0];
 		if (groupType != assetDetails[0]) {
 			if (groupType == "anim") {
-        #ifdef USEGL // remove after implemented
 				animLoadThread = std::thread([this, groupDetails] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
 					}
 					});
-        #endif
 			}
 			else if (groupType == "mat") {
 				matLoadThread = std::thread([this, groupDetails] {
@@ -470,11 +469,10 @@ void LevelManager::InitialiseAssets() {
 		}
 	}
 	delete[] assetDetails;
-#ifdef USEGL
 	animLoadThread.join();
-#endif
+
 	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	//mRenderer->Render();
+	mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
@@ -1132,7 +1130,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 #ifdef USEGL
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 #endif
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"]/*, mMaterials["Guard"]*/));
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1232,7 +1230,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetCollisionLayer(Npc);
 
 	RenderObject* renderObject = new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize);
-	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]);
+	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"]/*, mMaterials["Rig"]*/);
 
 	renderObject->SetAnimationObject(animObject);
 	guard->SetRenderObject(renderObject);
