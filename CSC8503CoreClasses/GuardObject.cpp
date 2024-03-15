@@ -383,6 +383,9 @@ BehaviourAction* GuardObject::Patrol() {
 			else if (mCanSeePlayer == true) {
 				return Failure;
 			}
+			else if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()){
+
+			}
 		}
 		return state;
 		}
