@@ -96,3 +96,8 @@ EntryPoint.dir
 /EntryPoint/EntryPoint.vcxproj.filters
 /EntryPoint/Shaders.vcxproj.filters
 /EntryPoint/EntryPoint.vcxproj.user
+
+Assets/Shaders/PSSL/Shadow_vv.ags
+Assets/Shaders/PSSL/Tech_p.ags
+Assets/Shaders/PSSL/Tech_vv.ags
+Assets/Shaders/PSSL/Shadow_vv.ags
