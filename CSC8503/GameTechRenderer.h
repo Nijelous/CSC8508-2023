@@ -26,7 +26,7 @@ namespace NCL {
 
 		constexpr short MAX_INSTANCE_MESHES = 3;
 		constexpr short MAX_POSSIBLE_LIGHTS = 256;
-		constexpr short MAX_POSSIBLE_OBJECTS = 256;
+		constexpr short MAX_POSSIBLE_OBJECTS = 8192;
 
 		class GameTechRenderer : public OGLRenderer {
 		public:
