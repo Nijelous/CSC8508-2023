@@ -18,6 +18,7 @@ endif()
 
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     add_compile_definitions(USEPROSPERO)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti")
     add_compile_options(-Wno-pragma-once-outside-header)
 endif()
 
