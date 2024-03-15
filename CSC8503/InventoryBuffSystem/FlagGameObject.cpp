@@ -1,7 +1,7 @@
 #include "FlagGameObject.h"
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
-#include "../CSC8503/SoundObject.h"
+#include "../CSC8503CoreClasses/SoundObject.h"
 using namespace NCL;
 using namespace CSC8503;
 
