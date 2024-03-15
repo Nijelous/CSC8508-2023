@@ -90,6 +90,7 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mIsPlayer = true;
 	mHasSilentSprintBuff = false;
 	mInteractHeldDt = 0;
+	mAnnouncementMap.clear();
 }
 
 PlayerObject::~PlayerObject() {
@@ -128,46 +129,17 @@ void PlayerObject::UpdateObject(float dt) {
 	else {
 		EnforceMaxSpeeds();
 	}
-	//SusBar
-	float iconValue = SusLinerInterpolation(dt);
 
-	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
-	if (mSusValue > 33) {
-		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
-		if (mSusValue > 66) {
-			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
-			mAlarmTime = mAlarmTime + dt;
-		}
-	}
-	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
-		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
-		mAlarmTime = 0;
-	}
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
-
+	UpdateLocalUI(dt);
+	UpdateGlobalUI(dt);
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
-
 	}
 }
 
 void PlayerObject::ShowDebugInfo(float dt)
 {
-	//It have some problem here
-	mUiTime = mUiTime + dt;
-	mUiTime = std::fmod(mUiTime, 1.0f);
-
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
-
-	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-	float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-	mLastSusValue = mSusValue;
-
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
 	Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)
 	), Vector2(70, 90));
@@ -701,8 +673,10 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 	{
 	case InventoryBuffSystem::flagAdded:
 		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
+		AddAnnouncement(AnnouncementType::FlagAddedAnnouncement, 8, playerNo);
 		break;
 	case InventoryBuffSystem::flagDropped:
+		AddAnnouncement(AnnouncementType::FlagDroppedAnnouncement, 8, playerNo);
 		break;
 	case InventoryBuffSystem::disguiseItemUsed:
 		break;
@@ -719,6 +693,57 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 	default:
 		break;
 	}
+}
+
+void PlayerObject::UpdateGlobalUI(float dt){
+	int announcementY = 15;
+	for (auto& entry : mAnnouncementMap) {
+		if (entry.second > 0) {
+			entry.second -= dt;
+			Debug::Print(entry.first, Vector2(0, announcementY));
+			announcementY += 5;
+		}
+	}
+}
+
+
+
+void PlayerObject::UpdateLocalUI(float dt){
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
+
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+			mAlarmTime = mAlarmTime + dt;
+		}
+	}
+	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+
+	//It have some problem here
+	mUiTime = mUiTime + dt;
+	mUiTime = std::fmod(mUiTime, 1.0f);
+
+	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
+
+	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
+
+	iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
+
+	mLastSusValue = mSusValue;
+
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
+
+	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
+
+
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {

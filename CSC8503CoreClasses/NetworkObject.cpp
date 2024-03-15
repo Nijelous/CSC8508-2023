@@ -158,6 +158,15 @@ SyncObjectStatePacket::SyncObjectStatePacket(int networkObjId, int objectState) 
 	this->objectState = objectState;
 }
 
+AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int playerNo) {
+	type = SyncAnnouncements;
+	size = sizeof(AnnouncementSyncPacket);
+
+	this->annType = annType;
+	this->time = time;
+	this->playerNo = playerNo;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors  = 0;

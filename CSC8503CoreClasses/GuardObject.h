@@ -74,9 +74,9 @@ namespace NCL {
             void GrabPlayer();
             float* QueryNavmesh(float* endPos);
             bool CheckPolyDistance();
-
             void CheckForDoors(float dt);
             void OpenDoor();
+            void SendAnnouncementToPlayer();
 
             float mDist;
             float* mNextPoly = new float[3];

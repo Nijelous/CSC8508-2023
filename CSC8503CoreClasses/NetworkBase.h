@@ -30,7 +30,8 @@ enum BasicNetworkMessages {
 	ClientSyncLocationSusChange,
 	SyncInteractable,
 	ClientSyncGlobalSusChange,
-	SyncObjectState
+	SyncObjectState,
+	SyncAnnouncements
 };
 
 struct GamePacket {

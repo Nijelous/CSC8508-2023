@@ -152,6 +152,13 @@ namespace NCL::CSC8503 {
 		SyncObjectStatePacket(int networkObjId, int objectState);
 	};
 
+	struct AnnouncementSyncPacket : public GamePacket {
+		int annType;
+		float time;
+		int playerNo;
+		AnnouncementSyncPacket(int annType, float time,int playerNo);
+	};
+
 	class NetworkObject	{
 	public:
 		NetworkObject(GameObject& o, int id);

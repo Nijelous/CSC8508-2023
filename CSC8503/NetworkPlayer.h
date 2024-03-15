@@ -47,6 +47,9 @@ namespace NCL {
 			void ResetPlayerInput();
 			void UpdateObject(float dt) override;
 			void MovePlayer(float dt) override;
+			void AddAnnouncement(AnnouncementType announcementType, float time, int playerNo) override;
+			void SendAnnouncementPacket(AnnouncementType announcementType, float time, int playerNo);
+			void SyncAnnouncements(AnnouncementType announcementType, float time, int playerNo);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override 
 			{ PlayerObject::UpdatePlayerBuffsObserver(buffEvent,playerNo); };
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override 

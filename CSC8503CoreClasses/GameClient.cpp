@@ -69,6 +69,11 @@ void GameClient::WriteAndSendClientInputPacket(int lastId, const PlayerInputs& p
 	this->SendPacket(packet);
 }
 
+void GameClient::WriteAndSendAnnouncementSyncPacket(int annType, float time, int playerNo) {
+	AnnouncementSyncPacket packet(annType, time, playerNo);
+	this->SendPacket(packet);
+}
+
 void GameClient::SendPacket(GamePacket&  payload) {
 	// defines packet to send and sends packet
 	ENetPacket* dataPacket = enet_packet_create(&payload, payload.GetTotalSize(), 0);

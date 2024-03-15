@@ -35,6 +35,7 @@ namespace NCL{
         struct ClientSyncGlobalSusChangePacket;
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
+        struct AnnouncementSyncPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -73,6 +74,8 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
             void SendPacketsThread();
 
@@ -131,6 +134,9 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void HandleAnnouncementSync(AnnouncementSyncPacket* packet) const;
+
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;

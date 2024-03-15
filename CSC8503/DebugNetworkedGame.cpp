@@ -97,6 +97,10 @@ void DebugNetworkedGame::StartAsServer() {
 	mThisServer->RegisterPacketHandler(Received_State, this);
 	mThisServer->RegisterPacketHandler(String_Message, this);
 	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
+	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
+	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
+	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
+	mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 	std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
 	senderThread.detach();
 }
@@ -124,6 +128,7 @@ void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
+	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
@@ -274,6 +279,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleObjectStatePacket(packet);
 		break;
 	}
+	case  BasicNetworkMessages::SyncAnnouncements:
+	{
+		AnnouncementSyncPacket* packet = (AnnouncementSyncPacket*)(payload);
+		HandleAnnouncementSync(packet);
+		break;
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -327,6 +338,11 @@ void DebugNetworkedGame::SendClientSyncLocationActiveSusCausePacket(int cantorPa
 void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const{
 	NCL::CSC8503::ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
 	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, float time, int playerNo){
+	NCL::CSC8503::AnnouncementSyncPacket packet(annType, time, playerNo);
+	GetServer()->SendGlobalPacket(packet);
 }
 
 void DebugNetworkedGame::SendPacketsThread() {
@@ -677,5 +693,11 @@ void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) 
 	if (objectToChangeState != nullptr) {
 		objectToChangeState->GetGameObject().SetObjectState(state);
 	}
+}
+
+void DebugNetworkedGame::HandleAnnouncementSync(AnnouncementSyncPacket* packet) const{
+	NetworkPlayer* localPlayer = static_cast<NetworkPlayer*>(mLocalPlayer);
+	const PlayerObject::AnnouncementType announcementType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
+	localPlayer->SyncAnnouncements(announcementType,packet->time,packet->playerNo);
 }
 #endif

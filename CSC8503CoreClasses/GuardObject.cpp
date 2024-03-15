@@ -10,6 +10,7 @@
 #include "RecastBuilder.h"
 #include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -296,6 +297,14 @@ void GuardObject::OpenDoor() {
 	}
 }
 
+void GuardObject::SendAnnouncementToPlayer(){
+	NetworkPlayer* networkPlayer = static_cast<NetworkPlayer*> (mPlayer);
+	if (typeid(networkPlayer) == typeid(NetworkPlayer*))
+		networkPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, networkPlayer->GetPlayerID());
+	else
+		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -486,6 +495,7 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
+				SendAnnouncementToPlayer();
 				LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 				mHasCaughtPlayer = false;
 				return Success;

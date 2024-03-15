@@ -13,11 +13,25 @@ namespace NCL {
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 
-			enum PlayerSpeedState {
+			const enum PlayerSpeedState {
 				Default,
 				SpedUp,
 				SlowedDown,
 				Stunned
+			};
+
+			const enum AnnouncementType {
+				DefaultAnnouncement,
+				FlagAddedAnnouncement,
+				FlagDroppedAnnouncement,
+				CaughtByGuardAnnouncement
+			};
+
+			map<const AnnouncementType, const string> mAnnouncementTypeToStringMap{
+				{DefaultAnnouncement, "DefaultAnnouncementText"},
+				{FlagAddedAnnouncement,"The heist item was stolen by player : "},
+				{FlagDroppedAnnouncement,"The flag was dropped by player : "},
+				{CaughtByGuardAnnouncement,"A guard has caught player : "}
 			};
 
 			PlayerObject(GameWorld* world,
@@ -42,10 +56,16 @@ namespace NCL {
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
+			void UpdateGlobalUI(float dt);
+			void UpdateLocalUI(float dt);
 			void ShowDebugInfo(float dt);
 			void ChangeActiveSusCausesBasedOnState(const GameObjectState &previousState, const GameObjectState& currentState);
 			void HandleInteractable(Interactable* interactablePtr, InteractType interactType);
 			PlayerInventory::item GetEquippedItem();
+			virtual void AddAnnouncement(AnnouncementType announcementType, float time, int playerNo) {
+				const std::string annString = mAnnouncementTypeToStringMap[announcementType] + std::to_string(playerNo) + '!';
+				mAnnouncementMap[annString] = time;
+			}
 
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
@@ -114,7 +134,7 @@ namespace NCL {
 			float mLastSusValue = 0.0;
 			float mAlarmTime=0.0;
 			
-
+			std::map<std::string , float> mAnnouncementMap;
 			bool	IsSeenByGameObject(GameObject* otherGameObject);
 		private:
 
