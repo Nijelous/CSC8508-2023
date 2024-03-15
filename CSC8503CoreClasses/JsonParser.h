@@ -21,7 +21,8 @@ namespace NCL {
 			Vents,
 			Helipad,
 			Doors,
-			PrisonDoorPos
+			PrisonDoorPos,
+			DecorationTransforms
 		};
 		class JsonParser {
 		public:
@@ -50,6 +51,7 @@ namespace NCL {
 			void WriteHelipad(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room);
 			void WriteDoors(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room);
 			void WritePrisonDoorPos(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room);
+			void WriteDecorationTransforms(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room);
 		};
 	}
 }
