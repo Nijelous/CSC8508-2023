@@ -405,13 +405,12 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 
 				float distance = (objPos - playerPos).Length();
 
-				if (distance > 10.f) {
+				if (distance > 17.5f) {
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
 
 				//Check if object is an item.
-#ifdef USEGL
 				Item* item = dynamic_cast<Item*>(objectHit);
 				if (item != nullptr) {
 					item->OnPlayerInteract(mPlayerID);
@@ -420,15 +419,14 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
 
 				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
-					interactablePtr->Interact(interactType);
+				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType,this)) {
+					interactablePtr->Interact(interactType, this);
 					if (interactType == ItemUse) {
 						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 					}
 
 					return;
 				}
-#endif
 				if (interactType == PickPocket)
 				{
 					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);

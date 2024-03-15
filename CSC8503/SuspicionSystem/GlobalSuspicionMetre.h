@@ -49,7 +49,7 @@ namespace SuspicionSystem
         void Notify(const SuspicionMetre::SusBreakpoint susBreakpoint);
 
         void Update(float dt);
-        void SyncSusChange(int localPlayerID, int changedValue);
+        void SyncSusChange(int changedValue);
     private:
         std::map<const instantGlobalSusCause, const float>  mInstantCauseSusSeverityMap =
         {

@@ -74,6 +74,11 @@ LevelManager::LevelManager() {
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
+
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
+
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
@@ -283,12 +288,13 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
 	}
+#endif
 
-	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	//LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
 	LoadCCTVs();
 
 
-#endif
+
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer);
 	SendWallFloorInstancesToGPU();
@@ -433,7 +439,14 @@ void LevelManager::InitialiseAssets() {
 					});
 			}
 			else if (groupType == "msh") {
+#ifdef USEGL
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+#endif
+#ifdef USEPROSPERO
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
+				}
+#endif
 				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
 				mRenderer->Render();
 			}
@@ -859,7 +872,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -935,7 +948,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	}
 
 	mWorld->AddGameObject(newDoor);
-
+	mGlobalSuspicionObserver.push_back(newDoor);
 	return newDoor;
 }
 
@@ -971,6 +984,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
 	mWorld->AddGameObject(newDoor);
+	mGlobalSuspicionObserver.push_back(newDoor);
 
 	return newDoor;
 }

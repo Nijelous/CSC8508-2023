@@ -273,9 +273,13 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 		}
 	}
 
-	bool isEquippedItemUsed = (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none && mIsLocalPlayer) || (mPlayerInputs.isEquippedItemUsed && GetEquippedItem() != PlayerInventory::item::none);
+	bool isEquippedItemUsed = (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none && mIsLocalPlayer) ||
+		(mPlayerInputs.isEquippedItemUsed && GetEquippedItem() != PlayerInventory::item::none);
 
 	if (isEquippedItemUsed) {
+		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
+		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
+			return;
 		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
 	}
@@ -300,7 +304,7 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 
 				float distance = (objPos - playerPos).Length();
 
-				if (distance > 10.f) {
+				if (distance > 17.5f) {
 					std::cout << "Nothing hit in range" << std::endl;
 					return;
 				}
@@ -314,7 +318,7 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 					
 				//Check if object is an interactable.
 				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType)) {
+				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType, this)) {
 					interactablePtr->Interact(interactType, this);
 					if (interactType == ItemUse) {
 						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
@@ -360,9 +364,10 @@ void NetworkPlayer::ControlInventory() {
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
-
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
+		if (equippedItemUseType == DirectUse) {
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
+		}
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {

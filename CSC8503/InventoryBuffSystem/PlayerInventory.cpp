@@ -1,21 +1,19 @@
 #include "PlayerInventory.h"
 
 #include "GameServer.h"
-#include "Level.h"
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
+#include "../LevelManager.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 #include <algorithm>
+#include <random>
 
 namespace {
 	constexpr int DEFAULT_ITEM_USAGE_COUNT = 0;
 	
 }
 
-namespace NCL::CSC8503 {
-	class DebugNetworkedGame;
-}
+
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
@@ -96,7 +94,7 @@ int PlayerInventory::RemoveItemFromPlayer(const item& inItem, const int& playerN
 	return -1;
 }
 
-void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
+void PlayerInventory::RemoveItemFromPlayer(const int& playerNo, const int& invSlot){
 	ResetItemUsageCount(playerNo, invSlot);
 	LevelManager::GetLevelManager()->DropEquippedIconTexture(invSlot);
 	mPlayerInventory[playerNo][invSlot] = none;

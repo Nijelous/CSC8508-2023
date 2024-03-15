@@ -5,5 +5,5 @@ struct LightData {
 				float dimDotProd = 0.0f;
 				Vector3 lightColour = { 0,0,0 };
 				float lightRadius = 0.0f;
-
+				int lightCount = 0;
 			};

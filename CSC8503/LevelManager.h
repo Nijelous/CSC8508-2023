@@ -36,8 +36,6 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
-		//class InventoryBuffSystem::PlayerInventoryObserver;
-		//class InventoryBuffSystem::PlayerBuffsObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -277,6 +275,7 @@ namespace NCL {
 
 			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
 			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;
+			std::vector<GlobalSuspicionObserver*> mGlobalSuspicionObserver;
 		};
 	}
 }

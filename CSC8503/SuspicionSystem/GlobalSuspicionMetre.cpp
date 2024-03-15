@@ -1,6 +1,7 @@
 #include "GlobalSuspicionMetre.h"
+
 #include <algorithm>
-#include "NetworkObject.h"
+
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 
@@ -57,17 +58,6 @@ void GlobalSuspicionMetre::Notify(const SuspicionMetre::SusBreakpoint susBreakpo
     }
 }
 
-/*
-void GlobalSuspicionMetre::UpdateInventoryObserver(InventoryBuffSystem::InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved){
-    switch (invEvent){
-    case InventoryBuffSystem::flagAdded:
-        SetPlayerGlobalSusMetre(flagCaptured);
-        break;
-    default:
-        break;
-    }
-}
-*/
 void GlobalSuspicionMetre::Update(float dt){
     if (mGlobalSusMeter == 0.0f &&
         mContinuousGlobalSusCauseVector.size() == 0)
@@ -110,9 +100,6 @@ void GlobalSuspicionMetre::HandleGlobalSusChangeNetworking(const int& changedVal
     int localPlayerId = 0;
     DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
     if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-        const auto* localPlayer = game->GetLocalPlayer();
-        localPlayerId = localPlayer->GetPlayerID();
-
         const bool isServer = game->GetIsServer();
         if (isServer) {
             game->SendClientSyncGlobalSusChangePacket(changedValue);
@@ -121,6 +108,6 @@ void GlobalSuspicionMetre::HandleGlobalSusChangeNetworking(const int& changedVal
 #endif
 };
 
-void GlobalSuspicionMetre::SyncSusChange(int localPlayerID, int changedValue) {
+void GlobalSuspicionMetre::SyncSusChange(int changedValue) {
     mGlobalSusMeter = changedValue;
 }

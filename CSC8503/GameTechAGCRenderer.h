@@ -33,11 +33,10 @@ namespace NCL {
 			GameTechAGCRenderer(GameWorld& world);
 			~GameTechAGCRenderer();
 
-			virtual Mesh*		LoadMesh(const std::string& name)				override;
-			void		LoadMeshes(unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details) override;
-			virtual Texture*	LoadTexture(const std::string& name)			override;
-			virtual Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
-			virtual void FillLightUBO() override;
+			Mesh*		LoadMesh(const std::string& name)				override;
+			Texture*	LoadTexture(const std::string& name)			override;
+			Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
+			void FillLightUBO() override;
 
 		protected:
 			void RenderFrame()	override;
@@ -136,7 +135,6 @@ namespace NCL {
 			sce::Agc::Core::Texture*	bindlessTextures;
 			sce::Agc::Core::Buffer*		bindlessBuffers;
 			uint32_t bufferCount;
-
 			sce::Agc::Core::Buffer textureBuffer;
 			std::map<std::string, NCL::PS5::AGCTexture*> textureMap;
 

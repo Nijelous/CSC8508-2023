@@ -1,11 +1,10 @@
 #include "LocalSuspicionMetre.h"
+
 #include <algorithm>
-#include "Debug.h"
-#include <string>
+
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 
 namespace NCL::CSC8503
 {
