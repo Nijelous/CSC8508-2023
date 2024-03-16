@@ -11,9 +11,9 @@ namespace NCL {
 		public:
 			CCTV(const float baseL = 5,const std::string& name = ""){
 				mBaseL = baseL;
+				mName == "CCTV";
 			};
 			~CCTV() {
-				hadSeenPlayer.clear();
 			};
 
 			void DrawDebugLines(const bool canSeePlayer);

@@ -74,8 +74,6 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
 	SetUIObject(UI);
 	SetSoundObject(soundObject);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
@@ -94,8 +92,6 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 }
 
 PlayerObject::~PlayerObject() {
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Detach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);
 }
 
 
@@ -459,7 +455,8 @@ void PlayerObject::ControlInventory() {
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
 		DEBUG_MODE) {
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::flag, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
 }

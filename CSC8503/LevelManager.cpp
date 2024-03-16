@@ -839,6 +839,41 @@ PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 	return returnObj;
 }
 
+float NCL::CSC8503::LevelManager::GetNearestGuardDistance(const Vector3& startPos) const{
+	GuardObject& firstGuard = *mGuardObjects[0];
+	GuardObject* returnObj = &firstGuard;
+	const Vector3& firstPos = firstGuard.GetTransform().GetPosition();
+	float minDistance = sqrt((startPos.x - firstPos.x) * (startPos.x - firstPos.x) +
+		(startPos.z - firstPos.z) * (startPos.z - firstPos.z));
+
+	for (int i = 1; i < mGuardObjects.size(); i++) {
+		GuardObject* serverGuard = mGuardObjects[i];
+		if (serverGuard != nullptr) {
+			const Vector3& guardPos = serverGuard->GetTransform().GetPosition();
+
+			float distance = sqrt((startPos.x - guardPos.x) * (startPos.x - guardPos.x) +
+				(startPos.z - guardPos.z) * (startPos.z - guardPos.z));
+			if (distance < minDistance) {
+				minDistance = distance;
+				returnObj = serverGuard;
+			}
+		}
+
+	}
+
+	return minDistance;
+}
+
+float LevelManager::GetNearestGuardToPlayerDistance(const int playerNo) const{
+	Vector3 playerPos;
+	if (serverPlayersPtr)
+		playerPos = (*serverPlayersPtr)[playerNo]->GetTransform().GetPosition();
+	else
+		playerPos = mTempPlayer->GetTransform().GetPosition();
+
+	return GetNearestGuardDistance(playerPos);
+}
+
 PrisonDoor* LevelManager::GetPrisonDoor() const {
 	return mPrisonDoor;
 }
