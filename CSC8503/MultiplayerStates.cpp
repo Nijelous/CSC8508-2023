@@ -1,5 +1,6 @@
 #include "MultiplayerStates.h"
 #include "DebugNetworkedGame.h"
+#include "GameClient.h"
 #include "GameServer.h"
 #include "SceneManager.h"
 #include "SinglePlayerStates.h"
@@ -13,21 +14,31 @@ PushdownState::PushdownResult MultiplayerLobby::OnUpdate(float dt, PushdownState
 	if (isServer) {
 		Debug::Print(" Waiting for player to join ...", Vector2(5, 95), Debug::RED);
 		if (Window::GetKeyboard()->KeyPressed(KeyCodes::S)) {
-			
+
 			mGameSceneManager->SetIsGameStarted(true);
 			*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
 			return PushdownResult::Push;
 		}
 	}
 	else {
-		Debug::Print(" Waiting for server to start ...", Vector2(5, 95), Debug::RED);
-		bool isGameStarted = mGameSceneManager->GetIsGameStarted();
-		if (isGameStarted) {
-			*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
-			return PushdownResult::Push;
+		bool isConnected = mGameSceneManager->GetClient()->GetIsConnected();
+		if (isConnected) {
+			Debug::ClearStringEntries();
+			Debug::Print("Connected Successfully! Waiting for server to start...", Vector2(5, 95), Debug::RED, 15.f);
+;			if (bool isGameStarted = mGameSceneManager->GetIsGameStarted()) {
+				*newState = new InitialisingMultiplayerLevel(mGameSceneManager);
+				return PushdownResult::Push;
+			}
 		}
+		else {
+			Debug::Print(" Trying To Connect .", Vector2(5, 60), Debug::RED);
+			Debug::Print(" Press ESC to return back.", Vector2(5, 80), Debug::RED);
+			if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
+				LevelManager::GetLevelManager()->SetGameState(MenuState);
+			}
+		}
+
 	}
-	mGameSceneManager->GetLevelManager()->GetRenderer()->Render();
 	return PushdownResult::NoChange;
 	
 }
@@ -48,7 +59,8 @@ PushdownState::PushdownResult InitialisingMultiplayerLevel::OnUpdate(float dt, P
 }
 
 void InitialisingMultiplayerLevel::OnAwake() {
-
+	auto* levelManager = LevelManager::GetLevelManager();
+	levelManager->GetRenderer()->SetIsGameStarted(true);
 }
 
 PushdownState::PushdownResult PlayingMultiplayerLevel::OnUpdate(float dt, PushdownState** newState) {
@@ -80,7 +92,9 @@ PushdownState::PushdownResult MultiplayerVictory::OnUpdate(float dt, PushdownSta
 }
 
 void MultiplayerVictory::OnAwake() {
+	auto* levelManager = LevelManager::GetLevelManager();
 	mGameSceneManager->ClearNetworkGame();
+	levelManager->GetRenderer()->SetIsGameStarted(false);
 }
 
 
@@ -100,5 +114,7 @@ PushdownState::PushdownResult MultiplayerDefeat::OnUpdate(float dt, PushdownStat
 }
 
 void MultiplayerDefeat::OnAwake() {
-	LevelManager::GetLevelManager()->ClearLevel();
+	auto* levelManager = LevelManager::GetLevelManager();
+	mGameSceneManager->ClearNetworkGame();
+	levelManager->GetRenderer()->SetIsGameStarted(false);
 }

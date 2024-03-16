@@ -22,6 +22,8 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "MainMenuScene.h"
         "SoundManager.h"
         "MultiplayerStates.h"
+        "BaseUI.h"
+        "WindowsUI.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -71,6 +73,8 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "MainMenuScene.cpp"
         "SoundManager.cpp"
         "MultiplayerStates.cpp"
+        "BaseUI.cpp"
+        "WindowsUI.cpp"
     )
 
 

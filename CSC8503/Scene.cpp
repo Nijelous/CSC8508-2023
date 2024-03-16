@@ -27,6 +27,9 @@ LevelManager* NCL::CSC8503::Scene::GetLevelManager()
     return mLevelManager;
 }
 
+void Scene::DrawCanvas() {
+}
+
 void Scene::InitCamera(){
     mLevelManager->GetGameWorld()->GetMainCamera().SetNearPlane(0.1f);
     mLevelManager->GetGameWorld()->GetMainCamera().SetFarPlane(500.0f);

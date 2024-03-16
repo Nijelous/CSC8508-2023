@@ -6,7 +6,8 @@ anim,PlayerWalk,FemaleGuard/StepForwardOneHand.anm,
 anim,PlayerSprint,FemaleGuard/StepForward.anm,
 anim,RigStand,Max/Idle.anm,
 anim,RigWalk,Max/Walk2.anm,
-anim,RigSprint,Max/Incentivise.anm,
+anim,RigPoint,Max/Incentivise.anm,
+anim,RigSprint,Max/Walk2.anm,
 mat,Guard,MaleGuard/Male_Guard.mat,
 mat,Player,FemaleGuard/Female_Guard.mat,
 mat,Rig,Max/Rig_Maximilian.mat,
@@ -23,6 +24,9 @@ msh,Farmer,Keeper.msh,
 msh,CornerWall,Walls/CornerWallCoridoor.msh,
 msh,Present,present.msh,
 msh,Chest,chest.msh,
+sdr,Basic,scene.vert,scene.frag
+sdr,Instance,sceneInstanced.vert,scene.frag
+sdr,Animation,animationScene.vert,scene.frag
 tex,Basic,checkerboard.png,
 tex,FleshyAlbedo,fleshy_albedo.png,
 tex,FleshyNormal,fleshy_normal.png,
@@ -50,7 +54,8 @@ tex,PresentAlbedo,paper_diffuse1.png,
 tex,PresentNormal,present_Present_Normal.png,
 tex,ChestAlbedo,Tex_Chest_01_Albedo.png,
 tex,ChestNormal,Tex_Chest_01_Normal.png,
-sdr,Basic,scene.vert,scene.frag
-sdr,Instance,sceneInstanced.vert,scene.frag
-sdr,Animation,animationScene.vert,scene.frag
+tex,LockDoor,lockDoor.png,
+tex,CloseDoor,closeDoor.png,
+tex,StopGuard,stopGuard.png,
+tex,OpenDoor,openDoor.png,
 end,,,

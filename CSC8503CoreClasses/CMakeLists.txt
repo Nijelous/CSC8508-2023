@@ -183,6 +183,27 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     )
     source_group("eNet" FILES ${enet_Files})
 
+    set(imgui_Files
+        #"./imgui/imgui.h"
+         "./imgui/imgui.cpp"
+         "./imgui/imconfig.h"
+         "./imgui/imstb_textedit.h"
+         "./imgui/imstb_rectpack.h"
+         "./imgui/imstb_truetype.h"
+         "./imgui/imgui_demo.cpp"
+         "./imgui/imgui_draw.cpp"
+         "./imgui/imgui_impl_opengl3.cpp"
+         "./imgui/imgui_impl_opengl3.h"
+         "./imgui/imgui_impl_opengl3_loader.h"
+         "./imgui/imgui_impl_win32.cpp"
+         "./imgui/imgui_impl_win32.h"
+         "./imgui/imgui_internal.h"
+         "./imgui/imgui_tables.cpp"
+         "./imgui/imgui_widgets.cpp"
+
+    )
+    source_group("imgui" FILES ${imgui_Files})
+
     set(ALL_FILES
         ${Header_Files}
         ${Source_Files}
@@ -199,6 +220,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         ${enet_Files}
         ${AI_Guard}
         ${AI_CCTV}
+        ${imgui_Files}
     )
 
     set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)

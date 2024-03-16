@@ -19,7 +19,7 @@ namespace NCL {
 
 			int GetPeerID() const;
 
-			bool Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum);
+			bool Connect(uint8_t a, uint8_t b, uint8_t c, uint8_t d, int portNum, const std::string& playerName);
 
 			void SendPacket(GamePacket&  payload);
 
@@ -32,11 +32,19 @@ namespace NCL {
 			void WriteAndSendClientUseItemPacket(int playerID, int objectID);
 
 			void Disconnect();
+
+			bool GetIsConnected() const;
 		protected:
+			bool mIsConnected;
+
 			int mPeerId;
+
+			std::string mPlayerName;
 			
 			_ENetPeer*	mNetPeer;
 			float mTimerSinceLastPacket;
+
+			void SendClientInitPacket();
 		};
 	}
 }

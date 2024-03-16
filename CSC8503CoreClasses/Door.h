@@ -11,6 +11,10 @@ namespace NCL {
 			virtual void CountDownTimer(float dt);
 			virtual void SetIsOpen(bool isOpen);
 			virtual void SetNavMeshFlags(int flag)=0;
+			virtual bool GetIsOpen() {
+				return mIsOpen;
+			}
+			
 		protected:
 			const float initDoorTimer = 10.0f;
 			float mTimer;

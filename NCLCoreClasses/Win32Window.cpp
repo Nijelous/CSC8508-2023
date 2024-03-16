@@ -4,12 +4,18 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <io.h>
+
+#include "../CSC8503CoreClasses/imgui/imgui_impl_win32.h"
 using namespace NCL;
 using namespace Win32Code;
 
 #define WINDOWCLASS "WindowClass"
 
+HWND Win32Code::Win32Window::windowHandle = nullptr;
+
 Win32Window::Win32Window(const std::string& title, int sizeX, int sizeY, bool fullScreen, int offsetX, int offsetY)	{
+	if (windowHandle) return;
+
 	forceQuit		= false;
 	init			= false;
 	mouseLeftWindow	= false;
@@ -208,7 +214,12 @@ void Win32Window::CheckMessages(MSG &msg)	{
 	}
 }
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK Win32Window::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)	{
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return true;
+
 	Win32Window* thisWindow = (Win32Window*)window;
 
 	bool applyResize = false;

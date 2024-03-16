@@ -75,6 +75,7 @@ PushdownState::PushdownResult PlayingLevel::OnUpdate(float dt, PushdownState** n
 }
 
 void PlayingLevel::OnAwake() {
+
 	mGameSceneManager->SetLevel();
 }
 
@@ -86,7 +87,9 @@ PushdownState::PushdownResult InitialisingLevel::OnUpdate(float dt, PushdownStat
 }
 
 void InitialisingLevel::OnAwake() {
-	LevelManager::GetLevelManager()->ClearLevel();
+	auto* levelManager = LevelManager::GetLevelManager();
+	levelManager->GetRenderer()->SetIsGameStarted(true);
+	levelManager->ClearLevel();
 	mGameSceneManager->SetInitLevel();
 	mGameSceneManager->CreateLevel();
 }
@@ -102,6 +105,8 @@ PushdownState::PushdownResult MainMenu::OnUpdate(float dt, PushdownState** newSt
 }
 
 void MainMenu::OnAwake() {
+	auto* levelManager = LevelManager::GetLevelManager();
+	levelManager->GetRenderer()->SetIsGameStarted(false);
 	mGameSceneManager->SetMainMenu();
-	LevelManager::GetLevelManager()->ClearLevel();
+	levelManager->ClearLevel();
 }

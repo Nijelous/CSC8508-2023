@@ -118,7 +118,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 	if (mIsLocalPlayer) {
 		const Vector3 playerPos = mTransform.GetPosition();
 
-		Debug::Print("Player Position: " + std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y) + ", " + std::to_string(playerPos.z), Vector2(5, 30), Debug::MAGENTA);
+		//Debug::Print("Player Position: " + std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y) + ", " + std::to_string(playerPos.z), Vector2(5, 30), Debug::MAGENTA);
 
 		if (Window::GetKeyboard()->KeyDown(KeyCodes::W))
 			mPlayerInputs.movementButtons[MOVE_FORWARD_INDEX] = true;
@@ -364,6 +364,7 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inte
 			std::cout << "Object hit " << objectHit->GetName() << std::endl;
 		}
 	}
+	
 }
 
 void NetworkPlayer::ControlInventory() {
