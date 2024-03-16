@@ -26,20 +26,19 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 
 	ObjectState s = objects[id];
 
-	float4 position;
-	float3 normal;
-	float4 tangent;
-	float3 binormal;
+	float4 position(0,0,0,0);
+	float3 normal (0,0,0);
+	float4 tangent(0,0,0,0);
+	float3 binormal(0,0,0);
 
 
 	TransformVertexToWorld(s, vertID, position, normal, tangent, binormal);
-	float3x3 normalMatrix = transpose(inverse(float3x3(s.modelMatrix)));
-	normal = normalize(mul(normalMatrix,normalize(normal)));
-	tangent = normalize(mul(normalMatrix,normalize(tangent.xyz)));
+	normal = normalize (mul(s.modelMatrix, float4(normal, 0.0)).xyz);
+	tangent = normalize (mul(s.modelMatrix, float4(tangent.xyz, 0.0)));
 	binormal = cross(tangent.xyz, normal) * tangent.w;
 
 	Output.Normal = normal;
-	Output.Tangent = tangent;
+	Output.Tangent = tangent.xyz;
 	Output.Binormal = binormal;
 	Output.Position = TransformWorldToClip(position);
 	Output.UV		= TextureCoords[vertID];
