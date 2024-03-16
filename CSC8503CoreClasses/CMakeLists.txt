@@ -144,6 +144,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.h"
         "AnimationObject.h"
         "AnimationSystem.h"
+        "SoundObject.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -156,6 +157,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "Transform.cpp"
         "AnimationObject.cpp"
         "AnimationSystem.cpp"
+        "SoundObject.cpp"
     )
     source_group("Source Files" FILES ${Source_Files})
 
@@ -181,6 +183,27 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     )
     source_group("eNet" FILES ${enet_Files})
 
+    set(imgui_Files
+        #"./imgui/imgui.h"
+         "./imgui/imgui.cpp"
+         "./imgui/imconfig.h"
+         "./imgui/imstb_textedit.h"
+         "./imgui/imstb_rectpack.h"
+         "./imgui/imstb_truetype.h"
+         "./imgui/imgui_demo.cpp"
+         "./imgui/imgui_draw.cpp"
+         "./imgui/imgui_impl_opengl3.cpp"
+         "./imgui/imgui_impl_opengl3.h"
+         "./imgui/imgui_impl_opengl3_loader.h"
+         "./imgui/imgui_impl_win32.cpp"
+         "./imgui/imgui_impl_win32.h"
+         "./imgui/imgui_internal.h"
+         "./imgui/imgui_tables.cpp"
+         "./imgui/imgui_widgets.cpp"
+
+    )
+    source_group("imgui" FILES ${imgui_Files})
+
     set(ALL_FILES
         ${Header_Files}
         ${Source_Files}
@@ -197,6 +220,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         ${enet_Files}
         ${AI_Guard}
         ${AI_CCTV}
+        ${imgui_Files}
     )
 
     set_source_files_properties(${ALL_FILES} PROPERTIES LANGUAGE CXX)
@@ -265,8 +289,16 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     include_directories("../NCLCoreClasses/")
     include_directories("./")
     include_directories("../OpenGLRendering/")
+    include_directories("../FMODCoreAPI/includes")
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
+    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
+
+    file(GLOB DLLS "../FMODCoreAPI/dlls/*.dll")
+    foreach(DLL ${DLLS})
+          add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    endforeach(DLL)
 
     if(MSVC)
         target_link_libraries(${PROJECT_NAME} PRIVATE "ws2_32.lib")
@@ -533,7 +565,10 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     include_directories("./")
     if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         include_directories("../OpenGLRendering/")
+        include_directories("../FMODCoreAPI/includes")
         target_link_libraries(${PROJECT_NAME} LINK_PUBLIC OpenGLRendering)
+        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
+        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
     endif()
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
 

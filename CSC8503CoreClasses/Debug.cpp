@@ -90,3 +90,7 @@ const std::vector<Debug::DebugStringEntry>& Debug::GetDebugStrings() {
 const std::vector<Debug::DebugLineEntry>& Debug::GetDebugLines() {
 	return lineEntries;
 }
+
+void Debug::ClearStringEntries() {
+	stringEntries.clear();
+}

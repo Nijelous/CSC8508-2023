@@ -21,8 +21,9 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "SceneStates.h"
         "MainMenuScene.h"
         "SoundManager.h"
-        "SoundObject.h"
         "MultiplayerStates.h"
+        "BaseUI.h"
+        "WindowsUI.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -71,8 +72,9 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "SceneStates.cpp"
         "MainMenuScene.cpp"
         "SoundManager.cpp"
-        "SoundObject.cpp"
         "MultiplayerStates.cpp"
+        "BaseUI.cpp"
+        "WindowsUI.cpp"
     )
 
 
@@ -227,7 +229,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     include_directories("../Detour")
     include_directories("../DebugUtils")
     include_directories("../DetourTileCache")
-    include_directories("../FMODCoreAPI/includes")
 
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC NCLCoreClasses)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)
@@ -236,13 +237,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC Detour)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DebugUtils)
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC DetourTileCache)
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
-    target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
-
-    file(GLOB DLLS "../FMODCoreAPI/dlls/*.dll")
-    foreach(DLL ${DLLS})
-          add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${DLL} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-    endforeach(DLL)
 endif()
 
 # PS5 Cmake file
@@ -382,11 +376,6 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
     include_directories("../Detour")
     include_directories("../DebugUtils")
     include_directories("../DetourTileCache")
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        include_directories("../FMODCoreAPI/includes")
-        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmod_vc")
-        target_link_libraries(${PROJECT_NAME} LINK_PUBLIC "../FMODCoreAPI/libs/fmodL_vc")
-    endif()
 
     target_link_libraries(${PROJECT_NAME} PRIVATE ${NCLCoreClasses})
     target_link_libraries(${PROJECT_NAME} LINK_PUBLIC CSC8503CoreClasses)

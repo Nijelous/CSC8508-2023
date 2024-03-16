@@ -4,8 +4,8 @@
 #include "State.h"
 #include "PhysicsObject.h"
 #include "Vector3.h"
-#include "map";
-#include "../CSC8503/SoundObject.h"
+#include "map"
+#include "SoundObject.h"
 
 using namespace NCL;
 using namespace CSC8503;
