@@ -240,7 +240,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 					LoadLights(room->GetLights(), key, (*val).GetPrimaryDoor() * 90);
 					LoadDoors(room->GetDoors(), key, isMultiplayer, (*val).GetPrimaryDoor() * 90);
 					LoadCCTVList(room->GetCCTVTransforms(), key, (*val).GetPrimaryDoor() * 90);
-					LoadDecorations((*mLevelList[levelID]).GetDecorationMap(), key, (*val).GetPrimaryDoor() * 90);
+					LoadDecorations(room->GetDecorationMap(), key, (*val).GetPrimaryDoor() * 90);
 					for (int i = 0; i < room->GetItemPositions().size(); i++) {
 						roomItemPositions.push_back(room->GetItemPositions()[i] + key);
 					}
@@ -645,6 +645,8 @@ void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
 	Debug::Print(std::format("Update World: {:.2f}ms", mWorldTime), Vector2(1, 49), Vector4(1, 1, 1, 1), 12.5f);
 	Debug::Print(std::format("Physics Update: {:.2f}ms", mPhysicsTime), Vector2(1, 52), Vector4(1, 1, 1, 1), 12.5f);
 	Debug::Print(std::format("Animation Update: {:.2f}ms", mAnimationTime), Vector2(1, 55), Vector4(1, 1, 1, 1), 12.5f);
+	Debug::Print(std::format("Position: {:.1f}, {:.1f}, {:.1f}", mTempPlayer->GetTransform().GetPosition().x, mTempPlayer->GetTransform().GetPosition().y,
+		mTempPlayer->GetTransform().GetPosition().z), Vector2(30, 3), Vector4(1, 1, 1, 1), 15.0f);
 
 	if (mShowVolumes) {
 		std::vector<GameObject*>::const_iterator first;
@@ -769,15 +771,15 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 			offsetKey.SetPosition(offsetKey.GetPosition() + startPosition);
 			switch (key) {
 			case Desk:
-				offsetKey.SetScale(Vector3(14, 4, 7.5f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(14, 4, 7.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "HotelDesk"));
 				break;
 			case Painting:
-				offsetKey.SetScale(Vector3(0.3f, 0.42f, 0.02f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2.85f, 4.2f, 0.1f)).Abs());
 				AddDecorationToWorld(offsetKey, "Painting");
 				break;
 			case PlantTall:
-				offsetKey.SetScale(Vector3(2, 6, 2));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2, 6, 2)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TallPlant"));
 				break;
 			case PlantPot:
@@ -785,11 +787,11 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallPlant"));
 				break;
 			case Bookshelf:
-				offsetKey.SetScale(Vector3(6.5f, 8.6f, 2));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.5f, 8.6f, 2)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bookshelf"));
 				break;
 			case Bed:
-				offsetKey.SetScale(Vector3(7, 4, 8.6f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 4, 8.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
 				break;
 			case Chair:
@@ -801,27 +803,27 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				AddDecorationToWorld(offsetKey, "CeilingLight");
 				break;
 			case TV:
-				offsetKey.SetScale(Vector3(6, 4, 2.8f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6, 4, 2.8f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TV"));
 				break;
 			case Table:
-				offsetKey.SetScale(Vector3(6.5f, 2, 3.5f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.5f, 2, 3.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Table"));
 				break;
 			case TableSmall:
-				offsetKey.SetScale(Vector3(3.35f, 2, 3.35f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(3.35f, 2, 3.35f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallTable"));
 				break;
 			case Shelf:
-				offsetKey.SetScale(Vector3(6.6f, 1.5f, 1.6f));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.6f, 1.5f, 1.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Shelf"));
 				break;
 			case Sofa:
-				offsetKey.SetScale(Vector3(7, 3, 3));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 3, 3)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Sofa"));
 				break;
 			case PoolTable:
-				offsetKey.SetScale(Vector3(7, 4, 12));
+				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 4, 12)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "PoolTable"));
 				break;
 			}
@@ -1117,8 +1119,8 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	Vent* newVent = new Vent();
 	newVent->SetName("Vent");
 
-	Vector3 size = Vector3(1.25f, 1.25f, 0.05f);
-	OBBVolume* volume = new OBBVolume(size);
+	Vector3 size = (vent->GetTransform().GetOrientation() * Vector3(1, 1, 0.05f)).Abs();
+	AABBVolume* volume = new AABBVolume(size);
 
 	newVent->SetBoundingVolume((CollisionVolume*)volume);
 
@@ -1530,7 +1532,7 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 	GameObject* decoration = new GameObject(StaticObj, "Decoration");
 
 	Vector3 size = transform.GetScale() / 2;
-	OBBVolume* volume = new OBBVolume(size);
+	AABBVolume* volume = new AABBVolume(size);
 	decoration->SetBoundingVolume((CollisionVolume*)volume);
 	decoration->GetTransform()
 		.SetScale(Vector3(1, 1, 1))

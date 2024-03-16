@@ -103,6 +103,7 @@ namespace NCL {
 			}
 
 			void OperateOnLeaf(QuadTreeFunc& func, const Vector3& objPos, const Vector3& objSize) {
+				if (!this) return;
 				if (!CollisionDetection::AABBTest(objPos, Vector3(position.x, 0, position.y), objSize, Vector3(size.x, 1000.0f, size.y))) return;
 				if (children) {
 					for (int i = 0; i < 4; i++) {
