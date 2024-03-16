@@ -5,6 +5,7 @@
 #include "Door.h"
 #include "PrisonDoor.h"
 #include "Vent.h"
+#include "InteractableDoor.h"
 
 using namespace NCL::CSC8503;
 
