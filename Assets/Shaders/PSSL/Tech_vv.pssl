@@ -10,8 +10,11 @@ struct VS_OUTPUT
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
 	float4 Colour		: TEXCOORD1;	
-	int	albedoTexID		: TEXCOORD2;
-	int normalTexID		: TEXCOORD3;
+	float3 Tangent		: TEXCOORD2;
+	float3 Normal		: TEXCOORD3;
+	float3 Binormal		: TEXCOORD4;
+	int	albedoTexID		: TEXCOORD5;
+	int normalTexID		: TEXCOORD6;
 };
 
 [CxxSymbol("TestShader::gs")]
@@ -26,10 +29,18 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	float4 position;
 	float3 normal;
 	float4 tangent;
-	float3 bitangent;
+	float3 binormal;
 
-	TransformVertexToWorld(s, vertID, position, normal, tangent, bitangent);
 
+	TransformVertexToWorld(s, vertID, position, normal, tangent, binormal);
+	float3x3 normalMatrix = transpose(inverse(float3x3(s.modelMatrix)));
+	normal = normalize(mul(normalMatrix,normalize(normal)));
+	tangent = normalize(mul(normalMatrix,normalize(tangent.xyz)));
+	binormal = cross(tangent.xyz, normal) * tangent.w;
+
+	Output.Normal = normal;
+	Output.Tangent = tangent;
+	Output.Binormal = binormal;
 	Output.Position = TransformWorldToClip(position);
 	Output.UV		= TextureCoords[vertID];
 	Output.Colour	= s.colour;

@@ -15,6 +15,7 @@ void TransformVertexToWorld(ObjectState s, uint vertID, out float4 position, out
 		vPos		= Positions[vertID];
 		vNormal		= Normals[vertID];
 		vTangent	= Tangents[vertID];
+		
 	}		
 	
 	position = mul(s.modelMatrix,float4(vPos.xyz, 1));

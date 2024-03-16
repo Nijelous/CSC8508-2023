@@ -196,9 +196,7 @@ This method builds a struct that
 */
 void GameTechAGCRenderer::WriteRenderPassConstants() {
 	ShaderConstants frameData;
-	frameData.lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	frameData.lightRadius = 1000.0f;
-	frameData.lightPosition = Vector3(-100.0f, 60.0f, -100.0f);
+
 	frameData.cameraPos = gameWorld.GetMainCamera().GetPosition();
 
 	frameData.viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
@@ -211,10 +209,6 @@ void GameTechAGCRenderer::WriteRenderPassConstants() {
 	frameData.inverseProjMatrix = frameData.projMatrix.Inverse();
 
 	frameData.orthoMatrix = Matrix4::Orthographic(0.0f, 100.0f, 100.0f, 0.0f, -1.0f, 1.0f);
-	frameData.shadowMatrix = Matrix4::Perspective(50.0f, 500.0f, 1.0f, 45.0f) *
-		Matrix4::BuildViewMatrix(frameData.lightPosition, Vector3(0, 0, 0), Vector3(0, 1, 0));
-
-	frameData.shadowID = shadowMap->GetAssetID();
 
 	currentFrame->data.WriteData<ShaderConstants>(frameData); //Let's start filling up our frame data!
 
