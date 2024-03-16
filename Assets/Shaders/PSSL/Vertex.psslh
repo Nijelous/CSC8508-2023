@@ -18,6 +18,8 @@ void TransformVertexToWorld(ObjectState s, uint vertID, out float4 position, out
 		
 	}		
 	
+	normal = vNormal;
+	tangent = vTangent;
 	position = mul(s.modelMatrix,float4(vPos.xyz, 1));
 }
 

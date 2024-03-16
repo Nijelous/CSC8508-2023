@@ -7,7 +7,7 @@ struct VS_OUTPUT
 	float4 Colour		: TEXCOORD1;	
 	float3 Tangent		: TEXCOORD2;
 	float3 Normal		: TEXCOORD3;
-	float3 Binormal		: TEXCOORD4;
+	float3 Bitangent	: TEXCOORD4;
 	int	albedoTexID		: TEXCOORD5;
 	int normalTexID		: TEXCOORD6;
 };
@@ -19,14 +19,14 @@ RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
 [CxxSymbol("TestShader::ps")]
 float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 {
-	float3x3 TBN = float3x3(normalize(vertex.Tangent), normalize(vertex.Binormal), normalize(vertex.Normal));
+	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
 	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.albedoTexID)]);
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
 	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
-	bumpNormal = normalize(mul(TBN, normalize(bumpNormal *2.0f - 1.0)));
+	bumpNormal = normalize(mul(TBN, normalize(bumpNormal * 2.0 - 1.0)));
 	
-	float4 texSample = albedoTex.Sample(sampler, vertex.UV);
+	float4 albedoSample = albedoTex.Sample(sampler, vertex.UV);
 	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
 	
-	return texSample;  
+	return normalSample;  
 }

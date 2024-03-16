@@ -12,7 +12,7 @@ struct VS_OUTPUT
 	float4 Colour		: TEXCOORD1;	
 	float3 Tangent		: TEXCOORD2;
 	float3 Normal		: TEXCOORD3;
-	float3 Binormal		: TEXCOORD4;
+	float3 Bitangent	: TEXCOORD4;
 	int	albedoTexID		: TEXCOORD5;
 	int normalTexID		: TEXCOORD6;
 };
@@ -29,17 +29,16 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	float4 position(0,0,0,0);
 	float3 normal (0,0,0);
 	float4 tangent(0,0,0,0);
-	float3 binormal(0,0,0);
-
-
-	TransformVertexToWorld(s, vertID, position, normal, tangent, binormal);
-	normal = normalize (mul(s.modelMatrix, float4(normal, 0.0)).xyz);
-	tangent = normalize (mul(s.modelMatrix, float4(tangent.xyz, 0.0)));
-	binormal = cross(tangent.xyz, normal) * tangent.w;
+	float3 bitangent(0,0,0);
+	float3x3 model3x3 = float3x3(s.modelMatrix);
+	TransformVertexToWorld(s, vertID, position, normal, tangent, bitangent);
+	normal = normalize (mul(model3x3, normal));
+	tangent = float4(normalize (mul(model3x3, tangent.xyz)),tangent.w);
+	bitangent = mul(model3x3,(cross(tangent.xyz, normal) * tangent.w));
 
 	Output.Normal = normal;
 	Output.Tangent = tangent.xyz;
-	Output.Binormal = binormal;
+	Output.Bitangent = bitangent;
 	Output.Position = TransformWorldToClip(position);
 	Output.UV		= TextureCoords[vertID];
 	Output.Colour	= s.colour;
