@@ -272,6 +272,7 @@ namespace NCL {
 
 			bool mIsLevelInitialised;
 			bool mShowDebug = false;
+			bool mShowVolumes = false;
 
 			ULARGE_INTEGER mLastCPU, mLastSysCPU, mLastUserCPU;
 			int mNumProcessors;

@@ -362,6 +362,9 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	}
 	if (mShowDebug) {
 		PrintDebug(dt);
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::F4)) {
+			mShowVolumes = !mShowVolumes;
+		}
 	}
 
 	if (isPaused) {
@@ -642,6 +645,16 @@ void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
 	Debug::Print(std::format("Update World: {:.2f}ms", mWorldTime), Vector2(1, 49), Vector4(1, 1, 1, 1), 12.5f);
 	Debug::Print(std::format("Physics Update: {:.2f}ms", mPhysicsTime), Vector2(1, 52), Vector4(1, 1, 1, 1), 12.5f);
 	Debug::Print(std::format("Animation Update: {:.2f}ms", mAnimationTime), Vector2(1, 55), Vector4(1, 1, 1, 1), 12.5f);
+
+	if (mShowVolumes) {
+		std::vector<GameObject*>::const_iterator first;
+		std::vector<GameObject*>::const_iterator last;
+		mWorld->GetObjectIterators(first, last);
+		for (auto i = first; i != last; i++) {
+			if ((*i)->GetName() == "Floor" || (*i)->GetName() == "Wall") continue;
+			(*i)->DrawCollisionVolume();
+		}
+	}
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
