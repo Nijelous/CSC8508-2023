@@ -27,6 +27,7 @@ float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	
 	float4 albedoSample = albedoTex.Sample(sampler, vertex.UV);
 	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
+	normalSample = float4(vertex.Tangent,1);
 	
 	return normalSample;  
 }
