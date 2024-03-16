@@ -14,6 +14,7 @@ void PlayerBuffs::Init(){
 	}
 
 	mBuffsObserverList.clear();
+	mActiveBuffDurationMap->clear();
 	mBuffsToRemove->clear();
 }
 

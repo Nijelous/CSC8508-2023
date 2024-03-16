@@ -36,19 +36,8 @@ namespace NCL::CSC8503 {
 			Default
 		};
 
-		const enum GameObjectType {
-			StaticObjectType,
-			InteractableObjectType,
-			ItemObjectType,
-			AIObjectType
-		};
-
 		void SetBoundingVolume(CollisionVolume* vol) {
 			mBoundingVolume = vol;
-		}
-
-		void SetGameObjectType(GameObjectType gameObjectType){
-			mGameObjectType = gameObjectType;
 		}
 
 		const CollisionVolume* GetBoundingVolume() const {
@@ -108,9 +97,6 @@ namespace NCL::CSC8503 {
 			return mSoundObject;
 		}
 
-		GameObjectType GetGameObjectType() const {
-			return mGameObjectType;
-		}
 
 #ifdef USEGL
 		void SetIsSensed(bool sensed);
@@ -203,7 +189,6 @@ namespace NCL::CSC8503 {
 		bool mIsPlayer;
 
 		GameObjectState mObjectState;
-		GameObjectType mGameObjectType;
 	};
 }
 
