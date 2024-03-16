@@ -325,10 +325,10 @@ bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& int
 		}
 	}
 	else {
-		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(mGameWorld->GetMainCamera());
 		RayCollision closestCollision;
 		
-		if (world->Raycast(ray, closestCollision, true, this)) {
+		if (mGameWorld->Raycast(ray, closestCollision, true, this)) {
 			auto* objectHit = (GameObject*)closestCollision.node;
 
 			Vector2 objPos = {objectHit->GetTransform().GetPosition().x, objectHit->GetTransform().GetPosition().z};

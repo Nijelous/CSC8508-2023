@@ -156,10 +156,9 @@ namespace NCL::CSC8503 {
 		int annType;
 		float time;
 		int playerNo;
-		AnnouncementSyncPacket(int annType, float time,int playerNo);
+		AnnouncementSyncPacket(int annType, float time, int playerNo);
 	};
 
-	class NetworkObject	{
 	struct ClientInitPacket : public GamePacket {
 		std::string playerName;
 

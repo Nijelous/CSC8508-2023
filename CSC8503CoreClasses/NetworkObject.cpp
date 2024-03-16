@@ -178,7 +178,6 @@ SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>
 
 }
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
 AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int playerNo) {
 	type = SyncAnnouncements;
 	size = sizeof(AnnouncementSyncPacket);
