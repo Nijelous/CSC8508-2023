@@ -5,10 +5,6 @@
 #include "CapsuleVolume.h"
 #include "../CSC8503/InventoryBuffSystem/Item.h"
 #include "Interactable.h"
-#include "Vent.h"
-#include "InteractableDoor.h"
-
-#include "Interactable.h"
 #include "../CSC8503/LevelManager.h"
 
 #include "Window.h"
@@ -218,15 +214,6 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 	}
 }
 
-void PlayerObject::HandleInteractable(Interactable* interactablePtr, InteractType interactType){
-	if (interactablePtr->CanBeInteractedWith(interactType, this)) {
-		interactablePtr->Interact(interactType, this);
-		if (interactType == ItemUse) {
-			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
-		}
-	}
-}
-
 void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	if (mPlayerID != playerNo)
 		return;
@@ -413,32 +400,33 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inter
 
 			//Check if object is an item.
 #ifdef USEGL
-			/*
-			Item* item = dynamic_cast<Item*>(objectHit);
-			if (item != nullptr) {
-				item->OnPlayerInteract(mPlayerID);
-				return;
-			}
-			*/
+				Item* item = dynamic_cast<Item*>(objectHit);
+				if (item != nullptr) {
+					item->OnPlayerInteract(mPlayerID);
+					return;
+				}
 
-			//Check if object is an interactable.
-			if (objectHit->GetGameObjectType() == GameObject::InteractableObjectType) {
-				Interactable* interactablePtr = static_cast<Interactable*> (objectHit);
-				InteractableDoor* interactableDoorPtr = static_cast<InteractableDoor*> (interactablePtr);
-				if (typeid(interactableDoorPtr) == typeid(InteractableDoor*)) {
-					HandleInteractable(interactableDoorPtr, interactType);
+				//Check if object is an interactable.
+				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType,this)) {
+					interactablePtr->Interact(interactType, this);
+					if (interactType == ItemUse) {
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
+					}
+
 					return;
 				}
-				Vent* ventPtr = static_cast<Vent*> (interactablePtr);
-				if (typeid(ventPtr) == typeid(Vent*))
+#endif
+				if (interactType == PickPocket)
 				{
-					HandleInteractable(interactableDoorPtr, interactType);
-					return;
+					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
+					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
+						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
+							TransferItemBetweenInventories(1,
+								0, this->GetPlayerID());
+					}
 				}
-			}
-#endif			
-			std::cout << "Object hit " << objectHit->GetName() << std::endl;
-				
+
 				std::cout << "Object hit " << objectHit->GetName() << std::endl;
 			}
 		}

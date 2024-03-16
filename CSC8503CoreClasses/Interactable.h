@@ -16,7 +16,7 @@ namespace NCL {
 			InteractableDoors
 		};
 
-		class Interactable:public GameObject{
+		class Interactable{
 		public:
 			virtual void Interact(InteractType interactType, GameObject* interactingObject = nullptr) { 
 				if (!CanBeInteractedWith(interactType))
@@ -24,13 +24,11 @@ namespace NCL {
 			};
 			virtual bool CanBeInteractedWith(InteractType interactType, GameObject* interactingObject = nullptr) { return mInteractable; } ;
 
-			InteractableItems GetInteractableItemType() {
-				return mInteractableItemType;
-			};
 			//virtual InventoryBuffSystem::PlayerInventory::item* GetRelatedItem() { return &mRelatedItem; };
 		protected:
 			bool mInteractable = false;
 			InteractableItems mInteractableItemType;
+			//InventoryBuffSystem::PlayerInventory::item mRelatedItem;
 		};
 	}
 }

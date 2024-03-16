@@ -168,7 +168,7 @@ namespace NCL {
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
-			void LoadDoors(const std::vector<InteractableDoor*>& doors, const Vector3& centre, bool isMultiplayerLevel = false, int rotation = 0);
+			void LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel = false, int rotation = 0);
 
 			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
 

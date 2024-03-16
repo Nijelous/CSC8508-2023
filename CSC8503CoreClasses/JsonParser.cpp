@@ -2,7 +2,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
-#include "InteractableDoor.h"
+#include "Door.h"
 #include "PrisonDoor.h"
 #include "Vent.h"
 

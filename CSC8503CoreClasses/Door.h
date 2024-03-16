@@ -4,11 +4,16 @@
 namespace NCL {
 	namespace CSC8503 {
 		
-		class Door {
+		class Door : public GameObject {
 		public:
-			virtual void Open()=0;
-			virtual void Close()=0;
+			Door(){
+				mName = "Door";
+			}	
+
+			virtual void Open();
+			virtual void Close();
 			virtual void CountDownTimer(float dt);
+			virtual void UpdateObject(float dt) override;
 			virtual void SetIsOpen(bool isOpen);
 			virtual void SetNavMeshFlags(int flag)=0;
 			virtual bool GetIsOpen() {
@@ -16,6 +21,8 @@ namespace NCL {
 			}
 			
 		protected:
+			void SetNavMeshFlags(int flag);
+
 			const float initDoorTimer = 10.0f;
 			float mTimer;
 			bool mIsOpen;
