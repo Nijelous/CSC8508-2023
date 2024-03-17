@@ -96,7 +96,7 @@ namespace NCL {
 
 			
 			struct TextureHandleData {
-				GLuint64 handles[128] = { 0 };
+				GLuint64 handles[256] = { 0 };
 			};
 
 			struct TextureHandleIndices {

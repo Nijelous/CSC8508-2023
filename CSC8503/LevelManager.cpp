@@ -209,7 +209,7 @@ void LevelManager::ResetLevel() {
 void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool isMultiplayer) {
 	if (levelID > mLevelList.size() - 1) return;
 	mActiveLevel = levelID;
-	mStartTimer = 3;
+	mStartTimer = 5;
 	ClearLevel();
 	std::vector<Vector3> itemPositions;
 	std::vector<Vector3> roomItemPositions;
@@ -332,7 +332,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	if (isPlayingLevel) {
 		mGameState = LevelState;
 		if (mStartTimer > 0) {
-			if (mStartTimer == 3) {
+			if (mStartTimer == 5) {
 				mTempPlayer->UpdateObject(dt);
 			}
 			mStartTimer -= dt;
@@ -399,7 +399,7 @@ void NCL::CSC8503::LevelManager::DebugUpdate(float dt, bool isPlayingLevel, bool
 	if (isPlayingLevel) {
 		mGameState = LevelState;
 		if (mStartTimer > 0) {
-			if (mStartTimer == 3) {
+			if (mStartTimer == 5) {
 				mTempPlayer->UpdateObject(dt);
 			}
 			mStartTimer -= dt;
@@ -721,13 +721,27 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 		AddPickupToWorld(itemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
 	}
 	std::uniform_int_distribution<> dis(0, roomItemPositions.size()-1);
+	std::uniform_int_distribution<> dis2(0, 1);
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr, seed);
 			continue;
 		}
-		AddPickupToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
+		if (!isMultiplayer) {
+			int itemRand = dis2(seed);
+			switch (itemRand) {
+			case 0:
+				AddPickupToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
+				break;
+			case 1:
+				AddPointObjectToWorld(roomItemPositions[i]);
+				break;
+			}
+		}
+		else {
+			AddPickupToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr, isMultiplayer);
+		}
 	}
 }
 
@@ -1215,19 +1229,33 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 	return newDoor;
 }
 
-FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr) {
+FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
+	std::mt19937 seed) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 	
 	flag->SetPoints(40);
 
-	Vector3 size = Vector3(0.75f, 0.75f, 0.75f);
-	SphereVolume* volume = new SphereVolume(0.75f);
+	Vector3 size = Vector3(0.5f, 0.5f, 0.5f);
+	SphereVolume* volume = new SphereVolume(1);
 	flag->SetBoundingVolume((CollisionVolume*)volume);
 	flag->GetTransform()
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Chest"], mTextures["ChestAlbedo"], mTextures["ChestNormal"], mShaders["Basic"], 0.75f));
+	std::uniform_int_distribution<> dis(0, 2);
+	int rand = dis(seed);
+	switch (rand) {
+	case 0:
+		flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Chest"], mTextures["ChestAlbedo"], mTextures["ChestNormal"], mShaders["Basic"], 1));
+		break;
+	case 1:
+		flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["DragonStatue"], mTextures["DragonStatueAlbedo"], mTextures["DragonStatueNormal"], mShaders["Basic"], 1));
+		break;
+	case 2:
+		flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Diamond"], mTextures["DiamondAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 1));
+		break;
+	}
+	
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetSoundObject(new SoundObject());
@@ -1254,13 +1282,13 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 	PickupGameObject* pickup = new PickupGameObject(inventoryBuffSystemClassPtr,isMultiplayer);
 
 	Vector3 size = Vector3(0.5f, 0.5f, 0.5f);
-	SphereVolume* volume = new SphereVolume(0.5f);
+	SphereVolume* volume = new SphereVolume(1);
 	pickup->SetBoundingVolume((CollisionVolume*)volume);
 	pickup->GetTransform()
 		.SetScale(size * 2)
 		.SetPosition(position);
   
-	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 0.75f));
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 1));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
 	pickup->SetSoundObject(new SoundObject());
@@ -1284,14 +1312,16 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 	PointGameObject* pointObject = new PointGameObject(pointsWorth, initCooldown);
 
 	Vector3 size = Vector3(0.5f, 0.5f, 0.5f);
-	SphereVolume* volume = new SphereVolume(0.5f);
+	SphereVolume* volume = new SphereVolume(1);
 	pointObject->SetBoundingVolume((CollisionVolume*)volume);
 	pointObject->GetTransform()
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	pointObject->SetRenderObject(new RenderObject(&pointObject->GetTransform(), mMeshes["Coins"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
+	pointObject->SetRenderObject(new RenderObject(&pointObject->GetTransform(), mMeshes["Coins"], mTextures["CoinsAlbedo"], mTextures["CoinsNormal"], mShaders["Basic"], 1));
 	pointObject->SetPhysicsObject(new PhysicsObject(&pointObject->GetTransform(), pointObject->GetBoundingVolume()));
+
+	pointObject->SetSoundObject(new SoundObject());
 
 	pointObject->SetCollisionLayer(Collectable);
 
@@ -1538,9 +1568,14 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 		.SetScale(Vector3(1, 1, 1))
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
-
-	decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Instance"],
-		std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
+	if (mTextures.find(meshName + "Albedo") != mTextures.end()) {
+		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures[meshName + "Albedo"], mTextures[meshName + "Normal"], mShaders["Instance"],
+			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
+	}
+	else {
+		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Instance"],
+			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
+	}
 	decoration->SetPhysicsObject(new PhysicsObject(&decoration->GetTransform(), decoration->GetBoundingVolume()));
 
 	decoration->GetPhysicsObject()->SetInverseMass(0);
