@@ -784,27 +784,27 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 			offsetKey.SetMatrix(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * offsetKey.GetMatrix());
 			offsetKey.SetPosition(offsetKey.GetPosition() + startPosition);
 			switch (key) {
-			case Desk:
+			case Desk: // To-Do (Alex): Rotate
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(14, 4, 7.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "HotelDesk"));
 				break;
-			case Painting:
+			case Painting: // To-Do (Alex): Rotate, Material
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2.85f, 4.2f, 0.1f)).Abs());
 				AddDecorationToWorld(offsetKey, "Painting");
 				break;
-			case PlantTall:
-				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2, 6, 2)).Abs());
+			case PlantTall: // To-Do (Alex): Material
+				offsetKey.SetScale(Vector3(2, 6, 2));
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TallPlant"));
 				break;
-			case PlantPot:
+			case PlantPot: // To-Do (Alex): Material
 				offsetKey.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallPlant"));
 				break;
-			case Bookshelf:
+			case Bookshelf: // To-Do (Alex): Material, Rotate
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.5f, 8.6f, 2)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bookshelf"));
 				break;
-			case Bed:
+			case Bed: // To-Do (Alex): Material, Rotate
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 4, 8.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
 				break;
@@ -816,19 +816,19 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale(Vector3(1.5f, 0.45f, 1.5f));
 				AddDecorationToWorld(offsetKey, "CeilingLight");
 				break;
-			case TV:
+			case TV: // To-Do (Alex): Material, Rotate
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6, 4, 2.8f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TV"));
 				break;
-			case Table:
+			case Table: // To-Do (Alex): Material
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.5f, 2, 3.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Table"));
 				break;
-			case TableSmall:
+			case TableSmall: // To-Do (Alex): Material
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(3.35f, 2, 3.35f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallTable"));
 				break;
-			case Shelf:
+			case Shelf: // To-Do (Alex): Material, Rotate
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.6f, 1.5f, 1.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Shelf"));
 				break;
@@ -836,7 +836,7 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 3, 3)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Sofa"));
 				break;
-			case PoolTable:
+			case PoolTable: 
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 4, 12)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "PoolTable"));
 				break;
