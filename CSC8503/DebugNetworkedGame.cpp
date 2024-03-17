@@ -90,7 +90,7 @@ const bool DebugNetworkedGame::GetIsGameStarted() const {
 	return mIsGameStarted;
 }
 
-void DebugNetworkedGame::StartAsServer() {
+bool DebugNetworkedGame::StartAsServer(const std::string& playerName){
 	mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
 	if (mThisServer) {
 
@@ -103,8 +103,6 @@ void DebugNetworkedGame::StartAsServer() {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
-
-		mThisServer->RegisterPacketHandler(Received_State, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
@@ -114,7 +112,7 @@ void DebugNetworkedGame::StartAsServer() {
 	return mThisServer;
 }
 
-void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
+bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std::string& playerName){
 	mThisClient = new GameClient();
 	bool isConnected = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
@@ -726,5 +724,61 @@ void DebugNetworkedGame::HandleAnnouncementSync(AnnouncementSyncPacket* packet) 
 	NetworkPlayer* localPlayer = static_cast<NetworkPlayer*>(mLocalPlayer);
 	const PlayerObject::AnnouncementType announcementType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
 	localPlayer->SyncAnnouncements(announcementType,packet->time,packet->playerNo);
+}
+
+void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {
+	mPlayerPeerNameMap.insert(std::pair<int, std::string>(playerId, playerName));
+	if (mThisServer) {
+		WriteAndSendSyncPlayerIdNameMapPacket();
+	}
+}
+
+void DebugNetworkedGame::HandleClientInitPacket(const ClientInitPacket* packet, int playerID) {
+	AddToPlayerPeerNameMap(playerID, packet->playerName);
+}
+
+void DebugNetworkedGame::WriteAndSendSyncPlayerIdNameMapPacket() const {
+	SyncPlayerIdNameMapPacket packet(mPlayerPeerNameMap);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet) {
+	mPlayerPeerNameMap.clear();
+	for (int i = 0; i < 4; i++) {
+		if (packet->playerIds[i] != -1) {
+			std::pair<int, std::string> playerIdNamePair(packet->playerIds[i], packet->playerNames[i]);
+			mPlayerPeerNameMap.insert(playerIdNamePair);
+		}
+	}
+}
+
+void DebugNetworkedGame::ShowPlayerList() const {
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::TAB)) {
+		Vector2 position(15, 20);
+
+		for (const std::pair<int, std::string>& playerIdNamePair : mPlayerPeerNameMap) {
+			const Vector4& textColour = playerIdNamePair.first == mLocalPlayerId ? LOCAL_PLAYER_COLOUR : DEFAULT_PLAYER_COLOUR;
+
+			std::stringstream ss;
+			ss << playerIdNamePair.second << " ------- (" << playerIdNamePair.first << ")";
+			Debug::Print(ss.str(), position, textColour);
+			position.y += VERTICAL_MARGIN_BETWEEN_PLAYER_NAMES;
+		}
+	}
+}
+
+void DebugNetworkedGame::HandleObjectStatePacket(SyncObjectStatePacket* packet) const {
+	NetworkObject* objectToChangeState = nullptr;
+	for (NetworkObject* networkObject : mNetworkObjects) {
+		if (networkObject->GetnetworkID() == packet->networkObjId) {
+			objectToChangeState = networkObject;
+			break;
+		}
+	}
+
+	GameObject::GameObjectState state = static_cast<GameObject::GameObjectState>(packet->objectState);
+	if (objectToChangeState != nullptr) {
+		objectToChangeState->GetGameObject().SetObjectState(state);
+	}
 }
 #endif
