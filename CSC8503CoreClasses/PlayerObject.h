@@ -4,6 +4,7 @@
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "UISystem.h"
+#include "Interactable.h"
 
 namespace NCL {
 	namespace CSC8503 {
