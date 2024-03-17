@@ -183,6 +183,9 @@ void LevelManager::ClearLevel() {
 	mLevelLayout.clear();
 	mRenderer->ClearInstanceObjects();
 	mAnimation->Clear();
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();
@@ -224,7 +227,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	LoadCCTVList((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
-	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor());
+	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor(),isMultiplayer);
 	mUpdatableObjects.push_back(mPrisonDoor);
 
 	for (Vector3 itemPos : (*mLevelList[levelID]).GetItemPositions()) {
@@ -261,7 +264,7 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 		});
 
 	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player", mPrisonDoor);
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	}
 #ifdef USEGL
 	else {
@@ -277,6 +280,8 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
 			mPlayerBuffsObservers.push_back(buffsObserver);
 		}
+
+		LoadCCTVs(isMultiplayer);
 	}
 
 	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
@@ -353,8 +358,6 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 					obj->UpdateObject(dt);
 				}
 			}
-			if (mTempPlayer)
-				Debug::Print("POINTS: " + to_string(int(mTempPlayer->GetPoints())), Vector2(0, 6));
 
 			Debug::Print("TIME LEFT: " + to_string(int(mTimer)), Vector2(0, 3));
 			mTimer -= dt;
@@ -497,8 +500,8 @@ void LevelManager::FixedUpdate(float dt){
 }
 
 void LevelManager::InitialiseAssets() {
-	//Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	//mRenderer->Render();
+	Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
 	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
@@ -532,15 +535,15 @@ void LevelManager::InitialiseAssets() {
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
-				//Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				//mRenderer->Render();
+				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
-				//Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				//mRenderer->Render();
+				Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+				mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -557,13 +560,12 @@ void LevelManager::InitialiseAssets() {
 	delete[] assetDetails;
 
 	animLoadThread.join();
-	//Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	//mRenderer->Render();
+	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+	mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
 	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["RigSprint"]));
-	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["RigPoint"]));
 	
 
 	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
@@ -758,12 +760,12 @@ void LevelManager::LoadCCTVList(const std::vector<Transform>& transforms, const 
 	}
 }
 
-void LevelManager::LoadCCTVs() {
+void LevelManager::LoadCCTVs(const bool isMultiplayerLevel) {
 	std::random_device rd;
 	std::mt19937 g(rd());
 	std::shuffle(mCCTVTransformList.begin(), mCCTVTransformList.end(), g);
 	for (int i = 0; i < (*mLevelList[mActiveLevel]).GetCCTVCount(); i++) {
-		AddCCTVToWorld(mCCTVTransformList[i]);
+		AddCCTVToWorld(mCCTVTransformList[i], isMultiplayerLevel);
 	}
 }
 
@@ -840,6 +842,41 @@ PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 	return returnObj;
 }
 
+float NCL::CSC8503::LevelManager::GetNearestGuardDistance(const Vector3& startPos) const{
+	GuardObject& firstGuard = *mGuardObjects[0];
+	GuardObject* returnObj = &firstGuard;
+	const Vector3& firstPos = firstGuard.GetTransform().GetPosition();
+	float minDistance = sqrt((startPos.x - firstPos.x) * (startPos.x - firstPos.x) +
+		(startPos.z - firstPos.z) * (startPos.z - firstPos.z));
+
+	for (int i = 1; i < mGuardObjects.size(); i++) {
+		GuardObject* serverGuard = mGuardObjects[i];
+		if (serverGuard != nullptr) {
+			const Vector3& guardPos = serverGuard->GetTransform().GetPosition();
+
+			float distance = sqrt((startPos.x - guardPos.x) * (startPos.x - guardPos.x) +
+				(startPos.z - guardPos.z) * (startPos.z - guardPos.z));
+			if (distance < minDistance) {
+				minDistance = distance;
+				returnObj = serverGuard;
+			}
+		}
+
+	}
+
+	return minDistance;
+}
+
+float LevelManager::GetNearestGuardToPlayerDistance(const int playerNo) const{
+	Vector3 playerPos;
+	if (serverPlayersPtr)
+		playerPos = (*serverPlayersPtr)[playerNo]->GetTransform().GetPosition();
+	else
+		playerPos = mTempPlayer->GetTransform().GetPosition();
+
+	return GetNearestGuardDistance(playerPos);
+}
+
 PrisonDoor* LevelManager::GetPrisonDoor() const {
 	return mPrisonDoor;
 }
@@ -872,25 +909,11 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mSuspisionIndicatorIcon = mUi->AddIcon(Vector2(90, 86), 3, 3, mTextures["SusIndicator"], 0.7);
 	mUi->SetEquippedItemIcon(SUSPISION_INDICATOR_SLOT, *mSuspisionIndicatorIcon);
 
-	UISystem::Icon* mCross = mUi->AddIcon(Vector2(48, 50), 3, 5, mTextures["Cross"],0.0);
+	UISystem::Icon* mCross = mUi->AddIcon(Vector2(50, 50), 3, 5, mTextures["Cross"],0.0);
 	mUi->SetEquippedItemIcon(CROSS, *mCross);
 
 	UISystem::Icon* mAlarm = mUi->AddIcon(Vector2(0, 0), 100, 100, mTextures["Alarm"], 0.0);
 	mUi->SetEquippedItemIcon(ALARM, *mAlarm);
-
-	UISystem::Icon* mNoticeRight = mUi->AddIcon(Vector2(52, 50), 8, 6, mTextures["OpenDoor"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICERIGHT, *mNoticeRight);
-
-	UISystem::Icon* mNoticeLeft = mUi->AddIcon(Vector2(39, 50), 8, 6, mTextures["CloseDoor"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICELEFT, *mNoticeLeft);
-
-	UISystem::Icon* mNoticeTop = mUi->AddIcon(Vector2(45, 43), 8, 6, mTextures["LockDoor"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICETOP, *mNoticeTop);
-
-	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
-	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
-
-
 
 	mRenderer->SetUIObject(mUi);
 }
@@ -995,8 +1018,8 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	return floor;
 }
 
-CCTV* LevelManager::AddCCTVToWorld(const Transform& transform) {
-	CCTV* camera = new CCTV();
+CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel) {
+	CCTV* camera = new CCTV(25);
 
 	Vector3 wallSize = Vector3(1, 1, 1);
 	camera->GetTransform()
@@ -1013,6 +1036,14 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform) {
 
 	camera->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
+	camera->GenerateViewPyramid();
+	camera->SetSoundObject(new SoundObject());
+
+	if (!isMultiplayerLevel)
+	{
+		camera->SetPlayerObjectPtr(mTempPlayer);
+	}
+	mUpdatableObjects.push_back(camera);
 	mWorld->AddGameObject(camera);
 
 	return camera;
@@ -1108,7 +1139,7 @@ InteractableDoor* LevelManager::AddDoorToWorld(const Transform& transform, const
 	return newDoor;
 }
 
-PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
+PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultiplayerLevel) {
 	PrisonDoor* newDoor = new PrisonDoor();
 
 	Vector3 size = Vector3(0.5f, 4.5f, 4.5f);
@@ -1138,6 +1169,11 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door) {
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
+
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*newDoor);
+	}
+
 	mWorld->AddGameObject(newDoor);
 	mGlobalSuspicionObserver.push_back(newDoor);
 
@@ -1156,7 +1192,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Chest"], mTextures["ChestAlbedo"], mTextures["ChestNormal"], mShaders["Basic"], 0.75f));
+	flag->SetRenderObject(new RenderObject(&flag->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
 	flag->SetPhysicsObject(new PhysicsObject(&flag->GetTransform(), flag->GetBoundingVolume()));
 
 	flag->SetSoundObject(new SoundObject());
@@ -1189,7 +1225,7 @@ PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, Invent
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Present"], mTextures["PresentAlbedo"], mTextures["PresentNormal"], mShaders["Basic"], 0.75f));
+	pickup->SetRenderObject(new RenderObject(&pickup->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"], 0.75f));
 	pickup->SetPhysicsObject(new PhysicsObject(&pickup->GetTransform(), pickup->GetBoundingVolume()));
 
 	pickup->SetSoundObject(new SoundObject());
@@ -1236,8 +1272,8 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 	return pointObject;
 }
 
-PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* prisonDoor) {
-	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName, prisonDoor);
+PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 

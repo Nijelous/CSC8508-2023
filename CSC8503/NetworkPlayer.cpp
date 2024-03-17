@@ -103,10 +103,12 @@ void NetworkPlayer::UpdateObject(float dt) {
 		EnforceSpedUpMaxSpeeds();
 	else
 		EnforceMaxSpeeds();
-
-	if (DEBUG_MODE && mIsLocalPlayer)
-	{
-		PlayerObject::ShowDebugInfo(dt);
+	
+	if (mIsLocalPlayer){
+		PlayerObject::UpdateGlobalUI(dt);
+		PlayerObject::UpdateLocalUI(dt);
+		if (DEBUG_MODE)
+			PlayerObject::ShowDebugInfo(dt);
 	}
 }
 
@@ -195,6 +197,24 @@ void NetworkPlayer::MovePlayer(float dt) {
 
 		mIsClientInputReceived = false;
 	}
+}
+
+void NCL::CSC8503::NetworkPlayer::AddAnnouncement(AnnouncementType announcementType, float time, int playerNo){
+	PlayerObject::AddAnnouncement(announcementType, time, playerNo);
+	if (game->GetIsServer() )
+		SendAnnouncementPacket(announcementType, time, playerNo);
+	else 
+	if (!game->GetIsServer())
+		game->GetClient()->WriteAndSendAnnouncementSyncPacket(announcementType, time, playerNo);
+}
+
+void NetworkPlayer::SendAnnouncementPacket(AnnouncementType announcementType, float time, int playerNo){
+	game->SendAnnouncementSyncPacket(announcementType,time, playerNo);
+}
+
+void NetworkPlayer::SyncAnnouncements(AnnouncementType announcementType, float time, int playerNo){
+	const std::string annString = mAnnouncementTypeToStringMap[announcementType] + std::to_string(playerNo) + '!';
+	mAnnouncementMap[annString] = time;
 }
 
 void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
@@ -344,7 +364,6 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inte
 			std::cout << "Object hit " << objectHit->GetName() << std::endl;
 		}
 	}
-	
 }
 
 void NetworkPlayer::ControlInventory() {
@@ -380,6 +399,13 @@ void NetworkPlayer::ControlInventory() {
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::O) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(true);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 	}
 }
 #endif

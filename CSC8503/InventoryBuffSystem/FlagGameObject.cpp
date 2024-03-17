@@ -1,14 +1,7 @@
 #include "FlagGameObject.h"
-#include "StateTransition.h"
-#include "StateMachine.h"
-#include "State.h"
-#include "PhysicsObject.h"
-#include "Vector3.h"
-#include "map";
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
-#include "../LevelManager.h"
-#include "../SuspicionSystem/GlobalSuspicionMetre.h"
+#include "../CSC8503CoreClasses/SoundObject.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -64,10 +57,10 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 	switch (buffEvent) {
 #ifdef USEGL
 	case BuffEvent::flagSightApplied:
-		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
+		SetIsSensed(true);
 		break;
 	case BuffEvent::flagSightRemoved:
-		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
+		SetIsSensed(false);
 #endif
 	default:
 		break;
@@ -75,11 +68,12 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 }
 
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if ((otherObject->GetCollisionLayer() & Player) &&
-		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
+	if ((otherObject->GetCollisionLayer() & Player)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
-		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
-		plObj->AddPlayerPoints(mPoints);
-		GetFlag(plObj->GetPlayerID());
+		const int playerID = plObj->GetPlayerID();
+		if (!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID)){
+			plObj->AddPlayerPoints(mPoints);
+			GetFlag(playerID);
+		}
 	}
 }
