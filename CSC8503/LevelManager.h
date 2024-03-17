@@ -149,6 +149,10 @@ namespace NCL {
 			PrisonDoor* GetPrisonDoor() const;
 
 			bool RoundHasStarted() { return mStartTimer <= 0; }
+
+			float GetNearestGuardToPlayerDistance(const int playerNo) const;
+			
+			float GetNearestGuardDistance(const Vector3& startPos) const;
 		protected:
 			LevelManager();
 			~LevelManager();
