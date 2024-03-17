@@ -364,6 +364,11 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 	mThisServer->SendGlobalPacket(packet);
 }
 
+void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, float time, int playerNo){
+	NCL::CSC8503::AnnouncementSyncPacket packet(annType,time, playerNo);
+	mThisServer->SendGlobalPacket(packet);
+}
+
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
 		if (mPacketToSendQueue.size() > 1) {
