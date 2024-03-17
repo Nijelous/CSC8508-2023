@@ -167,7 +167,11 @@ namespace NCL {
 			sce::Agc::Core::Sampler				shadowSampler;
 
 			sce::Agc::CxRenderTarget			screenTarget;
+			sce::Agc::CxRenderTarget			mGBuffAlbedoTarget;
+			sce::Agc::CxRenderTarget			mGBuffNormalTarget;
 			NCL::PS5::AGCTexture*				screenTex; //ptr into bindless array
+			NCL::PS5::AGCTexture*				mGBuffAlbedoTex;
+			NCL::PS5::AGCTexture*				mGBuffNormalTex;
 
 			std::vector<SkinningJob> frameJobs;
 		};

@@ -26,14 +26,14 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 
 	ObjectState s = objects[id];
 
-	float4 position(0,0,0,0);
-	float3 normal (0,0,0);
-	float4 tangent(0,0,0,0);
-	float3 bitangent(0,0,0);
+	float4 position;
+	float3 normal;
+	float4 tangent;
+	float3 bitangent;
 	
 	TransformVertexToWorld(s, vertID, position, normal, tangent, bitangent);
 	normal = normalize (float3(mul(s.modelMatrix, float4(normal,0))));
-	tangent.xyz = normalize (float3(mul(s.modelMatrix, float4(tangent.xyz,0))));
+	tangent.xyz = normalize(mul(s.modelMatrix,float4(tangent.xyz,0)).xyz);
 	bitangent = normalize((cross(tangent.xyz, normal) * tangent.w));
 
 	Output.Normal = normal;

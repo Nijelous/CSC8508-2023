@@ -47,9 +47,6 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	error = sce::Agc::Core::initialize(&arrayBuffer, &buffSpec);
 	bufferCount = 1; //We skip over index 0, makes some selection logic easier later
 
-
-	defaultTexture = (AGCTexture*)LoadTexture("doge.png");
-
 	skyboxTexture = (AGCTexture*)LoadTexture("Skybox.dds");
 
 	quadMesh = new AGCMesh();
@@ -96,10 +93,15 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	shadowMap = CreateFrameBufferTextureSlot("Shadowmap");
 
 	screenTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffAlbedoTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffNormalTarget.setSlot(1);
 	screenTex = CreateFrameBufferTextureSlot("Screen");
-
+	mGBuffAlbedoTex = CreateFrameBufferTextureSlot("albedoTex");
+	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
-
+	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	shadowSampler.init()
 		.setXyFilterMode(
 			sce::Agc::Core::Sampler::FilterMode::kPoint,	//magnification
@@ -379,6 +381,7 @@ void GameTechAGCRenderer::ShadowmapPass() {
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
 
 	sce::Agc::Core::translate(&bindlessTextures[shadowMap->GetAssetID()], &shadowTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
+	
 }
 
 void GameTechAGCRenderer::MainRenderPass() {
@@ -391,10 +394,14 @@ void GameTechAGCRenderer::MainRenderPass() {
 	frameContext->m_sb.setState(backBuffers[currentSwap].renderTarget);
 
 	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
+	rtMask.setMask(1, 0xFF);
 	frameContext->m_sb.setState(rtMask);
-	frameContext->m_sb.setState(screenTarget);
-
+	frameContext->m_sb.setState(mGBuffAlbedoTarget);
+	
 	frameContext->m_sb.setState(depthTarget);
+
+	
+	frameContext->m_sb.setState(mGBuffNormalTarget);
 
 	sce::Agc::CxDepthStencilControl depthControl;
 	depthControl.init();
@@ -415,6 +422,11 @@ void GameTechAGCRenderer::MainRenderPass() {
 		.setSamplers(0, 1, &defaultSampler)
 		.setSamplers(1, 1, &shadowSampler);
 	DrawObjects();
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 }
 
 void GameTechAGCRenderer::UpdateDebugData() {

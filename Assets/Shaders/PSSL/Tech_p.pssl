@@ -16,8 +16,10 @@ SamplerState sampler			: register(s0);
 
 RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
 
+out float4 fragColour[2];
+
 [CxxSymbol("TestShader::ps")]
-float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 {
 	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
 	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.albedoTexID)]);
@@ -27,7 +29,7 @@ float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	
 	float4 albedoSample = albedoTex.Sample(sampler, vertex.UV);
 	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
-	normalSample = float4(vertex.Tangent,1);
-	
-	return normalSample;  
+
+	fragColour[0] = albedoSample;
+	fragColour[1] = normalSample;
 }
