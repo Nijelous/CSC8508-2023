@@ -100,8 +100,8 @@ void PlayerObject::UpdateObject(float dt) {
 		NCL::CSC8503::InteractType interactType;
 		if(GotRaycastInput(interactType,dt))
 			RayCastFromPlayer(mGameWorld, interactType, dt);
-		else
-			RayCastFromPlayerForUI(mGameWorld, dt);
+		//else
+			//RayCastFromPlayerForUI(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
@@ -286,8 +286,7 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt)
-{
+bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt){
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
 		
