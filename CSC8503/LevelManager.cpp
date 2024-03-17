@@ -65,10 +65,6 @@ LevelManager::LevelManager() {
 	InitialiseAssets();
 #ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
-
-	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
 #endif
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
@@ -285,7 +281,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	SendWallFloorInstancesToGPU();
 	
 	
-	mAnimation->SetGameObjectLists(mUpdatableObjects,mPlayerTextures,mGuardTextures);
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
 
@@ -582,6 +578,9 @@ void LevelManager::InitialiseAssets() {
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
 	matLoadThread.join();
+	for (auto const& [key, val] : mMaterials) {
+		mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+	}
 }
 
 void LevelManager::InitialiseDebug() {
@@ -788,7 +787,7 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(14, 4, 7.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "HotelDesk"));
 				break;
-			case Painting: // To-Do (Alex): Rotate, Material
+			case Painting:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2.85f, 4.2f, 0.1f)).Abs());
 				AddDecorationToWorld(offsetKey, "Painting");
 				break;
@@ -1386,6 +1385,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1484,11 +1484,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 	guard->SetCollisionLayer(Npc);
 
-	RenderObject* renderObject = new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize);
-	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]);
-
-	renderObject->SetAnimationObject(animObject);
-	guard->SetRenderObject(renderObject);
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize));
+	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]));
+	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Rig"]);
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	guard->SetPatrolNodes(nodes);
@@ -1575,6 +1573,9 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 	else {
 		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Instance"],
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
+	}
+	if (mMeshMaterials.find(meshName) != mMeshMaterials.end()) {
+		decoration->GetRenderObject()->SetMatTextures(mMeshMaterials[meshName]);
 	}
 	decoration->SetPhysicsObject(new PhysicsObject(&decoration->GetTransform(), decoration->GetBoundingVolume()));
 

@@ -231,20 +231,13 @@ namespace NCL {
 			std::unordered_map<std::string, Shader*> mShaders;
 			std::unordered_map<std::string, MeshMaterial*> mMaterials;
 			std::unordered_map<std::string, MeshAnimation*> mAnimations;
+			std::unordered_map<std::string, vector<int>> mMeshMaterials;
 
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
 
 			FlagGameObject* mMainFlag;
-
-#ifdef USEGL
-			vector<GLuint>  mGuardTextures;
-			vector<GLuint> mPlayerTextures;
-#endif
-#ifdef USEPROSPERO
-			// PSSL textures
-#endif
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;

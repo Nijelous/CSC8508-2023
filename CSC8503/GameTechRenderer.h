@@ -39,6 +39,7 @@ namespace NCL {
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
 			MeshMaterial* LoadMaterial(const std::string& name) override;
+			std::vector<int> LoadMeshMaterial(Mesh& mesh, MeshMaterial& meshMaterial);
 			
 
 			void AddLight(Light* light);
