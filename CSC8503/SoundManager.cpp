@@ -68,6 +68,12 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	mResult = mSystem->createSound("../Assets/Sounds/heater-vent-hit-higher-part-103305.mp3", FMOD_2D, 0, &mSpottedSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Spotted Sound Error !!" << std::endl;
+		return;
+	}
+
 	mResult = mFootStepSound->set3DMinMaxDistance(15.0f, 100.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
@@ -123,6 +129,10 @@ SoundManager::~SoundManager() {
 	mFootStepSound->release();
 	mSoundEmitterSound->release();
 	mPickUpSound->release();
+	mLockDoorSound->release();
+	mAlarmSound->release();
+	mVentSound->release();
+	mSpottedSound->release();
 	mSystem->close();
 	mSystem->release();
 }
@@ -257,7 +267,7 @@ void SoundManager::PlayVentSound(Vector3 soundPos) {
 	channel->setPaused(false);
 }
 
-void SoundManager::PlaySound(Vector3 soundPos, Sound* sound) {
+void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
 	Channel* channel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(sound, 0, true, &channel);
@@ -346,6 +356,19 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 	case GameObject::GameObjectState::Happy:
 		break;
 	}
+}
+
+void SoundManager::UpdateMultiplayerSound(bool isPlay) {
+	if (isPlay) {
+		std::cout<<11;
+	}
+	/*Channel* channel;
+	mResult = mSystem->playSound(mSpottedSound, 0, false, &channel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Spotted Sound error" << std::endl;
+		return;
+	}
+	mSystem->update();*/
 }
 
 void SoundManager::UpdateListenerAttributes() {

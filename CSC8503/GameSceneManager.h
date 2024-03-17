@@ -51,8 +51,6 @@ namespace NCL {
 
 			void InitCamera();
 
-			void InitIcons();
-
 			void DisplayMainMenu();
 			void DisplayVictory();
 			void DisplayDefeat();

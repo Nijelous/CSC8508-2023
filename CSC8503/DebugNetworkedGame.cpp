@@ -107,6 +107,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(String_Message, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+		//mThisClient->RegisterPacketHandler(BasicNetworkMessages::Sound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -142,6 +143,7 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::Sound, this);
 	}
 
 	return isConnected;
@@ -307,6 +309,12 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	case BasicNetworkMessages::SyncPlayerIdNameMap: {
 		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
 		HandleSyncPlayerIdNameMapPacket(packet);
+		break;
+	}
+	case BasicNetworkMessages::Sound: {
+		SoundPacket* packet = (SoundPacket*)(payload);
+		HandleMultiplayerSound(packet);
+		break;
 	}
 
 	default:
@@ -361,6 +369,11 @@ void DebugNetworkedGame::SendClientSyncLocationActiveSusCausePacket(int cantorPa
 
 void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const {
 	NCL::CSC8503::ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendSoundStatePacket(bool isPlay) const {
+	SoundPacket packet(isPlay);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -698,6 +711,10 @@ void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationAc
 void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const {
 	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
 	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleMultiplayerSound(SoundPacket* packet) const {
+	mLevelManager->GetSoundManager()->UpdateMultiplayerSound(packet->isPlay);
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {

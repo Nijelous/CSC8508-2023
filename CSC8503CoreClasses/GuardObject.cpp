@@ -13,6 +13,7 @@
 #include "RecastBuilder.h"
 #include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
+#include "../CSC8503/DebugNetworkedGame.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -96,6 +97,10 @@ void GuardObject::RaycastToPlayer() {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
 		//mPlayer = nullptr;
+	}
+	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+		game->SendSoundStatePacket(mCanSeePlayer);
 	}
 }
 

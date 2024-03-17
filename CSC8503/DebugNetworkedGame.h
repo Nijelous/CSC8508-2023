@@ -45,6 +45,7 @@ namespace NCL{
         struct ClientSyncGlobalSusChangePacket;
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
+        struct SoundPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -83,6 +84,8 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendSoundStatePacket(bool isPlay) const;
 
             void SendPacketsThread();
 
@@ -141,6 +144,8 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void HandleMultiplayerSound(SoundPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);

@@ -178,6 +178,12 @@ SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>
 
 }
 
+SoundPacket::SoundPacket(const bool isPlay) {
+	type = BasicNetworkMessages::Sound;
+	size = sizeof(SoundPacket);
+	this->isPlay = isPlay;
+}
+
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
 	deltaErrors = 0;
 	fullErrors = 0;
