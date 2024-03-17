@@ -14,6 +14,7 @@ namespace NCL {
 				mName == "CCTV";
 			};
 			~CCTV() {
+				hadSeenPlayer.clear();
 			};
 
 			void DrawDebugLines(const bool canSeePlayer);

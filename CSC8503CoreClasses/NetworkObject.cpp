@@ -165,15 +165,42 @@ AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int play
 	this->annType = annType;
 	this->time = time;
 	this->playerNo = playerNo;
+ClientInitPacket::ClientInitPacket(const std::string& playerName) {
+	type = ClientInit;
+	size = sizeof(ClientInitPacket);
+
+	this->playerName = playerName;
+}
+
+SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap) {
+	type = SyncPlayerIdNameMap;
+	size = sizeof(SyncPlayerIdNameMapPacket);
+
+	int counter = 0;
+	for (std::pair<int, std::string> playerIdName : playerIdNameMap) {
+		playerIds[counter] = playerIdName.first;
+		playerNames[counter] = playerIdName.second;
+		counter++;
+	}
+
+}
+
+AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int playerNo) {
+	type = SyncAnnouncements;
+	size = sizeof(AnnouncementSyncPacket);
+
+	this->annType = annType;
+	this->time = time;
+	this->playerNo = playerNo;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
-	fullErrors  = 0;
-	networkID   = id;
+	fullErrors = 0;
+	networkID = id;
 }
 
-NetworkObject::~NetworkObject()	{
+NetworkObject::~NetworkObject() {
 }
 
 bool NetworkObject::ReadPacket(GamePacket& p) {

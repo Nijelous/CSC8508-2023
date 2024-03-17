@@ -92,43 +92,59 @@ const bool DebugNetworkedGame::GetIsGameStarted() const {
 
 void DebugNetworkedGame::StartAsServer() {
 	mThisServer = new GameServer(NetworkBase::GetDefaultPort(), MAX_PLAYER);
-	mIsServer = true;
+	if (mThisServer) {
 
-	mThisServer->RegisterPacketHandler(Received_State, this);
-	mThisServer->RegisterPacketHandler(String_Message, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
-	mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
-	std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
-	senderThread.detach();
+		mIsServer = true;
+
+		mThisServer->RegisterPacketHandler(Received_State, this);
+		mThisServer->RegisterPacketHandler(String_Message, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+
+		mThisServer->RegisterPacketHandler(Received_State, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+
+		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
+		std::thread senderThread(&DebugNetworkedGame::SendPacketsThread, this);
+		senderThread.detach();
+	}
+	return mThisServer;
 }
 
 void DebugNetworkedGame::StartAsClient(char a, char b, char c, char d) {
 	mThisClient = new GameClient();
 	bool isConnected = mThisClient->Connect(a, b, c, d, NetworkBase::GetDefaultPort());
 
-    mThisClient->RegisterPacketHandler(Delta_State, this);
-    mThisClient->RegisterPacketHandler(Full_State, this);
-    mThisClient->RegisterPacketHandler(Player_Connected, this);
-    mThisClient->RegisterPacketHandler(Player_Disconnected, this);
-    mThisClient->RegisterPacketHandler(String_Message, this);
-    mThisClient->RegisterPacketHandler(GameStartState, this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage,this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot,this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalActiveCause, this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalSusChange, this);
-    mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
-	mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+	if (isConnected) {
+		mIsServer = false;
+		mThisClient->RegisterPacketHandler(Delta_State, this);
+		mThisClient->RegisterPacketHandler(Full_State, this);
+		mThisClient->RegisterPacketHandler(Player_Connected, this);
+		mThisClient->RegisterPacketHandler(Player_Disconnected, this);
+		mThisClient->RegisterPacketHandler(String_Message, this);
+		mThisClient->RegisterPacketHandler(GameStartState, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayers, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GameEndState,this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlotUsage,this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot,this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalActiveCause, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocalSusChange, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncGlobalSusChange, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationActiveCause, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this); 
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+	}
+
+	return isConnected;
+
 }
 
 void DebugNetworkedGame::UpdateGame(float dt) {
@@ -285,6 +301,17 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleAnnouncementSync(packet);
 		break;
 	}
+	case BasicNetworkMessages::ClientInit: {
+		ClientInitPacket* packet = (ClientInitPacket*)(payload);
+		const int playerPeer = source + 1;
+		HandleClientInitPacket(packet, playerPeer);
+		break;
+	}
+	case BasicNetworkMessages::SyncPlayerIdNameMap: {
+		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
+		HandleSyncPlayerIdNameMapPacket(packet);
+	}
+
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;

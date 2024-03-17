@@ -137,6 +137,14 @@ namespace NCL{
 
             void HandleAnnouncementSync(AnnouncementSyncPacket* packet) const;
 
+            void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
+            void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
+
+            void WriteAndSendSyncPlayerIdNameMapPacket() const;
+            void HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet);
+
+            void ShowPlayerList() const;
+
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;

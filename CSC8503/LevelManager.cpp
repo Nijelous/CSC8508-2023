@@ -183,6 +183,9 @@ void LevelManager::ClearLevel() {
 	mLevelLayout.clear();
 	mRenderer->ClearInstanceObjects();
 	mAnimation->Clear();
+	mPlayerInventoryObservers.clear();
+	mPlayerBuffsObservers.clear();
+	mGlobalSuspicionObserver.clear();
 	mInventoryBuffSystemClassPtr->Reset();
 	mSuspicionSystemClassPtr->Reset(mInventoryBuffSystemClassPtr);
 	if(mTempPlayer)mTempPlayer->ResetPlayerPoints();
@@ -736,7 +739,7 @@ void LevelManager::LoadVents(const std::vector<Vent*>& vents, std::vector<int> v
 	}
 }
 
-void LevelManager::LoadDoors(const std::vector<InteractableDoor*>& doors, const Vector3& centre, bool isMultiplayerLevel, int rotation) {
+void LevelManager::LoadDoors(const std::vector<Door*>& doors, const Vector3& centre, bool isMultiplayerLevel, int rotation) {
 	for (int i = 0; i < doors.size(); i++) {
 		Transform doorTransform = Transform();
 		doorTransform.SetPosition(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * doors[i]->GetTransform().GetPosition())

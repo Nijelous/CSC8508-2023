@@ -31,6 +31,8 @@ enum BasicNetworkMessages {
 	SyncInteractable,
 	ClientSyncGlobalSusChange,
 	SyncObjectState,
+	ClientInit,
+	SyncPlayerIdNameMap,
 	SyncAnnouncements
 };
 

@@ -156,10 +156,23 @@ namespace NCL::CSC8503 {
 		int annType;
 		float time;
 		int playerNo;
-		AnnouncementSyncPacket(int annType, float time,int playerNo);
+		AnnouncementSyncPacket(int annType, float time, int playerNo);
 	};
 
-	class NetworkObject	{
+	struct ClientInitPacket : public GamePacket {
+		std::string playerName;
+
+		ClientInitPacket(const std::string& playerName);
+	};
+
+	struct SyncPlayerIdNameMapPacket : public GamePacket {
+		int playerIds[4] = { -1 , -1, -1,-1 };
+		std::string playerNames[4];
+
+		SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap);
+	};
+
+	class NetworkObject {
 	public:
 		NetworkObject(GameObject& o, int id);
 		virtual ~NetworkObject();

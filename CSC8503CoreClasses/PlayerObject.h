@@ -4,12 +4,12 @@
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "UISystem.h"
+#include "Interactable.h"
 
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
 		class Interactable;
-		enum InteractType;
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 
@@ -60,7 +60,7 @@ namespace NCL {
 			void UpdateLocalUI(float dt);
 			void ShowDebugInfo(float dt);
 			void ChangeActiveSusCausesBasedOnState(const GameObjectState &previousState, const GameObjectState& currentState);
-			void HandleInteractable(Interactable* interactablePtr, InteractType interactType);
+
 			PlayerInventory::item GetEquippedItem();
 			virtual void AddAnnouncement(AnnouncementType announcementType, float time, int playerNo) {
 				const std::string annString = mAnnouncementTypeToStringMap[announcementType] + std::to_string(playerNo) + '!';

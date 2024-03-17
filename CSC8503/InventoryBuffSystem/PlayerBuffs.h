@@ -72,7 +72,7 @@ namespace InventoryBuffSystem {
 
 		std::map<const buff, const float> mBuffInitDurationMap =
 		{
-			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 10}, {stun,3}, {flagSight, 5}
+			{disguiseBuff,20}, {slow,8}, {silentSprint, 8}, {speed, 30}, {stun,3}, {flagSight, 5}
 		};
 
 		std::map<const buff, const BuffEvent> mOnBuffAppliedBuffEventMap =
