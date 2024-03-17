@@ -100,8 +100,8 @@ void PlayerObject::UpdateObject(float dt) {
 		NCL::CSC8503::InteractType interactType;
 		if(GotRaycastInput(interactType,dt))
 			RayCastFromPlayer(mGameWorld, interactType, dt);
-		//else
-			//RayCastFromPlayerForUI(mGameWorld, dt);
+		else
+			RayCastFromPlayerForUI(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {

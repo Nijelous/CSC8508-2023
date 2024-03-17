@@ -176,6 +176,11 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		}
 
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
+			DEBUG_MODE) {
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::flag, mPlayerID);
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
+		}
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 

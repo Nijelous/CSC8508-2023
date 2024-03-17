@@ -2,6 +2,8 @@
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
 #include "../CSC8503CoreClasses/SoundObject.h"
+#include "../CSC8503/SceneManager.h"
+#include "../CSC8503/DebugNetworkedGame.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -22,21 +24,29 @@ FlagGameObject::~FlagGameObject() {
 }
 
 void FlagGameObject::GetFlag(int playerNo) {
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 	GetSoundObject()->TriggerSoundEvent();
 
+	if (IsMultiplayerAndIsNotServer())
+		return;
+
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 	this->SetActive(false);
 }
 
 void FlagGameObject::Reset() {
+	if (IsMultiplayerAndIsNotServer())
+		return;
+
 	if (!this->IsActive())
 	{
 		this->SetActive(true);
 	}
 }
 
-void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
-{
+void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId){
+	if (IsMultiplayerAndIsNotServer())
+		return;
+
 	if (this->IsRendered()) {
 		GetFlag(playerId);
 		this->SetActive(false);
@@ -45,12 +55,29 @@ void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 
 
 void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
+	if (IsMultiplayerAndIsNotServer())
+		return;
+
 	switch (invEvent) {
 	case InventoryBuffSystem::flagDropped:
 		Reset();
 	default:
 		break;
 	}
+}
+
+const bool FlagGameObject::IsMultiplayerAndIsNotServer(){
+	auto* sceneManager = SceneManager::GetSceneManager();
+	const bool isSingleplayer = sceneManager->IsInSingleplayer();
+	if (isSingleplayer)
+		return false;
+
+	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+	const bool isServer = networkedGame->GetIsServer();
+	if (!isServer)
+		return true;
+	
+	return false;
 }
 
 void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
