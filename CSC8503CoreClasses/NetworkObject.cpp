@@ -22,11 +22,12 @@ void SyncPlayerListPacket::SyncPlayerList(std::vector<int>& clientPlayerList) co
 	}
 }
 
-GameStartStatePacket::GameStartStatePacket(bool val) {
+GameStartStatePacket::GameStartStatePacket(bool val, std::mt19937 levelSeed) {
 	type = BasicNetworkMessages::GameStartState;
 	size = sizeof(GameStartStatePacket);
 
 	isGameStarted = val;
+	this->levelSeed = levelSeed;
 }
 
 GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId) {
