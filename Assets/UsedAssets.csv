@@ -113,6 +113,7 @@ tex,CarpetAlbedo,CarpetAlbedo.png,
 tex,CarpetNormal,CarpetNormal.png,
 tex,PavementAlbedo,PavementAlbedo.png,
 tex,PavementNormal,PavementNormal.png,
+tex,DoorLockedAlbedo,PolygonScifi_01_A_Locked.png,
 sdr,Basic,scene.vert,scene.frag
 sdr,Instance,sceneInstanced.vert,scene.frag
 sdr,Animation,animationScene.vert,scene.frag
