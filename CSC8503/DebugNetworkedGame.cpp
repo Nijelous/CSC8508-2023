@@ -20,7 +20,8 @@
 
 namespace {
 	constexpr int MAX_PLAYER = 4;
-	constexpr int LEVEL_NUM = 0;
+	constexpr int DEMO_LEVEL_NUM = 0;
+	constexpr int LEVEL_NUM = 1;
 	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
@@ -199,6 +200,9 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 }
 
 void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
+	if (mIsGameStarted == isGameStarted) {
+		return;
+	}
 	this->mIsGameStarted = isGameStarted;
 
 	if (isGameStarted) {
@@ -515,10 +519,7 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	//TODO(erendgrmc): Second parameter is redundant remove it from func.
-	std::random_device rd;
-	std::mt19937 g(rd());
-	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
+	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 
