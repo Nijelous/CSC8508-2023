@@ -19,10 +19,14 @@ namespace NCL {
 
 			void DrawDebugLines(const bool canSeePlayer);
 			void UpdateObject(float dt) override;
+			const void UpdateForPlayerObject(PlayerObject* playerObjectPtr, const float dt);
 			void GenerateViewPyramid();
 			Vector3 GetBase(float angle);
 			void SetPlayerObjectPtr(PlayerObject* playerObjectPtr) {
 				mPlayerObject = playerObjectPtr;
+			}
+			void SetInitAngle(float angle) {
+				initAngle = angle;
 			}
 			bool CanSeePlayer(PlayerObject* mPlayerObject) const;
 			const void OnPlayerSeen(PlayerObject* mPlayerObject);
@@ -34,6 +38,7 @@ namespace NCL {
 			Pyramid mViewPyramid;
 			PlayerObject* mPlayerObject=nullptr;
 			std::map<int, bool> hadSeenPlayer;
+			float initAngle;
 			float rotateAngle;
 		};
 	}
