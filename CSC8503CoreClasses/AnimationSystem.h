@@ -43,8 +43,8 @@ namespace NCL {
 			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mRigTexture, vector<GLuint>& mGuardTextures);
 #endif
 #ifdef USEPROSPERO
-			void PreloadMatTextures(GameTechAGCRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& mMatTextures);
-			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> mPlayerTexture, vector<sce::Agc::Core::Texture*>& mGuardTextures);
+			void PreloadMatTextures(GameTechAGCRenderer& renderer, const Mesh& mesh, const MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& matTextures);
+			void SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> playerTexture, vector<sce::Agc::Core::Texture*>& guardTextures);
 #endif
 
 			void SetAnimationState(GameObject* gameObject, GameObject::GameObjectState objState);

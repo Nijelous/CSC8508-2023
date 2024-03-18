@@ -124,8 +124,7 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 #endif
 
 #ifdef USEPROSPERO
-void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& mMatTextures) {
-
+void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, const Mesh& mesh, const MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& matTextures) {
 	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
 		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
 		const string* filename = nullptr;
@@ -136,27 +135,28 @@ void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, Mesh& me
 			string path = *filename;
 			std::cout << path << std::endl;
 			mAnimTexture = renderer.LoadTexture(path.c_str());
-			texID = ((PS5::AGCTexture*)mAnimTexture)->GetAGCPointer();
+			PS5::AGCTexture* tempTex = (PS5::AGCTexture*)mAnimTexture;
+			texID = tempTex->GetAGCPointer();
 			std::cout << texID << endl;
 		}
-		mMatTextures.emplace_back(texID);
+		matTextures.emplace_back(texID);
 	}
 }
 
-void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> mPlayerTexture, vector<sce::Agc::Core::Texture*>& mGuardTextures) {
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> playerTexture, vector<sce::Agc::Core::Texture*>& guardTextures) {
 	for (auto& obj : UpdatableObjects) {
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
+			obj->GetRenderObject()->SetMatTextures(guardTextures);
 
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
+			obj->GetRenderObject()->SetMatTextures(playerTexture);
 
 		}
 	}

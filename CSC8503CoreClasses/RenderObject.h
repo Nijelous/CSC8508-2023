@@ -2,6 +2,7 @@
 
 #ifdef USEPROSPERO
 #include <agc.h>
+#include "AGCTexture.h"
 #endif
 
 #include "Texture.h"
