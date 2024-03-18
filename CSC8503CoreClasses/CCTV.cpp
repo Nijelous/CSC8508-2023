@@ -4,6 +4,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
+#include "GameWorld.h"
 
 using namespace NCL::CSC8503;
 namespace {
@@ -69,8 +70,27 @@ void CCTV::UpdateObject(float dt) {
 	}
 }
 
-bool CCTV::CanSeePlayer(PlayerObject* mPlayerObject) const{
-	return mViewPyramid.SphereInsidePyramid(mPlayerObject->GetTransform().GetPosition(), mPlayerObject->GetRenderObject()->GetCullSphereRadius());
+const bool CCTV::PlayerInRaycast(PlayerObject* mPlayerObject){
+	const Vector3 thisPosition = GetTransform().GetPosition();
+	const Vector3 playerObjPosition = mPlayerObject->GetTransform().GetPosition();
+	const Vector3 dir = (playerObjPosition - thisPosition).Normalised();
+	Ray ray = Ray(thisPosition, dir);
+	RayCollision closestCollision;
+
+	mWorld->Raycast(ray, closestCollision, true, this, true);
+	const auto* objectHit = (GameObject*)closestCollision.node;
+
+	if (objectHit == mPlayerObject)
+		return true;
+
+	return false;
+}
+
+const bool CCTV::CanSeePlayer(PlayerObject* ) {
+	if (mViewPyramid.SphereInsidePyramid(mPlayerObject->GetTransform().GetPosition(), mPlayerObject->GetRenderObject()->GetCullSphereRadius()) &&
+		PlayerInRaycast(mPlayerObject))
+		return true;
+	return false;
 }
 
 const void CCTV::OnPlayerSeen(PlayerObject* mPlayerObject){
@@ -89,7 +109,7 @@ const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
 	hadSeenPlayer[playerID] = false;
 }
 
-void CCTV::AngleToNormalisedCoords(float angle, float& x, float& y) const{
+void CCTV::AngleToNormalisedCoords(float angle, float& x, float& y){
 	float radsAngle = Maths::DegreesToRadians(angle);
 
 	x = sin(radsAngle);

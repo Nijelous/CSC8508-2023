@@ -1117,7 +1117,7 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform, bool isOut
 }
 
 CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel) {
-	CCTV* camera = new CCTV(25);
+	CCTV* camera = new CCTV(25, mWorld);
 
 	Vector3 wallSize = Vector3(1, 1, 1);
 	camera->GetTransform()
