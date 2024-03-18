@@ -3,7 +3,8 @@
 
 namespace NCL {
     namespace CSC8503 {
-        class Scene;
+	    class MainMenuScene;
+	    class Scene;
 
         class MainMenuSceneState : public PushdownState {
         public:
@@ -12,6 +13,7 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+            MainMenuScene* mMainMenuScene;
         };
 
         class SingleplayerState : public PushdownState {
@@ -30,6 +32,9 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+
+            bool mHostedSuccessfully;
+            std::string mPlayerName;
         };
 
         class ClientState : public PushdownState {
@@ -39,6 +44,19 @@ namespace NCL {
             PushdownResult OnUpdate(float dt, PushdownState** newState) override;
 
             void OnAwake() override;
+
+            bool mIsClientConnected;
+            int ipToConnect[4];
+            std::string mPlayerName;
+        };
+
+        class MultiplayerLobbyState : public PushdownState {
+        public:
+            MultiplayerLobbyState(){}
+            PushdownResult OnUpdate(float dt, PushdownState** pushFunc) override;
+            void OnAwake() override;
+
+            MainMenuScene* mMainMenuScene;
         };
     }
 }

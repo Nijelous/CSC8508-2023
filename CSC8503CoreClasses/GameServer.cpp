@@ -94,6 +94,7 @@ void GameServer::UpdateServer() {
 					mPeers[i] = -1;
 				}
 			}
+
 		}
 		else if (type == ENetEventType::ENET_EVENT_TYPE_RECEIVE) {
 			//std::cout << "Server: Has recieved packet" << std::endl;

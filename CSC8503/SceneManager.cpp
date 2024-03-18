@@ -44,10 +44,20 @@ void SceneManager::InitPushdownMachine() {
 }
 
 void SceneManager::SetCurrentScene(Scenes scene) {
+
+#ifdef USEGL
+
+	GameTechRenderer* renderer = (GameTechRenderer*)(LevelManager::GetLevelManager()->GetRenderer());
+	renderer->SetImguiCanvasFunc([this]
+		{
+			currentScene->DrawCanvas();
+		});
+
+#endif
+
 	mIsInSingleplayer = scene == Scenes::Singleplayer;
 	auto* nextScene = gameScenesMap[scene];
 	currentScene = nextScene;
-	mCurrentSceneType = scene;
 }
 
 bool SceneManager::GetIsForceQuit() {
@@ -70,12 +80,24 @@ void SceneManager::SetIsServer(bool isServer) {
 	mIsServer = isServer;
 }
 
+void SceneManager::SetChangeSceneTrigger(Scenes scene) {
+	mCurrentSceneType = scene;
+}
+
 PushdownMachine* SceneManager::GetScenePushdownMachine() {
 	return pushdownMachine;
 }
 
 Scene* SceneManager::GetCurrentScene() {
 	return currentScene;
+}
+
+Scene* SceneManager::GetScene(Scenes sceneType) {
+	return gameScenesMap[sceneType];
+}
+
+Scenes SceneManager::GetCurrentSceneType() const {
+	return mCurrentSceneType;
 }
 
 SceneManager* SceneManager::GetSceneManager() {

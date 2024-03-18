@@ -12,23 +12,31 @@ using namespace NCL::CSC8503;
 
 #ifdef USEGL
 
-void MainMenuSceneState::OnAwake() {	
-	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::MainMenu);
-}
+void MainMenuSceneState::OnAwake() {
+	Window* w = Window::GetWindow();
+	w->ShowOSPointer(true);
+
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+	sceneManager->SetCurrentScene(Scenes::MainMenu);
+
+	if (mMainMenuScene == nullptr) {
+		mMainMenuScene = (MainMenuScene*)sceneManager->GetCurrentScene();
+		mMainMenuScene->SetOpenPanel(MainMenuScene::LevelSelection);
+		mMainMenuScene->SetLevelSelectionPanelState(MainMenuScene::Selection);
+	}
+} 
 
 PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownState** newState) {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
+	MainMenuScene::MainMenuPanels currentMainMenuPanel = mMainMenuScene->GetOpenPanel();
+	MainMenuScene::LevelSelectionPanelStates currentLevelSelectionPanelState = mMainMenuScene->GetLevelSelectionPanelState();
+
+	if (currentLevelSelectionPanelState == MainMenuScene::StartSingleplayer) {
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}
-	
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
-		*newState = new ServerState();
-		return PushdownResult::Push;
-	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM3)) {
-		*newState = new ClientState();
+	if (currentMainMenuPanel == MainMenuScene::MultiplayerLobby) {
+		*newState = new MultiplayerLobbyState();
 		return PushdownResult::Push;
 	}
 
@@ -48,11 +56,21 @@ PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownStat
 }
 
 void SingleplayerState::OnAwake() {
+	Window* w = Window::GetWindow();
+	w->ShowOSPointer(false);
+	w->LockMouseToWindow(true);
+
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Singleplayer);
+	SceneManager::GetSceneManager()->SetChangeSceneTrigger(Scenes::Singleplayer);
 	GameSceneManager* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
 }
 
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
+	if (!mHostedSuccessfully) {
+		*newState = new MainMenuSceneState();
+		return PushdownResult::Push;
+	}
+
 	GameStates currentState = LevelManager::GetLevelManager()->GetGameState();
 	bool isInMenuState = currentState == MenuState;
 	if (isInMenuState) {
@@ -68,14 +86,26 @@ PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** ne
 }
 
 void ServerState::OnAwake(){
-	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
-	SceneManager::GetSceneManager()->SetIsServer(true);
-	DebugNetworkedGame* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
-	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
-	server->StartAsServer();
-}
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+	DebugNetworkedGame* server = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetScene(Scenes::Multiplayer);
+
+	mHostedSuccessfully = server->StartAsServer(mPlayerName);
+	if (mHostedSuccessfully) {
+		Window* w = Window::GetWindow();
+		w->ShowOSPointer(false);
+		w->LockMouseToWindow(true);
+
+		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
+		sceneManager->SetIsServer(true);
+		sceneManager->SetCurrentScene(Scenes::Multiplayer);
+		sceneManager->SetChangeSceneTrigger(Scenes::Multiplayer);
+	}}
 
 PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** newState) {
+	if (!mIsClientConnected) {
+		*newState = new MainMenuSceneState();
+		return PushdownResult::Push;
+	}
 	GameStates currentState = LevelManager::GetLevelManager()->GetGameState();
 	bool isInMenuState = currentState == MenuState;
 	if (isInMenuState) {
@@ -91,12 +121,61 @@ PushdownState::PushdownResult ClientState::OnUpdate(float dt, PushdownState** ne
 }
 
 void ClientState::OnAwake() {
-	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Multiplayer);
-	SceneManager::GetSceneManager()->SetIsServer(false);
-	LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
-	DebugNetworkedGame* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetCurrentScene();
-	//client->StartAsClient(10,58,221,142);
-	//Localhost IP
-	client->StartAsClient(127, 0, 0, 1);
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+	DebugNetworkedGame* client = (DebugNetworkedGame*)SceneManager::GetSceneManager()->GetScene(Scenes::Multiplayer);
+
+	mIsClientConnected = client->StartAsClient(ipToConnect[0], ipToConnect[1], ipToConnect[2], ipToConnect[3], mPlayerName);
+	if (mIsClientConnected) {
+		Window* w = Window::GetWindow();
+		w->ShowOSPointer(false);
+		w->LockMouseToWindow(true);
+
+		sceneManager->SetCurrentScene(Scenes::Multiplayer);
+		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
+		sceneManager->SetIsServer(false);
+	}
+}
+
+PushdownState::PushdownResult MultiplayerLobbyState::OnUpdate(float dt, PushdownState** newState) {
+	MainMenuScene::MainMenuPanels currentMainMenuPanel = mMainMenuScene->GetOpenPanel();
+
+	if (currentMainMenuPanel == MainMenuScene::LevelSelection) {
+		*newState = new MainMenuSceneState();
+		return PushdownResult::Push;
+	}
+
+	const MainMenuScene::MultiplayerLobbyPanelStates multiplayerLobbyState = mMainMenuScene->GetMultiplayerLobbyState();
+	if (multiplayerLobbyState == MainMenuScene::MultiplayerLobbyPanelStates::StartAsClient) {
+		*newState = new ClientState();
+		ClientState* clientState = static_cast<ClientState*>(*newState);
+		int* ip = mMainMenuScene->GetIpAdressToConnect();
+
+		mMainMenuScene->SetMultiplayerLobbyState(MainMenuScene::Lobby);
+		for (int i = 0; i < 4; i++) {
+			clientState->ipToConnect[i] = ip[i];
+		}
+		clientState->mPlayerName = mMainMenuScene->GetPlayerName();
+
+		return PushdownResult::Push;
+	}
+	if (multiplayerLobbyState == MainMenuScene::MultiplayerLobbyPanelStates::StartAsServer) {
+		*newState = new ServerState();
+		ServerState* serverState = static_cast<ServerState*>(*newState);
+		serverState->mPlayerName = mMainMenuScene->GetPlayerName();
+		return PushdownResult::Push;
+	}
+
+	return PushdownResult::NoChange;
+}
+
+void MultiplayerLobbyState::OnAwake() {
+	SceneManager* sceneManager = SceneManager::GetSceneManager();
+	Scene* currentScene = sceneManager->GetCurrentScene();
+
+	sceneManager->SetCurrentScene(Scenes::MainMenu);
+
+	if (mMainMenuScene == nullptr) {
+		mMainMenuScene = (MainMenuScene*)currentScene;
+	}
 }
 #endif
