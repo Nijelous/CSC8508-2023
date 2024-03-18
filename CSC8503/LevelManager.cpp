@@ -1130,10 +1130,10 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 	camera->GetRenderObject()->SetColour(Vector4(0.2f, 0.2f, 0.2f, 1));
 
 	camera->GenerateViewPyramid();
+	camera->SetInitAngle(transform.GetOrientation().ToEuler().y);
 	camera->SetSoundObject(new SoundObject());
 
-	if (!isMultiplayerLevel)
-	{
+	if (!isMultiplayerLevel){
 		camera->SetPlayerObjectPtr(mTempPlayer);
 	}
 	mUpdatableObjects.push_back(camera);
