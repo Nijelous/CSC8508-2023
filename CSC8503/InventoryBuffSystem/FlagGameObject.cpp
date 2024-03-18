@@ -9,6 +9,9 @@
 #include "PlayerObject.h"
 #include "../LevelManager.h"
 #include "../SuspicionSystem/GlobalSuspicionMetre.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -78,6 +81,13 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 	if ((otherObject->GetCollisionLayer() & Player) &&
 		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
+		auto* sceneManager = SceneManager::GetSceneManager();
+		bool isSinglePlayer = sceneManager->IsInSingleplayer();
+		if (!isSinglePlayer) {
+			NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
+			if (!netPlayer->GetIsLocalPlayer())
+				return;
+		}
 		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		plObj->AddPlayerPoints(mPoints);
 		GetFlag(plObj->GetPlayerID());
