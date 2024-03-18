@@ -18,6 +18,9 @@ namespace NCL {
 			virtual bool GetIsOpen() {
 				return mIsOpen;
 			}
+			virtual bool GetIsLock() {
+				return mIsLocked;
+			}
 			
 		protected:
 			void SetNavMeshFlags(int flag);
@@ -25,6 +28,7 @@ namespace NCL {
 			const float initDoorTimer = 10.0f;
 			float mTimer;
 			bool mIsOpen;
+			bool mIsLocked;
 		};
 	}
 }

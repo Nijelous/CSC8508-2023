@@ -68,7 +68,7 @@ LevelManager::LevelManager() {
 
 	//preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
-	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
+	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard_Red"], mPlayerTextures);
 #endif
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
@@ -101,7 +101,7 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 	{PlayerInventory::item::flag , mTextures["FlagIcon"]},
     {PlayerInventory::item::stunItem, mTextures["Stun"]},
-    {PlayerInventory::item::screwdriver, mTextures["Stun"]}
+    {PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 	loadRooms.join();
 	loadLevels.join();
@@ -582,8 +582,10 @@ void LevelManager::InitialiseAssets() {
 		{mTextures["MidSusBar"]},
 		{mTextures["HighSusBar"]}
 	};
+
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
+
 	matLoadThread.join();
 }
 
@@ -887,10 +889,14 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mNoticeTop = mUi->AddIcon(Vector2(45, 43), 8, 6, mTextures["LockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICETOP, *mNoticeTop);
 
-	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
+	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
 
+	UISystem::Icon* mNoticeBotLeft = mUi->AddIcon(Vector2(39, 58), 8, 6, mTextures["UseScrewDriver"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOTLEFT, *mNoticeBotLeft);
 
+	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
 
 	mRenderer->SetUIObject(mUi);
 }

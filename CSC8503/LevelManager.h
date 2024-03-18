@@ -246,6 +246,10 @@ namespace NCL {
 #ifdef USEGL
 			vector<GLuint>  mGuardTextures;
 			vector<GLuint> mPlayerTextures;
+			vector<GLuint> mRedPlayerTextures;
+			vector<GLuint> mBluePlayerTextures;
+			vector<GLuint> mYellowPlayerTextures;
+			vector<GLuint> mGreenlayerTextures;
 #endif
 #ifdef USEPROSPERO
 			// PSSL textures

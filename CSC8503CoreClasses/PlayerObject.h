@@ -123,7 +123,8 @@ namespace NCL {
 			float mTransparencyLeft = 0.0;
 			float mTransparencyTop = 0.0;
 			float mTransparencyBot = 0.0;
-			
+			float mTransparencyBotLeft = 0.0;
+			float mTransparencyBotRight = 0.0;
 
 			bool	IsSeenByGameObject(GameObject* otherGameObject);
 		private:
