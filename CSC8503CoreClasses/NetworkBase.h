@@ -32,7 +32,8 @@ enum BasicNetworkMessages {
 	ClientSyncGlobalSusChange,
 	SyncObjectState,
 	ClientInit,
-	SyncPlayerIdNameMap
+	SyncPlayerIdNameMap,
+	SyncAnnouncements
 };
 
 struct GamePacket {
