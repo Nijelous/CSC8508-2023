@@ -272,21 +272,10 @@ void LevelManager::LoadLevel(int levelID, int playerID, bool isMultiplayer) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 			serverPlayersPtr = game->GetServerPlayersPtr();
 		}
-
-		for (const auto& pair : *serverPlayersPtr)
-		{
-			PlayerInventoryObserver* invObserver = reinterpret_cast<PlayerInventoryObserver*>(pair.second);
-			mPlayerInventoryObservers.push_back(invObserver);
-			PlayerBuffsObserver* buffsObserver = reinterpret_cast<PlayerBuffsObserver*>(pair.second);
-			mPlayerBuffsObservers.push_back(buffsObserver);
-		}
-
-		LoadCCTVs(isMultiplayer);
 	}
 
 	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
-	LoadCCTVs();
-
+	LoadCCTVs(isMultiplayer);
 
 #endif
 
@@ -870,8 +859,10 @@ float NCL::CSC8503::LevelManager::GetNearestGuardDistance(const Vector3& startPo
 
 float LevelManager::GetNearestGuardToPlayerDistance(const int playerNo) const {
 	Vector3 playerPos;
-	if (serverPlayersPtr)
+	if (serverPlayersPtr) {
+		if ((*serverPlayersPtr)[playerNo] == nullptr) return -1;
 		playerPos = (*serverPlayersPtr)[playerNo]->GetTransform().GetPosition();
+	}
 	else
 		playerPos = mTempPlayer->GetTransform().GetPosition();
 

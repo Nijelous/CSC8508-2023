@@ -149,6 +149,9 @@ namespace NCL {
 			PrisonDoor* GetPrisonDoor() const;
 
 			bool RoundHasStarted() { return mStartTimer <= 0; }
+
+			std::vector<PlayerInventoryObserver*> GetPlayerInventoryObservers() { return mPlayerInventoryObservers; };
+			std::vector<PlayerBuffsObserver*> GetPlayerBuffsObservers() { return mPlayerBuffsObservers; };
 		protected:
 			LevelManager();
 			~LevelManager();

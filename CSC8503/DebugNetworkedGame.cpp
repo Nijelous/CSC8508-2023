@@ -532,6 +532,8 @@ void DebugNetworkedGame::SpawnPlayers() {
 			const Vector3& pos = mLevelManager->GetPlayerStartPosition(i);
 			auto* netPlayer = AddPlayerObject(pos, i);
 			mServerPlayers.emplace(i, netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->Attach(netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr()->Attach(netPlayer);
 		}
 		else
 		{

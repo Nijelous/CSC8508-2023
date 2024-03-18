@@ -26,17 +26,11 @@ FlagGameObject::~FlagGameObject() {
 void FlagGameObject::GetFlag(int playerNo) {
 	GetSoundObject()->TriggerSoundEvent();
 
-	if (IsMultiplayerAndIsNotServer())
-		return;
-
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 	this->SetActive(false);
 }
 
 void FlagGameObject::Reset() {
-	if (IsMultiplayerAndIsNotServer())
-		return;
-
 	if (!this->IsActive())
 	{
 		this->SetActive(true);
@@ -44,9 +38,6 @@ void FlagGameObject::Reset() {
 }
 
 void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId){
-	if (IsMultiplayerAndIsNotServer())
-		return;
-
 	if (this->IsRendered()) {
 		GetFlag(playerId);
 		this->SetActive(false);
