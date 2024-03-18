@@ -4,7 +4,8 @@ namespace NCL {
 		enum TileType {
 			Wall,
 			Floor,
-			CornerWall
+			CornerWall,
+			OutsideFloor
 		};
 		enum RoomType {
 			Small,

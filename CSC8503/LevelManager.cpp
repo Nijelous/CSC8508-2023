@@ -669,10 +669,13 @@ void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMa
 			AddWallToWorld(offsetKey);
 			break;
 		case Floor:
-			AddFloorToWorld(offsetKey);
+			AddFloorToWorld(offsetKey, false);
 			break;
 		case CornerWall:
 			AddCornerWallToWorld(offsetKey);
+			break;
+		case OutsideFloor:
+			AddFloorToWorld(offsetKey, true);
 			break;
 		}
 	}
@@ -783,7 +786,7 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 			offsetKey.SetMatrix(Matrix4::Rotation(rotation, Vector3(0, -1, 0)) * offsetKey.GetMatrix());
 			offsetKey.SetPosition(offsetKey.GetPosition() + startPosition);
 			switch (key) {
-			case Desk: // To-Do (Alex): Rotate
+			case Desk:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(14, 4, 7.5f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "HotelDesk"));
 				break;
@@ -791,19 +794,19 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(2.85f, 4.2f, 0.1f)).Abs());
 				AddDecorationToWorld(offsetKey, "Painting");
 				break;
-			case PlantTall: // To-Do (Alex): Material
+			case PlantTall:
 				offsetKey.SetScale(Vector3(2, 6, 2));
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TallPlant"));
 				break;
-			case PlantPot: // To-Do (Alex): Material
+			case PlantPot:
 				offsetKey.SetScale(Vector3(1.5f, 1.5f, 1.5f));
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallPlant"));
 				break;
-			case Bookshelf: // To-Do (Alex): Material, Rotate
+			case Bookshelf:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.5f, 8.6f, 2)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bookshelf"));
 				break;
-			case Bed: // To-Do (Alex): Material, Rotate
+			case Bed:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(7, 4, 8.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
 				break;
@@ -815,7 +818,7 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale(Vector3(1.5f, 0.45f, 1.5f));
 				AddDecorationToWorld(offsetKey, "CeilingLight");
 				break;
-			case TV: // To-Do (Alex): Material, Rotate
+			case TV:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6, 4, 2.8f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "TV"));
 				break;
@@ -827,7 +830,7 @@ void LevelManager::LoadDecorations(const std::unordered_map<DecorationType, std:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(3.35f, 2, 3.35f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "SmallTable"));
 				break;
-			case Shelf: // To-Do (Alex): Material, Rotate
+			case Shelf:
 				offsetKey.SetScale((offsetKey.GetOrientation() * Vector3(6.6f, 1.5f, 1.6f)).Abs());
 				mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Shelf"));
 				break;
@@ -1046,7 +1049,7 @@ GameObject* LevelManager::AddCornerWallToWorld(const Transform& transform) {
 	return wall;
 }
 
-GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
+GameObject* LevelManager::AddFloorToWorld(const Transform& transform, bool isOutside) {
 	GameObject* floor = new GameObject(StaticObj, "Floor");
 
 	Vector3 floorSize = Vector3(4.5f, 0.5f, 4.5f);
@@ -1057,8 +1060,24 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 		.SetPosition(transform.GetPosition())
 		.SetOrientation(transform.GetOrientation());
 
-	floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mMeshes["Floor"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Instance"],
-		std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
+	if (!isOutside) {
+		floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mMeshes["Floor"], mTextures["CarpetAlbedo"], mTextures["CarpetNormal"], mShaders["Instance"],
+			std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
+		mInstanceMatrices["Floor"].push_back(floor->GetTransform().GetMatrix());
+		if (mBaseObjects.find("Floor") == mBaseObjects.end()) mBaseObjects["Floor"] = floor;
+	}
+	else if(transform.GetPosition().y < 0) {
+		floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mMeshes["OutsideFloor"], mTextures["PavementAlbedo"], mTextures["PavementNormal"], mShaders["Instance"],
+			std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
+		mInstanceMatrices["OutsideFloor"].push_back(floor->GetTransform().GetMatrix());
+		if (mBaseObjects.find("OutsideFloor") == mBaseObjects.end()) mBaseObjects["OutsideFloor"] = floor;
+	}
+	else {
+		floor->SetRenderObject(new RenderObject(&floor->GetTransform(), mMeshes["Ceiling"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Instance"],
+			std::sqrt(std::pow(floorSize.x, 2) + std::powf(floorSize.z, 2))));
+		mInstanceMatrices["Ceiling"].push_back(floor->GetTransform().GetMatrix());
+		if (mBaseObjects.find("Ceiling") == mBaseObjects.end()) mBaseObjects["Ceiling"] = floor;
+	}
 	floor->SetPhysicsObject(new PhysicsObject(&floor->GetTransform(), floor->GetBoundingVolume(), 0, 2, 2));
 
 	floor->GetPhysicsObject()->SetInverseMass(0);
@@ -1071,10 +1090,6 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform) {
 	mWorld->AddGameObject(floor);
 
 	if(transform.GetPosition().y < 0) mLevelLayout.push_back(floor);
-
-	mInstanceMatrices["Floor"].push_back(floor->GetTransform().GetMatrix());
-
-	if (mBaseObjects.find("Floor") == mBaseObjects.end()) mBaseObjects["Floor"] = floor;
 
 	return floor;
 }
@@ -1571,7 +1586,7 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	else {
-		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Instance"],
+		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["Normal"], mShaders["Instance"],
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	if (mMeshMaterials.find(meshName) != mMeshMaterials.end()) {

@@ -35,6 +35,7 @@ namespace NCL {
 			Mesh*		LoadMesh(const std::string& name) override;
 			void		LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details);
 			Texture*	LoadTexture(const std::string& name) override;
+			GLuint		LoadTextureGetID(const std::string& name);
 			Texture* LoadDebugTexture(const std::string& name) override;
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
@@ -234,6 +235,7 @@ namespace NCL {
 			Frustum mFrameFrustum;
 
 			UISystem* mUi;
+			std::unordered_map<std::string, GLuint> mLoadedTextures;
 			//TODO(erendgrmnc): added after integrating Imgui lib. Refactor UISystem into this logic.
 			std::function<void()> mImguiCanvasFuncToRender = nullptr;
 			WindowsUI* mUIHandler;

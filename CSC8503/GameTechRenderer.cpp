@@ -496,8 +496,10 @@ void GameTechRenderer::DrawWallsFloorsInstanced() {
 		BindMesh(*mesh);
 		if (rendObj->GetMatTextures().size() > 1) {
 			for (size_t b = 0; b < layerCount; ++b) {
-				texInds.albedoIndex = FindTexHandleIndex(rendObj->GetMatTextures()[b]);
-				texInds.normalIndex = FindTexHandleIndex((OGLTexture*)rendObj->GetNormalTexture());
+				if(rendObj->GetMatTextures()[b * 2] == 0) texInds.albedoIndex = FindTexHandleIndex((OGLTexture*)rendObj->GetAlbedoTexture());
+				texInds.albedoIndex = FindTexHandleIndex(rendObj->GetMatTextures()[b * 2]);
+				if(rendObj->GetMatTextures()[(b * 2) + 1] == 0) texInds.normalIndex = FindTexHandleIndex((OGLTexture*)rendObj->GetNormalTexture());
+				else texInds.normalIndex = FindTexHandleIndex(rendObj->GetMatTextures()[(b * 2) + 1]);
 				glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 				DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
@@ -551,7 +553,9 @@ void GameTechRenderer::FillGBuffer() {
 				for (int i = 0; i < frameMatrices.size(); i++) frameData[i] = frameMatrices[i];
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Matrix4) * 128, frameData);
 				delete[] frameData;
-				texInds.albedoIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[b]);
+				texInds.albedoIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[b * 2]);
+				if (mActiveObjects[i]->GetMatTextures()[(b * 2) + 1] == 0) texInds.normalIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetNormalTexture());
+				else texInds.normalIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[(b * 2) + 1]);
 				glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 				glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 				DrawBoundMesh((uint32_t)b);
@@ -561,7 +565,8 @@ void GameTechRenderer::FillGBuffer() {
 			if (mActiveObjects[i]->GetMatTextures().size() > 1) {
 				for (size_t b = 0; b < layerCount; ++b) {
 					texInds.albedoIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[b]);
-					texInds.normalIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetNormalTexture());
+					if (mActiveObjects[i]->GetMatTextures()[(b * 2) + 1] == 0) texInds.normalIndex = FindTexHandleIndex((OGLTexture*)mActiveObjects[i]->GetNormalTexture());
+					else texInds.normalIndex = FindTexHandleIndex(mActiveObjects[i]->GetMatTextures()[(b * 2) + 1]);
 					glBindBufferBase(GL_UNIFORM_BUFFER, textureIdUBO, uBOBlocks[textureIdUBO]);
 					glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(texInds), &texInds);
 					DrawBoundMesh((uint32_t)b, mesh->GetInstanceMatricesSize());
@@ -854,15 +859,23 @@ void GameTechRenderer::NewRenderText() {
 }
 
 Texture* GameTechRenderer::LoadTexture(const std::string& name) {
-	
 	OGLTexture*  tex = OGLTexture::TextureFromFile(name).release();
 	if (FindTexHandleIndex(tex->GetObjectID()) == -1) {
 		const GLuint64 handle = glGetTextureHandleARB(tex->GetObjectID());
 		glMakeTextureHandleResidentARB(handle);
 		mTextureHandles.push_back(std::pair<GLuint, GLuint64>(tex->GetObjectID(), handle));
+		mLoadedTextures[name] = tex->GetObjectID();
 	}
 	
 	return tex;
+}
+
+GLuint GameTechRenderer::LoadTextureGetID(const std::string& name) {
+	if (mLoadedTextures.find(name) != mLoadedTextures.end()) {
+		return mLoadedTextures[name];
+	}
+	Texture* texture = LoadTexture(name);
+	return ((OGLTexture*)texture)->GetObjectID();
 }
 
 Texture* GameTechRenderer::LoadDebugTexture(const std::string& name) {
@@ -907,8 +920,19 @@ std::vector<int> NCL::CSC8503::GameTechRenderer::LoadMeshMaterial(Mesh& mesh, Me
 		if (filename) {
 			string path = *filename;
 			std::cout << path << std::endl;
-			Texture* animTexture = LoadTexture(path.c_str());
-			texID = ((OGLTexture*)animTexture)->GetObjectID();
+			texID = LoadTextureGetID(path.c_str());
+			std::cout << texID << endl;
+		}
+		matTextures.emplace_back(texID);
+
+		filename = nullptr;
+		matEntry->GetEntry("Normal", &filename);
+		texID = 0;
+
+		if (filename) {
+			string path = *filename;
+			std::cout << path << std::endl;
+			texID = LoadTextureGetID(path.c_str());
 			std::cout << texID << endl;
 		}
 		matTextures.emplace_back(texID);
