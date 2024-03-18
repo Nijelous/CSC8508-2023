@@ -66,7 +66,7 @@ namespace NCL{
 
             void SetIsGameStarted(bool isGameStarted);
             void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
-            void StartLevel();
+            void StartLevel(const std::mt19937& levelSeed);
 
             void AddEventOnGameStarts(std::function<void()> event);
 
@@ -108,10 +108,10 @@ namespace NCL{
             void UpdateMinimumState();
             int GetPlayerPeerID(int peerId = -2);
 
-            void SendStartGameStatusPacket();
+            void SendStartGameStatusPacket(std::mt19937* levelSeed = nullptr);
             void SendFinishGameStatusPacket();
             
-            void InitWorld() override;
+            void InitWorld(const std::mt19937& levelSeed);
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 

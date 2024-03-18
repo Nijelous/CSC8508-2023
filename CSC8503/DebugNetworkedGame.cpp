@@ -20,7 +20,8 @@
 
 namespace {
 	constexpr int MAX_PLAYER = 4;
-	constexpr int LEVEL_NUM = 0;
+	constexpr int DEMO_LEVEL_NUM = 0;
+	constexpr int LEVEL_NUM = 1;
 	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
@@ -199,13 +200,24 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 }
 
 void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
-	this->mIsGameStarted = isGameStarted;
-	if (mThisServer) {
-		SendStartGameStatusPacket();
+	if (mIsGameStarted == isGameStarted) {
+		return;
 	}
+	this->mIsGameStarted = isGameStarted;
+
 	if (isGameStarted) {
+		std::random_device rd;
+		std::mt19937 g(rd());
 		mGameState = GameSceneState::InitialisingLevelState;
-		StartLevel();
+		if (mThisServer) {
+			SendStartGameStatusPacket(&g);
+		}
+		StartLevel(g);
+	}
+	else {
+		if (mThisServer) {
+			SendStartGameStatusPacket();
+		}
 	}
 }
 
@@ -217,8 +229,8 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished, int winningPlaye
 	}
 }
 
-void DebugNetworkedGame::StartLevel() {
-	InitWorld();
+void DebugNetworkedGame::StartLevel(const std::mt19937& levelSeed) {
+	InitWorld(levelSeed);
 	Debug::Print("Game Started", Vector2(10, 5));
 
 	for (auto& event : mOnGameStarts) {
@@ -498,8 +510,8 @@ const int DebugNetworkedGame::GetClientLastFullID() const {
 	return mClientSideLastFullID;
 }
 
-void DebugNetworkedGame::SendStartGameStatusPacket() {
-	GameStartStatePacket state(mIsGameStarted);
+void DebugNetworkedGame::SendStartGameStatusPacket(std::mt19937* levelSeed) {
+	GameStartStatePacket state(mIsGameStarted, *levelSeed);
 	mThisServer->SendGlobalPacket(state);
 }
 
@@ -508,12 +520,11 @@ void DebugNetworkedGame::SendFinishGameStatusPacket() {
 	mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::InitWorld() {
+void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	//TODO(erendgrmc): Second parameter is redundant remove it from func.
-	mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
+	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 

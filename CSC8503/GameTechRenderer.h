@@ -24,7 +24,6 @@ namespace NCL {
 	namespace CSC8503 {
 		class RenderObject;
 
-		constexpr short MAX_INSTANCE_MESHES = 3;
 		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
@@ -40,6 +39,7 @@ namespace NCL {
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
 			MeshMaterial* LoadMaterial(const std::string& name) override;
+			std::vector<int> LoadMeshMaterial(Mesh& mesh, MeshMaterial& meshMaterial);
 			
 
 			void AddLight(Light* light);
@@ -47,10 +47,10 @@ namespace NCL {
 
 			void ClearInstanceObjects() { mInstanceTiles.clear(); }
 
-			void SetInstanceObjects(GameObject* floorTile, GameObject* wallTile, GameObject* cornerWallTile) {
-				mInstanceTiles.push_back(floorTile);
-				mInstanceTiles.push_back(wallTile);
-				mInstanceTiles.push_back(cornerWallTile);
+			void SetInstanceObjects(std::unordered_map<std::string, GameObject*>& baseObjects) {
+				for (auto const& [key, val] : baseObjects) {
+					mInstanceTiles.push_back(val);
+				}
 			}
 			void FillLightUBO();
 			void FillTextureDataUBO();
@@ -97,7 +97,7 @@ namespace NCL {
 
 			
 			struct TextureHandleData {
-				GLuint64 handles[128] = { 0 };
+				GLuint64 handles[256] = { 0 };
 			};
 
 			struct TextureHandleIndices {

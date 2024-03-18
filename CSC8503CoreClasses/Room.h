@@ -26,6 +26,8 @@ namespace NCL {
 			std::vector<Door*> GetDoors() const { return mDoors; }
 			int GetDoorConfig() const { return mDoorConfig; }
 			int GetPrimaryDoor() const { return mPrimaryDoor; }
+			const std::unordered_map<DecorationType, std::vector<Transform>>& GetDecorationMap() { return mDecorationMap; }
+
 			friend class JsonParser;
 		protected:
 			std::string mRoomName;
@@ -37,6 +39,7 @@ namespace NCL {
 			std::vector<Transform> mCCTVTransforms;
 			std::vector<Vector3> mItemPositions;
 			std::vector<Door*> mDoors;
+			std::unordered_map<DecorationType, std::vector<Transform>> mDecorationMap;
 		};
 	}
 }
