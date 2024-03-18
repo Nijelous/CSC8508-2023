@@ -1128,7 +1128,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 #ifdef USEGL
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 #endif
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"]/*, mMaterials["Guard"]*/));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1228,7 +1228,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetCollisionLayer(Npc);
 
 	RenderObject* renderObject = new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize);
-	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"]/*, mMaterials["Rig"]*/);
+	AnimationObject* animObject = new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]);
 
 	renderObject->SetAnimationObject(animObject);
 	guard->SetRenderObject(renderObject);
