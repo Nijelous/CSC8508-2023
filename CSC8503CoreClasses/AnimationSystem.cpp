@@ -149,14 +149,14 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 			mGuardList.emplace_back((GuardObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			//obj->GetRenderObject()->SetMatTextures(mGuardTextures);
+			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
 
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			//obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
+			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
 
 		}
 	}

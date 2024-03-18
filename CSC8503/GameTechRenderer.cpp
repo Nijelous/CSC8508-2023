@@ -850,8 +850,7 @@ Shader* GameTechRenderer::LoadShader(const std::string& vertex, const std::strin
 	return new OGLShader(vertex, fragment);
 }
 
-MeshAnimation* NCL::CSC8503::GameTechRenderer::LoadAnimation(const std::string& name)
-{
+MeshAnimation* NCL::CSC8503::GameTechRenderer::LoadAnimation(const std::string& name) {
 	return new MeshAnimation(name);
 }
 

@@ -89,11 +89,10 @@ namespace NCL {
 			SuspicionSystemClass* GetSuspicionSystem();
 
 			UISystem* GetUiSystem() { return mUi; };
-
 #ifdef USEGL
 			SoundManager* GetSoundManager() { return mSoundManager; };
-			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 #endif
+			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
 

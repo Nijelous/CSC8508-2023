@@ -1,4 +1,7 @@
 #include "GameObject.h"
+
+#include "AnimationSystem.h"
+#include "../CSC8503/LevelManager.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -99,12 +102,12 @@ void GameObject::SetObjectState(GameObjectState state) {
 	}
 	
 	mObjectState = state;
-#ifdef USEGL
 	if (mRenderObject->GetAnimationObject() != nullptr ) {
 		AnimationSystem* animSystem = LevelManager::GetLevelManager()->GetAnimationSystem();
 		animSystem->SetAnimationState(this, mObjectState);
 	}
 
+#ifdef USEGL
 	if (mNetworkObject) {
 		SceneManager* sceneManager = SceneManager::GetSceneManager();
 		bool isServer = sceneManager->IsServer();

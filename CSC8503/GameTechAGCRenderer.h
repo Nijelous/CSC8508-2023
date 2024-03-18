@@ -37,6 +37,7 @@ namespace NCL {
 			Texture*	LoadTexture(const std::string& name)			override;
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
+			MeshMaterial* LoadMaterial(const std::string& name) override;
 			void FillLightUBO() override;
 
 		protected:

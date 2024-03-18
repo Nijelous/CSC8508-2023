@@ -66,10 +66,8 @@ LevelManager::LevelManager() {
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
 
 	// preLoadtexID   I used Guard mesh to player and used rigMesh to guard   @(0v0)@  Chris 12/02/1998
-#ifdef USEGL
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Rig"], *mMaterials["Rig"], mGuardTextures);
 	mAnimation->PreloadMatTextures(*mRenderer, *mMeshes["Guard"], *mMaterials["Guard"], mPlayerTextures);
-#endif
 
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);

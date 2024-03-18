@@ -1,4 +1,9 @@
 #pragma once
+
+#ifdef USEPROSPERO
+#include <agc.h>
+#endif
+
 #include "Texture.h"
 #include "Shader.h"
 #include "Mesh.h"
@@ -108,6 +113,7 @@ namespace NCL {
 			int GetCurrentFrame() const {
 				return mCurrentFrame;
 			}
+#ifdef USEGL
 
 			void SetMatTextures(vector<GLuint> matTextures) {
 				mMatTextures = matTextures;
@@ -116,6 +122,20 @@ namespace NCL {
 			vector<GLuint>  GetMatTextures() const {
 				return mMatTextures;
 			}
+
+#endif
+
+#ifdef USEPROSPERO
+
+			void SetMatTextures(vector<sce::Agc::Core::Texture*> matTextures) {
+				mMatTextures = matTextures;
+			}
+
+			vector<sce::Agc::Core::Texture*>  GetMatTextures() const {
+				return mMatTextures;
+			}
+
+#endif
 
 			void SetFrameMatricesVec(std::vector<std::vector<Matrix4>> frameMatrices) {
 				mFrameMatricesVec = frameMatrices;
@@ -153,8 +173,12 @@ namespace NCL {
 			float mSqDistToCam;
 			bool mOutlined = false;
 			bool mIsInstanced = false;
-
+#ifdef USEGL
 			vector<GLuint>  mMatTextures;
+#endif
+#ifdef USEPROSPERO
+			vector<sce::Agc::Core::Texture*> mMatTextures;
+#endif
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 

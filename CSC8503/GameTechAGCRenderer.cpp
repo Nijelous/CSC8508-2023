@@ -162,6 +162,10 @@ MeshAnimation* GameTechAGCRenderer::LoadAnimation(const std::string& name) {
 	return new MeshAnimation(name);
 }
 
+MeshMaterial* GameTechAGCRenderer::LoadMaterial(const std::string& name) {
+	return new MeshMaterial(name);
+}
+
 void GameTechAGCRenderer::RenderFrame() {
 	currentFrame = &allFrames[currentFrameIndex];
 
@@ -281,35 +285,40 @@ void GameTechAGCRenderer::GPUSkinningPass() {
 
 	sce::Agc::DispatchModifier modifier = skinningCompute->GetAGCPointer()->m_specials->m_dispatchModifier;
 
+
 	for (int i = 0; i < frameJobs.size(); i++) {
 		NCL::PS5::AGCMesh* m = (AGCMesh*)frameJobs[i].object->GetMesh();
+		size_t layerCount = m->GetSubMeshCount();
 
-		sce::Agc::Core::Buffer inputBuffers[6];
+		for (size_t b = 0; b < layerCount; ++b) {
+			sce::Agc::Core::Buffer inputBuffers[6];
 
-		if (!m->GetAGCBuffer(VertexAttribute::Positions, inputBuffers[0]) ||
-			!m->GetAGCBuffer(VertexAttribute::Normals, inputBuffers[1]) ||
-			!m->GetAGCBuffer(VertexAttribute::Tangents, inputBuffers[2]) ||
-			!m->GetAGCBuffer(VertexAttribute::JointWeights, inputBuffers[3]) ||
-			!m->GetAGCBuffer(VertexAttribute::JointIndices, inputBuffers[4])) {
-			continue;
+			if (!m->GetAGCBuffer(VertexAttribute::Positions, inputBuffers[0]) ||
+				!m->GetAGCBuffer(VertexAttribute::Normals, inputBuffers[1]) ||
+				!m->GetAGCBuffer(VertexAttribute::Tangents, inputBuffers[2]) ||
+				!m->GetAGCBuffer(VertexAttribute::JointWeights, inputBuffers[3]) ||
+				!m->GetAGCBuffer(VertexAttribute::JointIndices, inputBuffers[4])) {
+				continue;
+			}
+
+			char* offset = currentFrame->data.data;
+
+			const std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[b];
+			currentFrame->data.WriteData((void*)skeleton.data(), sizeof(Matrix4) * skeleton.size());
+
+			sce::Agc::Core::BufferSpec bufSpec;
+			bufSpec.initAsRegularBuffer(offset, sizeof(Matrix4), skeleton.size());
+			SceError error = sce::Agc::Core::initialize(&inputBuffers[5], &bufSpec);
+
+			inputBuffers[5].setFormat(sce::Agc::Core::Buffer::Format::k32_32_32_32Float);
+
+			frameContext->m_bdr.getStage(sce::Agc::ShaderType::kCs)
+				.setBuffers(0, 6, inputBuffers)
+				.setRwBuffers(0, 1, &bindlessBuffers[frameJobs[i].outputIndex]);
+
+			uint32_t threadCount = (m->GetVertexCount() + 63) / 64;
+			frameContext->m_dcb.dispatch(threadCount, 1, 1, modifier);
 		}
-		char* offset = currentFrame->data.data;
-
-		const std::vector<Matrix4>& skeleton = frameJobs[i].object->GetFrameMatricesVec()[0];
-		currentFrame->data.WriteData((void*)skeleton.data(), sizeof(Matrix4) * skeleton.size());
-
-		sce::Agc::Core::BufferSpec bufSpec;
-		bufSpec.initAsRegularBuffer(offset, sizeof(Matrix4), skeleton.size());
-		SceError error = sce::Agc::Core::initialize(&inputBuffers[5], &bufSpec);
-
-		inputBuffers[5].setFormat(sce::Agc::Core::Buffer::Format::k32_32_32_32Float);
-
-		frameContext->m_bdr.getStage(sce::Agc::ShaderType::kCs)
-			.setBuffers(0, 6, inputBuffers)
-			.setRwBuffers(0, 1, &bindlessBuffers[frameJobs[i].outputIndex]);
-
-		uint32_t threadCount = (m->GetVertexCount() + 63) / 64;
-		frameContext->m_dcb.dispatch(threadCount, 1, 1, modifier);
 	}
 	//TODO fence
 	frameJobs.clear();
@@ -598,6 +607,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 							bindlessBuffers[bufferID] = vBuffer;
 						}
+
 						state.index[2] = b->GetAssetID();
 
 						frameJobs.push_back({ g, b->GetAssetID() });
