@@ -29,6 +29,8 @@ set(Maths
     "Plane.h"
     "Frustum.cpp"
     "Frustum.h"
+    "Pyramid.cpp"
+    "Pyramid.h"
     "Quaternion.cpp"
     "Quaternion.h"
 

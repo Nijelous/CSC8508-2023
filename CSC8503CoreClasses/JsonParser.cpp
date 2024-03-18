@@ -5,6 +5,7 @@
 #include "Door.h"
 #include "PrisonDoor.h"
 #include "Vent.h"
+#include "InteractableDoor.h"
 
 using namespace NCL::CSC8503;
 
@@ -243,7 +244,7 @@ void JsonParser::WriteHelipad(std::vector<std::unordered_map<std::string, float>
 
 void JsonParser::WriteDoors(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room) {
 	if (keyValuePairs.size() == 1) return;
-	Door* door = new Door();
+	InteractableDoor* door = new InteractableDoor();
 	door->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
 	if (level) level->mDoors.push_back(door);
