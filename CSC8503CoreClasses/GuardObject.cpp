@@ -100,7 +100,9 @@ void GuardObject::RaycastToPlayer() {
 	}
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		game->SendSoundStatePacket(mCanSeePlayer);
+		if (mPlayer) {
+			game->SendSoundStatePacket(mCanSeePlayer, mPlayer->GetPlayerID());
+		}
 	}
 }
 
