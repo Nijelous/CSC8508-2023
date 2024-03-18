@@ -107,7 +107,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(String_Message, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
-		//mThisClient->RegisterPacketHandler(BasicNetworkMessages::Sound, this);
+	    mThisServer->RegisterPacketHandler(BasicNetworkMessages::Sound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -233,7 +233,7 @@ void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event) {
 }
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-
+	
 	switch (type) {
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
@@ -588,8 +588,10 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 		break;
 	case 2:
 		colour = Vector4(0, 0, 1, 1); //Blue
+		break;
 	case 3:
 		colour = Vector4(1, 1, 0, 1); //Yellow
+		break;
 	default:
 		break;
 	}
