@@ -623,7 +623,6 @@ void PlayerObject::ChangeTransparency(bool isUp, float& transparency)
 
 void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 {
-	cout << objectHit->GetName() << endl;
 	//Open Door
 	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
 		auto* doorHit = (Door*)objectHit;
