@@ -1,3 +1,4 @@
+#include "imgui/imgui_impl_win32.h"
 #ifdef USEGL
 
 #include "GameTechRenderer.h"
@@ -86,6 +87,7 @@ GameTechRenderer::GameTechRenderer(GameWorld& world) : OGLRenderer(*Window::GetW
 	SetDebugStringBufferSizes(10000);
 	SetDebugLineBufferSizes(1000);
 	FillTextureDataUBO();
+	mUIHandler = new WindowsUI();
 }
 
 GameTechRenderer::~GameTechRenderer() {
@@ -111,6 +113,7 @@ GameTechRenderer::~GameTechRenderer() {
 	delete mDebugTextShader;
 	delete mSkyboxShader;
 	delete mIconShader;
+	delete mUIHandler;
 	ClearLights();
 }
 
@@ -274,6 +277,15 @@ void GameTechRenderer::FillTextureDataUBO() {
 	glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(TextureHandleData), &handlesToUpload);
 }
 
+std::function<void()>& GameTechRenderer::GetImguiCanvasFunc() {
+	return mImguiCanvasFuncToRender;
+}
+
+void GameTechRenderer::SetImguiCanvasFunc(std::function<void()> func) {
+	mImguiCanvasFuncToRender = func;
+}
+
+
 void GameTechRenderer::UnbindAllTextures() {
 	for (std::pair<GLuint, GLuint64> handle : mTextureHandles) {
 		glMakeTextureHandleNonResidentARB(handle.second);
@@ -366,16 +378,19 @@ void GameTechRenderer::RenderFrame() {
 
 	NewRenderLines();
 	NewRenderText();
-	const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
-	if (mUi) {
-		for (auto& i : icons) {
-			RenderIcons(*i);
+	if (mIsGameStarted) {
+		const std::vector<UISystem::Icon*>& icons = mUi->GetIcons();
+		if (mUi) {
+			for (auto& i : icons) {
+				RenderIcons(*i);
+			}
 		}
 	}
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	mUIHandler->RenderUI(mImguiCanvasFuncToRender);
 }
 
 void GameTechRenderer::BuildObjectList() {

@@ -40,6 +40,8 @@ namespace NCL {
 		static const std::vector<DebugStringEntry>& GetDebugStrings();
 		static const std::vector<DebugLineEntry>& GetDebugLines();
 
+		static void ClearStringEntries();
+
 
 		static const Vector4 RED;
 		static const Vector4 GREEN;
