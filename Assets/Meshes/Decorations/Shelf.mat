@@ -3,10 +3,12 @@ MeshMat
 2
 2
 Shelf
-1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Shelf/Shelf.png
-Shelf Bracket
-1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Shelf/Shelf.png
+2
+Diffuse:/Shelf.png
+Normal:/Shelf_Normal.png
+ShelfBracket
+2
+Diffuse:/Shelf.png
+Normal:/Shelf_Normal.png
 0
 1

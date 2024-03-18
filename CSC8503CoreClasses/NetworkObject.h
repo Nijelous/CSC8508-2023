@@ -19,8 +19,8 @@ namespace NCL::CSC8503 {
 	};
 
 	struct DeltaPacket : public GamePacket {
-		int		fullID = -1;
-		int		objectID = -1;
+		int		fullID		= -1;
+		int		objectID	= -1;
 		char	pos[3];
 		char	orientation[4];
 
@@ -38,13 +38,13 @@ namespace NCL::CSC8503 {
 		ClientPacket() {
 			type = Received_State;
 			size = sizeof(ClientPacket) - sizeof(GamePacket);
-			cameraPosition = Vector3(0, 0, 0);
+			cameraPosition = Vector3(0,0,0);
 		}
 	};
-
+	
 	struct SyncPlayerListPacket : public GamePacket {
 		int playerList[4];
-
+		
 		SyncPlayerListPacket(std::vector<int>& serverPlayers);
 		void SyncPlayerList(std::vector<int>& clientPlayerList) const;
 	};
@@ -55,19 +55,19 @@ namespace NCL::CSC8503 {
 		GameStartStatePacket(bool val, std::mt19937 levelSeed);
 	};
 
-	struct GameEndStatePacket : public GamePacket {
+	struct GameEndStatePacket : public GamePacket{
 		bool isGameEnded = false;
 		int winningPlayerId;
 
 		GameEndStatePacket(bool val, int winningPlayerId);
 	};
 
-	struct ClientPlayerInputPacket : public GamePacket {
+	struct ClientPlayerInputPacket : public GamePacket{
 		int lastId;
 		PlayerInputs playerInputs;
 		float mouseXLook = 0.0f;
-
-		ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs);
+		
+		ClientPlayerInputPacket(int lastId,  const PlayerInputs& playerInputs);
 	};
 
 	struct ClientUseItemPacket : public GamePacket {
@@ -153,6 +153,13 @@ namespace NCL::CSC8503 {
 		SyncObjectStatePacket(int networkObjId, int objectState);
 	};
 
+	struct AnnouncementSyncPacket : public GamePacket {
+		int annType;
+		float time;
+		int playerNo;
+		AnnouncementSyncPacket(int annType, float time, int playerNo);
+	};
+
 	struct ClientInitPacket : public GamePacket {
 		std::string playerName;
 
@@ -190,11 +197,11 @@ namespace NCL::CSC8503 {
 
 		bool GetNetworkState(int frameID, NetworkState& state);
 
-		virtual bool ReadDeltaPacket(DeltaPacket& p);
-		virtual bool ReadFullPacket(FullPacket& p);
+		virtual bool ReadDeltaPacket(DeltaPacket &p);
+		virtual bool ReadFullPacket(FullPacket &p);
 
-		virtual bool WriteDeltaPacket(GamePacket** p, int stateID);
-		virtual bool WriteFullPacket(GamePacket** p);
+		virtual bool WriteDeltaPacket(GamePacket**p, int stateID);
+		virtual bool WriteFullPacket(GamePacket**p);
 
 		GameObject& object;
 

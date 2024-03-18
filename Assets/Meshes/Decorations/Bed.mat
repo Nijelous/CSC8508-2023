@@ -3,11 +3,14 @@ MeshMat
 3
 3
 White_metal_material
-0
+1
+Diffuse:/Bed_Metal_Albedo.png
 White_duvet_material
-0
+1
+Diffuse:/Bed_Duvet_Albedo.png
 Blue_material
-0
+1
+Diffuse:/Bed_Blue_Albedo.png
 0
 1
 2

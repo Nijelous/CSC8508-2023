@@ -115,4 +115,9 @@ void GameClient::SendClientInitPacket() {
 	ClientInitPacket packet(mPlayerName);
 	SendPacket(packet);
 }
+
+void GameClient::WriteAndSendAnnouncementSyncPacket(int annType, float time, int playerNo) {
+	AnnouncementSyncPacket packet(annType, time, playerNo);
+	this->SendPacket(packet);
+}
 #endif#

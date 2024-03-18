@@ -4,6 +4,7 @@
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "UISystem.h"
+#include "Interactable.h"
 
 namespace NCL {
 	namespace CSC8503 {
@@ -12,18 +13,32 @@ namespace NCL {
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 
-			enum PlayerSpeedState {
+			const enum PlayerSpeedState {
 				Default,
 				SpedUp,
 				SlowedDown,
 				Stunned
 			};
 
+			const enum AnnouncementType {
+				DefaultAnnouncement,
+				FlagAddedAnnouncement,
+				FlagDroppedAnnouncement,
+				CaughtByGuardAnnouncement
+			};
+
+			map<const AnnouncementType, const string> mAnnouncementTypeToStringMap{
+				{DefaultAnnouncement, "DefaultAnnouncementText"},
+				{FlagAddedAnnouncement,"The heist item was stolen by player : "},
+				{FlagDroppedAnnouncement,"The flag was dropped by player : "},
+				{CaughtByGuardAnnouncement,"A guard has caught player : "}
+			};
+
 			PlayerObject(GameWorld* world,
 				InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
 				SuspicionSystem::SuspicionSystemClass* suspicionSystemClassptr,
 				UISystem* UI, SoundObject* soundObject,
-				const std::string& objName = "",PrisonDoor* prisonDoorPtr = nullptr,
+				const std::string& objName = "",
 				int playerID = 0,int walkSpeed = 40, int sprintSpeed = 50, int crouchSpeed = 35, Vector3 offset = Vector3(0, 0, 0));
 			~PlayerObject();
 
@@ -41,18 +56,20 @@ namespace NCL {
 			virtual void UpdateObject(float dt);
 			virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
+			void UpdateGlobalUI(float dt);
+			void UpdateLocalUI(float dt);
 			void ShowDebugInfo(float dt);
 			void ChangeActiveSusCausesBasedOnState(const GameObjectState &previousState, const GameObjectState& currentState);
 
 			PlayerInventory::item GetEquippedItem();
-
-			void ClosePrisonDoor();
+			virtual void AddAnnouncement(AnnouncementType announcementType, float time, int playerNo) {
+				const std::string annString = mAnnouncementTypeToStringMap[announcementType] + std::to_string(playerNo) + '!';
+				mAnnouncementMap[annString] = time;
+			}
 
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}
-
-			void SetPrisonDoor(PrisonDoor* prisonDoor);
 
 		protected:
 			bool mIsCrouched;
@@ -70,7 +87,6 @@ namespace NCL {
 			int mPlayerPoints;
 
 			PlayerSpeedState mPlayerSpeedState;
-			PrisonDoor* mPrisonDoorPtr;
 
 			GameWorld* mGameWorld;
 			InventoryBuffSystem::InventoryBuffSystemClass* mInventoryBuffSystemClassPtr = nullptr;
@@ -78,7 +94,9 @@ namespace NCL {
 
 			virtual void MovePlayer(float dt);
 			
-			virtual void RayCastFromPlayer(GameWorld* world, float dt);
+			virtual bool GotRaycastInput(NCL::CSC8503::InteractType &interactType,const float dt);
+			virtual void RayCastFromPlayer(GameWorld* world,const NCL::CSC8503::InteractType& interactType,const float dt);
+			virtual void RayCastFromPlayerForUI(GameWorld* world,const float dt);
 
 			virtual void ControlInventory();
 
@@ -123,8 +141,8 @@ namespace NCL {
 			float mTransparencyLeft = 0.0;
 			float mTransparencyTop = 0.0;
 			float mTransparencyBot = 0.0;
-			
 
+			std::map<std::string , float> mAnnouncementMap;
 			bool	IsSeenByGameObject(GameObject* otherGameObject);
 		private:
 

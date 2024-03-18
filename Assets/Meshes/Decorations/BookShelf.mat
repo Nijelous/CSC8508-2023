@@ -3,28 +3,27 @@ MeshMat
 7
 21
 BookShelf
+2
+Diffuse:/BookShelf_Albedo.png
+Normal:/BookShelf_Normal.png
+Book01
 1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Bookshelf/BookShelf.png
-Book 01
+Diffuse:/book_01.png
+Book02
 1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Books/book_01.png
-Book 02
+Diffuse:/book_02.png
+Book03
 1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Books/book_02.png
-Book 03
+Diffuse:/book_03.png
+Book04
 1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Books/book_03.png
-Book 04
-1
-Diffuse:/danthaigames/DS Furniture Pack 01/Assets/Textures/Books/book_04.png
+Diffuse:/book_04.png
 Dracaena
-2
-Diffuse:/Free Furniture Set/Source/Textures/HomePlant7.png
-Bump:/Free Furniture Set/Source/Textures/HomePlant7_Normal.png
+1
+Diffuse:/HomePlant7.png
 BrownSmallPot
-2
-Diffuse:/Free Furniture Set/Source/Textures/Pot6_2_BaseColor.png
-Bump:/Free Furniture Set/Source/Textures/Pot6_2_Normal.png
+1
+Diffuse:/Pot6_2_BaseColor.png
 0
 1
 2

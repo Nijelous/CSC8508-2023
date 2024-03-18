@@ -11,22 +11,22 @@
 
 namespace NCL::CSC8503
 {
-	struct SyncPlayerIdNameMapPacket;
+    struct SyncPlayerIdNameMapPacket;
 }
 
 namespace NCL::CSC8503
 {
-	struct ClientInitPacket;
+    struct ClientInitPacket;
 }
 
 namespace NCL::CSC8503
 {
-	struct SyncObjectStatePacket;
+    struct SyncObjectStatePacket;
 }
 
 namespace NCL::CSC8503 {
-	struct SyncInteractablePacket;
-	struct ClientSyncItemSlotPacket;
+    struct SyncInteractablePacket;
+    struct ClientSyncItemSlotPacket;
 }
 
 namespace NCL{
@@ -45,6 +45,7 @@ namespace NCL{
         struct ClientSyncGlobalSusChangePacket;
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
+        struct AnnouncementSyncPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -83,6 +84,8 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
             void SendPacketsThread();
 
@@ -141,6 +144,8 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void HandleAnnouncementSync(AnnouncementSyncPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
