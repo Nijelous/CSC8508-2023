@@ -1,6 +1,5 @@
 struct ShaderConstants
 {
-	matrix shadowMatrix;
 	matrix orthoMatrix;
 
 	matrix viewProjMatrix;
@@ -11,11 +10,8 @@ struct ShaderConstants
 	matrix inverseViewMatrix;
 	matrix inverseProjMatrix;
 
-	float3 lightPosition;
-	float  lightRadius;
-	float4 lightColour;
 	float3 cameraPos;
-	uint32_t shadowID;
+	float2 pixelSize;
 };
 
 #ifndef __cplusplus 

@@ -47,9 +47,6 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	error = sce::Agc::Core::initialize(&arrayBuffer, &buffSpec);
 	bufferCount = 1; //We skip over index 0, makes some selection logic easier later
 
-
-	defaultTexture = (AGCTexture*)LoadTexture("doge.png");
-
 	skyboxTexture = (AGCTexture*)LoadTexture("Skybox.dds");
 
 	quadMesh = new AGCMesh();
@@ -96,10 +93,15 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	shadowMap = CreateFrameBufferTextureSlot("Shadowmap");
 
 	screenTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffAlbedoTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mGBuffNormalTarget.setSlot(1);
 	screenTex = CreateFrameBufferTextureSlot("Screen");
-
+	mGBuffAlbedoTex = CreateFrameBufferTextureSlot("albedoTex");
+	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
-
+	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	shadowSampler.init()
 		.setXyFilterMode(
 			sce::Agc::Core::Sampler::FilterMode::kPoint,	//magnification
@@ -187,7 +189,7 @@ void GameTechAGCRenderer::RenderFrame() {
 	//Step 5: Draw a skybox to our main scene render target
 	SkyboxPass();
 	//Step 6: Draw the scene to our main scene render target
-	MainRenderPass();
+	DeferredRenderingPass();
 	//Step 7: Draw the debug data to the main scene render target
 	UpdateDebugData();
 	RenderDebugLines();
@@ -204,9 +206,7 @@ This method builds a struct that
 */
 void GameTechAGCRenderer::WriteRenderPassConstants() {
 	ShaderConstants frameData;
-	frameData.lightColour = Vector4(0.8f, 0.8f, 0.5f, 1.0f);
-	frameData.lightRadius = 1000.0f;
-	frameData.lightPosition = Vector3(-100.0f, 60.0f, -100.0f);
+
 	frameData.cameraPos = gameWorld.GetMainCamera().GetPosition();
 
 	frameData.viewMatrix = gameWorld.GetMainCamera().BuildViewMatrix();
@@ -219,10 +219,7 @@ void GameTechAGCRenderer::WriteRenderPassConstants() {
 	frameData.inverseProjMatrix = frameData.projMatrix.Inverse();
 
 	frameData.orthoMatrix = Matrix4::Orthographic(0.0f, 100.0f, 100.0f, 0.0f, -1.0f, 1.0f);
-	frameData.shadowMatrix = Matrix4::Perspective(50.0f, 500.0f, 1.0f, 45.0f) *
-		Matrix4::BuildViewMatrix(frameData.lightPosition, Vector3(0, 0, 0), Vector3(0, 1, 0));
-
-	frameData.shadowID = shadowMap->GetAssetID();
+	frameData.pixelSize = Vector2(1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	currentFrame->data.WriteData<ShaderConstants>(frameData); //Let's start filling up our frame data!
 
@@ -398,9 +395,17 @@ void GameTechAGCRenderer::ShadowmapPass() {
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
 
 	sce::Agc::Core::translate(&bindlessTextures[shadowMap->GetAssetID()], &shadowTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
+	
 }
 
-void GameTechAGCRenderer::MainRenderPass() {
+void GameTechAGCRenderer::DeferredRenderingPass(){
+	FillGBuffer();
+	DrawLightVolumes();
+	CombineBuffers();
+}
+
+
+void GameTechAGCRenderer::FillGBuffer() {
 	frameContext->setShaders(nullptr, defaultVertexShader->GetAGCPointer(), defaultPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
 
 	sce::Agc::CxViewport viewPort;
@@ -410,10 +415,14 @@ void GameTechAGCRenderer::MainRenderPass() {
 	frameContext->m_sb.setState(backBuffers[currentSwap].renderTarget);
 
 	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
+	rtMask.setMask(1, 0xFF);
 	frameContext->m_sb.setState(rtMask);
-	frameContext->m_sb.setState(screenTarget);
-
+	frameContext->m_sb.setState(mGBuffAlbedoTarget);
+	
 	frameContext->m_sb.setState(depthTarget);
+
+	
+	frameContext->m_sb.setState(mGBuffNormalTarget);
 
 	sce::Agc::CxDepthStencilControl depthControl;
 	depthControl.init();
@@ -434,7 +443,24 @@ void GameTechAGCRenderer::MainRenderPass() {
 		.setSamplers(0, 1, &defaultSampler)
 		.setSamplers(1, 1, &shadowSampler);
 	DrawObjects();
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 }
+
+void GameTechAGCRenderer::DrawLightVolumes() {
+	//set clear colour to black, and clear frame
+	//set blend function to on for all channels
+	//for each light, draw a sphere
+}
+
+void GameTechAGCRenderer::CombineBuffers() {
+	
+}
+
+
 
 void GameTechAGCRenderer::UpdateDebugData() {
 	const std::vector<NCL::Debug::DebugStringEntry>& strings = NCL::Debug::GetDebugStrings();
@@ -629,8 +655,9 @@ void GameTechAGCRenderer::FillLightUBO() {
 
 	LightData lightData;
 	vector<LightData> allData;
-	lightData.lightCount = mLights.size();
+
 	uint32_t bufferID = SKINNED_MESH_COUNT;
+	int index = 0;
 	for (Light* l : mLights) {
 		lightData.lightColour = l->GetColour();
 		Light::Type type = l->GetType();
@@ -641,6 +668,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			lightData.lightDirection = dl->GetDirection();
 			lightData.lightPos = dl->GetCentre();
 			lightData.lightRadius = dl->GetRadius();
+			lightData.lightType = 'd';
 		}
 		break;
 		case Light::Point:
@@ -648,6 +676,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			PointLight* pl = static_cast<PointLight*>(l);			
 			lightData.lightPos = pl->GetPosition();
 			lightData.lightRadius = pl->GetRadius();
+			lightData.lightType = 'p';
 		}
 		break;
 		case Light::Spot:
@@ -658,6 +687,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			lightData.dimDotProd = sl->GetDimProdMin();
 			lightData.minDotProd = sl->GetDotProdMin();
 			lightData.lightRadius = sl->GetRadius();
+			lightData.lightType = 's';
 		}
 		break;
 		default:
