@@ -90,6 +90,7 @@ namespace NCL {
             float mPointTimer;
 
             BehaviourAction* Patrol();
+            BehaviourAction* CheckSusLocation();
             BehaviourAction* PointAtPlayer();
             BehaviourAction* ChasePlayerSetup();
             BehaviourAction* GoToLastKnownLocation();
