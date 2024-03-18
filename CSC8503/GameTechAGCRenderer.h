@@ -55,7 +55,10 @@ namespace NCL {
 
 			void ShadowmapPass();
 			void SkyboxPass();
-			void MainRenderPass();
+			void DeferredRenderingPass();
+			void FillGBuffer();
+			void DrawLightVolumes();
+			void CombineBuffers();
 
 			void DisplayRenderPass();
 

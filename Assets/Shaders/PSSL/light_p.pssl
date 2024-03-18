@@ -1,0 +1,24 @@
+#include "ShaderConstants.psslh"
+#include "LightData.psslh"
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	uint LightID		: TEXCOORD0;
+};
+
+SamplerState sampler			: register(s0);
+
+RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
+
+out float4 albedoLight;
+out float4 specularLight;
+
+[CxxSymbol("TestShader::ps")]
+void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+{
+	float fragX = (vertex.Position.x + 1) / 2;
+	float fragY = (vertex.Position.y + 1) / 2;
+	float2 fragCoord = float2(fragX, fragY) * Constants.pixelSize;
+
+}

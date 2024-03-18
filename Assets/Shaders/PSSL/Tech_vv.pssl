@@ -21,7 +21,7 @@ struct VS_OUTPUT
 VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instanceID : S_INSTANCE_ID)
 {
 	VS_OUTPUT Output;
-
+	
 	uint id = objID + instanceID;
 
 	ObjectState s = objects[id];

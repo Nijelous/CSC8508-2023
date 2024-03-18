@@ -11,6 +11,7 @@ struct ShaderConstants
 	matrix inverseProjMatrix;
 
 	float3 cameraPos;
+	float2 pixelSize;
 };
 
 #ifndef __cplusplus 

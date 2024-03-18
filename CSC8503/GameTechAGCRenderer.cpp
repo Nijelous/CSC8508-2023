@@ -181,7 +181,7 @@ void GameTechAGCRenderer::RenderFrame() {
 	//Step 5: Draw a skybox to our main scene render target
 	SkyboxPass();
 	//Step 6: Draw the scene to our main scene render target
-	MainRenderPass();
+	DeferredRenderingPass();
 	//Step 7: Draw the debug data to the main scene render target
 	UpdateDebugData();
 	RenderDebugLines();
@@ -211,6 +211,7 @@ void GameTechAGCRenderer::WriteRenderPassConstants() {
 	frameData.inverseProjMatrix = frameData.projMatrix.Inverse();
 
 	frameData.orthoMatrix = Matrix4::Orthographic(0.0f, 100.0f, 100.0f, 0.0f, -1.0f, 1.0f);
+	frameData.pixelSize = Vector2(1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
 	currentFrame->data.WriteData<ShaderConstants>(frameData); //Let's start filling up our frame data!
 
@@ -384,7 +385,14 @@ void GameTechAGCRenderer::ShadowmapPass() {
 	
 }
 
-void GameTechAGCRenderer::MainRenderPass() {
+void GameTechAGCRenderer::DeferredRenderingPass(){
+	FillGBuffer();
+	DrawLightVolumes();
+	CombineBuffers();
+}
+
+
+void GameTechAGCRenderer::FillGBuffer() {
 	frameContext->setShaders(nullptr, defaultVertexShader->GetAGCPointer(), defaultPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
 
 	sce::Agc::CxViewport viewPort;
@@ -428,6 +436,18 @@ void GameTechAGCRenderer::MainRenderPass() {
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 }
+
+void GameTechAGCRenderer::DrawLightVolumes() {
+	//set clear colour to black, and clear frame
+	//set blend function to on for all channels
+	//for each light, draw a sphere
+}
+
+void GameTechAGCRenderer::CombineBuffers() {
+	
+}
+
+
 
 void GameTechAGCRenderer::UpdateDebugData() {
 	const std::vector<NCL::Debug::DebugStringEntry>& strings = NCL::Debug::GetDebugStrings();
@@ -621,8 +641,9 @@ void GameTechAGCRenderer::FillLightUBO() {
 
 	LightData lightData;
 	vector<LightData> allData;
-	lightData.lightCount = mLights.size();
+
 	uint32_t bufferID = SKINNED_MESH_COUNT;
+	int index = 0;
 	for (Light* l : mLights) {
 		lightData.lightColour = l->GetColour();
 		Light::Type type = l->GetType();
@@ -633,6 +654,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			lightData.lightDirection = dl->GetDirection();
 			lightData.lightPos = dl->GetCentre();
 			lightData.lightRadius = dl->GetRadius();
+			lightData.lightType = 'd';
 		}
 		break;
 		case Light::Point:
@@ -640,6 +662,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			PointLight* pl = static_cast<PointLight*>(l);			
 			lightData.lightPos = pl->GetPosition();
 			lightData.lightRadius = pl->GetRadius();
+			lightData.lightType = 'p';
 		}
 		break;
 		case Light::Spot:
@@ -650,6 +673,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			lightData.dimDotProd = sl->GetDimProdMin();
 			lightData.minDotProd = sl->GetDotProdMin();
 			lightData.lightRadius = sl->GetRadius();
+			lightData.lightType = 's';
 		}
 		break;
 		default:

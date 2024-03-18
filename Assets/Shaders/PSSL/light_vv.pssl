@@ -1,0 +1,26 @@
+#include "ShaderConstants.psslh"
+#include "VertexAttributes.psslh"
+#include "Skinning.psslh"
+#include "TechObject.psslh"
+#include "Bindless.psslh"
+#include "Vertex.psslh"
+#include "LightData.psslh"
+
+struct VS_OUTPUT
+{
+	float4 Position	: S_POSITION;
+	uint LightID	: TEXCOORD0;
+};
+
+[CxxSymbol("TestShader::gs")]
+VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA)
+{
+	
+	VS_OUTPUT Output;
+	RegularBuffer<LightData> lightBuffer = bindlessBuffers[128];
+	float3 scale = float3(lightBuffer[objID].lightRadius,lightBuffer[objID].lightRadius,lightBuffer[objID].lightRadius);
+	float3 worldPos = (Positions[vertID] * scale) + lightBuffer[objID].lightPos; 
+	Output.Position[objID] = mul(mul(Constants.projMatrix, Constants.viewMatrix),float4(worldPos,1.0));
+	Output.LightID = objID;
+	return Output;
+}
