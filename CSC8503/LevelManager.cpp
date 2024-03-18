@@ -266,7 +266,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 		}
 	}
 
-	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer);
+	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer,seed);
 	LoadCCTVs(seed,isMultiplayer);
 
 #endif
@@ -720,7 +720,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed);
 			continue;
 		}
 		if (!isMultiplayer) {
