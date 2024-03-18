@@ -716,7 +716,9 @@ void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePack
 }
 
 void DebugNetworkedGame::HandleMultiplayerSound(SoundPacket* packet) const {
-	mLevelManager->GetSoundManager()->UpdateMultiplayerSound(packet->isPlay);
+	if (packet->playerId == mLocalPlayerId) {
+		mLevelManager->GetSoundManager()->UpdateMultiplayerSound(packet->isPlay);
+	}
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {
