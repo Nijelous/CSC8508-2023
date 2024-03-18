@@ -6,6 +6,9 @@
 #include "../CSC8503/SceneManager.h"
 
 using namespace NCL::CSC8503;
+namespace {
+	const float MIN_PLAYER_DIST = 150;
+}
 
 void CCTV::DrawDebugLines(const bool canSeePlayer){
 	Vector4 DebugColour;
@@ -38,29 +41,31 @@ Vector3 CCTV::GetBase(float angle){
 		* Vector3(1,0,1) + Vector3(0,-4.5,0);
 }
 
+const void CCTV::UpdateForPlayerObject(PlayerObject* playerObjectPtr, const float dt){
+	if ((playerObjectPtr->GetTransform().GetPosition() -
+		GetTransform().GetPosition()).Length() > MIN_PLAYER_DIST)
+		return;
+	
+	if (CanSeePlayer(playerObjectPtr))
+		OnPlayerSeen(playerObjectPtr);
+	else {
+		OnPlayerNotSeen(playerObjectPtr);
+		rotateAngle += dt;
+		GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0,initAngle + 45 * cos(rotateAngle), 0));
+		GenerateViewPyramid();
+	}
+}
+
 void CCTV::UpdateObject(float dt) {
 	//if SinglePlayer
 	if (mPlayerObject){
-		if (CanSeePlayer(mPlayerObject))
-			OnPlayerSeen(mPlayerObject);
-		else{
-			OnPlayerNotSeen(mPlayerObject);
-			rotateAngle += dt;
-			GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, 45 * cos(rotateAngle), 0));
-			GenerateViewPyramid();
-		}
+		UpdateForPlayerObject(mPlayerObject,dt);
 	}
 	//if Multiplayer
 	else{
 		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		if (CanSeePlayer(game->GetLocalPlayer()))
-			OnPlayerSeen(game->GetLocalPlayer());
-		else{
-			OnPlayerNotSeen(game->GetLocalPlayer());
-			rotateAngle += dt;
-			GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(0, 45 * cos(rotateAngle), 0));
-			GenerateViewPyramid();
-		}
+		if(game->GetLocalPlayer() !=nullptr)
+			UpdateForPlayerObject(game->GetLocalPlayer(), dt);
 	}
 }
 
