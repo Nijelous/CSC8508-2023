@@ -490,8 +490,6 @@ void LevelManager::FixedUpdate(float dt){
 }
 
 void LevelManager::InitialiseAssets() {
-	//Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	//mRenderer->Render();
 	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
@@ -525,15 +523,11 @@ void LevelManager::InitialiseAssets() {
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
-				//Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				//mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
-				//Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				//mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -550,8 +544,6 @@ void LevelManager::InitialiseAssets() {
 	delete[] assetDetails;
 
 	animLoadThread.join();
-	//Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	//mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
