@@ -73,7 +73,7 @@ namespace NCL {
 			Level* GetActiveLevel() const { return mLevelList[mActiveLevel]; }
 
 			Vector3 GetPlayerStartPosition(int player) const { return (*mLevelList[mActiveLevel]).GetPlayerStartTransform(player).GetPosition(); }
-			void LoadLevel(int levelID, int playerID,  bool isMultiplayer = false);
+			void LoadLevel(int levelID, std::mt19937 seed, int playerID,  bool isMultiplayer = false);
 			PlayerObject* GetTempPlayer() { return mTempPlayer; }
 
 			void SetTempPlayer(PlayerObject* playerObject) { mTempPlayer = playerObject; }
@@ -96,12 +96,6 @@ namespace NCL {
 			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
-
-			const std::vector<Matrix4>& GetLevelFloorMatrices() { return mLevelFloorMatrices; }
-
-			const std::vector<Matrix4>& GetLevelWallMatrices() { return mLevelWallMatrices; }
-
-			const std::vector<Matrix4>& GetLevelCornerWallMatrices() { return mLevelCornerWallMatrices; }
 
 			virtual void Update(float dt, bool isUpdatingObjects, bool isPaused);
 
@@ -162,9 +156,9 @@ namespace NCL {
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation = 0);
 
-			void LoadGuards(int guardCount, bool isInMultiplayer);
+			void LoadGuards(int guardCount, bool isInMultiplayer, std::mt19937 seed);
 
-			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer);
+			void LoadItems(const std::vector<Vector3>& itemPositions, const std::vector<Vector3>& roomItemPositions, const bool& isMultiplayer, std::mt19937 seed);
 
 			void LoadVents(const std::vector<Vent*>& vents, const std::vector<int> ventConnections, bool isMultiplayerLevel = false);
 
@@ -172,7 +166,9 @@ namespace NCL {
 
 			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
 
-			void LoadCCTVs();
+			void LoadDecorations(const std::unordered_map<DecorationType, std::vector<Transform>>& decorationMap, const Vector3& startPosition, int rotation = 0);
+
+			void LoadCCTVs(std::mt19937 seed);
 
 			void LoadDoorsInNavGrid();
 
@@ -189,7 +185,8 @@ namespace NCL {
 			InteractableDoor* AddDoorToWorld(const Transform& transform, const Vector3& offset, bool isMultiplayerLevel = false);
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
 
-			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr);
+			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
+				std::mt19937 seed);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
@@ -201,15 +198,13 @@ namespace NCL {
 
 			SoundEmitter* AddSoundEmitterToWorld(const Vector3& position, LocationBasedSuspicion* locationBasedSuspicionPTR);
 
+			GameObject* AddDecorationToWorld(const Transform& transform, const std::string& meshName);
+
 			std::vector<Level*> mLevelList;
 			std::vector<Room*> mRoomList;
 			std::vector<GameObject*> mLevelLayout;
-			std::vector<Matrix4> mLevelFloorMatrices;
-			std::vector<Matrix4> mLevelWallMatrices;
-			std::vector<Matrix4> mLevelCornerWallMatrices;
-			GameObject* mBaseFloor;
-			GameObject* mBaseWall;
-			GameObject* mBaseCornerWall;
+			std::unordered_map<std::string, std::vector<Matrix4>> mInstanceMatrices;
+			std::unordered_map<std::string, GameObject*> mBaseObjects;
 
 			RecastBuilder* mBuilder;
 
@@ -236,20 +231,13 @@ namespace NCL {
 			std::unordered_map<std::string, Shader*> mShaders;
 			std::unordered_map<std::string, MeshMaterial*> mMaterials;
 			std::unordered_map<std::string, MeshAnimation*> mAnimations;
+			std::unordered_map<std::string, vector<int>> mMeshMaterials;
 
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
 
 			FlagGameObject* mMainFlag;
-
-#ifdef USEGL
-			vector<GLuint>  mGuardTextures;
-			vector<GLuint> mPlayerTextures;
-#endif
-#ifdef USEPROSPERO
-			// PSSL textures
-#endif
 
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
@@ -278,6 +266,7 @@ namespace NCL {
 
 			bool mIsLevelInitialised;
 			bool mShowDebug = false;
+			bool mShowVolumes = false;
 
 			ULARGE_INTEGER mLastCPU, mLastSysCPU, mLastUserCPU;
 			int mNumProcessors;

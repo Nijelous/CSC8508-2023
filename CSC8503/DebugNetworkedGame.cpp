@@ -516,7 +516,9 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetPhysics()->Clear();
 
 	//TODO(erendgrmc): Second parameter is redundant remove it from func.
-	mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
+	std::random_device rd;
+	std::mt19937 g(rd());
+	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
 
 	SpawnPlayers();
 

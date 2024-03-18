@@ -13,6 +13,22 @@ namespace NCL {
 			LShape,
 			INVALID
 		};
+		enum DecorationType {
+			Desk,
+			Painting,
+			PlantTall,
+			PlantPot,
+			Bookshelf,
+			Bed,
+			Chair,
+			CeilingLight,
+			TV,
+			Table,
+			TableSmall,
+			Shelf,
+			Sofa,
+			PoolTable
+		};
 
 		class LevelEnums {
 
