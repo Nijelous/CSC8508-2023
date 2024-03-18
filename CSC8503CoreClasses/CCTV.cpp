@@ -64,8 +64,8 @@ void CCTV::UpdateObject(float dt) {
 	//if Multiplayer
 	else{
 		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		const auto localPlayer = game->GetLocalPlayer();
-		UpdateForPlayerObject(mPlayerObject, dt);
+		if(game->GetLocalPlayer() !=nullptr)
+			UpdateForPlayerObject(game->GetLocalPlayer(), dt);
 	}
 }
 
