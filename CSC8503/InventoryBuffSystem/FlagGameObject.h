@@ -27,7 +27,7 @@ namespace NCL {
             void SetPoints(int points) {
                 mPoints = points;
             }
-            
+            const bool IsMultiplayerAndIsNotServer();
         protected:
             void UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) override;
 

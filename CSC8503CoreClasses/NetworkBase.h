@@ -33,6 +33,7 @@ enum BasicNetworkMessages {
 	SyncObjectState,
 	ClientInit,
 	SyncPlayerIdNameMap,
+	SyncAnnouncements
 	Sound
 };
 

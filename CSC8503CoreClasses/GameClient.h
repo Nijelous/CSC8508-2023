@@ -32,6 +32,8 @@ namespace NCL {
 			void Disconnect();
 
 			bool GetIsConnected() const;
+
+			void WriteAndSendAnnouncementSyncPacket(int annType, float time, int playerNo);
 		protected:
 			bool mIsConnected;
 

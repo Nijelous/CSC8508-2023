@@ -11,22 +11,22 @@
 
 namespace NCL::CSC8503
 {
-	struct SyncPlayerIdNameMapPacket;
+    struct SyncPlayerIdNameMapPacket;
 }
 
 namespace NCL::CSC8503
 {
-	struct ClientInitPacket;
+    struct ClientInitPacket;
 }
 
 namespace NCL::CSC8503
 {
-	struct SyncObjectStatePacket;
+    struct SyncObjectStatePacket;
 }
 
 namespace NCL::CSC8503 {
-	struct SyncInteractablePacket;
-	struct ClientSyncItemSlotPacket;
+    struct SyncInteractablePacket;
+    struct ClientSyncItemSlotPacket;
 }
 
 namespace NCL{
@@ -45,6 +45,7 @@ namespace NCL{
         struct ClientSyncGlobalSusChangePacket;
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
+        struct AnnouncementSyncPacket;
         struct SoundPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
@@ -66,7 +67,7 @@ namespace NCL{
 
             void SetIsGameStarted(bool isGameStarted);
             void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
-            void StartLevel();
+            void StartLevel(const std::mt19937& levelSeed);
 
             void AddEventOnGameStarts(std::function<void()> event);
 
@@ -84,6 +85,8 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
             void SendSoundStatePacket(int playerId) const;
 
@@ -108,10 +111,10 @@ namespace NCL{
             void UpdateMinimumState();
             int GetPlayerPeerID(int peerId = -2);
 
-            void SendStartGameStatusPacket();
+            void SendStartGameStatusPacket(std::mt19937* levelSeed = nullptr);
             void SendFinishGameStatusPacket();
             
-            void InitWorld() override;
+            void InitWorld(const std::mt19937& levelSeed);
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
@@ -144,6 +147,8 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
 
             void HandleMultiplayerSound(SoundPacket* packet) const;
 

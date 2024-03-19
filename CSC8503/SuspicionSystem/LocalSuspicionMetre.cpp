@@ -3,6 +3,8 @@
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 
+#include "../LevelManager.h"
+
 using namespace SuspicionSystem;
 
 void LocalSuspicionMetre::Init(){
@@ -11,11 +13,15 @@ void LocalSuspicionMetre::Init(){
         mPlayerMeters[i] = 0;
         mRecoveryCooldowns[i] = DT_UNTIL_LOCAL_RECOVERY;
         mActiveLocalSusCauseVector[i].clear();
+        mActiveLocalSusCausesToRemove[i].clear();
     }
 }
 
 void LocalSuspicionMetre::AddInstantLocalSusCause(const instantLocalSusCause &inCause, const int &playerNo){
-    ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause]);
+    const float guardDist = LevelManager::GetLevelManager()->GetNearestGuardToPlayerDistance(playerNo);
+    const float guardDistPerc = GetPercentageBasedOnDistance(guardDist);
+
+    ChangePlayerLocalSusMetre(playerNo, mInstantLocalSusCauseSeverityMap[inCause] * guardDistPerc);
     HandleLocalSusChangeNetworking(mPlayerMeters[playerNo], playerNo);
 };
 
@@ -39,6 +45,24 @@ void LocalSuspicionMetre::RemoveActiveLocalSusCause(const activeLocalSusCause &i
         mActiveLocalSusCausesToRemove[playerNo].push_back(inCause);
         HandleActiveSusCauseNetworking(inCause, playerNo, false);
     }
+}
+
+double SuspicionSystem::LocalSuspicionMetre::GetPercentageBasedOnDistance(const float distance, const float minVal, const float minDist, const float maxDist){
+    float outVal;
+    if (distance < minDist)
+        return 1;
+
+    if (distance > maxDist)
+        return minVal / 100;
+
+    outVal = (std::pow((maxDist - distance) / (maxDist - minDist),2)
+              * (100 - minVal)) + minVal;
+
+    outVal = std::clamp(outVal,
+                    minVal,
+                    100.0f);
+
+    return outVal / 100;
 }
 
 void LocalSuspicionMetre::HandleActiveSusCauseNetworking(const activeLocalSusCause& inCause, const int& playerNo, const bool& toApply){
@@ -88,8 +112,11 @@ void LocalSuspicionMetre::Update(float dt) {
             mActiveLocalSusCauseVector[playerNo].size() > 0) {
             const float unChangedSusValue = mPlayerMeters[playerNo];
 
+            const float guardDist = LevelManager::GetLevelManager()->GetNearestGuardToPlayerDistance(playerNo);
+            const float guardDistPerc = GetPercentageBasedOnDistance(guardDist);
+
             for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo]) {
-                ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause] * dt);
+                ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause] * dt * guardDistPerc);
             }
 
             if (mPlayerMeters[playerNo] <= unChangedSusValue){
