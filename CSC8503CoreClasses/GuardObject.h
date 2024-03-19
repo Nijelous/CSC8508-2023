@@ -1,3 +1,6 @@
+//Created by Oliver Perrin
+//Edited by Eren Degirmenci 
+
 #pragma once
 #include "GameObject.h"
 #include "BehaviourSequence.h"
@@ -16,6 +19,7 @@ namespace NCL {
         constexpr float FUMBLE_KEYS_TIME = 0.15;
         constexpr float RAYCAST_INTERVAL = 0.1;
         constexpr float POINTING_TIMER = 2;
+        constexpr int HIGH_SUSPICION = 70;
         class GuardObject : public GameObject {
         public:
             GuardObject(const std::string& name = "");
@@ -40,8 +44,6 @@ namespace NCL {
             void AddPlayer(PlayerObject* player){
                 mPlayerList.push_back(player);
             }
-
-            bool IsPlayerObject(GameObject& sightedObject);
 
         protected:
             void RaycastToPlayer();
@@ -76,6 +78,8 @@ namespace NCL {
             bool CheckPolyDistance();
             void GuardSpeedMultiplier();
             int AngleValue(float minAng);
+            Vector3 GetLocationMapSuspicion();
+            bool IsHighEnoughLocationSus();
 
             void CheckForDoors(float dt);
             void OpenDoor();
@@ -101,7 +105,7 @@ namespace NCL {
             BehaviourState mState = Ongoing;
 
             std::map<PlayerBuffs::buff, float> mAppliedBuffs;
-
+            std::vector<Vector3> mHighSusLocations;
         };
     }
 }

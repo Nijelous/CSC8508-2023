@@ -323,6 +323,26 @@ void GuardObject::OpenDoor() {
 	}
 }
 
+bool GuardObject::IsHighEnoughLocationSus() {
+	int searchedVal = 70;
+	mHighSusLocations.clear();
+	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->empty() == true) { return false; }
+
+	for (auto it = LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->begin();
+		it != LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->end(); it++) {
+		if ((*it).second >= HIGH_SUSPICION) {
+			mHighSusLocations.push_back((*it).first);
+		}
+	}
+
+	if (mHighSusLocations.empty() != true) { return true; }
+	else { return false; }
+}
+
+Vector3 GuardObject::GetLocationMapSuspicion() {
+	
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -383,8 +403,8 @@ BehaviourAction* GuardObject::Patrol() {
 			else if (mCanSeePlayer == true) {
 				return Failure;
 			}
-			else if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()){
-
+			else if (IsHighEnoughLocationSus() == true) {
+				return Failure;
 			}
 		}
 		return state;
@@ -404,7 +424,9 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 				return Failure;
 			}
 			else {
-				cout << "Big butty";
+				if () {
+					cout << "Big butty";
+				}
 			}
 		}
 		return state;
