@@ -64,13 +64,25 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 
 	mResult = mSystem->createSound("../Assets/Sounds/heater-vent-hit-higher-part-103305.mp3", FMOD_3D, 0, &mVentSound);
 	if (mResult != FMOD_OK) {
-		std::cout << "!! Create Alarm Sound Error !!" << std::endl;
+		std::cout << "!! Create Vent Sound Error !!" << std::endl;
 		return;
 	}
 
 	mResult = mSystem->createSound("../Assets/Sounds/warning-sound-6686.mp3", FMOD_2D, 0, &mSpottedSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create Spotted Sound Error !!" << std::endl;
+		return;
+	}
+
+	mResult = mSystem->createSound("../Assets/Sounds/warning-sound-6686.mp3", FMOD_2D | FMOD_LOOP_NORMAL, 0, &mCCTVSpotSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create CCTV Spotted Sound Error !!" << std::endl;
+		return;
+	}
+
+	mResult = mSystem->createSound("../Assets/Sounds/Metal-Pipe-Hit-Drop-A1-www.fesliyanstudios.com.mp3", FMOD_3D, 0, &mUnlockVentSound);
+	if (mResult != FMOD_OK) {
+		std::cout << "!! Create Unlock Vent Sound Error !!" << std::endl;
 		return;
 	}
 
@@ -121,9 +133,15 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
 	}
+
+	mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &mCCTVSpotChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play CCTV Spot sound error" << std::endl;
+	}
 }
 
 SoundManager::~SoundManager() {
+	mCCTVSpotChannel->stop();
 	mDoorOpenSound->release();
 	mDoorCloseSound->release();
 	mFootStepSound->release();
@@ -133,6 +151,8 @@ SoundManager::~SoundManager() {
 	mAlarmSound->release();
 	mVentSound->release();
 	mSpottedSound->release();
+	mCCTVSpotSound->release();
+	mUnlockVentSound->release();
 	mSystem->close();
 	mSystem->release();
 }
@@ -272,6 +292,27 @@ void SoundManager::PlayVentSound(Vector3 soundPos) {
 	channel->setPaused(false);
 }
 
+void SoundManager::PlayUnlockVentSound(Vector3 soundPos) {
+	Channel* channel = nullptr;
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	mResult = mSystem->playSound(mUnlockVentSound, 0, true, &channel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Unlock Vent Sound error" << std::endl;
+		return;
+	}
+	mResult = channel->setVolume(2.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Unlock Vent Sound Volume setting error" << std::endl;
+		return;
+	}
+	mResult = channel->set3DAttributes(&pos, nullptr);
+	if (mResult != FMOD_OK) {
+		std::cout << "Unlock Vent Sound position setting error" << std::endl;
+		return;
+	}
+	channel->setPaused(false);
+}
+
 void SoundManager::PlaySpottedSound() {
 	std::cout<<"Spotted" << std::endl;
 	Channel* channel;
@@ -281,6 +322,10 @@ void SoundManager::PlaySpottedSound() {
 		return;
 	}
 	mSystem->update();
+}
+
+void SoundManager::PlayCCTVSpotSound(bool isPlay) {
+	mCCTVSpotChannel->setPaused(isPlay);
 }
 
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
@@ -312,6 +357,8 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				PlaySpottedSound();
 				obj->GetSoundObject()->SetNotTriggered();
 			}
+			bool isClose = obj->GetSoundObject()->GetIsClosed();
+			PlayCCTVSpotSound(isClose);
 		}
 		else if (obj->GetName() == "Guard") {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
@@ -336,14 +383,20 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				obj->GetSoundObject()->SetNotTriggered();
 			}
 			bool isClose = obj->GetSoundObject()->GetIsClosed();
-			if (isClose && obj->GetName() == "InteractableDoor") {
+			if (isClose && (obj->GetName() == "InteractableDoor")) {
 				PlayDoorCloseSound(soundPos);
 				obj->GetSoundObject()->CloseDoorFinished();
 			}
 			bool isLocked = obj->GetSoundObject()->GetIsLocked();
-			if (isLocked && obj->GetName() == "InteractableDoor") {
-				PlayLockDoorSound(soundPos);
-				obj->GetSoundObject()->LockDoorFinished();
+			if (isLocked) {
+				if (obj->GetName() == "InteractableDoor") {
+					PlayLockDoorSound(soundPos);
+					obj->GetSoundObject()->LockDoorFinished();
+				}
+				if (obj->GetName() == "Vent") {
+					PlayUnlockVentSound(soundPos);
+					obj->GetSoundObject()->LockDoorFinished();
+				}
 			}
 		}
 	}

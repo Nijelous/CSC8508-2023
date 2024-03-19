@@ -28,6 +28,8 @@ namespace NCL{
 
 			void PlayVentSound(Vector3 soundpos);
 
+			void PlayUnlockVentSound(Vector3 soundPos);
+
 			void PlaySound(Vector3 soundPos, FMOD::Sound* sound);
 
 			void UpdateSounds(vector<GameObject*> object);
@@ -35,6 +37,8 @@ namespace NCL{
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
 
 			void PlaySpottedSound();
+
+			void PlayCCTVSpotSound(bool isPlay);
 
 			void UpdateListenerAttributes();
 
@@ -54,6 +58,9 @@ namespace NCL{
 			FMOD::Sound* mAlarmSound = nullptr;
 			FMOD::Sound* mVentSound = nullptr;
 			FMOD::Sound* mSpottedSound = nullptr;
+			FMOD::Sound* mUnlockVentSound = nullptr;
+			FMOD::Sound* mCCTVSpotSound = nullptr;
+			FMOD::Channel* mCCTVSpotChannel = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

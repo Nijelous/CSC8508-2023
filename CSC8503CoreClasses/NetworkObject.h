@@ -173,10 +173,17 @@ namespace NCL::CSC8503 {
 		SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap);
 	};
 
-	struct SoundPacket : public GamePacket {
+	struct GuardSpotSoundPacket : public GamePacket {
 		int playerId;
 
-		SoundPacket(const int playerId);
+		GuardSpotSoundPacket(const int playerId);
+	};
+
+	struct CCTVSpotSoundPacket : public GamePacket {
+		int playerId;
+		bool isPlay;
+
+		CCTVSpotSoundPacket(const int playerId, bool isPlay);
 	};
 
 	class NetworkObject {

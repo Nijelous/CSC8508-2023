@@ -416,7 +416,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 					if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 						DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 						if (mPlayer) {
-							game->SendSoundStatePacket(mPlayer->GetPlayerID());
+							game->SendGuardSpotSoundPacket(mPlayer->GetPlayerID());
 						}
 					}
 					else {

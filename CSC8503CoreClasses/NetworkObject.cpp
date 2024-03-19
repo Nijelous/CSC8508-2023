@@ -188,10 +188,17 @@ AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int play
 	this->playerNo = playerNo;
 }
 
-SoundPacket::SoundPacket(const int playerId) {
-	type = BasicNetworkMessages::Sound;
-	size = sizeof(SoundPacket);
+GuardSpotSoundPacket::GuardSpotSoundPacket(const int playerId) {
+	type = BasicNetworkMessages::GuardSpotSound;
+	size = sizeof(GuardSpotSoundPacket);
 	this->playerId = playerId;
+}
+
+CCTVSpotSoundPacket::CCTVSpotSoundPacket(const int playerId, bool isPlay) {
+	type = BasicNetworkMessages::CCTVSpotSound;
+	size = sizeof(CCTVSpotSoundPacket);
+	this->playerId = playerId;
+	this->isPlay = isPlay;
 }
 
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
