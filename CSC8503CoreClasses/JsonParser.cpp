@@ -5,10 +5,11 @@
 #include "Door.h"
 #include "PrisonDoor.h"
 #include "Vent.h"
+#include "InteractableDoor.h"
 
 using namespace NCL::CSC8503;
 
-constexpr ParserVariables LEVEL_VARIABLES[16] = {
+constexpr ParserVariables LEVEL_VARIABLES[17] = {
 	TileMap,
 	RoomList,
 	GuardCount,
@@ -24,10 +25,11 @@ constexpr ParserVariables LEVEL_VARIABLES[16] = {
 	Vents,
 	Helipad,
 	PrisonDoorPos,
-	Doors
+	Doors,
+	DecorationTransforms
 };
 
-constexpr ParserVariables ROOM_VARIABLES[8] = {
+constexpr ParserVariables ROOM_VARIABLES[9] = {
 	SetRoomType,
 	RoomDoorPos,
 	TileMap,
@@ -35,7 +37,8 @@ constexpr ParserVariables ROOM_VARIABLES[8] = {
 	Pointlight,
 	Spotlight,
 	ItemPositions,
-	Doors
+	Doors,
+	DecorationTransforms
 };
 
 JsonParser::JsonParser() {
@@ -57,6 +60,7 @@ JsonParser::JsonParser() {
 	mVariableWriteMap[Helipad] = std::bind(&JsonParser::WriteHelipad, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	mVariableWriteMap[Doors] = std::bind(&JsonParser::WriteDoors, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	mVariableWriteMap[PrisonDoorPos] = std::bind(&JsonParser::WritePrisonDoorPos, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	mVariableWriteMap[DecorationTransforms] = std::bind(&JsonParser::WriteDecorationTransforms, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 }
 
 void JsonParser::ParseJson(std::string JSON, Level* level, Room* room) {
@@ -240,7 +244,7 @@ void JsonParser::WriteHelipad(std::vector<std::unordered_map<std::string, float>
 
 void JsonParser::WriteDoors(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room) {
 	if (keyValuePairs.size() == 1) return;
-	Door* door = new Door();
+	InteractableDoor* door = new InteractableDoor();
 	door->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
 	if (level) level->mDoors.push_back(door);
@@ -252,4 +256,24 @@ void JsonParser::WritePrisonDoorPos(std::vector<std::unordered_map<std::string, 
 	pDoor->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
 		.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
 	level->mPrisonDoor = pDoor;
+}
+
+void JsonParser::WriteDecorationTransforms(std::vector<std::unordered_map<std::string, float>>& keyValuePairs, Level* level, Room* room) {
+	if (keyValuePairs.size() == 1) return;
+	Transform value = Transform();
+	value.SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
+		.SetOrientation(Quaternion(keyValuePairs[3]["x"], keyValuePairs[3]["w"], keyValuePairs[3]["z"], keyValuePairs[3]["y"]));
+	DecorationType key = (DecorationType)keyValuePairs[1]["type"];
+	if (level) {
+		if (level->mDecorationMap.find(key) == level->mDecorationMap.end()) {
+			level->mDecorationMap[key] = std::vector<Transform>();
+		}
+		level->mDecorationMap[key].push_back(value);
+	}
+	else {
+		if (room->mDecorationMap.find(key) == room->mDecorationMap.end()) {
+			room->mDecorationMap[key] = std::vector<Transform>();
+		}
+		room->mDecorationMap[key].push_back(value);
+	}
 }

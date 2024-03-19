@@ -28,6 +28,7 @@ namespace NCL {
 			Vector3 GetHelipadPosition() const { return mHelipadPosition; }
 			std::vector<Door*> GetDoors() const { return mDoors; }
 			PrisonDoor* GetPrisonDoor() const { return mPrisonDoor; }
+			const std::unordered_map<DecorationType, std::vector<Transform>>& GetDecorationMap() { return mDecorationMap; }
 
 			friend class JsonParser;
 		protected:
@@ -47,6 +48,7 @@ namespace NCL {
 			Vector3 mHelipadPosition;
 			std::vector<Door*> mDoors;
 			PrisonDoor* mPrisonDoor;
+			std::unordered_map<DecorationType, std::vector<Transform>> mDecorationMap;
 		};
 	}
 }

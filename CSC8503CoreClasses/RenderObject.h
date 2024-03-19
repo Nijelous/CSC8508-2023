@@ -105,11 +105,11 @@ namespace NCL {
 				return mCurrentFrame;
 			}
 
-			void SetMatTextures(vector<GLuint> matTextures) {
+			void SetMatTextures(vector<int> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<GLuint>  GetMatTextures() const {
+			vector<int>  GetMatTextures() const {
 				return mMatTextures;
 			}
 
@@ -147,7 +147,7 @@ namespace NCL {
 			bool mOutlined = false;
 			bool mIsInstanced = false;
 
-			vector<GLuint>  mMatTextures;
+			vector<int>  mMatTextures;
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 

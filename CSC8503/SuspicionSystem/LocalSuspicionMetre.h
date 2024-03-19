@@ -38,6 +38,7 @@ namespace SuspicionSystem
         void AddActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         void RemoveActiveLocalSusCause(const activeLocalSusCause &inCause, const int &playerNo);
         
+        static double GetPercentageBasedOnDistance(const float distance,const float minVal = 30, const float minDist=10, const float maxDist = 50);
 
         virtual void UpdateGlobalSuspicionObserver(SuspicionMetre::SusBreakpoint susBreakpoint) override;
         virtual void UpdatePlayerBuffsObserver(BuffEvent buffEvent,int playerNo) override;

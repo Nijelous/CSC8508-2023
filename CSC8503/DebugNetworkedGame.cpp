@@ -364,6 +364,11 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 	mThisServer->SendGlobalPacket(packet);
 }
 
+void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, float time, int playerNo){
+	NCL::CSC8503::AnnouncementSyncPacket packet(annType,time, playerNo);
+	mThisServer->SendGlobalPacket(packet);
+}
+
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
 		if (mPacketToSendQueue.size() > 1) {
@@ -508,7 +513,9 @@ void DebugNetworkedGame::InitWorld() {
 	mLevelManager->GetPhysics()->Clear();
 
 	//TODO(erendgrmc): Second parameter is redundant remove it from func.
-	mLevelManager->LoadLevel(LEVEL_NUM, 0, true);
+	std::random_device rd;
+	std::mt19937 g(rd());
+	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
 
 	SpawnPlayers();
 
@@ -527,6 +534,8 @@ void DebugNetworkedGame::SpawnPlayers() {
 			const Vector3& pos = mLevelManager->GetPlayerStartPosition(i);
 			auto* netPlayer = AddPlayerObject(pos, i);
 			mServerPlayers.emplace(i, netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->Attach(netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr()->Attach(netPlayer);
 		}
 		else
 		{
@@ -580,7 +589,6 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	default:
 		break;
 	}
-	netPlayer->SetPrisonDoor(mLevelManager->GetPrisonDoor());
 	netPlayer->GetRenderObject()->SetColour(colour);
 	return netPlayer;
 }

@@ -110,3 +110,27 @@ void GameObject::SetObjectState(GameObjectState state) {
 		}
 	}
 }
+
+void GameObject::DrawCollisionVolume() {
+	if (!mBoundingVolume) return;
+	switch (mBoundingVolume->type) {
+	case VolumeType::AABB:
+	{
+		AABBVolume* volume = (AABBVolume*)mBoundingVolume;
+		Debug::DrawCube(volume->GetHalfDimensions(), volume->GetOffset() + mTransform.GetPosition());
+	}
+		break;
+	case VolumeType::OBB:
+	{
+		OBBVolume* volume = (OBBVolume*)mBoundingVolume;
+		Debug::DrawRotatedCube(volume->GetHalfDimensions(), volume->GetOffset() + mTransform.GetPosition(), mTransform.GetOrientation());
+	}
+		break;
+	case VolumeType::Sphere:
+	{
+		SphereVolume* volume = (SphereVolume*)mBoundingVolume;
+		Debug::DrawSphere(volume->GetRadius(), volume->GetOffset() + mTransform.GetPosition());
+	}
+		break;
+	}
+}
