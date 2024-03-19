@@ -321,11 +321,14 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	case BasicNetworkMessages::SyncPlayerIdNameMap: {
 		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
 		HandleSyncPlayerIdNameMapPacket(packet);
+		break;
 	}
 	case BasicNetworkMessages::SyncAnnouncements: {
 		const AnnouncementSyncPacket* packet = (AnnouncementSyncPacket*)(payload);
 		HandleAnnouncementSync(packet);
+		break;
 	}
+	break;
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -598,8 +601,10 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 		break;
 	case 2:
 		colour = Vector4(0, 0, 1, 1); //Blue
+		break;
 	case 3:
 		colour = Vector4(1, 1, 0, 1); //Yellow
+		break;
 	default:
 		break;
 	}

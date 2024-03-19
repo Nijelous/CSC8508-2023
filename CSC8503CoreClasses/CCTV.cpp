@@ -65,7 +65,7 @@ void CCTV::UpdateObject(float dt) {
 	//if Multiplayer
 	else{
 		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		if(game->GetLocalPlayer() !=nullptr)
+		if(game->GetLocalPlayer() !=nullptr && game->GetLocalPlayer()->GetRenderObject()!=nullptr)
 			UpdateForPlayerObject(game->GetLocalPlayer(), dt);
 	}
 }
@@ -86,8 +86,11 @@ const bool CCTV::PlayerInRaycast(PlayerObject* mPlayerObject){
 	return false;
 }
 
-const bool CCTV::CanSeePlayer(PlayerObject* ) {
-	if (mViewPyramid.SphereInsidePyramid(mPlayerObject->GetTransform().GetPosition(), mPlayerObject->GetRenderObject()->GetCullSphereRadius()) &&
+const bool CCTV::CanSeePlayer(PlayerObject* mPlayerObject) {
+	const Vector3 playerPos = mPlayerObject->GetTransform().GetPosition();
+	const float playerCullSphereR = mPlayerObject->GetRenderObject()->GetCullSphereRadius();
+	if (mPlayerObject->GetRenderObject() != nullptr &&
+		mViewPyramid.SphereInsidePyramid(playerPos, playerCullSphereR)&&
 		PlayerInRaycast(mPlayerObject))
 		return true;
 	return false;
