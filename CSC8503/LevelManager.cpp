@@ -489,7 +489,29 @@ void LevelManager::InitialiseAssets() {
 	std::string groupType = "";
 	std::thread animLoadThread;
 	std::thread matLoadThread;
+	int fileSize = 0;
 	while (getline(assetsFile, line)) {
+		fileSize++;
+		if (line.substr(0, line.find(",")) == "mat") fileSize++;
+	}
+	assetsFile.clear();
+	assetsFile.seekg(std::ifstream::beg);
+	bool updateScreen = false;
+	bool loaded = false;
+	int lines = 0;
+	int animLines = 0;
+	int matLines = 0;
+	std::thread renderFlip([&updateScreen, &loaded] {
+		int loops = 0;
+		while (!loaded) {
+			std::cout << "Loops: " << loops << "\n";
+			updateScreen = true;
+			std::this_thread::sleep_for(1000ms);
+			loops++;
+		}
+		});
+	while (getline(assetsFile, line)) {
+		CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 		for (int i = 0; i < 3; i++) {
 			assetDetails[i] = line.substr(0, line.find(","));
 			line.erase(0, assetDetails[i].length() + 1);
@@ -499,31 +521,38 @@ void LevelManager::InitialiseAssets() {
 		if (groupType != assetDetails[0]) {
 			if (groupType == "anim") {
 #ifdef USEGL // remove after implemented
-				animLoadThread = std::thread([this, groupDetails] {
+				animLoadThread = std::thread([this, groupDetails, &animLines] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
+						animLines++;
 					}
 					});
 #endif
 			}
 			else if (groupType == "mat") {
-				matLoadThread = std::thread([this, groupDetails] {
+				matLoadThread = std::thread([this, groupDetails, &matLines] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mMaterials[groupDetails[i]] = mRenderer->LoadMaterial(groupDetails[i + 1]);
+						matLines++;
 					}
 					});
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+				lines += groupDetails.size() / 3;
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
+					CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
+					lines++;
 				}
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
+					CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 					mShaders[groupDetails[i]] = mRenderer->LoadShader(groupDetails[i + 1], groupDetails[i + 2]);
+					lines++;
 				}
 			}
 			groupType = assetDetails[0];
@@ -563,7 +592,20 @@ void LevelManager::InitialiseAssets() {
 	mUi->SetTextureVector("bar", susTexVec);
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
+		CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 		mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+		lines++;
+	}
+	loaded = true;
+	renderFlip.join();
+}
+
+void LevelManager::CheckRenderLoadScreen(bool& updateScreen, int linesDone, int totalLines) {
+	if (updateScreen) {
+		updateScreen = false;
+		Debug::Print(std::format("Loading: {:.0f}%", (linesDone / (float)totalLines) * 100), Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+		mRenderer->Render();
+		Debug::UpdateRenderables(0);
 	}
 }
 
@@ -589,7 +631,7 @@ void LevelManager::InitialiseDebug() {
 	mAnimationTime = 0;
 }
 
-void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
+void LevelManager::PrintDebug(float dt) {
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof(statex);
 	GlobalMemoryStatusEx(&statex);

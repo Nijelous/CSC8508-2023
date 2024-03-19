@@ -156,6 +156,8 @@ namespace NCL {
 
 			virtual void InitialiseAssets();
 
+			void CheckRenderLoadScreen(bool& updateScreen, int linesDone, int totalLines);
+
 			void InitialiseDebug();
 
 			void PrintDebug(float dt);
