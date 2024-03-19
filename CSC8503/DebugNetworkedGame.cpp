@@ -15,6 +15,7 @@
 #include "PushdownMachine.h"
 #include "RenderObject.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
+#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "Vent.h"
 
@@ -109,6 +110,8 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -544,6 +547,7 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 
 	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
+	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
 	SpawnPlayers();
 
 	mLevelManager->SetPlayersForGuards();
@@ -694,10 +698,15 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 		doorObj->SyncDoor(packet->isOpen);
 		break;
 	}
-	case InteractableItems::InteractableVents:
+	case InteractableItems::InteractableVents:{
 		Vent* ventObj = reinterpret_cast<Vent*>(interactedObj);
 		ventObj->SetIsOpen(packet->isOpen, false);
 		break;
+	}
+	case InteractableItems::HeistItem:{
+		LevelManager::GetLevelManager()->GetMainFlag()->Reset();
+		break;
+	}
 	}
 }
 void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const {
