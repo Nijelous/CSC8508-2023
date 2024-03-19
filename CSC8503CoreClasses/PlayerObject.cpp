@@ -125,27 +125,6 @@ void PlayerObject::UpdateObject(float dt) {
 	else {
 		EnforceMaxSpeeds();
 	}
-	//SusBar
-	float iconValue = SusLinerInterpolation(dt);
-	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
-	if (mSusValue > 33) {
-		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
-		if (mSusValue > 66) {
-			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-		}
-	}
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
-	
-	//globle suspicion
-	float globleSusValue = mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter();
-	if (globleSusValue > 33) {
-		mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
-		mAlarmTime = mAlarmTime + dt;
-	}
-	if (globleSusValue < 33 && mUi->GetIcons()[ALARM]->mTransparency>0) {
-		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
-		mAlarmTime = 0;
-	}
 
 	UpdateGlobalUI(dt);
 	UpdateLocalUI(dt);
@@ -905,7 +884,27 @@ void PlayerObject::UpdateLocalUI(float dt){
 
 	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
 
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+		}
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
+	//globle suspicion
+	float globleSusValue = mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter();
+	if (globleSusValue > 33) {
+		mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+		mAlarmTime = mAlarmTime + dt;
+	}
+	if (globleSusValue < 33 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {
