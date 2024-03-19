@@ -61,6 +61,7 @@ int main(){
 
     w->GetTimer().GetTimeDeltaSeconds(); //Clear the timer so we don't get a larget first dt!
     
+
     while (w->UpdateWindow() && !sceneManager->GetIsForceQuit()) {
         float dt = w->GetTimer().GetTimeDeltaSeconds();
         if (dt > 0.1f) {
