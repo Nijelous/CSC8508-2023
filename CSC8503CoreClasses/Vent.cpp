@@ -83,6 +83,9 @@ void Vent::SetIsOpen(bool isOpen, bool isSettedByServer) {
 	if (isMultiplayerGame && isSettedByServer) {
 		SyncVentStatusInMultiplayer();
 	}
+	if (mIsOpen == true) {
+		this->GetSoundObject()->LockDoorTriggered();
+	}
 }
 
 void Vent::Interact(InteractType interactType, GameObject* interactedObject) {

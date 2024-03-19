@@ -1202,6 +1202,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 		AddNetworkObject(*newVent);
 	}
 
+	mUpdatableObjects.push_back(newVent);
 	mWorld->AddGameObject(newVent);
 
 	return newVent;

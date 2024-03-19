@@ -74,19 +74,19 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(15.0f, 100.0f);
+	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 26.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorOpenSound->set3DMinMaxDistance(20.0f, 100.0f);
+	mResult = mDoorOpenSound->set3DMinMaxDistance(12.0f, 30.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Open Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorCloseSound->set3DMinMaxDistance(20.0f, 100.0f);
+	mResult = mDoorCloseSound->set3DMinMaxDistance(12.0f, 30.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
 		return;
@@ -98,13 +98,13 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mPickUpSound->set3DMinMaxDistance(20.0f, 100.0f);
+	mResult = mPickUpSound->set3DMinMaxDistance(10.0f, 20.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Pick Up Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mLockDoorSound->set3DMinMaxDistance(15.0f, 80.0f);
+	mResult = mLockDoorSound->set3DMinMaxDistance(10.0f, 20.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Lock Door Sound Attenuation Setting error" << std::endl;
 		return;
@@ -116,7 +116,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mVentSound->set3DMinMaxDistance(15.0f, 60.0f);
+	mResult = mVentSound->set3DMinMaxDistance(20.0f, 60.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
@@ -144,7 +144,7 @@ FMOD::Channel* SoundManager::AddWalkSound() {
 		std::cout << "Play Footstep sound error" << std::endl;
 		return nullptr;
 	}
-	mResult = footStepChannel->setVolume(4.0f);
+	mResult = footStepChannel->setVolume(2.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Footstep sound Volume Change error" << std::endl;
 		return nullptr;
@@ -207,12 +207,12 @@ void SoundManager::PlayPickUpSound(Vector3 soundPos) {
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mPickUpSound, 0, true, &pickUpChannel);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close sound error" << std::endl;
+		std::cout << "Play Pick Up sound error" << std::endl;
 		return;
 	}
 	mResult = pickUpChannel->set3DAttributes(&pos, nullptr);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close position setting error" << std::endl;
+		std::cout << "Pick Up Sound position setting error" << std::endl;
 		return;
 	}
 	pickUpChannel->setVolume(0.5f);
@@ -224,12 +224,12 @@ void SoundManager::PlayLockDoorSound(Vector3 soundPos) {
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mLockDoorSound, 0, true, &lockDoorChannel);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close sound error" << std::endl;
+		std::cout << "Play Lock Door sound error" << std::endl;
 		return;
 	}
 	mResult = lockDoorChannel->set3DAttributes(&pos, nullptr);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close position setting error" << std::endl;
+		std::cout << "Play Lock Door position setting error" << std::endl;
 		return;
 	}
 	lockDoorChannel->setPaused(false);
@@ -240,12 +240,12 @@ void SoundManager::PlayAlarmSound(Vector3 soundPos) {
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mAlarmSound, 0, true, &alarmChannel);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close sound error" << std::endl;
+		std::cout << "Play Alarm sound error" << std::endl;
 		return;
 	}
 	mResult = alarmChannel->set3DAttributes(&pos, nullptr);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close position setting error" << std::endl;
+		std::cout << "Alarm sound position setting error" << std::endl;
 		return;
 	}
 	alarmChannel->setPaused(false);
@@ -256,12 +256,17 @@ void SoundManager::PlayVentSound(Vector3 soundPos) {
 	FMOD_VECTOR pos = ConvertVector(soundPos);
 	mResult = mSystem->playSound(mVentSound, 0, true, &channel);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close sound error" << std::endl;
+		std::cout << "Vent Sound error" << std::endl;
+		return;
+	}
+	mResult = channel->setVolume(2.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "Vent Sound Volume setting error" << std::endl;
 		return;
 	}
 	mResult = channel->set3DAttributes(&pos, nullptr);
 	if (mResult != FMOD_OK) {
-		std::cout << "Play Door Close position setting error" << std::endl;
+		std::cout << "Vent Sound position setting error" << std::endl;
 		return;
 	}
 	channel->setPaused(false);
