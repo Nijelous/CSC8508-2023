@@ -108,6 +108,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(String_Message, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -143,6 +144,7 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 	}
 
 	return isConnected;
@@ -320,7 +322,10 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
 		HandleSyncPlayerIdNameMapPacket(packet);
 	}
-
+	case BasicNetworkMessages::SyncAnnouncements: {
+		const AnnouncementSyncPacket* packet = (AnnouncementSyncPacket*)(payload);
+		HandleAnnouncementSync(packet);
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -715,6 +720,13 @@ void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationAc
 void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const {
 	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
 	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const{
+	if (!mLocalPlayer)
+		return;
+	const PlayerObject::AnnouncementType annType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
+	GetLocalPlayer()->SyncAnnouncements(annType,packet->time,packet->playerNo);
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {

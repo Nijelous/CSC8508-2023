@@ -145,7 +145,7 @@ namespace NCL{
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
 
-            void HandleAnnouncementSync(AnnouncementSyncPacket* packet) const;
+            void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
