@@ -166,10 +166,9 @@ namespace NCL::CSC8503 {
 	};
 
 	struct SoundPacket : public GamePacket {
-		bool isPlay;
 		int playerId;
 
-		SoundPacket(const bool isPlay, int playerId);
+		SoundPacket(const int playerId);
 	};
 
 	class NetworkObject {

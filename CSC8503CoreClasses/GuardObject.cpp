@@ -98,12 +98,6 @@ void GuardObject::RaycastToPlayer() {
 		mSightedPlayer = nullptr;
 		//mPlayer = nullptr;
 	}
-	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		if (mPlayer) {
-			game->SendSoundStatePacket(mCanSeePlayer, mPlayer->GetPlayerID());
-		}
-	}
 }
 
 void GuardObject::GuardSpeedMultiplier() {
@@ -410,6 +404,17 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 				LookTowardFocalPoint(direction);
 				this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 				if (mPointTimer <= 0) {
+					if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+						DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+						if (mPlayer) {
+							game->SendSoundStatePacket(mPlayer->GetPlayerID());
+						}
+					}
+					else {
+						if (mPlayer) {
+							mPlayer->GetSoundObject()->TriggerSoundEvent();
+						}
+					}
 					mPointTimer = POINTING_TIMER;
 					return Failure;
 				}

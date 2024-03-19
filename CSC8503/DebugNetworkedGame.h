@@ -85,7 +85,7 @@ namespace NCL{
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
 
-            void SendSoundStatePacket(bool isPlay, int playerId) const;
+            void SendSoundStatePacket(int playerId) const;
 
             void SendPacketsThread();
 

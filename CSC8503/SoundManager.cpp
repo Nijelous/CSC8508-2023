@@ -68,7 +68,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/heater-vent-hit-higher-part-103305.mp3", FMOD_2D, 0, &mSpottedSound);
+	mResult = mSystem->createSound("../Assets/Sounds/warning-sound-6686.mp3", FMOD_2D, 0, &mSpottedSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create Spotted Sound Error !!" << std::endl;
 		return;
@@ -291,6 +291,11 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
+			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
+			if (isTrigger) {
+				UpdateMultiplayerSound();
+				obj->GetSoundObject()->SetNotTriggered();
+			}
 		}
 		else if (obj->GetName() == "Guard") {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
@@ -358,17 +363,14 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 	}
 }
 
-void SoundManager::UpdateMultiplayerSound(bool isPlay) {
-	if (isPlay) {
-		std::cout<<11;
-	}
-	/*Channel* channel;
+void SoundManager::UpdateMultiplayerSound() {
+	Channel* channel;
 	mResult = mSystem->playSound(mSpottedSound, 0, false, &channel);
 	if (mResult != FMOD_OK) {
 		std::cout << "Play Spotted Sound error" << std::endl;
 		return;
 	}
-	mSystem->update();*/
+	mSystem->update();
 }
 
 void SoundManager::UpdateListenerAttributes() {

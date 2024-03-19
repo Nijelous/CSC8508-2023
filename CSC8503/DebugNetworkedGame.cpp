@@ -372,8 +372,8 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 	mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::SendSoundStatePacket(bool isPlay, int playerId) const {
-	SoundPacket packet(isPlay, playerId);
+void DebugNetworkedGame::SendSoundStatePacket(int playerId) const {
+	SoundPacket packet(playerId);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -717,7 +717,7 @@ void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePack
 
 void DebugNetworkedGame::HandleMultiplayerSound(SoundPacket* packet) const {
 	if (packet->playerId == mLocalPlayerId) {
-		mLevelManager->GetSoundManager()->UpdateMultiplayerSound(packet->isPlay);
+		mLevelManager->GetSoundManager()->UpdateMultiplayerSound();
 	}
 }
 
