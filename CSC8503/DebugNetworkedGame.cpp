@@ -547,7 +547,6 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 
 	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
-	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
 	SpawnPlayers();
 
 	mLevelManager->SetPlayersForGuards();
