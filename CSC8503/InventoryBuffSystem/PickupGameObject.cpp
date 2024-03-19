@@ -9,6 +9,7 @@
 #include "PlayerObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
+#include "../NetworkPlayer.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -116,11 +117,15 @@ void PickupGameObject::ActivatePickup(int playerNo) {
 }
 
 void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
+	if ((!otherObject->GetCollisionLayer() & Player))
+		return;
 	//Simulate only in server
 	auto* sceneManager = SceneManager::GetSceneManager();
 	bool isSinglePlayer = sceneManager->IsInSingleplayer();
-	if (!isSinglePlayer && !sceneManager->IsServer()) {
-		return;
+	if (!isSinglePlayer) {
+		NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
+		if (!netPlayer->GetIsLocalPlayer())
+			return;
 	}
 	if (mCooldown == 0){
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);

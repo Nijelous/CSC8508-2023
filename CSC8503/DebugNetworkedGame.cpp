@@ -20,7 +20,8 @@
 
 namespace {
 	constexpr int MAX_PLAYER = 4;
-	constexpr int LEVEL_NUM = 0;
+	constexpr int DEMO_LEVEL_NUM = 0;
+	constexpr int LEVEL_NUM = 1;
 	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
@@ -107,6 +108,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(String_Message, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -142,6 +144,7 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 	}
 
 	return isConnected;
@@ -199,13 +202,24 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 }
 
 void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
-	this->mIsGameStarted = isGameStarted;
-	if (mThisServer) {
-		SendStartGameStatusPacket();
+	if (mIsGameStarted == isGameStarted) {
+		return;
 	}
+	this->mIsGameStarted = isGameStarted;
+
 	if (isGameStarted) {
+		std::random_device rd;
+		std::mt19937 g(rd());
 		mGameState = GameSceneState::InitialisingLevelState;
-		StartLevel();
+		if (mThisServer) {
+			SendStartGameStatusPacket(&g);
+		}
+		StartLevel(g);
+	}
+	else {
+		if (mThisServer) {
+			SendStartGameStatusPacket();
+		}
 	}
 }
 
@@ -217,8 +231,8 @@ void DebugNetworkedGame::SetIsGameFinished(bool isGameFinished, int winningPlaye
 	}
 }
 
-void DebugNetworkedGame::StartLevel() {
-	InitWorld();
+void DebugNetworkedGame::StartLevel(const std::mt19937& levelSeed) {
+	InitWorld(levelSeed);
 	Debug::Print("Game Started", Vector2(10, 5));
 
 	for (auto& event : mOnGameStarts) {
@@ -308,7 +322,10 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
 		HandleSyncPlayerIdNameMapPacket(packet);
 	}
-
+	case BasicNetworkMessages::SyncAnnouncements: {
+		const AnnouncementSyncPacket* packet = (AnnouncementSyncPacket*)(payload);
+		HandleAnnouncementSync(packet);
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -498,8 +515,8 @@ const int DebugNetworkedGame::GetClientLastFullID() const {
 	return mClientSideLastFullID;
 }
 
-void DebugNetworkedGame::SendStartGameStatusPacket() {
-	GameStartStatePacket state(mIsGameStarted);
+void DebugNetworkedGame::SendStartGameStatusPacket(std::mt19937* levelSeed) {
+	GameStartStatePacket state(mIsGameStarted, *levelSeed);
 	mThisServer->SendGlobalPacket(state);
 }
 
@@ -508,14 +525,11 @@ void DebugNetworkedGame::SendFinishGameStatusPacket() {
 	mThisServer->SendGlobalPacket(packet);
 }
 
-void DebugNetworkedGame::InitWorld() {
+void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	//TODO(erendgrmc): Second parameter is redundant remove it from func.
-	std::random_device rd;
-	std::mt19937 g(rd());
-	mLevelManager->LoadLevel(LEVEL_NUM, g, 0, true);
+	mLevelManager->LoadLevel(DEMO_LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 
@@ -706,6 +720,13 @@ void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationAc
 void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const {
 	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
 	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const{
+	if (!mLocalPlayer)
+		return;
+	const PlayerObject::AnnouncementType annType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
+	GetLocalPlayer()->SyncAnnouncements(annType,packet->time,packet->playerNo);
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {

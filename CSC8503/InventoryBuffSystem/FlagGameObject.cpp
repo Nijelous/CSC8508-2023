@@ -1,9 +1,11 @@
 #include "FlagGameObject.h"
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
-#include "../CSC8503CoreClasses/SoundObject.h"
-#include "../CSC8503/SceneManager.h"
+#include "../LevelManager.h"
+#include "../SuspicionSystem/GlobalSuspicionMetre.h"
 #include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 using namespace NCL;
 using namespace CSC8503;
 
@@ -88,10 +90,15 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 	if ((otherObject->GetCollisionLayer() & Player)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
-		const int playerID = plObj->GetPlayerID();
-		if (!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerID)){
-			plObj->AddPlayerPoints(mPoints);
-			GetFlag(playerID);
+		auto* sceneManager = SceneManager::GetSceneManager();
+		bool isSinglePlayer = sceneManager->IsInSingleplayer();
+		if (!isSinglePlayer) {
+			NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
+			if (!netPlayer->GetIsLocalPlayer())
+				return;
 		}
+		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
+		plObj->AddPlayerPoints(mPoints);
+		GetFlag(plObj->GetPlayerID());
 	}
 }
