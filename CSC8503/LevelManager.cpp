@@ -482,8 +482,6 @@ void LevelManager::FixedUpdate(float dt) {
 }
 
 void LevelManager::InitialiseAssets() {
-	Debug::Print("Loading", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	mRenderer->Render();
 	std::ifstream assetsFile(Assets::ASSETROOT + "UsedAssets.csv");
 	std::string line;
 	std::string* assetDetails = new std::string[4];
@@ -517,15 +515,11 @@ void LevelManager::InitialiseAssets() {
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
-				Debug::Print("Loading.", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				mRenderer->Render();
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
 				}
-				Debug::Print("Loading..", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-				mRenderer->Render();
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -542,8 +536,6 @@ void LevelManager::InitialiseAssets() {
 	delete[] assetDetails;
 
 	animLoadThread.join();
-	Debug::Print("Loading...", Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
-	mRenderer->Render();
 	//preLoadList
 	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
 	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
@@ -1125,7 +1117,7 @@ GameObject* LevelManager::AddFloorToWorld(const Transform& transform, bool isOut
 }
 
 CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel) {
-	CCTV* camera = new CCTV(25);
+	CCTV* camera = new CCTV(25, mWorld);
 
 	Vector3 wallSize = Vector3(1, 1, 1);
 	camera->GetTransform()
@@ -1261,9 +1253,9 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 	newDoor->GetTransform()
 		.SetPosition(door->GetTransform().GetPosition())
 		.SetOrientation(door->GetTransform().GetOrientation())
-		.SetScale(size * 2);
+		.SetScale(Vector3(1, 1, 1));
 
-	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mMeshes["Cube"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
+	newDoor->SetRenderObject(new RenderObject(&newDoor->GetTransform(), mMeshes["Door"], mTextures["DoorAlbedo"], mTextures["DoorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(size.y, 2) + std::powf(size.z, 2))));
 	newDoor->SetPhysicsObject(new PhysicsObject(&newDoor->GetTransform(), newDoor->GetBoundingVolume(), 1, 1, 5));
 	newDoor->SetSoundObject(new SoundObject());

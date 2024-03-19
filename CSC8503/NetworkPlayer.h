@@ -54,7 +54,7 @@ namespace NCL {
 			{ PlayerObject::UpdatePlayerBuffsObserver(buffEvent,playerNo); };
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override 
 			{ PlayerObject::UpdateInventoryObserver(invEvent,playerNo, invSlot, isItemRemoved); };
-
+			bool GetIsLocalPlayer() { return mIsLocalPlayer; };
 		protected:
 			bool mIsClientInputReceived = false;
 			bool mIsLocalPlayer = false;
