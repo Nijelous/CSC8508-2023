@@ -241,8 +241,8 @@ namespace NCL {
 #endif
 
 #ifdef USEPROSPERO
-			vector<sce::Agc::Core::Texture*> mGuardTextures;
-			vector<sce::Agc::Core::Texture*> mPlayerTextures;
+			vector<Texture*> mGuardTextures;
+			vector<Texture*> mPlayerTextures;
 #endif
 
 			//animation guard

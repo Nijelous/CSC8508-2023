@@ -128,11 +128,11 @@ namespace NCL {
 
 #ifdef USEPROSPERO
 
-			void SetMatTextures(vector<sce::Agc::Core::Texture*> matTextures) {
+			void SetMatTextures(vector<Texture*> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<sce::Agc::Core::Texture*>  GetMatTextures() const {
+			vector<Texture*>  GetMatTextures() const {
 				return mMatTextures;
 			}
 
@@ -178,7 +178,7 @@ namespace NCL {
 			vector<GLuint>  mMatTextures;
 #endif
 #ifdef USEPROSPERO
-			vector<sce::Agc::Core::Texture*> mMatTextures;
+			vector<Texture*> mMatTextures;
 #endif
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 

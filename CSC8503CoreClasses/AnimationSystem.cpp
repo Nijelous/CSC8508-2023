@@ -124,26 +124,25 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, v
 #endif
 
 #ifdef USEPROSPERO
-void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, const Mesh& mesh, const MeshMaterial& meshMaterial, vector<sce::Agc::Core::Texture*>& matTextures) {
+void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, const Mesh& mesh, const MeshMaterial& meshMaterial, vector<Texture*>& matTextures) {
 	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
 		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
 		const string* filename = nullptr;
 		matEntry->GetEntry("Diffuse", &filename);
-		sce::Agc::Core::Texture* texID = nullptr;
+		Texture* texID = nullptr;
 
 		if (filename) {
 			string path = *filename;
 			std::cout << path << std::endl;
 			mAnimTexture = renderer.LoadTexture(path.c_str());
-			PS5::AGCTexture* tempTex = (PS5::AGCTexture*)mAnimTexture;
-			texID = tempTex->GetAGCPointer();
+			texID = mAnimTexture;
 			std::cout << texID << endl;
 		}
 		matTextures.emplace_back(texID);
 	}
 }
 
-void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<sce::Agc::Core::Texture*> playerTexture, vector<sce::Agc::Core::Texture*>& guardTextures) {
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<Texture*> playerTexture, vector<Texture*>& guardTextures) {
 	for (auto& obj : UpdatableObjects) {
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);

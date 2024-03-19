@@ -141,6 +141,7 @@ namespace NCL::Rendering {
 			}
 			return &subMeshes[i];
 		}
+
 		const int* GetBindPoseIndices() const {
 			return mBindPoseIndices.data();
 		}
