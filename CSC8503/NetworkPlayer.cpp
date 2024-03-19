@@ -77,8 +77,10 @@ void NetworkPlayer::UpdateObject(float dt) {
 
 		//if (game->GetIsServer()) 
 		NCL::CSC8503::InteractType interactType;
-		if(GotRaycastInput(interactType,dt))
+		if (GotRaycastInput(interactType, dt))
 			RayCastFromPlayer(mGameWorld, interactType, dt);
+		else
+			PlayerObject::RayCastFromPlayerForUI(mGameWorld,dt);
 
 		ResetPlayerInput();
 

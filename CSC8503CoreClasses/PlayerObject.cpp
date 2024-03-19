@@ -374,7 +374,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inter
 };
 
 void PlayerObject::RayCastFromPlayerForUI(GameWorld* world, const float dt) {
-	std::cout << "Ray fired" << std::endl;
 	Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
 	RayCollision closestCollision;
 

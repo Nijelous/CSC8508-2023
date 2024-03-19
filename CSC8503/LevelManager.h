@@ -127,6 +127,8 @@ namespace NCL {
 
 			Helipad* GetHelipad(); 
 
+			Texture* GetTexture(std::string name) { return mTextures[name]; }
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
