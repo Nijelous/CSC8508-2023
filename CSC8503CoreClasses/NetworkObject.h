@@ -51,8 +51,8 @@ namespace NCL::CSC8503 {
 
 	struct GameStartStatePacket : public GamePacket {
 		bool isGameStarted = false;
-		std::mt19937 levelSeed;
-		GameStartStatePacket(bool val, std::mt19937 levelSeed);
+		std::string levelSeed;
+		GameStartStatePacket(bool val, const std::string& seed);
 	};
 
 	struct GameEndStatePacket : public GamePacket {

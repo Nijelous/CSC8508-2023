@@ -63,7 +63,7 @@ namespace NCL{
 
             void UpdateGame(float dt) override;
 
-            void SetIsGameStarted(bool isGameStarted);
+            void SetIsGameStarted(bool isGameStarted, unsigned int seed = -1);
             void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
             void StartLevel(const std::mt19937& levelSeed);
 
@@ -105,7 +105,7 @@ namespace NCL{
             void UpdateMinimumState();
             int GetPlayerPeerID(int peerId = -2);
 
-            void SendStartGameStatusPacket(std::mt19937* levelSeed = nullptr);
+            void SendStartGameStatusPacket(const std::string& seed = "") const;
             void SendFinishGameStatusPacket();
             
             void InitWorld(const std::mt19937& levelSeed);
