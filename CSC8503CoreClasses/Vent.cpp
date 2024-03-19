@@ -3,7 +3,6 @@
 #include "GameServer.h"
 #include "NetworkObject.h"
 #include "../CSC8503/LevelManager.h"
-#include "PlayerObject.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
 

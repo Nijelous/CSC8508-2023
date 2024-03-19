@@ -507,6 +507,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
 					mPlayerHasItems = false;
+					LevelManager::GetLevelManager()->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->DropAllItemsFromPlayer(mPlayer->GetPlayerID());
 					return Success;
 				}
 			}

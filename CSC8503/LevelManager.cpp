@@ -96,8 +96,8 @@ LevelManager::LevelManager() {
 	{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
 	{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 	{PlayerInventory::item::flag , mTextures["FlagIcon"]},
-	{PlayerInventory::item::stunItem, mTextures["Stun"]},
-	{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+    {PlayerInventory::item::stunItem, mTextures["Stun"]},
+    {PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 	loadRooms.join();
 	loadLevels.join();
@@ -559,11 +559,18 @@ void LevelManager::InitialiseAssets() {
 		{mTextures["MidSusBar"]},
 		{mTextures["HighSusBar"]}
 	};
+
 	mUi->SetTextureVector("key", keyTexVec);
 	mUi->SetTextureVector("bar", susTexVec);
+
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
-		mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+		if (key.substr(0, 5) == "Guard") {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Guard"], *val);
+		}
+		else {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+		}
 	}
 }
 
@@ -712,7 +719,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {
@@ -996,10 +1003,14 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mNoticeTop = mUi->AddIcon(Vector2(45, 43), 8, 6, mTextures["LockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICETOP, *mNoticeTop);
 
-	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
+	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
 
+	UISystem::Icon* mNoticeBotLeft = mUi->AddIcon(Vector2(39, 58), 8, 6, mTextures["UseScrewDriver"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOTLEFT, *mNoticeBotLeft);
 
+	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
 
 	mRenderer->SetUIObject(mUi);
 }
@@ -1268,6 +1279,8 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
+	newDoor->Open();
+
 	if (isMultiplayerLevel) {
 		AddNetworkObject(*newDoor);
 	}
@@ -1279,7 +1292,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 }
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
-	std::mt19937 seed) {
+	std::mt19937 seed,bool isMultiplayerLevel) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 
 	flag->SetPoints(40);
@@ -1319,7 +1332,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	mPlayerInventoryObservers.push_back(flag);
 	mPlayerBuffsObservers.push_back(flag);
 	mWorld->AddGameObject(flag);
-
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*flag);
+	}
 	mUpdatableObjects.push_back(flag);
 
 	return flag;
