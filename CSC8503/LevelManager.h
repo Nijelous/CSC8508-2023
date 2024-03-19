@@ -196,7 +196,7 @@ namespace NCL {
 			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door, bool isMultiplayerLevel);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
-				std::mt19937 seed);
+				std::mt19937 seed,bool isMultiplayerLevel);
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 

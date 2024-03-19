@@ -2,6 +2,7 @@
 #include "StateTransition.h"
 #include "StateMachine.h"
 #include "State.h"
+#include "../CSC8503/NetworkPlayer.h"
 #include "PhysicsObject.h"
 #include "Vector3.h"
 #include "random"
@@ -122,11 +123,9 @@ void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 	//Simulate only in server
 	auto* sceneManager = SceneManager::GetSceneManager();
 	bool isSinglePlayer = sceneManager->IsInSingleplayer();
-	if (!isSinglePlayer) {
-		NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
-		if (!netPlayer->GetIsLocalPlayer())
-			return;
-	}
+	bool isServer = sceneManager->IsServer();
+	if (!isSinglePlayer && !isServer) 
+		return;
 	if (mCooldown == 0){
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
 		//TODO(erendgrmnc): add player id here for multiplayer.

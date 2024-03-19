@@ -1,6 +1,7 @@
 #include "PlayerInventory.h"
 
 #include "GameServer.h"
+#include "GameClient.h"
 #include "NetworkObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
@@ -67,6 +68,10 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 				if (game->GetIsServer()) {
 					game->SendClientSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
 				}
+				else
+				{
+					game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+				}
 			}
 #endif
 
@@ -111,6 +116,10 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+		}
+		else
+		{
+			game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 		}
 	}
 
@@ -160,6 +169,10 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 			if (game->GetIsServer()) {
 				int usageCount = mItemUseCount[playerNo][invSlot];
 				game->SendClientSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
+			}
+			else
+			{
+				game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 			}
 		}
 #endif
