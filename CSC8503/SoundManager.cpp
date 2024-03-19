@@ -304,7 +304,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			UpdateFootstepSounds(state, soundPos, channel);
 			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
 			if (isTrigger) {
-				UpdateMultiplayerSound();
+				PlaySpottedSound();
 				obj->GetSoundObject()->SetNotTriggered();
 			}
 		}
