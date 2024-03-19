@@ -73,6 +73,7 @@ void GameSceneManager::InitCamera() {
 
 void GameSceneManager::CreateLevel() {
 	mLevelManager->LoadLevel(0, 0);
+
 }
 
 bool GameSceneManager::PlayerWonGame() {

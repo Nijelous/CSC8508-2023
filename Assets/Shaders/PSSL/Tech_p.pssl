@@ -22,16 +22,17 @@ out float4 fragColour[2];
 void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 {
 	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
+
 	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.albedoTexID)]);
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
-	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz * 2.0 - 1.0;
+	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
+	bumpNormal = pow(bumpNormal, 1.0f / 2.2f);
+	bumpNormal = bumpNormal * 2.0 - 1.0;
 	
-	bumpNormal = normalize(mul(TBN, normalize(bumpNormal)));
-	bumpNormal.y = -bumpNormal.y;
-	
+	bumpNormal = normalize(mul(normalize(bumpNormal), TBN));
 	float4 albedoSample = albedoTex.Sample(sampler, vertex.UV);
 	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
 
 	fragColour[0] = albedoSample;
-	fragColour[1] = normalSample;
+	fragColour[1].xyz = normalSample.xyz;
 }

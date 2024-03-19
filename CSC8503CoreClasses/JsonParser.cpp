@@ -229,7 +229,7 @@ void JsonParser::WriteVents(std::vector<std::unordered_map<std::string, float>>&
 	if (keyValuePairs.size() == 1) return;
 	Vent* vent = new Vent();
 	vent->GetTransform().SetPosition(Vector3(keyValuePairs[2]["x"], keyValuePairs[2]["y"], -keyValuePairs[2]["z"]))
-		.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"] - 180, -keyValuePairs[3]["z"]));
+		.SetOrientation(Quaternion::EulerAnglesToQuaternion(keyValuePairs[3]["x"], keyValuePairs[3]["y"], -keyValuePairs[3]["z"]));
 	level->mVents.push_back(vent);
 	level->mVentConnections.push_back(keyValuePairs[1]["connectedVentID"]);
 }

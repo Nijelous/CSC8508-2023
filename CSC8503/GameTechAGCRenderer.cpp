@@ -74,6 +74,9 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	debugTextVertexShader = new AGCShader("DebugText_vv.ags", allocator);
 	debugTextPixelShader = new AGCShader("DebugText_p.ags", allocator);
 
+	lightVertexShader = new AGCShader("light_vv.ags", allocator);
+	lightPixelShader = new AGCShader("light_p.ags", allocator);
+
 	allFrames = new FrameData[FRAMES_IN_FLIGHT];
 	for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
 
@@ -100,15 +103,24 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 
 	screenTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
 	mGBuffAlbedoTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
-	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
-	mGBuffNormalTarget.setSlot(1);
+	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true)
+		.setSlot(1);
+
+	mDiffLightTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mSpecLightTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true)
+		.setSlot(1);
+
 	screenTex = CreateFrameBufferTextureSlot("Screen");
 	mGBuffAlbedoTex = CreateFrameBufferTextureSlot("albedoTex");
 	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
+	mDiffLightTex = CreateFrameBufferTextureSlot("diffLight");
+	mSpecLightTex = CreateFrameBufferTextureSlot("specLightTex");
 	
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mDiffLightTex->GetAGCPointer(), &mDiffLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mSpecLightTex->GetAGCPointer(), &mSpecLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
 
 	const bool htileTC = (mGBuffDepthTarget.getTextureCompatiblePlaneCompression() == sce::Agc::CxDepthRenderTarget::TextureCompatiblePlaneCompression::kEnable);
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
@@ -430,7 +442,6 @@ void GameTechAGCRenderer::FillGBuffer() {
 	depthControl.setDepth(sce::Agc::CxDepthStencilControl::Depth::kEnable);
 	depthControl.setDepthFunction(sce::Agc::CxDepthStencilControl::DepthFunction::kLessEqual);
 	depthControl.setDepthWrite(sce::Agc::CxDepthStencilControl::DepthWrite::kEnable);
-
 	frameContext->m_sb.setState(depthControl);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs)
@@ -457,9 +468,45 @@ void GameTechAGCRenderer::FillGBuffer() {
 }
 
 void GameTechAGCRenderer::DrawLightVolumes() {
-	//set clear colour to black, and clear frame
-	//set blend function to on for all channels
-	//for each light, draw a sphere
+	sce::Agc::Toolkit::Result tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mDiffLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
+	tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mSpecLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
+	sce::Agc::Toolkit::Result wat = frameContext->resetToolkitChangesAndSyncToGl2(tk1);
+	
+	frameContext->setShaders(nullptr, lightVertexShader->GetAGCPointer(), lightPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
+
+	sce::Agc::CxViewport viewPort;
+	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 1.0f);
+	frameContext->m_sb.setState(viewPort);
+
+	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
+	rtMask.setMask(1, 0xFF);
+
+	frameContext->m_sb.setState(rtMask);
+	frameContext->m_sb.setState(mDiffLightTarget);
+	frameContext->m_sb.setState(mSpecLightTarget);
+
+	sce::Agc::CxPrimitiveSetup primState;
+	primState.init();
+	primState.setCullFace(sce::Agc::CxPrimitiveSetup::CullFace::kFront);
+	frameContext->m_sb.setState(primState);
+
+	sce::Agc::CxDepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthFunction(sce::Agc::CxDepthStencilControl::DepthFunction::kAlways);
+	depthControl.setDepthWrite(sce::Agc::CxDepthStencilControl::DepthWrite::kDisable);
+	frameContext->m_sb.setState(depthControl);
+
+	sce::Agc::CxBlendControl blendControl;
+	blendControl.init();
+	blendControl.setBlend(sce::Agc::CxBlendControl::Blend::kEnable)
+		.setAlphaBlendFunc(sce::Agc::CxBlendControl::AlphaBlendFunc::kAdd)
+		.setColorSourceMultiplier(sce::Agc::CxBlendControl::ColorSourceMultiplier::kSrcAlpha)
+		.setColorBlendFunc(sce::Agc::CxBlendControl::ColorBlendFunc::kAdd);
+	frameContext->m_sb.setState(blendControl);
+
+	for(int i = 0; i < mLights.size(); i++) {
+		
+	}
 }
 
 void GameTechAGCRenderer::CombineBuffers() {
@@ -510,7 +557,7 @@ void GameTechAGCRenderer::DisplayRenderPass() {
 	SceError error = sce::Agc::Core::translate(&outputTex, &backBuffers[currentSwap].renderTarget, sce::Agc::Core::RenderTargetComponent::kData);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kCs)
-		.setTextures(0, 1, screenTex->GetAGCPointer())
+		.setTextures(0, 1, mGBuffNormalTex->GetAGCPointer())
 		.setRwTextures(1, 1, &outputTex);
 	uint32_t xDims = (outputTex.getWidth() + 7) / 8;
 	uint32_t yDims = (outputTex.getHeight() + 7) / 8;
@@ -598,7 +645,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 					ObjectState state;
 					state.modelMatrix = g->GetTransform()->GetMatrix();
-					state.invModelMatrix = g->GetTransform()->GetMatrix();
+					state.invModelMatrix = g->GetTransform()->GetMatrix().Inverse();
 					state.colour = g->GetColour();
 					state.index[0] = 0; //Albedo texture
 					state.index[1] = 0; //Normal texture

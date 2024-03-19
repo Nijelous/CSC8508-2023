@@ -34,6 +34,8 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	float4 invClipPos = mul(Constants.inverseViewProjMatrix, float4(ndcPos, 1.0));
 	float3 worldPos = invClipPos.xyz / invClipPos.w;
 
+	
+
 	float dist = length(light.lightPos - worldPos);
 	float atten = 1.0 - clamp(dist / light.lightRadius, 0.0, 1.0);
 
@@ -41,8 +43,28 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffNormalIndex)]);
 	float3 normal = normalize(normalTex.Sample(sampler, fragCoord).xyz * 2.0 - 1.0);
-	float3 incident = normalize(light.lightPos - worldPos);
-	//float3 viewDir = normalize(Constants.);
+	float3 incident;
+	
+	if(light.lightType == 'd') incident = normalize(-light.lightDirection); 
+	else incident = normalize(light.lightPos - worldPos);
 
+	
+	float3 viewDir = normalize(Constants.cameraPos - worldPos);
+	float3 halfDir = normalize(incident + viewDir);
 
+	float lambert = clamp(dot(incident, normal), 0.0, 1.0);
+	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
+	specFactor = pow(specFactor, 60.0);
+	float3 attenuated;
+	if(light.lightType == 's') {
+		float fragDotProd = dot(-light.lightDirection, incident);
+		if(fragDotProd < light.minDotProd) discard;
+		float ringDiff = light.dimDotProd - light.minDotProd;
+		float edgeDimFactor = clamp((fragDotProd - light.minDotProd) / ringDiff, 0.0, 1.0);
+		attenuated = light.lightColour * atten * edgeDimFactor;
+	}
+	else attenuated = light.lightColour * atten;
+
+	albedoLight = float4(attenuated * lambert, 1.0);
+	specularLight = float4(attenuated * specFactor * 0.33, 1.0);
 }

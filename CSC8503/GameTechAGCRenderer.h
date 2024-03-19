@@ -163,6 +163,9 @@ namespace NCL {
 			NCL::PS5::AGCShader* debugTextVertexShader;
 			NCL::PS5::AGCShader* debugTextPixelShader;
 
+			NCL::PS5::AGCShader* lightVertexShader;
+			NCL::PS5::AGCShader* lightPixelShader;
+
 			NCL::PS5::AGCShader* gammaCompute;
 
 			sce::Agc::CxDepthRenderTarget		shadowTarget;
@@ -173,12 +176,16 @@ namespace NCL {
 			sce::Agc::CxRenderTarget			mGBuffAlbedoTarget;
 			sce::Agc::CxRenderTarget			mGBuffNormalTarget;
 			sce::Agc::CxDepthRenderTarget		mGBuffDepthTarget;
+			sce::Agc::CxRenderTarget			mDiffLightTarget;
+			sce::Agc::CxRenderTarget			mSpecLightTarget;
 			NCL::PS5::AGCTexture*				screenTex; //ptr into bindless array
 			NCL::PS5::AGCTexture*				mGBuffAlbedoTex;
 			NCL::PS5::AGCTexture*				mGBuffNormalTex;
 			NCL::PS5::AGCTexture*				mGBuffDepthTex;
+			NCL::PS5::AGCTexture*				mDiffLightTex;
+			NCL::PS5::AGCTexture*				mSpecLightTex;
 
-			std::vector<SkinningJob> frameJobs;
+			std::vector<SkinningJob>			frameJobs;
 		};
 	}
 }
