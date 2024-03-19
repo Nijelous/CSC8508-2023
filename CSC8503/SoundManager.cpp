@@ -325,7 +325,13 @@ void SoundManager::PlaySpottedSound() {
 }
 
 void SoundManager::PlayCCTVSpotSound(bool isPlay) {
-	mCCTVSpotChannel->setPaused(isPlay);
+	if (isPlay) {
+		std::cout << 1;
+	}
+	else {
+		std::cout << 2;
+	}
+	//mCCTVSpotChannel->setPaused(isPlay);
 }
 
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
