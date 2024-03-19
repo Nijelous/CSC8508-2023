@@ -94,6 +94,7 @@ namespace InventoryBuffSystem
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {
+			{flag,flagAdded}
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemDroppedInventoryEventMap = {
@@ -114,6 +115,7 @@ namespace InventoryBuffSystem
 			{ soundEmitter, "Sound Emitter" },
 			{ doorKey, "Door Key" },
 			{ stunItem, "Stun Item"},
+			{ flag, "Heist Item"},
 			{ none, "No Equipped Item" }
 		};
 

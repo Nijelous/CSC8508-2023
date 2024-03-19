@@ -127,6 +127,8 @@ namespace NCL {
 
 			Helipad* GetHelipad(); 
 
+			Texture* GetTexture(std::string name) { return mTextures[name]; }
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
@@ -135,9 +137,17 @@ namespace NCL {
 
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
+			float GetNearestGuardDistance(const Vector3& startPos) const;
+
+			float GetNearestGuardToPlayerDistance(const int playerNo) const;
+
+
 			PrisonDoor* GetPrisonDoor() const;
 
 			bool RoundHasStarted() { return mStartTimer <= 0; }
+
+			std::vector<PlayerInventoryObserver*> GetPlayerInventoryObservers() { return mPlayerInventoryObservers; };
+			std::vector<PlayerBuffsObserver*> GetPlayerBuffsObservers() { return mPlayerBuffsObservers; };
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -167,8 +177,8 @@ namespace NCL {
 			void LoadCCTVList(const std::vector<Transform>& transforms, const Vector3& startPosition, int rotation = 0);
 
 			void LoadDecorations(const std::unordered_map<DecorationType, std::vector<Transform>>& decorationMap, const Vector3& startPosition, int rotation = 0);
-
-			void LoadCCTVs(std::mt19937 seed);
+			
+			void LoadCCTVs(std::mt19937 seed, const bool isMultiplayerLevel = false);
 
 			void LoadDoorsInNavGrid();
 
@@ -178,12 +188,12 @@ namespace NCL {
 
 			GameObject* AddWallToWorld(const Transform& transform);
 			GameObject* AddCornerWallToWorld(const Transform& transform);
-			GameObject* AddFloorToWorld(const Transform& transform);
-			CCTV* AddCCTVToWorld(const Transform& transform);
+			GameObject* AddFloorToWorld(const Transform& transform, bool isOutside);
+			CCTV* AddCCTVToWorld(const Transform& transform, const bool isMultiplayerLevel = false);
 			Helipad* AddHelipadToWorld(const Vector3& position);
 			Vent* AddVentToWorld(Vent* vent, bool isMultiplayerLevel = false);
 			InteractableDoor* AddDoorToWorld(const Transform& transform, const Vector3& offset, bool isMultiplayerLevel = false);
-			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door);
+			PrisonDoor* AddPrisonDoorToWorld(PrisonDoor* door, bool isMultiplayerLevel);
 
 			FlagGameObject* AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
 				std::mt19937 seed);
@@ -192,7 +202,7 @@ namespace NCL {
 
 			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
 
-			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName, PrisonDoor* mPrisonDoor);
+			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
 			GuardObject* AddGuardToWorld(const vector<Vector3> nodes, const Vector3 prisonPosition, const std::string& guardName, bool isInMultiplayer);
 

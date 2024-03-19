@@ -2,15 +2,13 @@ MeshMat
 1
 2
 2
-Table 1 Glass
-3
-Diffuse:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 BaseMap.png
-Bump:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 Normal.png
-Metallic:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 MaskMap.png
-Table 1
-3
-Diffuse:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 BaseMap.png
-Bump:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 Normal.png
-Metallic:/AK STUDIO ART/Sofa Set/Models/Table 1/Table 1 MaskMap.png
+Table1Glass
+2
+Diffuse:/Table_1_BaseMap.png
+Normal:/Basic_Normal.png
+Table1
+2
+Diffuse:/Table_1_BaseMap.png
+Normal:/Basic_Normal.png
 0
 1

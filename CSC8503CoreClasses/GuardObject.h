@@ -79,7 +79,7 @@ namespace NCL {
 
             void CheckForDoors(float dt);
             void OpenDoor();
-
+            void SendAnnouncementToPlayer();
             float mDist;
             float* mNextPoly = new float[3];
             float mConfiscateItemsTime;

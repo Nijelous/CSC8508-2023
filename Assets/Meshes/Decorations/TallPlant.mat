@@ -2,18 +2,18 @@ MeshMat
 1
 3
 3
-Pine Mat
+PineMat
 2
-Diffuse:/Meshes/Decorative plants/Textures/Pine diffuse.tga
-Bump:/Meshes/Decorative plants/Textures/Pine normal.tga
-Cover Mat
+Diffuse:/Pine_diffuse.png
+Normal:/Pine_normal.tga
+CoverMat
 2
-Diffuse:/Meshes/Decorative plants/Textures/Cover diffuse.tga
-Bump:/Meshes/Decorative plants/Textures/Cover normal.tga
-Pot Mat
+Diffuse:/Cover_diffuse.png
+Normal:/Cover_normal.tga
+PotMat
 2
-Diffuse:/Meshes/Decorative plants/Textures/Pot diffuse.tga
-Bump:/Meshes/Decorative plants/Textures/Pot normal.tga
+Diffuse:/Pot_diffuse.png
+Normal:/Pot_normal.tga
 0
 1
 2

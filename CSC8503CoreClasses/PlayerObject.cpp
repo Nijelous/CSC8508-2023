@@ -63,17 +63,13 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
 	UISystem* UI, SoundObject* soundObject,
 	const std::string& objName,
-	 PrisonDoor* prisonDoorPtr,
 	int playerID,int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
-	mPrisonDoorPtr = prisonDoorPtr;
 	SetUIObject(UI);
 	SetSoundObject(soundObject);
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
 	mWalkSpeed = walkSpeed;
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
@@ -88,11 +84,10 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mIsPlayer = true;
 	mHasSilentSprintBuff = false;
 	mInteractHeldDt = 0;
+	mAnnouncementMap.clear();
 }
 
 PlayerObject::~PlayerObject() {
-	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Detach(this);
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Detach(this);
 }
 
 
@@ -101,7 +96,12 @@ void PlayerObject::UpdateObject(float dt) {
 		const GameObjectState previousObjectState = mObjectState;
 
 		MovePlayer(dt);
-		RayCastFromPlayer(mGameWorld, dt);
+
+		NCL::CSC8503::InteractType interactType;
+		if(GotRaycastInput(interactType,dt))
+			RayCastFromPlayer(mGameWorld, interactType, dt);
+		else
+			RayCastFromPlayerForUI(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
@@ -123,46 +123,17 @@ void PlayerObject::UpdateObject(float dt) {
 	else {
 		EnforceMaxSpeeds();
 	}
-	//SusBar
-	float iconValue = SusLinerInterpolation(dt);
 
-	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
-	if (mSusValue > 33) {
-		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
-		if (mSusValue > 66) {
-			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
-			mAlarmTime = mAlarmTime + dt;
-		}
-	}
-	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
-		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
-		mAlarmTime = 0;
-	}
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
-
+	UpdateLocalUI(dt);
+	UpdateGlobalUI(dt);
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
-
 	}
 }
 
 void PlayerObject::ShowDebugInfo(float dt)
 {
-	//It have some problem here
-	mUiTime = mUiTime + dt;
-	mUiTime = std::fmod(mUiTime, 1.0f);
-
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
-
-	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-	float iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-	mLastSusValue = mSusValue;
-
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
 	Debug::Print("Sus:" + std::to_string(
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)
 	), Vector2(70, 90));
@@ -263,14 +234,6 @@ PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 	return mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemInInventorySlot(mPlayerID, mActiveItemSlot);
 }
 
-void PlayerObject::ClosePrisonDoor(){
-	mPrisonDoorPtr->Close();
-}
-
-void PlayerObject::SetPrisonDoor(PrisonDoor* prisonDoor) {
-	mPrisonDoorPtr = prisonDoor;
-}
-
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
 	offset.y += 3;
@@ -323,108 +286,108 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 }
 
-void PlayerObject::RayCastFromPlayer(GameWorld* world, float dt) {
-	bool isRaycastTriggered = false;
-	NCL::CSC8503::InteractType interactType;
-
+bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt){
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
-		isRaycastTriggered = true;
+		
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
+		return true;
 	}
 	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
 		mInteractHeldDt += dt;
 		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if(DEBUG_MODE)
+			if (DEBUG_MODE)
 				Debug::Print("PickPocket window", Vector2(40, 85));
+			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::LongUse;
 			if (DEBUG_MODE)
 				Debug::Print("LongUse", Vector2(40, 85));
-		}
-	}
-	else {
-		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
-		RayCollision closestCollision;
-		
-		if (world->Raycast(ray, closestCollision, true, this)) {
-			auto* objectHit = (GameObject*)closestCollision.node;
-
-			Vector2 objPos = {objectHit->GetTransform().GetPosition().x, objectHit->GetTransform().GetPosition().z};
-			Vector2 playerPos = {GetTransform().GetPosition().x ,GetTransform().GetPosition().z};
-			float distance = (objPos - playerPos).Length();
-			RayCastIcon(objectHit, distance);
-
-		}
-		else {
-			ResetRayCastIcon();
+			return true;
 		}
 	}
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
 		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
-			return;
-		isRaycastTriggered = true;
+			return false;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
+		return true;
 	}
+	return false;
+}
 
-	if (isRaycastTriggered)
-	{
-		std::cout << "Ray fired" << std::endl;
-		Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
-		RayCollision closestCollision;
+void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::InteractType& interactType, const float dt) {
+	std::cout << "Ray fired" << std::endl;
+	Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+	RayCollision closestCollision;
 
-		if (world->Raycast(ray, closestCollision, true, this)) {
-			auto* objectHit = (GameObject*)closestCollision.node;
-			if (objectHit) {
-				Vector3 objPos = objectHit->GetTransform().GetPosition();
-				Vector3 playerPos = GetTransform().GetPosition();
+	if (world->Raycast(ray, closestCollision, true, this)) {
+		auto* objectHit = (GameObject*)closestCollision.node;
+		if (objectHit) {
+			Vector3 objPos = objectHit->GetTransform().GetPosition();
+			Vector3 playerPos = GetTransform().GetPosition();
 
-				float distance = (objPos - playerPos).Length();
+			float distance = (objPos - playerPos).Length();
 
-				if (distance > 17.5f) {
-					std::cout << "Nothing hit in range" << std::endl;
-					return;
-				}
+			if (distance > 17.5f) {
+				std::cout << "Nothing hit in range" << std::endl;
+				return;
+			}
 
-				//Check if object is an item.
+			//Check if object is an item.
 #ifdef USEGL
-				Item* item = dynamic_cast<Item*>(objectHit);
-				if (item != nullptr) {
-					item->OnPlayerInteract(mPlayerID);
-					return;
+			Item* item = dynamic_cast<Item*>(objectHit);
+			if (item != nullptr) {
+				item->OnPlayerInteract(mPlayerID);
+				return;
+			}
+
+			//Check if object is an interactable.
+			Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+			if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType, this)) {
+				interactablePtr->Interact(interactType, this);
+				if (interactType == ItemUse) {
+					mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 				}
 
-				//Check if object is an interactable.
-				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType,this)) {
-					interactablePtr->Interact(interactType, this);
-					if (interactType == ItemUse) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
-					}
-
-					return;
-				}
+				return;
+			}
 #endif
-				if (interactType == PickPocket)
-				{
-					GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
-					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
-							TransferItemBetweenInventories(1,
-								0, this->GetPlayerID());
-					}
+			if (interactType == PickPocket)
+			{
+				GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
+				if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
+					mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
+						TransferItemBetweenInventories(1,
+							0, this->GetPlayerID());
 				}
 			}
+			std::cout << "Object hit " << objectHit->GetName() << std::endl;
 		}
+	}
+};
+
+void PlayerObject::RayCastFromPlayerForUI(GameWorld* world, const float dt) {
+	Ray ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+	RayCollision closestCollision;
+
+	if (world->Raycast(ray, closestCollision, true, this)) {
+		auto* objectHit = (GameObject*)closestCollision.node;
+
+		Vector2 objPos = { objectHit->GetTransform().GetPosition().x, objectHit->GetTransform().GetPosition().z };
+		Vector2 playerPos = { GetTransform().GetPosition().x ,GetTransform().GetPosition().z };
+		float distance = (objPos - playerPos).Length();
+		RayCastIcon(objectHit, distance);
+
+	}
+	else {
+		ResetRayCastIcon();
 	}
 }
 
@@ -499,7 +462,8 @@ void PlayerObject::ControlInventory() {
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
 		DEBUG_MODE) {
-		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::flagSight, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::flag, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
 }
@@ -618,7 +582,6 @@ void PlayerObject::ChangeTransparency(bool isUp, float& transparency)
 	if (isUp == false && transparency > 0) {
 		transparency = transparency - 0.05;
 	}
-	
 }
 
 void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
@@ -800,7 +763,12 @@ void PlayerObject::ChangeToStunned(){
 void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent)
 	{
+	case InventoryBuffSystem::flagAdded:
+		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
+		AddAnnouncement(AnnouncementType::FlagAddedAnnouncement, 8, playerNo);
+		break;
 	case InventoryBuffSystem::flagDropped:
+		AddAnnouncement(AnnouncementType::FlagDroppedAnnouncement, 8, playerNo);
 		break;
 	case InventoryBuffSystem::disguiseItemUsed:
 		break;
@@ -817,6 +785,57 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 	default:
 		break;
 	}
+}
+
+void PlayerObject::UpdateGlobalUI(float dt){
+	int announcementY = 15;
+	for (auto& entry : mAnnouncementMap) {
+		if (entry.second > 0) {
+			entry.second -= dt;
+			Debug::Print(entry.first, Vector2(0, announcementY));
+			announcementY += 5;
+		}
+	}
+}
+
+
+
+void PlayerObject::UpdateLocalUI(float dt){
+	//SusBar
+	float iconValue = SusLinerInterpolation(dt);
+
+	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
+	if (mSusValue > 33) {
+		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
+		if (mSusValue > 66) {
+			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
+			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+			mAlarmTime = mAlarmTime + dt;
+		}
+	}
+	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
+
+	//It have some problem here
+	mUiTime = mUiTime + dt;
+	mUiTime = std::fmod(mUiTime, 1.0f);
+
+	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
+
+	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
+
+	iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
+
+	mLastSusValue = mSusValue;
+
+	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
+
+	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
+
+
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {

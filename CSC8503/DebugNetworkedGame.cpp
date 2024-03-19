@@ -108,6 +108,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(String_Message, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -143,6 +144,7 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::ClientSyncBuffs, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 	}
 
 	return isConnected;
@@ -329,8 +331,14 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	case BasicNetworkMessages::SyncPlayerIdNameMap: {
 		const SyncPlayerIdNameMapPacket* packet = (SyncPlayerIdNameMapPacket*)(payload);
 		HandleSyncPlayerIdNameMapPacket(packet);
+		break;
 	}
-
+	case BasicNetworkMessages::SyncAnnouncements: {
+		const AnnouncementSyncPacket* packet = (AnnouncementSyncPacket*)(payload);
+		HandleAnnouncementSync(packet);
+		break;
+	}
+	break;
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -383,6 +391,11 @@ void DebugNetworkedGame::SendClientSyncLocationActiveSusCausePacket(int cantorPa
 
 void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const {
 	NCL::CSC8503::ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, float time, int playerNo){
+	NCL::CSC8503::AnnouncementSyncPacket packet(annType,time, playerNo);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -529,7 +542,7 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
+	mLevelManager->LoadLevel(DEMO_LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 
@@ -548,6 +561,8 @@ void DebugNetworkedGame::SpawnPlayers() {
 			const Vector3& pos = mLevelManager->GetPlayerStartPosition(i);
 			auto* netPlayer = AddPlayerObject(pos, i);
 			mServerPlayers.emplace(i, netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->Attach(netPlayer);
+			mLevelManager->GetInventoryBuffSystem()->GetPlayerBuffsPtr()->Attach(netPlayer);
 		}
 		else
 		{
@@ -596,12 +611,13 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 		break;
 	case 2:
 		colour = Vector4(0, 0, 1, 1); //Blue
+		break;
 	case 3:
 		colour = Vector4(1, 1, 0, 1); //Yellow
+		break;
 	default:
 		break;
 	}
-	netPlayer->SetPrisonDoor(mLevelManager->GetPrisonDoor());
 	netPlayer->GetRenderObject()->SetColour(colour);
 	return netPlayer;
 }
@@ -719,6 +735,13 @@ void DebugNetworkedGame::HandleLocationActiveSusCauseChange(ClientSyncLocationAc
 void DebugNetworkedGame::HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const {
 	auto* locationSusMetre = mLevelManager->GetSuspicionSystem()->GetLocationBasedSuspicion();
 	locationSusMetre->SyncSusChange(packet->cantorPairedLocation, packet->changedValue);
+}
+
+void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const{
+	if (!mLocalPlayer)
+		return;
+	const PlayerObject::AnnouncementType annType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
+	GetLocalPlayer()->SyncAnnouncements(annType,packet->time,packet->playerNo);
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {
