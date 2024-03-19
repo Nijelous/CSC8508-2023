@@ -147,7 +147,8 @@ void PlayerObject::UpdateObject(float dt) {
 		mAlarmTime = 0;
 	}
 
-
+	UpdateGlobalUI(dt);
+	UpdateLocalUI(dt);
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
