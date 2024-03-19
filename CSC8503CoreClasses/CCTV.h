@@ -5,13 +5,13 @@
 
 namespace NCL {
 	namespace CSC8503 {
-	
-
 		class CCTV : public GameObject {
 		public:
-			CCTV(const float baseL = 5,const std::string& name = ""){
+			CCTV(const float baseL = 5, GameWorld* world = nullptr, const std::string& name = ""){
 				mBaseL = baseL;
 				mName == "CCTV";
+				mWorld = world;
+				
 			};
 			~CCTV() {
 				hadSeenPlayer.clear();
@@ -28,11 +28,11 @@ namespace NCL {
 			void SetInitAngle(float angle) {
 				initAngle = angle;
 			}
-			bool CanSeePlayer(PlayerObject* mPlayerObject) const;
+			const bool CanSeePlayer(PlayerObject* mPlayerObject) ;
+			const bool PlayerInRaycast(PlayerObject* mPlayerObject) ;
 			const void OnPlayerSeen(PlayerObject* mPlayerObject);
 			const void OnPlayerNotSeen(PlayerObject* mPlayerObject);
-			void AngleToNormalisedCoords(float angle, float& x, float& y) const;
-			
+			static void AngleToNormalisedCoords(float angle, float& x, float& y);
 		protected:
 			float mBaseL;
 			Pyramid mViewPyramid;
@@ -40,6 +40,7 @@ namespace NCL {
 			std::map<int, bool> hadSeenPlayer;
 			float initAngle;
 			float rotateAngle;
+			GameWorld* mWorld;
 		};
 	}
 }
