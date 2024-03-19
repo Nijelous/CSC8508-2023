@@ -249,6 +249,7 @@ namespace NCL {
 
 			FlagGameObject* mMainFlag;
 
+
 			//animation guard
 			std::map<std::string, MeshAnimation*> mPreAnimationList;
 
