@@ -183,6 +183,8 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
 		break;
 	case Sprint:
+		if (mHasSilentSprintBuff)
+			break;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerSprint, mPlayerID);
 		break;
 	default:
