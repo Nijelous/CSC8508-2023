@@ -748,7 +748,7 @@ void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* pa
 
 void DebugNetworkedGame::HandleMultiplayerSound(SoundPacket* packet) const {
 	if (packet->playerId == mLocalPlayerId) {
-		mLevelManager->GetSoundManager()->UpdateMultiplayerSound();
+		mLevelManager->GetSoundManager()->PlaySpottedSound();
 	}
 }
 

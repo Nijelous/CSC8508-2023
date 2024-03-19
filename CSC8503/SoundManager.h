@@ -34,7 +34,7 @@ namespace NCL{
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
 
-			void UpdateMultiplayerSound();
+			void PlaySpottedSound();
 
 			void UpdateListenerAttributes();
 

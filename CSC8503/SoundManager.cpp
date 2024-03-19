@@ -267,6 +267,17 @@ void SoundManager::PlayVentSound(Vector3 soundPos) {
 	channel->setPaused(false);
 }
 
+void SoundManager::PlaySpottedSound() {
+	std::cout<<"Spotted" << std::endl;
+	Channel* channel;
+	mResult = mSystem->playSound(mSpottedSound, 0, false, &channel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play Spotted Sound error" << std::endl;
+		return;
+	}
+	mSystem->update();
+}
+
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
 	Channel* channel = nullptr;
 	FMOD_VECTOR pos = ConvertVector(soundPos);
@@ -361,16 +372,6 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 	case GameObject::GameObjectState::Happy:
 		break;
 	}
-}
-
-void SoundManager::UpdateMultiplayerSound() {
-	Channel* channel;
-	mResult = mSystem->playSound(mSpottedSound, 0, false, &channel);
-	if (mResult != FMOD_OK) {
-		std::cout << "Play Spotted Sound error" << std::endl;
-		return;
-	}
-	mSystem->update();
 }
 
 void SoundManager::UpdateListenerAttributes() {
