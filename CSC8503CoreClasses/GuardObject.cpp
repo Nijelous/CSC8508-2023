@@ -325,22 +325,23 @@ void GuardObject::OpenDoor() {
 
 bool GuardObject::IsHighEnoughLocationSus() {
 	int searchedVal = 70;
-	mHighSusLocations.clear();
+	mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
+	mSmallestDistanceVector = Vector3(100000000, 100000000, 100000000);
 	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->empty() == true) { return false; }
 
 	for (auto it = LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->begin();
 		it != LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->end(); it++) {
 		if ((*it).second >= HIGH_SUSPICION) {
-			mHighSusLocations.push_back((*it).first);
+			float distance = ((*it).first - this->GetTransform().GetPosition()).LengthSquared();
+			if (distance < mSmallestDistance) {
+				mSmallestDistance = distance;
+				mSmallestDistanceVector = (*it).first;
+			}
 		}
 	}
 
-	if (mHighSusLocations.empty() != true) { return true; }
+	if (mSmallestDistance < MAX_DIST_TO_SUS_LOCATION) { return true; }
 	else { return false; }
-}
-
-Vector3 GuardObject::GetLocationMapSuspicion() {
-	
 }
 
 void GuardObject::BehaviourTree() {
@@ -384,7 +385,10 @@ BehaviourAction* GuardObject::Patrol() {
 
 		}
 		else if (state == Ongoing) {
-			if (mCanSeePlayer == false) {
+			if (IsHighEnoughLocationSus() == true) {
+				return Failure;
+			}
+			else if (mCanSeePlayer == false) {
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
@@ -403,9 +407,6 @@ BehaviourAction* GuardObject::Patrol() {
 			else if (mCanSeePlayer == true) {
 				return Failure;
 			}
-			else if (IsHighEnoughLocationSus() == true) {
-				return Failure;
-			}
 		}
 		return state;
 		}
@@ -421,11 +422,19 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true) {
+				//LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveActiveLocationSusCause(
+				//	LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->continouousSound, mSmallestDistanceVector);
+				mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 				return Failure;
 			}
 			else {
-				if () {
-					cout << "Big butty";
+				float* endPos = new float[3] {mSmallestDistanceVector.x, mSmallestDistanceVector.y, mSmallestDistanceVector.z};
+				MoveTowardFocalPoint(endPos);
+				if ((mSmallestDistanceVector - this->GetTransform().GetPosition()).LengthSquared() < MIN_DIST_TO_NEXT_POS) {
+					//LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveActiveLocationSusCause(
+					//	LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->continouousSound, mSmallestDistanceVector);
+					mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
+					return Success;
 				}
 			}
 		}
