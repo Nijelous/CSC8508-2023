@@ -1267,6 +1267,8 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
+	newDoor->Open();
+
 	if (isMultiplayerLevel) {
 		AddNetworkObject(*newDoor);
 	}
