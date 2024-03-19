@@ -32,8 +32,9 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	float3 bitangent;
 	
 	TransformVertexToWorld(s, vertID, position, normal, tangent, bitangent);
-	normal = normalize (float3(mul(s.modelMatrix, float4(normal,0))));
-	tangent.xyz = normalize(mul(s.modelMatrix,float4(tangent.xyz,0)).xyz);
+	float3x3 normalMatrix = transpose(float3x3(s.invModelMatrix));
+	normal = normalize (mul(normalMatrix, normal));
+	tangent.xyz = normalize(mul(normalMatrix,tangent.xyz));
 	bitangent = normalize((cross(tangent.xyz, normal) * tangent.w));
 
 	Output.Normal = normal;

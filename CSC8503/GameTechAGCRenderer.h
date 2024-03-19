@@ -172,9 +172,11 @@ namespace NCL {
 			sce::Agc::CxRenderTarget			screenTarget;
 			sce::Agc::CxRenderTarget			mGBuffAlbedoTarget;
 			sce::Agc::CxRenderTarget			mGBuffNormalTarget;
+			sce::Agc::CxDepthRenderTarget		mGBuffDepthTarget;
 			NCL::PS5::AGCTexture*				screenTex; //ptr into bindless array
 			NCL::PS5::AGCTexture*				mGBuffAlbedoTex;
 			NCL::PS5::AGCTexture*				mGBuffNormalTex;
+			NCL::PS5::AGCTexture*				mGBuffDepthTex;
 
 			std::vector<SkinningJob> frameJobs;
 		};

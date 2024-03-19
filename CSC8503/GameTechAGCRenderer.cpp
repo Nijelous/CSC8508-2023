@@ -1,4 +1,7 @@
 #include "GameTechAGCRenderer.h"
+
+#include <algorithm>
+
 #include "GameObject.h"
 #include "RenderObject.h"
 #include "Camera.h"
@@ -91,6 +94,9 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 
 	shadowTarget = CreateDepthBufferTarget(SHADOW_SIZE, SHADOW_SIZE);
 	shadowMap = CreateFrameBufferTextureSlot("Shadowmap");
+	mGBuffDepthTarget = CreateDepthBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
+	mGBuffDepthTex = CreateFrameBufferTextureSlot("depthTex");
+
 
 	screenTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
 	mGBuffAlbedoTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
@@ -99,9 +105,14 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	screenTex = CreateFrameBufferTextureSlot("Screen");
 	mGBuffAlbedoTex = CreateFrameBufferTextureSlot("albedoTex");
 	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
+	
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
+
+	const bool htileTC = (mGBuffDepthTarget.getTextureCompatiblePlaneCompression() == sce::Agc::CxDepthRenderTarget::TextureCompatiblePlaneCompression::kEnable);
+	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
+	sce::Agc::Core::translate(mGBuffDepthTex->GetAGCPointer(), &mGBuffDepthTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
 	shadowSampler.init()
 		.setXyFilterMode(
 			sce::Agc::Core::Sampler::FilterMode::kPoint,	//magnification
@@ -213,6 +224,10 @@ void GameTechAGCRenderer::WriteRenderPassConstants() {
 	frameData.orthoMatrix = Matrix4::Orthographic(0.0f, 100.0f, 100.0f, 0.0f, -1.0f, 1.0f);
 	frameData.pixelSize = Vector2(1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
 
+	frameData.gBuffAlbedoIndex = mGBuffAlbedoTex->GetAssetID();
+	frameData.gBuffNormalIndex = mGBuffNormalTex->GetAssetID();
+	frameData.gBuffDepthIndex = mGBuffDepthTex->GetAssetID();
+
 	currentFrame->data.WriteData<ShaderConstants>(frameData); //Let's start filling up our frame data!
 
 	currentFrame->data.AlignData(128);
@@ -229,7 +244,7 @@ void GameTechAGCRenderer::DrawObjects() {
 	int instanceCount = 0;
 
 	bool skipInstance = false;
-
+	
 	for (int i = 0; i < activeObjects.size(); ++i) {
 		AGCMesh* objectMesh = (AGCMesh*)activeObjects[i]->GetMesh();
 
@@ -393,23 +408,22 @@ void GameTechAGCRenderer::DeferredRenderingPass(){
 
 
 void GameTechAGCRenderer::FillGBuffer() {
+	sce::Agc::Toolkit::Result tk1 = sce::Agc::Toolkit::clearDepthRenderTargetCs(&frameContext->m_dcb, &mGBuffDepthTarget);
+	sce::Agc::Toolkit::Result wat = frameContext->resetToolkitChangesAndSyncToGl2(tk1);
+
 	frameContext->setShaders(nullptr, defaultVertexShader->GetAGCPointer(), defaultPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
 
 	sce::Agc::CxViewport viewPort;
 	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 1.0f);
 	frameContext->m_sb.setState(viewPort);
-	frameContext->m_sb.setState(backBuffers[currentSwap].targetMask);
-	frameContext->m_sb.setState(backBuffers[currentSwap].renderTarget);
 
 	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
 	rtMask.setMask(1, 0xFF);
-	frameContext->m_sb.setState(rtMask);
-	frameContext->m_sb.setState(mGBuffAlbedoTarget);
-	
-	frameContext->m_sb.setState(depthTarget);
 
-	
+	frameContext->m_sb.setState(rtMask);
+	frameContext->m_sb.setState(mGBuffAlbedoTarget);	
 	frameContext->m_sb.setState(mGBuffNormalTarget);
+	frameContext->m_sb.setState(mGBuffDepthTarget);
 
 	sce::Agc::CxDepthStencilControl depthControl;
 	depthControl.init();
@@ -427,14 +441,19 @@ void GameTechAGCRenderer::FillGBuffer() {
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
 		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
 		.setBuffers(0, 1, &textureBuffer)
-		.setSamplers(0, 1, &defaultSampler)
-		.setSamplers(1, 1, &shadowSampler);
+		.setSamplers(0, 1, &defaultSampler);
 	DrawObjects();
 
 	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
 
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushCompressedDepthBufferForTexture);
+	const bool htileTC = (mGBuffDepthTarget.getTextureCompatiblePlaneCompression() == sce::Agc::CxDepthRenderTarget::TextureCompatiblePlaneCompression::kEnable);
+	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffDepthTex->GetAssetID()], &mGBuffDepthTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
+
 }
 
 void GameTechAGCRenderer::DrawLightVolumes() {
@@ -579,7 +598,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 					ObjectState state;
 					state.modelMatrix = g->GetTransform()->GetMatrix();
-
+					state.invModelMatrix = g->GetTransform()->GetMatrix();
 					state.colour = g->GetColour();
 					state.index[0] = 0; //Albedo texture
 					state.index[1] = 0; //Normal texture
@@ -631,7 +650,6 @@ void GameTechAGCRenderer::UpdateObjectList() {
 			}
 		}
 	);
-
 	sce::Agc::Core::BufferSpec bufSpec;
 	bufSpec.initAsRegularBuffer(dataPos, sizeof(ObjectState), at);
 	sce::Agc::Core::initialize(&currentFrame->objectBuffer, &bufSpec);

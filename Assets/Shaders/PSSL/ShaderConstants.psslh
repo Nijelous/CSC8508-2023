@@ -10,8 +10,15 @@ struct ShaderConstants
 	matrix inverseViewMatrix;
 	matrix inverseProjMatrix;
 
+	int gBuffAlbedoIndex;
+	int gBuffNormalIndex;
+	int gBuffDepthIndex;
+	int diffuseLightIndex;
+	int specularLightIndex;
+
 	float3 cameraPos;
 	float2 pixelSize;
+ 
 };
 
 #ifndef __cplusplus 
