@@ -15,21 +15,22 @@ SyncPlayerListPacket::SyncPlayerListPacket(std::vector<int>& serverPlayers) {
 
 void SyncPlayerListPacket::SyncPlayerList(std::vector<int>& clientPlayerList) const
 {
-	//TODO(erendgrmnc): Add config for max player number.
-
+//TODO(erendgrmnc): Add config for max player number.
+	
 	for (int i = 0; i < 4; ++i) {
 		clientPlayerList[i] = playerList[i];
 	}
 }
 
-GameStartStatePacket::GameStartStatePacket(bool val) {
+GameStartStatePacket::GameStartStatePacket(bool val, std::mt19937 levelSeed) {
 	type = BasicNetworkMessages::GameStartState;
 	size = sizeof(GameStartStatePacket);
 
 	isGameStarted = val;
+	this->levelSeed = levelSeed;
 }
 
-GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId) {
+GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId){
 	type = BasicNetworkMessages::GameEndState;
 	size = sizeof(GameEndStatePacket);
 
@@ -37,7 +38,7 @@ GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId) {
 	this->winningPlayerId = winningPlayerId;
 }
 
-ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs) {
+ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs& playerInputs){
 	type = BasicNetworkMessages::ClientPlayerInputState;
 	size = sizeof(ClientPlayerInputPacket);
 
@@ -49,10 +50,10 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 
 	this->playerInputs.leftHandItemId = playerInputs.leftHandItemId;
 	this->playerInputs.rightHandItemId = playerInputs.rightHandItemId;
-
+	
 	this->playerInputs.movementButtons[0] = playerInputs.movementButtons[0];
 	this->playerInputs.movementButtons[1] = playerInputs.movementButtons[1];
-	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[2];
+	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[3];
 	this->playerInputs.movementButtons[3] = playerInputs.movementButtons[3];
 
 	this->playerInputs.fwdAxis.x = playerInputs.fwdAxis.x;
@@ -65,8 +66,8 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	this->playerInputs.cameraYaw = playerInputs.cameraYaw;
 
 	this->playerInputs.rayFromPlayer = playerInputs.rayFromPlayer;
-
-	this->lastId = lastId;
+	
+	this-> lastId = lastId;
 	this->mouseXLook = mouseXLook;
 }
 
@@ -178,7 +179,16 @@ SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>
 
 }
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
+AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int playerNo) {
+	type = SyncAnnouncements;
+	size = sizeof(AnnouncementSyncPacket);
+
+	this->annType = annType;
+	this->time = time;
+	this->playerNo = playerNo;
+}
+
+NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
 	deltaErrors = 0;
 	fullErrors = 0;
 	networkID = id;
@@ -210,7 +220,7 @@ bool NetworkObject::WritePacket(GamePacket** p, bool deltaFrame, int stateID) {
 	return WriteFullPacket(p);
 }
 //Client objects recieve these packets
-bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
+bool NetworkObject::ReadDeltaPacket(DeltaPacket &p) {
 	// if the delta packets full state is not the same as the last examined full state we discard it
 	if (p.fullID != lastFullState.stateID)
 		return false;
@@ -233,7 +243,7 @@ bool NetworkObject::ReadDeltaPacket(DeltaPacket& p) {
 	return true;
 }
 
-bool NetworkObject::ReadFullPacket(FullPacket& p) {
+bool NetworkObject::ReadFullPacket(FullPacket &p) {
 	// if packet is old discard
 	if (p.fullState.stateID < lastFullState.stateID)
 		return false;
@@ -248,7 +258,7 @@ bool NetworkObject::ReadFullPacket(FullPacket& p) {
 	return true;
 }
 
-bool NetworkObject::WriteDeltaPacket(GamePacket** p, int stateID) {
+bool NetworkObject::WriteDeltaPacket(GamePacket**p, int stateID) {
 	DeltaPacket* dp = new DeltaPacket();
 	NetworkState state;
 
@@ -280,7 +290,7 @@ bool NetworkObject::WriteDeltaPacket(GamePacket** p, int stateID) {
 	return true;
 }
 
-bool NetworkObject::WriteFullPacket(GamePacket** p) {
+bool NetworkObject::WriteFullPacket(GamePacket**p) {
 	FullPacket* fp = new FullPacket();
 
 

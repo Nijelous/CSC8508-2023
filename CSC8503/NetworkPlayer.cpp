@@ -76,7 +76,11 @@ void NetworkPlayer::UpdateObject(float dt) {
 		MovePlayer(dt);
 
 		//if (game->GetIsServer()) 
-			RayCastFromPlayer(mGameWorld, dt);
+		NCL::CSC8503::InteractType interactType;
+		if (GotRaycastInput(interactType, dt))
+			RayCastFromPlayer(mGameWorld, interactType, dt);
+		else
+			PlayerObject::RayCastFromPlayerForUI(mGameWorld,dt);
 
 		ResetPlayerInput();
 
@@ -101,10 +105,12 @@ void NetworkPlayer::UpdateObject(float dt) {
 		EnforceSpedUpMaxSpeeds();
 	else
 		EnforceMaxSpeeds();
-
-	if (DEBUG_MODE && mIsLocalPlayer)
-	{
-		PlayerObject::ShowDebugInfo(dt);
+	
+	if (mIsLocalPlayer){
+		PlayerObject::UpdateGlobalUI(dt);
+		PlayerObject::UpdateLocalUI(dt);
+		if (DEBUG_MODE)
+			PlayerObject::ShowDebugInfo(dt);
 	}
 }
 
@@ -172,6 +178,11 @@ void NetworkPlayer::MovePlayer(float dt) {
 			mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		}
 
+		if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
+			DEBUG_MODE) {
+			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::flag, mPlayerID);
+			mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
+		}
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 
@@ -193,6 +204,24 @@ void NetworkPlayer::MovePlayer(float dt) {
 
 		mIsClientInputReceived = false;
 	}
+}
+
+void NCL::CSC8503::NetworkPlayer::AddAnnouncement(AnnouncementType announcementType, float time, int playerNo){
+	PlayerObject::AddAnnouncement(announcementType, time, playerNo);
+	if (game->GetIsServer() )
+		SendAnnouncementPacket(announcementType, time, playerNo);
+	else 
+	if (!game->GetIsServer())
+		game->GetClient()->WriteAndSendAnnouncementSyncPacket(announcementType, time, playerNo);
+}
+
+void NetworkPlayer::SendAnnouncementPacket(AnnouncementType announcementType, float time, int playerNo){
+	game->SendAnnouncementSyncPacket(announcementType,time, playerNo);
+}
+
+void NetworkPlayer::SyncAnnouncements(AnnouncementType announcementType, float time, int playerNo){
+	const std::string annString = mAnnouncementTypeToStringMap[announcementType] + std::to_string(playerNo) + '!';
+	mAnnouncementMap[annString] = time;
 }
 
 void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
@@ -240,18 +269,14 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 	StopSliding();
 }
 
-
-void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
-	bool isRaycastTriggered = false;
-	NCL::CSC8503::InteractType interactType;
-
+bool NCL::CSC8503::NetworkPlayer::GotRaycastInput(NCL::CSC8503::InteractType& interactType, const float dt){
 	bool isThereAnyInputFromUser = (Window::GetKeyboard()->KeyPressed(KeyCodes::E) && mIsLocalPlayer) || (mPlayerInputs.isInteractButtonPressed && !mIsLocalPlayer);
 	bool isPlayerHoldingInteract = (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) || (!mIsLocalPlayer && mPlayerInputs.isHoldingInteractButton);
 
 	if (isThereAnyInputFromUser) {
-		isRaycastTriggered = true;   
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
+		return true;
 	}
 	else if (isPlayerHoldingInteract) {
 		//TODO(erendgrmnc): add config or get from entity for long interact duration.
@@ -259,17 +284,19 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::PickPocket;
 			if (DEBUG_MODE)
 				Debug::Print("PickPocket window", Vector2(40, 85));
+
+			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
-			isRaycastTriggered = true;
 			interactType = NCL::CSC8503::InteractType::LongUse;
 			if (DEBUG_MODE)
 				Debug::Print("LongUse", Vector2(40, 85));
+
+			return true;
 		}
 	}
 
@@ -279,69 +306,71 @@ void NetworkPlayer::RayCastFromPlayer(GameWorld* world, float dt) {
 	if (isEquippedItemUsed) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
 		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
-			return;
-		isRaycastTriggered = true;
+			return false;
 		interactType = NCL::CSC8503::InteractType::ItemUse;
+
+		return true;
 	}
+	return false;
+}
 
-	if (isRaycastTriggered) {
-		Ray ray;
-		if (!mIsLocalPlayer) {
-			ray = mPlayerInputs.rayFromPlayer;
-		}
-		else {
-			ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
-		}
-		std::cout << "Ray fired" << std::endl;
-		RayCollision closestCollision;
 
-		if (world->Raycast(ray, closestCollision, true, this)) {
-			auto* objectHit = (GameObject*)closestCollision.node;
-			if (objectHit) {
-				Vector3 objPos = objectHit->GetTransform().GetPosition();
+void NetworkPlayer::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::InteractType& interactType, float dt) {
+	Ray ray;
+	if (!mIsLocalPlayer) {
+		ray = mPlayerInputs.rayFromPlayer;
+	}
+	else {
+		ray = CollisionDetection::BuidRayFromCenterOfTheCamera(world->GetMainCamera());
+	}
+	std::cout << "Ray fired" << std::endl;
+	RayCollision closestCollision;
 
-				Vector3 playerPos = GetTransform().GetPosition();
+	if (world->Raycast(ray, closestCollision, true, this)) {
+		auto* objectHit = (GameObject*)closestCollision.node;
+		if (objectHit) {
+			Vector3 objPos = objectHit->GetTransform().GetPosition();
 
-				float distance = (objPos - playerPos).Length();
+			Vector3 playerPos = GetTransform().GetPosition();
 
-				if (distance > 17.5f) {
-					std::cout << "Nothing hit in range" << std::endl;
-					return;
-				}
+			float distance = (objPos - playerPos).Length();
 
-				//Check if object is an item.
-				Item* item = dynamic_cast<Item*>(objectHit);
-				if (item != nullptr) {
-					item->OnPlayerInteract(mPlayerID);
-					return;
-				}
-					
-				//Check if object is an interactable.
-				Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
-				if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType, this)) {
-					interactablePtr->Interact(interactType, this);
-					if (interactType == ItemUse) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
-					}
-
-					return;
-				}
-
-				if (interactType == PickPocket)
-				{
-					NetworkPlayer* otherPlayerObject = dynamic_cast<NetworkPlayer*>(objectHit);
-					if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
-						mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
-							TransferItemBetweenInventories(otherPlayerObject->GetPlayerID(),
-								otherPlayerObject->GetActiveItemSlot(), this->GetPlayerID());
-					}
-				}
-
-				std::cout << "Object hit " << objectHit->GetName() << std::endl;
+			if (distance > 17.5f) {
+				std::cout << "Nothing hit in range" << std::endl;
+				return;
 			}
+
+			//Check if object is an item.
+			Item* item = dynamic_cast<Item*>(objectHit);
+			if (item != nullptr) {
+				item->OnPlayerInteract(mPlayerID);
+				return;
+			}
+					
+			//Check if object is an interactable.
+			Interactable* interactablePtr = dynamic_cast<Interactable*>(objectHit);
+			if (interactablePtr != nullptr && interactablePtr->CanBeInteractedWith(interactType, this)) {
+				interactablePtr->Interact(interactType, this);
+				if (interactType == ItemUse) {
+					mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
+				}
+
+				return;
+			}
+
+			if (interactType == PickPocket)
+			{
+				NetworkPlayer* otherPlayerObject = dynamic_cast<NetworkPlayer*>(objectHit);
+				if (otherPlayerObject != nullptr && IsSeenByGameObject(otherPlayerObject)) {
+					mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->
+						TransferItemBetweenInventories(otherPlayerObject->GetPlayerID(),
+							otherPlayerObject->GetActiveItemSlot(), this->GetPlayerID());
+				}
+			}
+
+			std::cout << "Object hit " << objectHit->GetName() << std::endl;
 		}
 	}
-	
 }
 
 void NetworkPlayer::ControlInventory() {
@@ -377,6 +406,13 @@ void NetworkPlayer::ControlInventory() {
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::O) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(true);
+	}
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && DEBUG_MODE) {
+		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 	}
 }
 #endif

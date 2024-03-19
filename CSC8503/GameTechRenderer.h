@@ -25,7 +25,6 @@ namespace NCL {
 		class RenderObject;
         class MiniMap;
 
-		constexpr short MAX_INSTANCE_MESHES = 3;
 		constexpr short MAX_POSSIBLE_LIGHTS = 256;
 		constexpr short MAX_POSSIBLE_OBJECTS = 256;
 
@@ -39,10 +38,12 @@ namespace NCL {
 			Mesh*		LoadMesh(const std::string& name) override;
 			void		LoadMeshes(std::unordered_map<std::string, Mesh*>& meshMap, const std::vector<std::string>& details);
 			Texture*	LoadTexture(const std::string& name) override;
+			GLuint		LoadTextureGetID(const std::string& name);
 			Texture* LoadDebugTexture(const std::string& name) override;
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment) override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
 			MeshMaterial* LoadMaterial(const std::string& name) override;
+			std::vector<int> LoadMeshMaterial(Mesh& mesh, MeshMaterial& meshMaterial);
 			
 
 			void AddLight(Light* light);
@@ -50,10 +51,10 @@ namespace NCL {
 
 			void ClearInstanceObjects() { mInstanceTiles.clear(); }
 
-			void SetInstanceObjects(GameObject* floorTile, GameObject* wallTile, GameObject* cornerWallTile) {
-				mInstanceTiles.push_back(floorTile);
-				mInstanceTiles.push_back(wallTile);
-				mInstanceTiles.push_back(cornerWallTile);
+			void SetInstanceObjects(std::unordered_map<std::string, GameObject*>& baseObjects) {
+				for (auto const& [key, val] : baseObjects) {
+					mInstanceTiles.push_back(val);
+				}
 			}
 			void FillLightUBO();
 			void FillTextureDataUBO();
@@ -103,7 +104,7 @@ namespace NCL {
 
 			
 			struct TextureHandleData {
-				GLuint64 handles[128] = { 0 };
+				GLuint64 handles[256] = { 0 };
 			};
 
 			struct TextureHandleIndices {
@@ -240,6 +241,7 @@ namespace NCL {
 			Frustum mFrameFrustum;
 
 			UISystem* mUi;
+			std::unordered_map<std::string, GLuint> mLoadedTextures;
 
             MiniMap* mMiniMap{};
 			//TODO(erendgrmnc): added after integrating Imgui lib. Refactor UISystem into this logic.

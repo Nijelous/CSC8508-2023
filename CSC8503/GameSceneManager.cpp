@@ -72,7 +72,9 @@ void GameSceneManager::InitCamera() {
 }
 
 void GameSceneManager::CreateLevel() {
-	mLevelManager->LoadLevel(1, 0);
+	std::random_device rd;
+	std::mt19937 g(rd());
+	mLevelManager->LoadLevel(1, g, 0);
 }
 
 bool GameSceneManager::PlayerWonGame() {
