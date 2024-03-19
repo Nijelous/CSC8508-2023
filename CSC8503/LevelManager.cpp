@@ -537,15 +537,15 @@ void LevelManager::InitialiseAssets() {
 
 	animLoadThread.join();
 	//preLoadList
-	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
-	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
-	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["RigSprint"]));
-	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["RigPoint"]));
+	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["GuardStand"]));
+	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["GuardWalk"]));
+	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["GuardSprint"]));
+	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["GuardPoint"]));
 
 
-	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
-	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["GuardWalk"]));
-	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["GuardSprint"]));
+	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["PlayerStand"]));
+	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["PlayerWalk"]));
+	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["PlayerSprint"]));
 
 	//icons
 	vector<Texture*> keyTexVec = {
@@ -565,8 +565,8 @@ void LevelManager::InitialiseAssets() {
 
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
-		if (key.substr(0, 5) == "Guard") {
-			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Guard"], *val);
+		if (key.substr(0, 6) == "Player") {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Player"], *val);
 		}
 		else {
 			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
@@ -1168,7 +1168,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Helipad"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -1440,12 +1440,12 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
-	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"], mMaterials["Player_Red"]));
+	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Player_Red"]);
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1544,9 +1544,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 	guard->SetCollisionLayer(Npc);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize));
-	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]));
-	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Rig"]);
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Guard"], mTextures["Basic"], mTextures["Normal"], mShaders["Animation"], meshSize));
+	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	guard->SetPatrolNodes(nodes);
@@ -1596,7 +1596,7 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		0.75f));
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
@@ -1631,7 +1631,7 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	else {
-		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["Normal"], mShaders["Instance"],
+		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["FloorAlbedo"], mTextures["Normal"], mShaders["Instance"],
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	if (mMeshMaterials.find(meshName) != mMeshMaterials.end()) {
