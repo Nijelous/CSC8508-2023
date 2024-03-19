@@ -67,6 +67,7 @@ namespace NCL {
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			void InitialiseGameAssets();
 			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
@@ -140,7 +141,6 @@ namespace NCL {
 			float GetNearestGuardDistance(const Vector3& startPos) const;
 
 			float GetNearestGuardToPlayerDistance(const int playerNo) const;
-
 
 			PrisonDoor* GetPrisonDoor() const;
 
@@ -277,6 +277,7 @@ namespace NCL {
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+			bool mAreAssetsInitialised = false;
 			bool mShowDebug = false;
 			bool mShowVolumes = false;
 

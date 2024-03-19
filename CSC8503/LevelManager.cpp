@@ -39,20 +39,6 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-	mRoomList = std::vector<Room*>();
-	std::thread loadRooms([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
-			Room* newRoom = new Room(entry.path().string());
-			mRoomList.push_back(newRoom);
-		}
-		});
-	mLevelList = std::vector<Level*>();
-	std::thread loadLevels([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
-			Level* newLevel = new Level(entry.path().string());
-			mLevelList.push_back(newLevel);
-		}
-		});
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
@@ -62,10 +48,10 @@ LevelManager::LevelManager() {
 	mRenderer = new GameTechAGCRenderer();
 #endif
 	mUi = new UISystem();
-	InitialiseAssets();
+
 #ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
-#endif
+#endif	
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
@@ -88,19 +74,6 @@ LevelManager::LevelManager() {
 
 	mIsLevelInitialised = false;
 
-	InitialiseIcons();
-	InitialiseDebug();
-	mItemTextureMap = {
-	{PlayerInventory::item::none, mTextures["InventorySlot"]},
-	{PlayerInventory::item::disguise, mTextures["Stun"]},
-	{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
-	{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
-	{PlayerInventory::item::flag , mTextures["FlagIcon"]},
-	{PlayerInventory::item::stunItem, mTextures["Stun"]},
-	{PlayerInventory::item::screwdriver, mTextures["Stun"]}
-	};
-	loadRooms.join();
-	loadLevels.join();
 	loadSoundManager.join();
 }
 
@@ -188,6 +161,31 @@ void LevelManager::ClearLevel() {
 	mCCTVTransformList.clear();
 
 	ResetEquippedIconTexture();
+}
+
+void LevelManager::InitialiseGameAssets() {
+	if (!mAreAssetsInitialised) {
+		mRoomList = std::vector<Room*>();
+		std::thread loadRooms([this] {
+			for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
+				Room* newRoom = new Room(entry.path().string());
+				mRoomList.push_back(newRoom);
+			}
+			});
+		mLevelList = std::vector<Level*>();
+		std::thread loadLevels([this] {
+			for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
+				Level* newLevel = new Level(entry.path().string());
+				mLevelList.push_back(newLevel);
+			}
+			});
+		InitialiseAssets();
+		InitialiseIcons();
+		InitialiseDebug();
+		loadRooms.join();
+		loadLevels.join();
+		mAreAssetsInitialised = true;
+	}
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -496,18 +494,22 @@ void LevelManager::InitialiseAssets() {
 	}
 	assetsFile.clear();
 	assetsFile.seekg(std::ifstream::beg);
-	bool updateScreen = false;
+	bool updateScreen = true;
+	bool meshesLoaded = false;
+	int meshCount = 0;
 	bool loaded = false;
 	int lines = 0;
 	int animLines = 0;
 	int matLines = 0;
-	std::thread renderFlip([&updateScreen, &loaded] {
-		int loops = 0;
+	std::thread renderFlip([&updateScreen, &loaded, &meshesLoaded, &meshCount, &lines] {
+		int added = 0;
 		while (!loaded) {
-			std::cout << "Loops: " << loops << "\n";
 			updateScreen = true;
-			std::this_thread::sleep_for(1000ms);
-			loops++;
+			std::this_thread::sleep_for(16.7ms);
+			if (meshesLoaded && added != meshCount) {
+				added++;
+				lines++;
+			}
 		}
 		});
 	while (getline(assetsFile, line)) {
@@ -539,7 +541,8 @@ void LevelManager::InitialiseAssets() {
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
-				lines += groupDetails.size() / 3;
+				meshCount = groupDetails.size() / 3;
+				meshesLoaded = true;
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -598,12 +601,14 @@ void LevelManager::InitialiseAssets() {
 	}
 	loaded = true;
 	renderFlip.join();
+	CheckRenderLoadScreen(updateScreen, 100, 100);
 }
 
 void LevelManager::CheckRenderLoadScreen(bool& updateScreen, int linesDone, int totalLines) {
 	if (updateScreen) {
 		updateScreen = false;
-		Debug::Print(std::format("Loading: {:.0f}%", (linesDone / (float)totalLines) * 100), Vector2(30, 50), Vector4(1, 1, 1, 1), 40.0f);
+		float percent = linesDone / (float)totalLines;
+		Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
 		mRenderer->Render();
 		Debug::UpdateRenderables(0);
 	}
@@ -1041,9 +1046,17 @@ void LevelManager::InitialiseIcons() {
 	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["StopGuard"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
 
-
-
 	mRenderer->SetUIObject(mUi);
+
+	mItemTextureMap = {
+		{PlayerInventory::item::none, mTextures["InventorySlot"]},
+		{PlayerInventory::item::disguise, mTextures["Stun"]},
+		{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
+		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
+		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
+		{PlayerInventory::item::stunItem, mTextures["Stun"]},
+		{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+	};
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
