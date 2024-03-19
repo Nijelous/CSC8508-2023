@@ -422,8 +422,6 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true) {
-				//LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveActiveLocationSusCause(
-				//	LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->continouousSound, mSmallestDistanceVector);
 				mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 				return Failure;
 			}
@@ -431,8 +429,6 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 				float* endPos = new float[3] {mSmallestDistanceVector.x, mSmallestDistanceVector.y, mSmallestDistanceVector.z};
 				MoveTowardFocalPoint(endPos);
 				if ((mSmallestDistanceVector - this->GetTransform().GetPosition()).LengthSquared() < MIN_DIST_TO_NEXT_POS) {
-					//LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveActiveLocationSusCause(
-					//	LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->continouousSound, mSmallestDistanceVector);
 					mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 					return Success;
 				}
