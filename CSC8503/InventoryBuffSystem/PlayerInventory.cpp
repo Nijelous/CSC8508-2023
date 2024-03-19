@@ -149,6 +149,11 @@ void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot
 	//Extra drop logic
 }
 
+void PlayerInventory::DropAllItemsFromPlayer(const int& playerNo){
+	for (int i = 0; i < MAX_INVENTORY_SLOTS; i++)
+		DropItemFromPlayer(playerNo,i);
+}
+
 void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot) {
 	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
 		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo)) {

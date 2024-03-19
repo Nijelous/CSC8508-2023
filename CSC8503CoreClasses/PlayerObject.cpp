@@ -885,7 +885,7 @@ void PlayerObject::UpdateLocalUI(float dt){
 	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
 
 	//SusBar
-	float iconValue = SusLinerInterpolation(dt);
+	iconValue = SusLinerInterpolation(dt);
 	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 	if (mSusValue > 33) {
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
