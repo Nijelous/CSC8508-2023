@@ -573,7 +573,12 @@ void LevelManager::InitialiseAssets() {
 
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
-		mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+		if (key.substr(0, 5) == "Guard") {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Guard"], *val);
+		}
+		else {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
+		}
 	}
 }
 
