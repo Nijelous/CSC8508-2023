@@ -23,6 +23,8 @@ namespace NCL {
 		constexpr int NOTICELEFT = 11;
 		constexpr int NOTICETOP = 12;
 		constexpr int NOTICEBOT = 13;
+		constexpr int NOTICEBOTLEFT = 14;
+		constexpr int NOTICEBOTRIGHT = 15;
 
 
 		class UISystem {
@@ -78,6 +80,7 @@ namespace NCL {
 
 
 
+
 		protected:
 			Icon mIcon;
 
@@ -99,9 +102,12 @@ namespace NCL {
 			Icon* mNoticeLeft;
 			Icon* mNoticeTop;
 			Icon* mNoticeBot;
+			Icon* mNoticeBotLeft;
+			Icon* mNoticeBotRight;
 			std::vector<Icon*> mIconsVec;
 			std::vector<Texture*> mKeyTexVec;
 			std::vector<Texture*> mSusBarTexVec;
+
 
 		};
 	}
