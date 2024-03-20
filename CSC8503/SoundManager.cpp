@@ -444,6 +444,7 @@ void SoundManager::UpdateListenerAttributes() {
 	FMOD_VECTOR camForward = ConvertVector(forward);
 	FMOD_VECTOR camUp = GetUpVector(forward, right);
 	mSystem->set3DListenerAttributes(0, &camPos, 0, &camForward, &camUp);
+	mSystem->update();
 }
 
 FMOD_VECTOR SoundManager::ConvertVector(Vector3 vector) {
