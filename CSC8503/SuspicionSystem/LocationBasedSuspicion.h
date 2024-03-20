@@ -115,6 +115,7 @@ namespace SuspicionSystem
         std::map<CantorPair, float> mLocationSusAmountMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationlSusCausesToRemove;
+        std::vector<CantorPair*> locationsToClear;
 
         bool AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
         bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
@@ -130,5 +131,7 @@ namespace SuspicionSystem
     
         void HandleActiveSusCauseNetworking(const activeLocationSusCause& inCause, const CantorPair& pairedLocation, const bool& toApply);
         void HandleSusChangeNetworking(const int& changedValue, const CantorPair& pairedLocation);
+
+        void RemoveSusLocation(const Vector3 pos);
     };
 }

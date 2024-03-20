@@ -13,6 +13,7 @@ void LocationBasedSuspicion::Init(){
 	mActiveLocationSusCauseMap.clear();
 	mVec3LocationSusAmountMap.clear();
 	mActiveLocationlSusCausesToRemove.clear();
+	locationsToClear.clear();
 }
 
 void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inCause, Vector3 pos){
@@ -78,8 +79,6 @@ bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause
 void LocationBasedSuspicion::Update(float dt){
 	if (mActiveLocationSusCauseMap.empty())
 		return;
-
-	std::vector<CantorPair*> locationsToClear;
 
 	for (auto entry = mActiveLocationSusCauseMap.begin(); entry != mActiveLocationSusCauseMap.end(); ++entry){
 		std::vector<activeLocationSusCause> vector = entry->second;
@@ -267,5 +266,13 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 	}
 }
 
+void LocationBasedSuspicion::RemoveSusLocation(const Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 
+	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
+		return;
+
+	locationsToClear.push_back(&nearbyPairedLocation);
+}
 
