@@ -90,6 +90,16 @@ namespace NCL {
             mWallShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/wall.frag"));
             mIconShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/tex.frag"));
 
+            for(int i=0;i<MINIMAP_NUM;++i)
+            {
+                mItemTextures[i] = mRenderer->LoadTexture("buff.png");
+            }
+
+            mItemTextures[MINIMAP_BUFF_FLAGSIGHT] = mRenderer->LoadTexture("radar.png");
+            mItemTextures[MINIMAP_GUARD] = mRenderer->LoadTexture("guard.png");
+            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("flag0.png");
+            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("flag0.png");
+
             CreateItemRenderable();
             CreateBackGround();
 
@@ -339,10 +349,10 @@ namespace NCL {
                             item.type = MINIMAP_ITEM_FLAG;
                             break;
                         case PlayerInventory::item::screwdriver:
-                            item.type = MINIMAP_ITEM_SCREWDRIVER;
+                            item.type = MINIMAP_BUFF_SCREWDRIVER;
                             break;
                         case PlayerInventory::item::doorKey:
-                            item.type = MINIMAP_ITEM_DOORKEY;
+                            item.type = MINIMAP_BUFF_DOORKEY;
                             break;
                         case PlayerInventory::item::stunItem:
                             item.type = MINIMAP_ITEM_STUNITEM;

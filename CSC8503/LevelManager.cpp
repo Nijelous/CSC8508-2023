@@ -1008,23 +1008,6 @@ void LevelManager::InitialiseIcons() {
 }
 void LevelManager::InitialiseMiniMap() {
     mMiniMap = new MiniMap(mRenderer);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_DISGUISEBUFF, mTextures["minimap_buff_disguiseBuff"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_SLOW, mTextures["minimap_buff_slow"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_MAKESOUND, mTextures["minimap_buff_makeSound"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_SLOWEVERYONEELSE, mTextures["minimap_buff_slowEveryoneElse"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_EVERYONEELSEMAKESSOUND, mTextures["minimap_buff_everyoneElseMakesSound"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_SILENTSPRINT, mTextures["minimap_buff_silentSprint"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_SPEED, mTextures["minimap_buff_speed"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_STUN, mTextures["minimap_buff_stun"]);
-    mMiniMap->SetItemTexture(MINIMAP_BUFF_FLAGSIGHT, mTextures["minimap_buff_flagSight"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_DISGUISE, mTextures["minimap_item_disguise"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_SOUNDEMITTER, mTextures["minimap_item_soundEmitter"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_FLAG, mTextures["minimap_item_flag"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_SCREWDRIVER, mTextures["minimap_item_screwdriver"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_DOORKEY, mTextures["minimap_item_doorKey"]);
-    mMiniMap->SetItemTexture(MINIMAP_ITEM_STUNITEM, mTextures["minimap_item_stunItem"]);
-    mMiniMap->SetItemTexture(MINIMAP_GUARD, mTextures["minimap_guard"]);
-    mMiniMap->SetItemTexture(MINIMAP_FLAG, mTextures["minimap_flag"]);
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
