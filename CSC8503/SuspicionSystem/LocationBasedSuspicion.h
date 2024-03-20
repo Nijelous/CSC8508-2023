@@ -83,6 +83,7 @@ namespace SuspicionSystem
         void Update(float dt);
 
         int GetLocationSusAmount(Vector3 pos);
+        void SetMinLocationSusAmount(Vector3 pos, float susValue);
 
         void UpdateVec3LocationSusAmountMap();
 

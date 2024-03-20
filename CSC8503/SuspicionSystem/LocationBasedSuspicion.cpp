@@ -1,6 +1,7 @@
 #include "LocationBasedSuspicion.h"
 #include <algorithm>
 #include <limits>
+#include "GameCLient.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
@@ -138,6 +139,22 @@ int LocationBasedSuspicion::GetLocationSusAmount(Vector3 pos){
 	return -1;
 }
 
+void SuspicionSystem::LocationBasedSuspicion::SetMinLocationSusAmount(Vector3 pos, float susValue)
+{
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
+
+	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
+	{
+		AddNewLocation(pairedLocation, susValue);
+		return;
+	}
+		
+	mLocationSusAmountMap[nearbyPairedLocation] = std::min(susValue, mLocationSusAmountMap[nearbyPairedLocation]);
+	HandleSusChangeNetworking(mLocationSusAmountMap[nearbyPairedLocation], nearbyPairedLocation);
+	UpdateVec3LocationSusAmountMap();
+}
+
 void LocationBasedSuspicion::UpdateVec3LocationSusAmountMap(){
 	for (auto it = mLocationSusAmountMap.begin(); it != mLocationSusAmountMap.end(); ++it)
 	{
@@ -204,6 +221,7 @@ void LocationBasedSuspicion::AddNewLocation(CantorPair pairedLocation, float ini
 		return;
 
 	mLocationSusAmountMap[pairedLocation] = initSusAmount;
+	HandleSusChangeNetworking(initSusAmount, pairedLocation);
 }
 
 bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation) {
@@ -242,6 +260,9 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncLocationSusChangePacket(pairedLocation, changedValue);
+		}
+		else{
+			game->GetClient()->WriteAndSendSyncLocationSusChangePacket(pairedLocation, changedValue);
 		}
 	}
 }
