@@ -86,7 +86,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(2.0f, 0.2f);
+	mResult = mFootStepSound->set3DMinMaxDistance(3.0f, 2.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
 		return;
@@ -122,7 +122,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mAlarmSound->set3DMinMaxDistance(1000.0f, 1200.0f);
+	mResult = mAlarmSound->set3DMinMaxDistance(1500.0f, 3000.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
