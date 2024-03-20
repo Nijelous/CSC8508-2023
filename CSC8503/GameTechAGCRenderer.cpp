@@ -49,6 +49,7 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	bufferCount = 1; //We skip over index 0, makes some selection logic easier later
 
 	skyboxTexture = (AGCTexture*)LoadTexture("Skybox.dds");
+	defaultTexture = (AGCTexture*)LoadTexture("doge.png");
 
 	quadMesh = new AGCMesh();
 	CreateQuad(quadMesh);
@@ -245,12 +246,19 @@ void GameTechAGCRenderer::DrawObjects() {
 		//The new mesh is different than previous meshes, flush out the old list
 		if (prevMesh != objectMesh || skipInstance) {
 			prevMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
+			Temp* tempStruct = static_cast<Temp*>(frameContext->m_dcb.allocateTopDown(sizeof(Temp), sce::Agc::Alignment::kBuffer));
+			tempStruct->objID = startingIndex;
 
-			uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
-			*objID = startingIndex;
-			frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(objID, 1);
+			frameContext->m_dcb.setNumInstances(instanceCount);
+			// draw by submesh
+			for (size_t x = 0; x < prevMesh->GetSubMeshCount(); x++) {
+				tempStruct->subMeshID = x;
+				frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
+				frameContext->drawIndex(prevMesh->GetSubMesh(x)->count, prevMesh->GetAGCIndexData() + (prevMesh->GetSubMesh(x)->start * sizeof(int)));
+			}
+			frameContext->m_dcb.setNumInstances(1);
 
-			DrawBoundMeshInstanced(*frameContext, *prevMesh, instanceCount);
+			//DrawBoundMeshInstanced(*frameContext, *prevMesh, instanceCount);
 			prevMesh = objectMesh;
 			instanceCount = 0;
 			startingIndex = i;
@@ -258,15 +266,21 @@ void GameTechAGCRenderer::DrawObjects() {
 		if (i == activeObjects.size() - 1) {
 			objectMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
 
-			uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
-			*objID = startingIndex;
-			frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(objID, 1);
+			Temp* tempStruct = static_cast<Temp*>(frameContext->m_dcb.allocateTopDown(sizeof(Temp), sce::Agc::Alignment::kBuffer));
+			tempStruct->objID = startingIndex;
 
 			if (prevMesh == objectMesh) {
 				instanceCount++;
 			}
 
-			DrawBoundMeshInstanced(*frameContext, *objectMesh, instanceCount);
+			frameContext->m_dcb.setNumInstances(instanceCount);
+			// draw by submesh
+			for (size_t x = 0; x < prevMesh->GetSubMeshCount(); x++) {
+				tempStruct->subMeshID = x;
+				frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
+				frameContext->drawIndex(prevMesh->GetSubMesh(x)->count, prevMesh->GetAGCIndexData() + (prevMesh->GetSubMesh(x)->start * sizeof(int)));
+			}
+			frameContext->m_dcb.setNumInstances(1);
 		}
 		else {
 			instanceCount++;
@@ -599,6 +613,27 @@ void GameTechAGCRenderer::UpdateObjectList() {
 					state.index[1] = 0; //Normal texture
 					state.index[2] = 0; //skinning buffer
 
+					Texture* tex = g->GetAlbedoTexture();
+					if (tex) {
+						state.index[0] = tex->GetAssetID();
+					}
+
+					tex = g->GetNormalTexture();
+					if (tex) {
+						state.index[1] = tex->GetAssetID();
+					}
+
+					if (g->GetMatTextures().size() > 0) {
+						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
+						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x]->GetAssetID();
+					   }
+						state.materialLayerAlbedos[1] = 0;
+						state.hasMaterials = 1;
+					}
+					else {
+						state.hasMaterials = 0;
+					}
+
 					AGCMesh* m = (AGCMesh*)g->GetMesh();
 					if (m && m->GetJointCount() > 0) {//It's a skeleton mesh, need to update transformed vertices buffer
 
@@ -631,35 +666,9 @@ void GameTechAGCRenderer::UpdateObjectList() {
 						frameJobs.push_back({ g, b->GetAssetID() });
 					}
 
-					if (g->GetMatTextures().size() == 0) {
-						Texture* tex = g->GetAlbedoTexture();
-					   if (tex) {
-						   state.index[0] = tex->GetAssetID();
-					   }
-					   tex = g->GetNormalTexture();
-					   if(tex)	{
-						   state.index[1] = tex->GetAssetID();
-					   }
-					}
-					if (g->GetMatTextures().size() > 0) {
-						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
-						   state.subMeshIndex = x;
-						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x]->GetAssetID();
-						   currentFrame->data.WriteData<ObjectState>(state);
-						   currentFrame->debugLinesOffset += sizeof(ObjectState);
-						   at++;
-					   }
-					}
-					else {
-						state.subMeshIndex = 5;
-						currentFrame->data.WriteData<ObjectState>(state);
-						currentFrame->debugLinesOffset += sizeof(ObjectState);
-						at++;
-					}
-
-					//currentFrame->data.WriteData<ObjectState>(state);
-					//currentFrame->debugLinesOffset += sizeof(ObjectState);
-					//at++;
+					currentFrame->data.WriteData<ObjectState>(state);
+					currentFrame->debugLinesOffset += sizeof(ObjectState);
+					at++;
 				}
 			}
 		}

@@ -3,7 +3,13 @@ struct ObjectState {
 		float4 colour;
 		int index[4];
 
-		int subMeshIndex;
+		int hasMaterials;
+
 		int materialLayerAlbedos[4];
 		int materialLayerNormals[4];
+};
+
+struct Temp {
+	int objID;
+	int subMeshID;
 };

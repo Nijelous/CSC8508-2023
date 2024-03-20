@@ -17,19 +17,20 @@ struct VS_OUTPUT
 	int normalTexID		: TEXCOORD6;
 
 	int subMeshIndex	: TEXCOORD7;
+	int hasMaterial		: TEXCOORD8;
 
-	int materialLayer1Albedo : TEXCOORD8;
-	int materialLayer2Albedo : TEXCOORD9;
-	int materialLayer3Albedo : TEXCOORD10;
-	int materialLayer4Albedo : TEXCOORD11;
+	int materialLayer1Albedo : TEXCOORD9;
+	int materialLayer2Albedo : TEXCOORD10;
+	int materialLayer3Albedo : TEXCOORD11;
+	int materialLayer4Albedo : TEXCOORD12;
 };
 
 [CxxSymbol("TestShader::gs")]
-VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instanceID : S_INSTANCE_ID)
+VS_OUTPUT main(uint vertID : S_VERTEX_ID, Temp tempStruct : S_SRT_DATA, uint instanceID : S_INSTANCE_ID)
 {
 	VS_OUTPUT Output;
 	
-	uint id = objID + instanceID;
+	uint id = tempStruct.objID + instanceID;
 
 	ObjectState s = objects[id];
 
@@ -52,7 +53,9 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	Output.albedoTexID	= s.index[0];
 	Output.normalTexID = s.index[1];
 
-	Output.subMeshIndex = s.subMeshIndex;
+	Output.subMeshIndex = tempStruct.subMeshID;
+	Output.hasMaterial = s.hasMaterials;
+
 	Output.materialLayer1Albedo	= s.materialLayerAlbedos[0];
 	Output.materialLayer2Albedo = s.materialLayerAlbedos[1];
 	Output.materialLayer3Albedo	= s.materialLayerAlbedos[2];

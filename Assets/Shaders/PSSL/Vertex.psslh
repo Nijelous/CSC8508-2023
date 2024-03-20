@@ -27,21 +27,27 @@ float4 TransformWorldToClip(in float4 world) {
 	return mul(Constants.projMatrix,mul(Constants.viewMatrix,world));
 }
 
-int DetermineTextureID(int subMeshIndex, int texture1ID, int texture2ID, int texture3ID, int texture4ID, int defaultTex) {
-	if (subMeshIndex == 0){
-		return texture1ID;
-	}
-	if (subMeshIndex == 1){
-		return texture2ID;
-	}
-	if (subMeshIndex == 2){
-		return texture3ID;
-	}
-	if (subMeshIndex == 3){
-		return texture4ID;
-	}
-	if (subMeshIndex == 5){
-		return defaultTex;
+int DetermineTextureID(int hasMaterials, int subMeshIndex, int texture1ID, int texture2ID, int texture3ID, int texture4ID, int defaultTex) {
+	if (hasMaterials == 1) {
+		if (subMeshIndex == 0){
+			return texture1ID;
+		}
+		if (subMeshIndex == 1){
+			return texture2ID;
+		}
+		if (subMeshIndex == 2){
+			return texture3ID;
+		}
+		if (subMeshIndex == 3){
+			return texture4ID;
+		}
 	}
 	return defaultTex;
+}
+
+float4 FlipTexture(float4 currentTex, int isMaterial) {
+	if (isMaterial == 1) {
+		currentTex.y = currentTex.y * -1;
+	}
+	return currentTex;
 }
