@@ -468,6 +468,13 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::V) &&
+		DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::soundEmitter, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
+	}
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
