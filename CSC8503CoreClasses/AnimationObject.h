@@ -1,14 +1,7 @@
 #pragma once
 
-#include "Texture.h"
-#include "Shader.h"
-#include "Mesh.h"
 #include "MeshAnimation.h"
 #include "MeshMaterial.h"
-
-
-
-
 
 namespace NCL {
     using namespace NCL::Rendering;

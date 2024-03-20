@@ -1,6 +1,7 @@
 #include "Door.h"
 #include "InteractableDoor.h"
 #include "NetworkObject.h"
+#include "SoundObject.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
 

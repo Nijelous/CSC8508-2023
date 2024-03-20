@@ -6,13 +6,6 @@
 
 #include "GameWorld.h"
 #include "Frustum.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-
-
-#include "MeshAnimation.h"
-#include "MeshMaterial.h"
 
 #include "UISystem.h"
 #include "WindowsUI.h"

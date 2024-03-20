@@ -16,6 +16,7 @@ namespace NCL {
 			InteractableDoors
 		};
 
+		class GameObject;
 		class Interactable{
 		public:
 			virtual void Interact(InteractType interactType, GameObject* interactingObject = nullptr) { 

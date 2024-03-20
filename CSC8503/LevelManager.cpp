@@ -16,6 +16,9 @@
 #include "Vent.h"
 #include "InteractableDoor.h"
 #include "PrisonDoor.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#include "DirectionalLight.h"
 
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"
@@ -27,6 +30,7 @@
 #include "NetworkObject.h"
 #include "UISystem.h"
 #include "Assets.h"
+#include "Debug.h"
 #include <filesystem>
 #include <fstream>
 

@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
 #include "Vector3.h"
-#include "StateMachine.h"
 #include "PlayerBuffs.h"
 #include "PlayerInventory.h"
 #include "InventoryBuffSystem.h"
@@ -11,6 +10,7 @@ using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
+        class StateMachine;
         class PickupGameObject : public GameObject {
         public:
             PickupGameObject() {};

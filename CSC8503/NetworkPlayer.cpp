@@ -2,6 +2,7 @@
 #include "NetworkPlayer.h"
 
 #include "DebugNetworkedGame.h"
+#include "LevelManager.h"
 #include "GameClient.h"
 #include "Interactable.h"
 #include "NetworkedGame.h"
@@ -9,6 +10,7 @@
 #include "PhysicsObject.h"
 #include "InventoryBuffSystem/Item.h"
 #include "SoundManager.h"
+#include "Debug.h"
 
 using namespace NCL;
 using namespace CSC8503;

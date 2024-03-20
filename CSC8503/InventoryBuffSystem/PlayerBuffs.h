@@ -118,6 +118,6 @@ namespace InventoryBuffSystem {
 
 		std::map<buff, float> mActiveBuffDurationMap[NCL::CSC8503::MAX_PLAYERS];
 		std::list<PlayerBuffsObserver*> mBuffsObserverList;
-		vector<buff> mBuffsToRemove[NCL::CSC8503::MAX_PLAYERS];
+		std::vector<buff> mBuffsToRemove[NCL::CSC8503::MAX_PLAYERS];
 	};
 }

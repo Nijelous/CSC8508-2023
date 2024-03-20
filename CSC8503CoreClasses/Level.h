@@ -5,8 +5,6 @@ using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
-		constexpr int MAX_PLAYERS = 4;
-
 		class Vent;
 
 		class Level {

@@ -1,7 +1,6 @@
 #pragma once
 #include "Vector2.h"
 #include "CollisionDetection.h"
-#include "Debug.h"
 
 namespace NCL {
 	using namespace NCL::Maths;

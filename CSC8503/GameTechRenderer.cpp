@@ -9,6 +9,10 @@
 #include "MshLoader.h"
 #include "UISystem.h"
 #include "Mesh.h"
+#include "Debug.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 using namespace NCL;
 using namespace Rendering;

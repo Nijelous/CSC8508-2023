@@ -3,6 +3,7 @@
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
+#include "RenderObject.h"
 
 
 #define SHADERDIR	"../Assets/Shaders/"
@@ -13,7 +14,6 @@
 AnimationSystem::AnimationSystem(GameWorld& g, std::map<std::string, MeshAnimation*>& preAnimationList) : gameWorld(g),
 	mPreAnimationList(preAnimationList)
 {
-	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
 	InitGuardStateAnimationMap();
@@ -44,7 +44,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> up
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
-				mShader = obj->GetRenderObject()->GetShader();
 
 				const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 				const Matrix4* frameData = mAnim->GetJointData(currentFrame);

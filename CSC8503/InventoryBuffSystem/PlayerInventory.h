@@ -2,7 +2,7 @@
 #include <functional>
 #include <map>
 #include "Vector3.h"
-#include "Level.h"
+#include "LevelEnums.h"
 
 using namespace NCL::CSC8503;
 
@@ -142,7 +142,7 @@ namespace InventoryBuffSystem
 		int mItemUseCount[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		std::map < item ,bool[NCL::CSC8503::MAX_PLAYERS]> PlayerAbleToUseItem;
-		void CreateItemPickup(item inItem, Vector3 Position) {}
+		void CreateItemPickup(item inItem, Maths::Vector3 Position) {}
 
 		void IncreaseUsageCount(const int& playerNo, const int& invSlot) {
 			mItemUseCount[playerNo][invSlot]++;

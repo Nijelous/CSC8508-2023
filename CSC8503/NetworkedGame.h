@@ -2,19 +2,22 @@
 #pragma once
 #include "GameSceneManager.h"
 #include "NetworkBase.h"
+#include "Vector3.h"
 
 namespace NCL {
 	namespace CSC8503 {
 		class GameServer;
 		class GameClient;
+		class GameObject;
 		class NetworkPlayer;
+		class NetworkObject;
 
 		struct ClientInput {
 
 			// struct that takes in user inputs to be sent from client to serve
 			//
 			// Author: Ewan Squire
-			ClientInput(int lastID, char but1, char but2, char but3, char but4, char but5, char but6, char but7, char but8, Vector3 camPos) {
+			ClientInput(int lastID, char but1, char but2, char but3, char but4, char but5, char but6, char but7, char but8, Maths::Vector3 camPos) {
 				this->lastID = lastID;
 				buttonStates[0] = but1;
 				buttonStates[1] = but2;
@@ -29,7 +32,7 @@ namespace NCL {
 
 			int lastID;
 			char buttonStates[8];
-			Vector3 cameraPosition;
+			Maths::Vector3 cameraPosition;
 		};
 
 		class NetworkedGame : public GameSceneManager, public PacketReceiver {

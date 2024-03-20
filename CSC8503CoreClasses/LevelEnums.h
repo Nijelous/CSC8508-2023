@@ -1,6 +1,7 @@
 #pragma once
 namespace NCL {
 	namespace CSC8503 {
+		constexpr int MAX_PLAYERS = 4;
 		enum TileType {
 			Wall,
 			Floor,

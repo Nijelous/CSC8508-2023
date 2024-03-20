@@ -4,7 +4,7 @@
 #include "BehaviourAction.h"
 #include <string>
 #include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
-#include "../Detour/Include/DetourNavMeshQuery.h"
+
 using namespace std;
 using namespace InventoryBuffSystem;
 

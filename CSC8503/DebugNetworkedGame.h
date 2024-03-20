@@ -4,8 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <functional>
-#include "NetworkBase.h"
-#include "GameSceneManager.h"
+#include <random>
 #include "NetworkedGame.h"
 
 
@@ -117,7 +116,7 @@ namespace NCL{
 
             void SpawnPlayers();
 
-        	NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
+        	NetworkPlayer* AddPlayerObject(const Maths::Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
 
