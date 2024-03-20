@@ -1,17 +1,20 @@
 #include "PlayerBuffs.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-
+#include "../NetworkPlayer.h"
 #include <algorithm>
 
 using namespace InventoryBuffSystem;
 using namespace NCL::CSC8503;
 
 void PlayerBuffs::Init(){
-	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++)
+	for (int playerNo = 0; playerNo < NCL::CSC8503::MAX_PLAYERS; playerNo++){
 		mActiveBuffDurationMap[playerNo].clear();
+		mBuffsToRemove[playerNo].clear();
+	}
 
 	mBuffsObserverList.clear();
+	mActiveBuffDurationMap->clear();
 	mBuffsToRemove->clear();
 }
 
@@ -43,7 +46,8 @@ void PlayerBuffs::HandleBuffNetworking(const buff& inBuff, const int& playerNo, 
 	int localPlayerId = 0;
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-
+		auto* localPlayer = game->GetLocalPlayer();
+		localPlayerId = localPlayer->GetPlayerID();
 		const bool isServer = game->GetIsServer();
 		if (isServer) {
 			game->SendClientSyncBuffPacket(playerNo, inBuff, toApply);

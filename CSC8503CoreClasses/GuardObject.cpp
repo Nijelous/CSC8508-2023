@@ -13,6 +13,7 @@
 #include "RecastBuilder.h"
 #include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -343,6 +344,14 @@ bool GuardObject::IsHighEnoughLocationSus() {
 	else { return false; }
 }
 
+void GuardObject::SendAnnouncementToPlayer(){
+	NetworkPlayer* networkPlayer = static_cast<NetworkPlayer*> (mPlayer);
+	if (typeid(networkPlayer) == typeid(NetworkPlayer*))
+		networkPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, networkPlayer->GetPlayerID());
+	else
+		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -350,7 +359,6 @@ void GuardObject::BehaviourTree() {
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
-	FirstSelect->AddChild(CheckSusLocation());
 	FirstSelect->AddChild(SeenPlayerSequence);
 	SeenPlayerSequence->AddChild(ChasePlayerSelector);
 	ChasePlayerSelector->AddChild(PointAtPlayer());
@@ -439,12 +447,11 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 	return CheckSusLocation;
 }
 
-
 BehaviourAction* GuardObject::PointAtPlayer() {
 	BehaviourAction* PointAtPlayer = new BehaviourAction("Point at Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
-			SetObjectState(Sprint);
+			SetObjectState(Point);
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
@@ -456,9 +463,6 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 					mPointTimer = POINTING_TIMER;
 					return Failure;
 				}
-			}
-			else {
-				return Success;
 			}
 		}
 		return state;
@@ -539,6 +543,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
 					mPlayerHasItems = false;
+					LevelManager::GetLevelManager()->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->DropAllItemsFromPlayer(mPlayer->GetPlayerID());
 					return Success;
 				}
 			}
@@ -566,7 +571,8 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
-				mPlayer->ClosePrisonDoor();
+				SendAnnouncementToPlayer();
+				LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 				mHasCaughtPlayer = false;
 				return Success;
 			}

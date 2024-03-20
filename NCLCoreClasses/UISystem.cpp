@@ -130,6 +130,24 @@ void UISystem::ChangeBuffSlotTransparency(int slotNum, float transparency){
 	case ALARM:
 		mAlarm->mTransparency = transparency;
 		break;
+	case NOTICERIGHT:
+		mNoticeRight->mTransparency = transparency;
+		break;
+	case NOTICELEFT:
+		mNoticeLeft->mTransparency = transparency;
+		break;
+	case NOTICETOP:
+		mNoticeTop->mTransparency = transparency;
+		break;
+	case NOTICEBOT:
+		mNoticeBot->mTransparency = transparency;
+		break;
+	case NOTICEBOTLEFT:
+		mNoticeBotLeft->mTransparency = transparency;
+		break;
+	case NOTICEBOTRIGHT:
+		mNoticeBotRight->mTransparency = transparency;
+		break;
 
 	default:
 		break;
@@ -169,7 +187,24 @@ void UISystem::SetEquippedItemIcon(int slotNum, Icon& icon) {
 		case ALARM:
 			mAlarm = &icon;
 			break;
-
+		case NOTICERIGHT:
+			mNoticeRight = &icon;
+			break;
+		case NOTICELEFT:
+			mNoticeLeft = &icon;
+			break;
+		case NOTICETOP:
+			mNoticeTop = &icon;
+			break;
+		case NOTICEBOT:
+			mNoticeBot = &icon;
+			break;
+		case NOTICEBOTLEFT:
+			mNoticeBotLeft = &icon;
+			break;
+		case NOTICEBOTRIGHT:
+			mNoticeBotRight = &icon;
+			break;
 	default:
 		break;
 	}

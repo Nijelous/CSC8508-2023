@@ -1,20 +1,19 @@
 #include "FlagGameObject.h"
-#include "StateTransition.h"
-#include "StateMachine.h"
-#include "State.h"
-#include "PhysicsObject.h"
-#include "Vector3.h"
-#include "map";
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
 #include "../LevelManager.h"
 #include "../SuspicionSystem/GlobalSuspicionMetre.h"
+#include "GameClient.h"
+#include "Interactable.h"
+#include "../CSC8503/DebugNetworkedGame.h"
+#include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 using namespace NCL;
 using namespace CSC8503;
 
 FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
-	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr) {
+	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr), NetworkObject(this->GetGameObject(), 0) {
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
@@ -29,10 +28,9 @@ FlagGameObject::~FlagGameObject() {
 }
 
 void FlagGameObject::GetFlag(int playerNo) {
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
-	GetSoundObject()->TriggerSoundEvent();
-
 	this->SetActive(false);
+	GetSoundObject()->TriggerSoundEvent();
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 }
 
 void FlagGameObject::Reset() {
@@ -42,8 +40,7 @@ void FlagGameObject::Reset() {
 	}
 }
 
-void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
-{
+void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId){
 	if (this->IsRendered()) {
 		GetFlag(playerId);
 		this->SetActive(false);
@@ -53,21 +50,50 @@ void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId)
 
 void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
 	switch (invEvent) {
-	case InventoryBuffSystem::flagDropped:
+	case InventoryBuffSystem::flagDropped: {
 		Reset();
+		auto* sceneManager = SceneManager::GetSceneManager();
+		if (sceneManager->IsInSingleplayer()) break;
+
+		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+
+		if (networkedGame->GetIsServer()) {
+			networkedGame->SendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
+		}
+		else
+		{
+			networkedGame->GetClient()->WriteAndSendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
+		}
+		break;
+	}
+
 	default:
 		break;
 	}
+}
+
+const bool FlagGameObject::IsMultiplayerAndIsNotServer(){
+	auto* sceneManager = SceneManager::GetSceneManager();
+	const bool isSingleplayer = sceneManager->IsInSingleplayer();
+	if (isSingleplayer)
+		return false;
+
+	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+	const bool isServer = networkedGame->GetIsServer();
+	if (!isServer)
+		return true;
+	
+	return false;
 }
 
 void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo = 0) {
 	switch (buffEvent) {
 #ifdef USEGL
 	case BuffEvent::flagSightApplied:
-		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(true);
+		SetIsSensed(true);
 		break;
 	case BuffEvent::flagSightRemoved:
-		LevelManager::GetLevelManager()->GetMainFlag()->SetIsSensed(false);
+		SetIsSensed(false);
 #endif
 	default:
 		break;
@@ -75,11 +101,22 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 }
 
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
-	if ((otherObject->GetCollisionLayer() & Player) &&
-		!mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(0)) {
+	if ((otherObject->GetCollisionLayer() & Player)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
+		const float playerNo = plObj->GetPlayerID();
+
+		//To fix bug where the client would get 2 flags in multiplayer
+		if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(InventoryBuffSystem::PlayerInventory::flag, playerNo)) {
+			this->SetActive(false);
+			return;
+		}
+
+		if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerNo))
+			return;
+
 		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		plObj->AddPlayerPoints(mPoints);
-		GetFlag(plObj->GetPlayerID());
+
+		GetFlag(playerNo);
 	}
 }

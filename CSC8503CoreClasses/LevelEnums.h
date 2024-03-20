@@ -4,7 +4,8 @@ namespace NCL {
 		enum TileType {
 			Wall,
 			Floor,
-			CornerWall
+			CornerWall,
+			OutsideFloor
 		};
 		enum RoomType {
 			Small,
@@ -12,6 +13,22 @@ namespace NCL {
 			Large,
 			LShape,
 			INVALID
+		};
+		enum DecorationType {
+			Desk,
+			Painting,
+			PlantTall,
+			PlantPot,
+			Bookshelf,
+			Bed,
+			Chair,
+			CeilingLight,
+			TV,
+			Table,
+			TableSmall,
+			Shelf,
+			Sofa,
+			PoolTable
 		};
 
 		class LevelEnums {

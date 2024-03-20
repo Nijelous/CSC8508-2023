@@ -15,6 +15,7 @@ namespace NCL{
 
             LevelManager* GetLevelManager();
 
+            virtual void DrawCanvas();
         protected:
             LevelManager* mLevelManager;
 

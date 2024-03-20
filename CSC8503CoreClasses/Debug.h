@@ -31,6 +31,12 @@ namespace NCL {
 
 		static void DrawAxisLines(const Matrix4& modelMatrix, float scaleBoost = 1.0f, float time = 0.0f);
 
+		static void DrawCube(const Vector3& halfDimensions, const Vector3& position);
+
+		static void DrawRotatedCube(const Vector3& halfDimensions, const Vector3& position, const Quaternion& orientation);
+
+		static void DrawSphere(float radius, const Vector3& position);
+
 		static void UpdateRenderables(float dt);
 
 		static SimpleFont* GetDebugFont();
@@ -39,6 +45,8 @@ namespace NCL {
 
 		static const std::vector<DebugStringEntry>& GetDebugStrings();
 		static const std::vector<DebugLineEntry>& GetDebugLines();
+
+		static void ClearStringEntries();
 
 
 		static const Vector4 RED;

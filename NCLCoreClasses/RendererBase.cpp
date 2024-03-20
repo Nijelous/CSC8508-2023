@@ -11,3 +11,7 @@ RendererBase::RendererBase(Window& window) : hostWindow(window)	{
 RendererBase::~RendererBase()
 {
 }
+
+void RendererBase::SetIsGameStarted(const bool isGameStarted) {
+	mIsGameStarted = isGameStarted;
+}

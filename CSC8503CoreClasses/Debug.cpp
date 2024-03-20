@@ -55,6 +55,41 @@ void Debug::DrawAxisLines(const Matrix4& modelMatrix, float scaleBoost, float ti
 	DrawLine(worldPos, worldPos + (fwd * scaleBoost), Debug::BLUE, time);
 }
 
+void Debug::DrawCube(const Vector3& halfDimensions, const Vector3& position) {
+	Vector3 vertices[4] = { {1, 1, 1}, {1, -1, -1}, {-1, 1, -1}, {-1, -1, 1} };
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 3; j++) {
+			Vector3 vertex = vertices[i];
+			vertex[j] *= -1;
+			DrawLine(position + (vertices[i] * halfDimensions), position + (vertex * halfDimensions), Debug::GREEN);
+		}
+	}
+}
+
+void Debug::DrawRotatedCube(const Vector3& halfDimensions, const Vector3& position, const Quaternion& orientation) {
+	Vector3 vertices[4] = { {1, 1, 1}, {1, -1, -1}, {-1, 1, -1}, {-1, -1, 1} };
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 3; j++) {
+			Vector3 vertex = vertices[i];
+			vertex[j] *= -1;
+			DrawLine(position + (orientation * (vertices[i] * halfDimensions)), position + (orientation * (vertex * halfDimensions)), Debug::GREEN);
+		}
+	}
+}
+
+void Debug::DrawSphere(float radius, const Vector3& position) {
+	const int circleAmount = 32;
+	Vector3 spin[3] = { Vector3(1, 0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0) };
+	Vector3 translations[3] = { Vector3(0, radius, 0), Vector3(0, radius, 0), Vector3(radius, 0, 0) };
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < circleAmount; j++) {
+			Vector3 start = position + (Matrix4::Rotation(360 / (circleAmount - 2) * j, spin[i]) * Matrix4::Translation(translations[i])).GetPositionVector();
+			Vector3 end = position + (Matrix4::Rotation(360 / (circleAmount - 2) * (j + 1), spin[i]) * Matrix4::Translation(translations[i])).GetPositionVector();
+			DrawLine(start, end, Debug::GREEN);
+		}
+	}
+}
+
 void Debug::UpdateRenderables(float dt) {
 	int trim = 0;
 	for (int i = 0; i < lineEntries.size(); ) {
@@ -89,4 +124,8 @@ const std::vector<Debug::DebugStringEntry>& Debug::GetDebugStrings() {
 
 const std::vector<Debug::DebugLineEntry>& Debug::GetDebugLines() {
 	return lineEntries;
+}
+
+void Debug::ClearStringEntries() {
+	stringEntries.clear();
 }

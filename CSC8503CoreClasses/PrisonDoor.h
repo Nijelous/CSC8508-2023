@@ -14,6 +14,11 @@ namespace NCL {
 			virtual void Close() override;
 			virtual void UpdateObject(float dt) override;
 
+			virtual void SetIsOpen(bool toOpen) override;
+#ifdef USEGL
+			void SyncInteractableDoorStatusInMultiplayer(bool toOpen);
+			void SyncDoor(bool toOpen);
+#endif
 		protected:
 			const int initDoorTimer = 5;
 		};
