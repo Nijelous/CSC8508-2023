@@ -96,7 +96,6 @@ void GuardObject::RaycastToPlayer() {
 	else {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
-		//mPlayer = nullptr;
 	}
 }
 
@@ -359,6 +358,7 @@ void GuardObject::BehaviourTree() {
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
+	FirstSelect->AddChild(CheckSusLocation());
 	FirstSelect->AddChild(SeenPlayerSequence);
 	SeenPlayerSequence->AddChild(ChasePlayerSelector);
 	ChasePlayerSelector->AddChild(PointAtPlayer());
