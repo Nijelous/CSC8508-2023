@@ -86,19 +86,19 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(10.0f, 26.0f);
+	mResult = mFootStepSound->set3DMinMaxDistance(0.6f, 0.8f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorOpenSound->set3DMinMaxDistance(12.0f, 30.0f);
+	mResult = mDoorOpenSound->set3DMinMaxDistance(3.0f, 10.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Open Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorCloseSound->set3DMinMaxDistance(12.0f, 30.0f);
+	mResult = mDoorCloseSound->set3DMinMaxDistance(3.0f, 10.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
 		return;
@@ -110,25 +110,25 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mPickUpSound->set3DMinMaxDistance(10.0f, 20.0f);
+	mResult = mPickUpSound->set3DMinMaxDistance(3.0f, 7.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Pick Up Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mLockDoorSound->set3DMinMaxDistance(10.0f, 20.0f);
+	mResult = mLockDoorSound->set3DMinMaxDistance(2.0f, 6.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Lock Door Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mAlarmSound->set3DMinMaxDistance(1000.0f, 2000.0f);
+	mResult = mAlarmSound->set3DMinMaxDistance(1000.0f, 1200.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mVentSound->set3DMinMaxDistance(20.0f, 60.0f);
+	mResult = mVentSound->set3DMinMaxDistance(5.0f, 13.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
@@ -314,7 +314,6 @@ void SoundManager::PlayUnlockVentSound(Vector3 soundPos) {
 }
 
 void SoundManager::PlaySpottedSound() {
-	std::cout<<"Spotted" << std::endl;
 	Channel* channel;
 	mResult = mSystem->playSound(mSpottedSound, 0, false, &channel);
 	if (mResult != FMOD_OK) {
@@ -424,7 +423,7 @@ void SoundManager::UpdateFootstepSounds(GameObject::GameObjectState state, Vecto
 		break;
 	case GameObject::GameObjectState::Sprint:
 		channel->set3DAttributes(&pos, nullptr);
-		channel->setFrequency(48000*1.5);
+		channel->setFrequency(96000);
 		channel->setPaused(false);
 		break;
 	case GameObject::GameObjectState::IdleCrouch:
