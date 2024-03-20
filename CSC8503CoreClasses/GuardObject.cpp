@@ -324,7 +324,6 @@ void GuardObject::OpenDoor() {
 }
 
 bool GuardObject::IsHighEnoughLocationSus() {
-	int searchedVal = 70;
 	mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 	mSmallestDistanceVector = Vector3(100000000, 100000000, 100000000);
 	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->empty() == true) { return false; }
