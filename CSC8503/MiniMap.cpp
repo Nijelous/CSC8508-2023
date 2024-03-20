@@ -97,8 +97,7 @@ namespace NCL {
 
             mItemTextures[MINIMAP_BUFF_FLAGSIGHT] = mRenderer->LoadTexture("radar.png");
             mItemTextures[MINIMAP_GUARD] = mRenderer->LoadTexture("guard.png");
-            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("flag0.png");
-            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("flag0.png");
+            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("item.png");
 
             CreateItemRenderable();
             CreateBackGround();
@@ -343,7 +342,7 @@ namespace NCL {
                             item.type = MINIMAP_ITEM_DISGUISE;
                             break;
                         case PlayerInventory::item::soundEmitter:
-                            item.type = MINIMAP_ITEM_SOUNDEMITTER;
+                            item.type = MINIMAP_BUFF_SOUNDEMITTER;
                             break;
                         case PlayerInventory::item::flag:
                             item.type = MINIMAP_ITEM_FLAG;
