@@ -20,8 +20,8 @@ namespace {
 	constexpr float STOPPING_SPEED = 3.f;
 
 	constexpr float CHAR_STANDING_HEIGHT = 1.4f;
-	constexpr float CHAR_CROUCH_HEIGHT = .7f;
-	constexpr float CROUCH_OFFSET = 1;
+	constexpr float CHAR_CROUCH_HEIGHT = 1.f;
+	constexpr float CROUCH_OFFSET = 1.f;
 
 	constexpr int MAX_CROUCH_SPEED = 5;
 	constexpr int MAX_WALK_SPEED = 9;
@@ -262,7 +262,7 @@ PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
-	offset.y += 3;
+	offset.y += 5;
 	world->GetMainCamera().SetPosition(offset);
 }
 

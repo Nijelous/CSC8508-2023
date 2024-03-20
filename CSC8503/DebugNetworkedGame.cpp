@@ -532,7 +532,7 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	mLevelManager->LoadLevel(DEMO_LEVEL_NUM, levelSeed, 0, true);
+	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 

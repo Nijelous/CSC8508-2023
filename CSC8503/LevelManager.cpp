@@ -1417,10 +1417,9 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0,2.f,0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
-
 	playerObject.GetTransform()
 		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
 		.SetPosition(position);
