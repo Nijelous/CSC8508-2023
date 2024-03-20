@@ -19,6 +19,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "DirectionalLight.h"
+#include "BaseLight.h"
 
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"

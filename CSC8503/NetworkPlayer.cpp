@@ -10,6 +10,7 @@
 #include "PhysicsObject.h"
 #include "InventoryBuffSystem/Item.h"
 #include "SoundManager.h"
+#include "PrisonDoor.h"
 #include "Debug.h"
 
 using namespace NCL;

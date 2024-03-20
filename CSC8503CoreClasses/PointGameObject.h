@@ -1,11 +1,11 @@
 #pragma once
 #include "GameObject.h"
 #include "Vector3.h"
-#include "StateMachine.h"
 #include "Interactable.h"
 
 namespace NCL {
     namespace CSC8503 {
+        class StateMachine;
         class PointGameObject : public GameObject{
         public:
             PointGameObject(int pointsWorth = 0, float initCooldown=5);

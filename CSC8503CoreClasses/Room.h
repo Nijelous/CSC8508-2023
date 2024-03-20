@@ -1,8 +1,7 @@
 #pragma once
 #include "LevelEnums.h"
-#include "BaseLight.h"
 #include "Transform.h"
-#include "Door.h"
+#include "BaseLight.h"
 #include <unordered_map>
 
 using namespace NCL::Maths;
@@ -10,7 +9,7 @@ using namespace NCL::Maths;
 namespace NCL {
 	namespace CSC8503 {
 		class GameObject;
-
+		class Door;
 		class Room {
 		public:
 			Room() { mType = INVALID; }

@@ -14,6 +14,7 @@
 #include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
 #include "../CSC8503/NetworkPlayer.h"
+#include "PrisonDoor.h"
 
 using namespace NCL;
 using namespace CSC8503;

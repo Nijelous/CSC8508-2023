@@ -6,7 +6,6 @@
 #include "Vector3.h"
 #include "map";
 #include "PlayerObject.h"
-#include "State.h"
 
 using namespace NCL;
 using namespace CSC8503;
