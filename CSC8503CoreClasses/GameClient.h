@@ -38,6 +38,8 @@ namespace NCL {
 			void WriteAndSendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
 
 			void WriteAndSendInventoryPacket(int playerNo, int invSlot, int inItem, int usageCount);
+
+			void WriteAndSendSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue);
 		protected:
 			bool mIsConnected;
 
