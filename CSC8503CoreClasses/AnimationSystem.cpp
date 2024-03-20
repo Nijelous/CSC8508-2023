@@ -132,5 +132,7 @@ void AnimationSystem::InitPlayerStateAnimationMap() {
 	{GameObject::GameObjectState::Idle, "PlayerStand"},
 	{GameObject::GameObjectState::Walk, "PlayerWalk"},
 	{GameObject::GameObjectState::Sprint, "PlayerSprint"},
+	{GameObject::GameObjectState::Crouch, "PlayerStand"},
+	{GameObject::GameObjectState::IdleCrouch, "PlayerStand"},
 	};
 }
