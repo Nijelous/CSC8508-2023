@@ -97,6 +97,7 @@ namespace NCL {
             Vector3 mSmallestDistanceVector;
 
             BehaviourAction* Patrol();
+            BehaviourAction* CheckSusLocation();
             BehaviourAction* PointAtPlayer();
             BehaviourAction* ChasePlayerSetup();
             BehaviourAction* GoToLastKnownLocation();
