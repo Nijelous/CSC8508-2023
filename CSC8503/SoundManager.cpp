@@ -134,10 +134,6 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &mCCTVSpotChannel);
-	if (mResult != FMOD_OK) {
-		std::cout << "Play CCTV Spot sound error" << std::endl;
-	}
 }
 
 SoundManager::~SoundManager() {
@@ -324,13 +320,15 @@ void SoundManager::PlaySpottedSound() {
 }
 
 void SoundManager::PlayCCTVSpotSound(bool isPlay) {
-	if (isPlay) {
-		std::cout << 1;
+	if (mCCTVSpotChannel == nullptr) {
+		mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &mCCTVSpotChannel);
+		if (mResult != FMOD_OK) {
+			std::cout << "Play CCTV Spot sound error" << std::endl;
+		}
 	}
 	else {
-		std::cout << 2;
+		mCCTVSpotChannel->setPaused(!isPlay);
 	}
-	//mCCTVSpotChannel->setPaused(isPlay);
 }
 
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
