@@ -27,7 +27,7 @@ namespace NCL {
             MINIMAP_BUFF_DOORKEY,
             MINIMAP_BUFF_SOUNDEMITTER,
             MINIMAP_ITEM = 0x20,
-            MINIMAP_BUFF_FLAG,
+            MINIMAP_ITEM_FLAG,
             MINIMAP_ITEM_STUNITEM,
             MINIMAP_ITEM_DISGUISE,
             MINIMAP_GUARD = 0x30,
