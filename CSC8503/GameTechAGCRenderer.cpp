@@ -411,8 +411,9 @@ void GameTechAGCRenderer::ShadowmapPass() {
 }
 
 void GameTechAGCRenderer::DeferredRenderingPass() {
+
 	FillGBuffer();
-	DrawLightVolumes();
+	if (mLights.size() > 0) DrawLightVolumes();
 	CombineBuffers();
 }
 
@@ -454,14 +455,13 @@ void GameTechAGCRenderer::FillGBuffer() {
 	DrawObjects();
 
 	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
-
-	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
-	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
-
-	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushCompressedDepthBufferForTexture);
 	const bool htileTC = (mGBuffDepthTarget.getTextureCompatiblePlaneCompression() == sce::Agc::CxDepthRenderTarget::TextureCompatiblePlaneCompression::kEnable);
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffDepthTex->GetAssetID()], &mGBuffDepthTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushCompressedDepthBufferForTexture);
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 
 }
 
@@ -499,32 +499,41 @@ void GameTechAGCRenderer::DrawLightVolumes() {
 	blendControl.init();
 	blendControl.setBlend(sce::Agc::CxBlendControl::Blend::kEnable)
 		.setAlphaBlendFunc(sce::Agc::CxBlendControl::AlphaBlendFunc::kAdd)
-		.setColorSourceMultiplier(sce::Agc::CxBlendControl::ColorSourceMultiplier::kSrcAlpha)
-		.setColorBlendFunc(sce::Agc::CxBlendControl::ColorBlendFunc::kAdd);
+		.setColorBlendFunc(sce::Agc::CxBlendControl::ColorBlendFunc::kAdd)
+		.setAlphaSourceMultiplier(sce::Agc::CxBlendControl::AlphaSourceMultiplier::kOne)
+		.setColorSourceMultiplier(sce::Agc::CxBlendControl::ColorSourceMultiplier::kOne)
+		.setAlphaDestMultiplier(sce::Agc::CxBlendControl::AlphaDestMultiplier::kOne)
+		.setColorDestMultiplier(sce::Agc::CxBlendControl::ColorDestMultiplier::kOne);
+
 	frameContext->m_sb.setState(blendControl);
-	
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs)
 		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
 		.setBuffers(0, 1, &currentFrame->objectBuffer)
-		.setBuffers(1, 1, &arrayBuffer);
+		.setBuffers(1, 1, &bindlessBuffers[128]);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
 		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
 		.setBuffers(0, 1, &textureBuffer)
-		.setSamplers(0, 1, &defaultSampler);
+		.setSamplers(0, 1, &defaultSampler)
+		.setBuffers(1, 1, &bindlessBuffers[128]);
+
 
 
 
 	mSphereMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
-
+	uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
 	for (int i = 0; i < mLights.size(); i++) {
 
-		uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
 		*objID = i;
 		frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(objID, 1);
-		DrawBoundMeshInstanced(*frameContext, *mSphereMesh, mLights.size());
+		DrawBoundMesh(*frameContext, *mSphereMesh);
 	}
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+
+	sce::Agc::Core::translate(&bindlessTextures[mDiffLightTex->GetAssetID()], &mDiffLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	sce::Agc::Core::translate(&bindlessTextures[mSpecLightTex->GetAssetID()], &mSpecLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
 }
 
 void GameTechAGCRenderer::CombineBuffers() {
@@ -575,7 +584,7 @@ void GameTechAGCRenderer::DisplayRenderPass() {
 	SceError error = sce::Agc::Core::translate(&outputTex, &backBuffers[currentSwap].renderTarget, sce::Agc::Core::RenderTargetComponent::kData);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kCs)
-		.setTextures(0, 1, mGBuffNormalTex->GetAGCPointer())
+		.setTextures(0, 1, mDiffLightTex->GetAGCPointer())
 		.setRwTextures(1, 1, &outputTex);
 	uint32_t xDims = (outputTex.getWidth() + 7) / 8;
 	uint32_t yDims = (outputTex.getHeight() + 7) / 8;
@@ -769,14 +778,12 @@ void GameTechAGCRenderer::FillLightUBO() {
 	size_t lightCount = allData.size();
 	size_t bufferSize = lightSize * lightCount;
 
-	LightData* lightDataPtr = (LightData*)allocator.Allocate((uint64_t)(bufferSize), sce::Agc::Alignment::kBuffer);
-	
+	char* lightDataPtr = (char*)allocator.Allocate((uint64_t)(bufferSize), sce::Agc::Alignment::kBuffer);
+
 	sce::Agc::Core::BufferSpec bufSpec;
 	bufSpec.initAsRegularBuffer(lightDataPtr, lightSize, lightCount);
-
 	sce::Agc::Core::Buffer lBuffer;
 	SceError error = sce::Agc::Core::initialize(&lBuffer, &bufSpec);
-	memcpy(lightDataPtr, allData.data(), mLights.size());	
-
 	bindlessBuffers[bufferID] = lBuffer;
+	memcpy(lightDataPtr, allData.data(), bufferSize);
 }

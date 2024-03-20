@@ -11,37 +11,27 @@ struct VS_OUTPUT
 SamplerState sampler			: register(s0);
 
 RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
-RegularBuffer<sce::Agc::Core::Buffer> bindlessBuffers		: register(t1);
+RegularBuffer<LightData> lightBuffer		: register(t1);
 
-out float4 albedoLight;
-out float4 specularLight;
+
+out float4 fragColour[2];
 
 [CxxSymbol("TestShader::ps")]
-void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+void main(VS_OUTPUT vertex, float4 pixelPos : S_POSITION) : S_TARGET_OUTPUT
 {
-
-	
-	RegularBuffer<LightData> lightBuffer = bindlessBuffers[128];
 	LightData light = lightBuffer[vertex.LightID];
-
-	float fragX = (vertex.Position.x + 1) / 2;
-	float fragY = (vertex.Position.y + 1) / 2;
-	float2 fragCoord = float2(fragX, fragY) * Constants.pixelSize;
+	float2 fragCoord = pixelPos * Constants.pixelSize;
 	Texture2D<float4> depthTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffDepthIndex)]);
-	
 	
 	float depth = depthTex.Sample(sampler, fragCoord).x;
 	float3 ndcPos = float3(fragCoord, depth) * 2.0 - 1.0;
 	float4 invClipPos = mul(Constants.inverseViewProjMatrix, float4(ndcPos, 1.0));
 	float3 worldPos = invClipPos.xyz / invClipPos.w;
 
-	
-
-	
 	float dist = length(light.lightPos - worldPos);
 	float atten = 1.0 - clamp(dist / light.lightRadius, 0.0, 1.0);
 
-	//if(atten == 0.0) {discard;}
+	if(atten == 0.0) {discard;}
 	
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffNormalIndex)]);
 	float3 normal = normalize(normalTex.Sample(sampler, fragCoord).xyz * 2.0 - 1.0);
@@ -62,14 +52,15 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	if(light.lightType == 's') {
 		
 	float fragDotProd = dot(-light.lightDirection, incident);
-		//if(fragDotProd < light.minDotProd) discard;
+		if(fragDotProd < light.minDotProd) discard;
 		float ringDiff = light.dimDotProd - light.minDotProd;
 		float edgeDimFactor = clamp((fragDotProd - light.minDotProd) / ringDiff, 0.0, 1.0);
 		attenuated = light.lightColour * atten * edgeDimFactor;		
 	}
 	else attenuated = light.lightColour * atten;
 	
-	//albedoLight = float4(attenuated * lambert, 1.0);
-	//specularLight = float4(attenuated * specFactor * 0.33, 1.0);
+	fragColour[0] = float4(attenuated * lambert, 1.0);
+	//fragColour[0] = float4(1,0,0,1);
+	fragColour[1] = float4(attenuated * specFactor * 0.33, 1.0);
 	
 }

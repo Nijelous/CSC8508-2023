@@ -146,6 +146,7 @@ namespace NCL {
 			std::map<std::string, NCL::PS5::AGCTexture*> textureMap;
 
 			sce::Agc::Core::Buffer arrayBuffer;
+			sce::Agc::Core::Buffer mLightBuffer;
 
 			NCL::PS5::AGCTexture* defaultTexture;
 			NCL::PS5::AGCTexture* skyboxTexture;
