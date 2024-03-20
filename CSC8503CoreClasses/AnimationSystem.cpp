@@ -90,7 +90,7 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 		}
-		if (obj->GetName() == "Player") {
+		else if (obj->GetName().find("Player") != std::string::npos) {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);

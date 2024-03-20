@@ -1,3 +1,4 @@
+#include "SceneManager.h"
 #ifdef USEGL
 #include "NetworkPlayer.h"
 
@@ -40,6 +41,8 @@ NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::strin
 	LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	this->game = game;
 	mPlayerID = num;
+	this->SetName(objName);
+
 }
 
 NetworkPlayer::~NetworkPlayer() {
@@ -82,8 +85,6 @@ void NetworkPlayer::UpdateObject(float dt) {
 		else
 			PlayerObject::RayCastFromPlayerForUI(mGameWorld,dt);
 
-		ResetPlayerInput();
-
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 
@@ -118,6 +119,8 @@ void NetworkPlayer::MovePlayer(float dt) {
 	bool isServer = game->GetIsServer();
 
 	if (mIsLocalPlayer) {
+
+		ResetPlayerInput();
 		const Vector3 playerPos = mTransform.GetPosition();
 
 		//Debug::Print("Player Position: " + std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y) + ", " + std::to_string(playerPos.z), Vector2(5, 30), Debug::MAGENTA);
@@ -186,6 +189,8 @@ void NetworkPlayer::MovePlayer(float dt) {
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 
+	const GameObjectState previousObjectState = mObjectState;
+
 	if (isServer == false && mIsLocalPlayer) {
 		//TODO(eren.degirmenci): is dynamic casting here is bad ?
 		const Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
@@ -194,16 +199,15 @@ void NetworkPlayer::MovePlayer(float dt) {
 		mPlayerInputs.rightAxis = rightAxis;
 		game->GetClient()->WriteAndSendClientInputPacket(game->GetClientLastFullID(), mPlayerInputs);
 	}
-	else {
-		const GameObjectState previousObjectState = mObjectState;
+	else if (isServer) {
 
 		HandleMovement(dt, mPlayerInputs);
 
-		if (previousObjectState != mObjectState)
-			ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
-
 		mIsClientInputReceived = false;
 	}
+
+	if (previousObjectState != mObjectState)
+		ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
 }
 
 void NCL::CSC8503::NetworkPlayer::AddAnnouncement(AnnouncementType announcementType, float time, int playerNo){
@@ -255,14 +259,14 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 
 	if (isIdle) {
 		if (mIsCrouched)
-			mObjectState = IdleCrouch;
+			SetObjectState(IdleCrouch);
 		else
-			mObjectState = Idle;
+			SetObjectState(Idle);
 	}
 	else {
 		ActivateSprint(playerInputs.isSprinting);
 		if (mIsCrouched)
-			mObjectState = Crouch;
+			SetObjectState(Crouch);
 	}
 	ToggleCrouch(playerInputs.isCrouching);
 

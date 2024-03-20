@@ -537,6 +537,8 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	SpawnPlayers();
 
 	mLevelManager->SetPlayersForGuards();
+
+	mLevelManager->InitAnimationSystemObjects();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {
