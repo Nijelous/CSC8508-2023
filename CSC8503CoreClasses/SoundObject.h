@@ -12,10 +12,6 @@ namespace NCL {
 			SoundObject();
 			~SoundObject();
 
-			void AddChannel(Channel* channel);
-
-			std::vector<Channel*> GetChannels();
-
 			Channel* GetChannel();
 
 			void TriggerSoundEvent();
@@ -38,7 +34,6 @@ namespace NCL {
 
 		protected:
 			Channel* mChannel = nullptr;
-			std::vector<Channel*> mChannels;
 			bool mIsTriggered;
 			bool mIsClosed;
 			bool mIsLocked;
