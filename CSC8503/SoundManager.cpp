@@ -74,7 +74,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSystem->createSound("../Assets/Sounds/warning-sound-6686.mp3", FMOD_2D | FMOD_LOOP_NORMAL, 0, &mCCTVSpotSound);
+	mResult = mSystem->createSound("../Assets/Sounds/Alarm-Fast-A1-www.fesliyanstudios.com.mp3", FMOD_2D | FMOD_LOOP_NORMAL, 0, &mCCTVSpotSound);
 	if (mResult != FMOD_OK) {
 		std::cout << "!! Create CCTV Spotted Sound Error !!" << std::endl;
 		return;
@@ -321,7 +321,7 @@ void SoundManager::PlaySpottedSound() {
 
 void SoundManager::PlayCCTVSpotSound(bool isPlay) {
 	if (mCCTVSpotChannel == nullptr) {
-		mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &mCCTVSpotChannel);
+		mResult = mSystem->playSound(mCCTVSpotSound, 0, !isPlay, &mCCTVSpotChannel);
 		if (mResult != FMOD_OK) {
 			std::cout << "Play CCTV Spot sound error" << std::endl;
 		}
