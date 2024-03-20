@@ -107,7 +107,7 @@ namespace SuspicionSystem
 
         std::map<const activeLocationSusCause, const float>  activeLocationSusCauseSeverityMap =
         {
-            {continouousSound, 80}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
+            {continouousSound, 5}, {cameraLOS, 3}, {susPlayerNearby,2}, {passiveRecovery,-2}
         };
 
         std::map<Vector3, float> mVec3LocationSusAmountMap;
