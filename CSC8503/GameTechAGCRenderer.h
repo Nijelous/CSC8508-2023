@@ -6,6 +6,9 @@
 #include "../PS5Core/AGCRenderer.h"
 
 #include "../PS5Core/AGCBuffer.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 #include "../Assets/Shaders/PSSL/Interop.h"		//Always include this before any PSSL headers
 #include "../Assets/Shaders/PSSL/ShaderConstants.psslh"
@@ -134,6 +137,7 @@ namespace NCL {
 			int currentFrameIndex;
 
 			NCL::PS5::AGCMesh* quadMesh;
+			NCL::PS5::AGCMesh* mSphereMesh;
 
 			sce::Agc::Core::Texture*	bindlessTextures;
 			sce::Agc::Core::Buffer*		bindlessBuffers;

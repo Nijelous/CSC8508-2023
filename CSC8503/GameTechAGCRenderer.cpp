@@ -5,11 +5,8 @@
 #include "GameObject.h"
 #include "RenderObject.h"
 #include "Camera.h"
-#include "DirectionalLight.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "PointLight.h"
-#include "SpotLight.h"
 #include "../PS5Core/AGCMesh.h"
 #include "../PS5Core/AGCTexture.h"
 #include "../PS5Core/AGCShader.h"
@@ -55,6 +52,7 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	quadMesh = new AGCMesh();
 	CreateQuad(quadMesh);
 	quadMesh->UploadToGPU(this);
+	mSphereMesh = (AGCMesh*)LoadMesh("Sphere.msh");
 
 	skinningCompute = new AGCShader("Skinning_c.ags", allocator);
 	gammaCompute = new AGCShader("Gamma_c.ags", allocator);
@@ -115,9 +113,9 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
 	mDiffLightTex = CreateFrameBufferTextureSlot("diffLight");
 	mSpecLightTex = CreateFrameBufferTextureSlot("specLightTex");
-	
+
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
-	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mDiffLightTex->GetAGCPointer(), &mDiffLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mSpecLightTex->GetAGCPointer(), &mSpecLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
@@ -256,7 +254,7 @@ void GameTechAGCRenderer::DrawObjects() {
 	int instanceCount = 0;
 
 	bool skipInstance = false;
-	
+
 	for (int i = 0; i < activeObjects.size(); ++i) {
 		AGCMesh* objectMesh = (AGCMesh*)activeObjects[i]->GetMesh();
 
@@ -409,10 +407,10 @@ void GameTechAGCRenderer::ShadowmapPass() {
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
 
 	sce::Agc::Core::translate(&bindlessTextures[shadowMap->GetAssetID()], &shadowTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
-	
+
 }
 
-void GameTechAGCRenderer::DeferredRenderingPass(){
+void GameTechAGCRenderer::DeferredRenderingPass() {
 	FillGBuffer();
 	DrawLightVolumes();
 	CombineBuffers();
@@ -433,7 +431,7 @@ void GameTechAGCRenderer::FillGBuffer() {
 	rtMask.setMask(1, 0xFF);
 
 	frameContext->m_sb.setState(rtMask);
-	frameContext->m_sb.setState(mGBuffAlbedoTarget);	
+	frameContext->m_sb.setState(mGBuffAlbedoTarget);
 	frameContext->m_sb.setState(mGBuffNormalTarget);
 	frameContext->m_sb.setState(mGBuffDepthTarget);
 
@@ -468,10 +466,11 @@ void GameTechAGCRenderer::FillGBuffer() {
 }
 
 void GameTechAGCRenderer::DrawLightVolumes() {
+	sce::Agc::Core::Encoder::EncoderValue clearColor = sce::Agc::Core::Encoder::encode(backBuffers[currentSwap].spec.getFormat(), { 0,0,0,1 });
 	sce::Agc::Toolkit::Result tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mDiffLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
 	tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mSpecLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
 	sce::Agc::Toolkit::Result wat = frameContext->resetToolkitChangesAndSyncToGl2(tk1);
-	
+
 	frameContext->setShaders(nullptr, lightVertexShader->GetAGCPointer(), lightPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
 
 	sce::Agc::CxViewport viewPort;
@@ -503,14 +502,33 @@ void GameTechAGCRenderer::DrawLightVolumes() {
 		.setColorSourceMultiplier(sce::Agc::CxBlendControl::ColorSourceMultiplier::kSrcAlpha)
 		.setColorBlendFunc(sce::Agc::CxBlendControl::ColorBlendFunc::kAdd);
 	frameContext->m_sb.setState(blendControl);
+	
 
-	for(int i = 0; i < mLights.size(); i++) {
-		
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
+		.setBuffers(0, 1, &currentFrame->objectBuffer)
+		.setBuffers(1, 1, &arrayBuffer);
+
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
+		.setBuffers(0, 1, &textureBuffer)
+		.setSamplers(0, 1, &defaultSampler);
+
+
+
+	mSphereMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
+
+	for (int i = 0; i < mLights.size(); i++) {
+
+		uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
+		*objID = i;
+		frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(objID, 1);
+		DrawBoundMeshInstanced(*frameContext, *mSphereMesh, mLights.size());
 	}
 }
 
 void GameTechAGCRenderer::CombineBuffers() {
-	
+
 }
 
 
@@ -656,7 +674,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 						state.index[0] = tex->GetAssetID();
 					}
 					tex = g->GetNormalTexture();
-					if(tex)	{
+					if (tex) {
 						state.index[1] = tex->GetAssetID();
 					}
 
@@ -724,7 +742,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 		break;
 		case Light::Point:
 		{
-			PointLight* pl = static_cast<PointLight*>(l);			
+			PointLight* pl = static_cast<PointLight*>(l);
 			lightData.lightPos = pl->GetPosition();
 			lightData.lightRadius = pl->GetRadius();
 			lightData.lightType = 'p';
@@ -745,22 +763,20 @@ void GameTechAGCRenderer::FillLightUBO() {
 			break;
 		}
 
-		allData.push_back(lightData);		
+		allData.push_back(lightData);
 	}
 	size_t lightSize = sizeof(LightData);
 	size_t lightCount = allData.size();
 	size_t bufferSize = lightSize * lightCount;
 
-	char* lightDataPtr = (char*)allocator.Allocate((uint64_t)(bufferSize), sce::Agc::Alignment::kBuffer);
-
+	LightData* lightDataPtr = (LightData*)allocator.Allocate((uint64_t)(bufferSize), sce::Agc::Alignment::kBuffer);
+	
 	sce::Agc::Core::BufferSpec bufSpec;
 	bufSpec.initAsRegularBuffer(lightDataPtr, lightSize, lightCount);
 
 	sce::Agc::Core::Buffer lBuffer;
 	SceError error = sce::Agc::Core::initialize(&lBuffer, &bufSpec);
-
-	lightDataPtr = (char*) &allData[0];
-	AGCBuffer* b = new AGCBuffer(lBuffer, lightDataPtr);
+	memcpy(lightDataPtr, allData.data(), mLights.size());	
 
 	bindlessBuffers[bufferID] = lBuffer;
 }

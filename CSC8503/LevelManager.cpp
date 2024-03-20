@@ -523,7 +523,6 @@ void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMa
 }
 
 void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation) {
-#ifdef USEGL
 	for (int i = 0; i < lights.size(); i++) {
 		if (lights[i]->GetType() == Light::Point) {
 			PointLight* pl = static_cast<PointLight*>(lights[i]);
@@ -544,7 +543,6 @@ void LevelManager::LoadLights(const std::vector<Light*>& lights, const Vector3& 
 			mRenderer->AddLight(newDL);
 		}
 	}
-#endif
 }
 
 void LevelManager::LoadGuards(int guardCount, bool isInMultiplayer) {
