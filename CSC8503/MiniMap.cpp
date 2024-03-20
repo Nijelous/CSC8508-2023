@@ -97,7 +97,7 @@ namespace NCL {
 
             mItemTextures[MINIMAP_BUFF_FLAGSIGHT] = mRenderer->LoadTexture("radar.png");
             mItemTextures[MINIMAP_GUARD] = mRenderer->LoadTexture("guard.png");
-            mItemTextures[MINIMAP_FLAG] = mRenderer->LoadTexture("item.png");
+            mItemTextures[MINIMAP_ITEM_FLAG] = mRenderer->LoadTexture("item.png");
 
             CreateItemRenderable();
             CreateBackGround();
