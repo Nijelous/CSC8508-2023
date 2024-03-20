@@ -653,7 +653,7 @@ bool CollisionDetection::SphereCapsuleIntersection(
 	Vector3 capsuleMax = worldTransformA.GetPosition() + volumeA.GetOffset() + (capsuleDir * volumeA.GetHalfHeight());
 	Vector3 capsuleMin = worldTransformA.GetPosition() + volumeA.GetOffset() - (capsuleDir * volumeA.GetHalfHeight());
 
-	Vector3 pointToCapsuleDir = worldTransformB.GetPosition() - worldTransformA.GetPosition();
+	Vector3 pointToCapsuleDir = (worldTransformB.GetPosition() + volumeB.GetOffset()) - (worldTransformA.GetPosition() + volumeA.GetOffset());
 	float proj = Vector3::Dot(capsuleDir, pointToCapsuleDir);
 
 	Vector3 capsulePoint = worldTransformA.GetPosition() + volumeA.GetOffset() + (capsuleDir * proj);
