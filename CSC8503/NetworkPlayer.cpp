@@ -206,8 +206,7 @@ void NetworkPlayer::MovePlayer(float dt) {
 		mIsClientInputReceived = false;
 	}
 
-	if (previousObjectState != mObjectState)
-		ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
+	ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
 }
 
 void NCL::CSC8503::NetworkPlayer::AddAnnouncement(AnnouncementType announcementType, float time, int playerNo){
