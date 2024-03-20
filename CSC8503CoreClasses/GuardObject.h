@@ -81,6 +81,7 @@ namespace NCL {
             void GuardSpeedMultiplier();
             int AngleValue(float minAng);
             bool IsHighEnoughLocationSus();
+            bool IsPlayerSprintingNearby(Vector3 dir);
 
             void CheckForDoors(float dt);
             void OpenDoor();
