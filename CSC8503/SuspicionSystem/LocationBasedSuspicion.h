@@ -27,6 +27,10 @@ namespace SuspicionSystem
                      (shiftedPos.x + shiftedPos.z + 1) / 2 + shiftedPos.z;
         };
 
+        bool operator==(const CantorPair& other) const {
+            return mValue == other.mValue;
+        }
+
         bool operator<(const CantorPair& other) const {
             return mValue < other.mValue;
         }   
@@ -98,6 +102,7 @@ namespace SuspicionSystem
 
         void SyncActiveSusCauses(const activeLocationSusCause& inCause, const int& pairedLocation, const bool& toApply);
         void SyncSusChange(const int& pairedLocation, const int& changedValue);
+        void RemoveSusLocation(const Vector3 pos);
 
     private:
 
@@ -115,7 +120,7 @@ namespace SuspicionSystem
         std::map<CantorPair, float> mLocationSusAmountMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationSusCauseMap;
         std::map<CantorPair, std::vector<activeLocationSusCause>> mActiveLocationlSusCausesToRemove;
-        std::vector<CantorPair*> locationsToClear;
+        std::vector<CantorPair> locationsToClear;
 
         bool AddActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
         bool RemoveActiveLocationSusCause(activeLocationSusCause inCause, CantorPair pairedLocation);
@@ -132,6 +137,5 @@ namespace SuspicionSystem
         void HandleActiveSusCauseNetworking(const activeLocationSusCause& inCause, const CantorPair& pairedLocation, const bool& toApply);
         void HandleSusChangeNetworking(const int& changedValue, const CantorPair& pairedLocation);
 
-        void RemoveSusLocation(const Vector3 pos);
     };
 }

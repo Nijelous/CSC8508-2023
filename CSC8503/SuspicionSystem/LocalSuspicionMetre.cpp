@@ -156,7 +156,7 @@ void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, a
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){
     mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo] + ammount,
                                         mGlobalSusMeterPTR->GetGlobalSusMeter(),
-                                        100.0f);
+                                        99.0f);
 }
 
 void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo) {

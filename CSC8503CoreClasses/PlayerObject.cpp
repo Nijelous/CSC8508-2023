@@ -475,6 +475,15 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM9) &&
+		DEBUG_MODE) {
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion()->SetMinLocationSusAmount(GetTransform().GetPosition(),20);
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM0) &&
+		DEBUG_MODE) {
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion()->RemoveSusLocation(GetTransform().GetPosition());
+	}
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {

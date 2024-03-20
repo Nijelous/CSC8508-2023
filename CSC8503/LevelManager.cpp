@@ -77,7 +77,6 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
-	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	mDtSinceLastFixedUpdate = 0;
 
 	mActiveLevel = -1;
@@ -282,6 +281,8 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	mTimer = INIT_TIMER_VALUE;
 
 	mIsLevelInitialised = true;
+	mPlayerInventoryObservers.push_back(this);
+	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	for (const auto invObserver : mPlayerInventoryObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
 
@@ -1600,8 +1601,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
-		0.75f));
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 1));
+	
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
