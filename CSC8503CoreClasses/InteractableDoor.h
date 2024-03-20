@@ -27,7 +27,6 @@ namespace NCL {
 			bool CanUseItem(GameObject* userObj);
 			const float initDoorTimer = 5.0f;
 			const float initLockCooldown = 2.0f;
-			bool mIsLocked;
 			float mLockCooldown;
 		};
 	}

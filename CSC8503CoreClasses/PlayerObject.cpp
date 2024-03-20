@@ -10,6 +10,8 @@
 #include "Window.h"
 #include "GameWorld.h"
 #include "UISystem.h"
+#include "Vent.h"
+
 
 
 using namespace NCL::CSC8503;
@@ -124,8 +126,8 @@ void PlayerObject::UpdateObject(float dt) {
 		EnforceMaxSpeeds();
 	}
 
-	UpdateLocalUI(dt);
 	UpdateGlobalUI(dt);
+	UpdateLocalUI(dt);
 	if (DEBUG_MODE)
 	{
 		ShowDebugInfo(dt);
@@ -134,9 +136,7 @@ void PlayerObject::UpdateObject(float dt) {
 
 void PlayerObject::ShowDebugInfo(float dt)
 {
-	Debug::Print("Sus:" + std::to_string(
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)
-	), Vector2(70, 90));
+
 	if (mHasSilentSprintBuff)
 		Debug::Print("HasSilentSprint", Vector2(70, 95));
 	switch (mPlayerSpeedState) {
@@ -175,6 +175,8 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
 		break;
 	case Sprint:
+		if (mHasSilentSprintBuff)
+			break;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::playerSprint, mPlayerID);
 		break;
 	default:
@@ -466,6 +468,13 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::V) &&
+		DEBUG_MODE) {
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(PlayerInventory::soundEmitter, mPlayerID);
+		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
+	}
+
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
@@ -587,9 +596,9 @@ void PlayerObject::ChangeTransparency(bool isUp, float& transparency)
 void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 {
 	//Open Door
-	if (objectHit->GetName() == "InteractableDoor" && distance < 15) {
-		auto* DoorHit = (Door*)objectHit;
-		if (!DoorHit->GetIsOpen()) {
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen()&&!doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyRight);
 			mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 		}
@@ -603,9 +612,9 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 	}
 	//Close Door
-	if (objectHit->GetName() == "InteractableDoor" && distance < 15) {
-		auto* DoorHit = (Door*)objectHit;
-		if (DoorHit->GetIsOpen()) {
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
+		auto* doorHit = (Door*)objectHit;
+		if (doorHit->GetIsOpen()) {
 			ChangeTransparency(true, mTransparencyLeft);
 			mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
 		}
@@ -619,9 +628,9 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
 	}
 	//Lock Door
-	if (objectHit->GetName() == "InteractableDoor" && distance < 15 && GetEquippedItem() == PlayerInventory::item::doorKey) {
-		auto* DoorHit = (Door*)objectHit;
-		if (!DoorHit->GetIsOpen()) {
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::doorKey)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen()&&!doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyTop);
 			mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 		}
@@ -634,19 +643,58 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyTop);
 		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	}
-	//Stop Guard
-	if (objectHit->GetName() == "Guard" && distance < 100 && GetEquippedItem() == PlayerInventory::item::stunItem) {
-		if (mTransparencyBot < 1) {
-			mTransparencyBot = mTransparencyBot + 0.1;
+	//Use ScrewDriver
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15 )&&(GetEquippedItem() == PlayerInventory::item::doorKey)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen()&&doorHit->GetIsLock()) {
+			ChangeTransparency(true, mTransparencyBot);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 		}
-		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+		else {
+			ChangeTransparency(false, mTransparencyBot);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
+		}
 	}
 	else {
-		if (mTransparencyBot > 0) {
-			mTransparencyBot = mTransparencyBot - 0.02;
-		}
+		ChangeTransparency(false, mTransparencyBot);
 		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 	}
+	//Unlock Door
+	if ((objectHit->GetName() == "Vent") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::screwdriver)) {
+		auto* ventHit = (Vent*)objectHit;
+		if (!ventHit->IsOpen()) {
+			ChangeTransparency(true, mTransparencyBotRight);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOTRIGHT, mTransparencyBotRight);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyBotRight);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOTRIGHT, mTransparencyBotRight);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyBotRight);
+		mUi->ChangeBuffSlotTransparency(NOTICEBOTRIGHT, mTransparencyBotRight);
+	}
+
+
+	//Use Vent
+	if ((objectHit->GetName() == "Vent") && (distance < 15)) {
+		auto* ventHit = (Vent*)objectHit;
+		if (ventHit->IsOpen()) {
+			ChangeTransparency(true, mTransparencyBotLeft);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyBotLeft);
+			mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
+		}
+	}
+	else{
+		ChangeTransparency(false, mTransparencyBotLeft);
+		mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
+	}
+
+
 }
 
 void NCL::CSC8503::PlayerObject::ResetRayCastIcon()
@@ -655,11 +703,13 @@ void NCL::CSC8503::PlayerObject::ResetRayCastIcon()
 	ChangeTransparency(false, mTransparencyBot);
 	ChangeTransparency(false, mTransparencyLeft);
 	ChangeTransparency(false, mTransparencyRight);
+	ChangeTransparency(false, mTransparencyBotLeft);
 
 	mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 	mUi->ChangeBuffSlotTransparency(NOTICELEFT, mTransparencyLeft);
 	mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
+	mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
 }
 
 float PlayerObject::SusLinerInterpolation(float dt)
@@ -674,7 +724,7 @@ float PlayerObject::SusLinerInterpolation(float dt)
 	else {
 		mUiTime = 1;
 		mLastSusValue = tempSusValue;
-		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(0);
+		mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
 	}
 	float iconValue = 100.00 - (tempSusValue * 0.7 + 14.00);
 	return iconValue;
@@ -746,13 +796,6 @@ void PlayerObject::ChangeToStunned(){
 	mWalkSpeed = 0;
 	mSprintSpeed = 0;
 
-	if (mSuspicionSystemClassPtr != nullptr) {
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
-		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerWalk, mPlayerID);
-	}
-
 	mPhysicsObject->SetLinearVelocity(Vector3(0,0,0));
 	mPlayerSpeedState = Stunned;
 
@@ -803,39 +846,31 @@ void PlayerObject::UpdateGlobalUI(float dt){
 void PlayerObject::UpdateLocalUI(float dt){
 	//SusBar
 	float iconValue = SusLinerInterpolation(dt);
-
 	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 	if (mSusValue > 33) {
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
 		if (mSusValue > 66) {
 			mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[2];
-			mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
-			mAlarmTime = mAlarmTime + dt;
 		}
-	}
-	if (mSusValue < 66 && mUi->GetIcons()[ALARM]->mTransparency>0) {
-		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
-		mAlarmTime = 0;
 	}
 	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
-	//It have some problem here
-	mUiTime = mUiTime + dt;
-	mUiTime = std::fmod(mUiTime, 1.0f);
+	Debug::Print("Sus lvl:", Vector2(80, 95));
+	Debug::Print(std::to_string((int)mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)), Vector2(95, 95));
 
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
+	//global suspicion
+	float globalSusValue = mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter();
+	if (globalSusValue > 33) {
+		mUi->ChangeBuffSlotTransparency(ALARM, abs(sin(mAlarmTime) * 0.5));
+		mAlarmTime = mAlarmTime + dt;
+	}
+	if (globalSusValue < 33 && mUi->GetIcons()[ALARM]->mTransparency>0) {
+		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
+		mAlarmTime = 0;
+	}
 
-	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-	iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-	mLastSusValue = mSusValue;
-
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
-
-	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
-
-
+	Debug::Print(" Alert lvl:", Vector2(74, 98));
+	Debug::Print(std::to_string((int)mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->GetGlobalSusMeter()), Vector2(95, 98));
 }
 
 void PlayerObject::MatchCameraRotation(float yawValue) {
