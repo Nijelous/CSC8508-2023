@@ -6,6 +6,7 @@
 #include "TextureLoader.h"
 #include "MshLoader.h"
 #include "PointLight.h"
+#include "RecastBuilder.h"
 #include "SpotLight.h"
 #include "../PS5Core/AGCMesh.h"
 #include "../PS5Core/AGCTexture.h"
@@ -598,15 +599,6 @@ void GameTechAGCRenderer::UpdateObjectList() {
 					state.index[1] = 0; //Normal texture
 					state.index[2] = 0; //skinning buffer
 
-					Texture* tex = g->GetAlbedoTexture();
-					if (tex) {
-						state.index[0] = tex->GetAssetID();
-					}
-					tex = g->GetNormalTexture();
-					if(tex)	{
-						state.index[1] = tex->GetAssetID();
-					}
-
 					AGCMesh* m = (AGCMesh*)g->GetMesh();
 					if (m && m->GetJointCount() > 0) {//It's a skeleton mesh, need to update transformed vertices buffer
 
@@ -638,9 +630,36 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 						frameJobs.push_back({ g, b->GetAssetID() });
 					}
-					currentFrame->data.WriteData<ObjectState>(state);
-					currentFrame->debugLinesOffset += sizeof(ObjectState);
-					at++;
+
+					if (g->GetMatTextures().size() == 0) {
+						Texture* tex = g->GetAlbedoTexture();
+					   if (tex) {
+						   state.index[0] = tex->GetAssetID();
+					   }
+					   tex = g->GetNormalTexture();
+					   if(tex)	{
+						   state.index[1] = tex->GetAssetID();
+					   }
+					}
+					if (g->GetMatTextures().size() > 0) {
+						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
+						   state.subMeshIndex = x;
+						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x]->GetAssetID();
+						   currentFrame->data.WriteData<ObjectState>(state);
+						   currentFrame->debugLinesOffset += sizeof(ObjectState);
+						   at++;
+					   }
+					}
+					else {
+						state.subMeshIndex = 5;
+						currentFrame->data.WriteData<ObjectState>(state);
+						currentFrame->debugLinesOffset += sizeof(ObjectState);
+						at++;
+					}
+
+					//currentFrame->data.WriteData<ObjectState>(state);
+					//currentFrame->debugLinesOffset += sizeof(ObjectState);
+					//at++;
 				}
 			}
 		}

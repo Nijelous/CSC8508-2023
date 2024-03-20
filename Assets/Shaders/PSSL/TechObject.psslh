@@ -2,4 +2,8 @@ struct ObjectState {
 		matrix modelMatrix;
 		float4 colour;
 		int index[4];
+
+		int subMeshIndex;
+		int materialLayerAlbedos[4];
+		int materialLayerNormals[4];
 };

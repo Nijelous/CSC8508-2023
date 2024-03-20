@@ -1,4 +1,9 @@
 #include "ShaderConstants.psslh"
+#include "VertexAttributes.psslh"
+#include "Skinning.psslh"
+#include "TechObject.psslh"
+#include "Bindless.psslh"
+#include "Vertex.psslh"
 
 struct VS_OUTPUT
 {
@@ -10,6 +15,13 @@ struct VS_OUTPUT
 	float3 Bitangent	: TEXCOORD4;
 	int	albedoTexID		: TEXCOORD5;
 	int normalTexID		: TEXCOORD6;
+
+	int subMeshIndex	: TEXCOORD7;
+
+	int materialLayer1Albedo : TEXCOORD8;
+	int materialLayer2Albedo : TEXCOORD9;
+	int materialLayer3Albedo : TEXCOORD10;
+	int materialLayer4Albedo : TEXCOORD11;
 };
 
 SamplerState sampler			: register(s0);
@@ -22,7 +34,8 @@ out float4 fragColour[2];
 void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 {
 	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
-	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.albedoTexID)]);
+	int finalTexture = DetermineTextureID(vertex.subMeshIndex, vertex.materialLayer1Albedo, vertex.materialLayer2Albedo, vertex.materialLayer3Albedo, vertex.materialLayer4Albedo, vertex.albedoTexID);
+	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(finalTexture)]);
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
 	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
 	bumpNormal = normalize(mul(TBN, normalize(bumpNormal * 2.0 - 1.0)));

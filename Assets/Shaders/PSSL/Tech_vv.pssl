@@ -15,6 +15,13 @@ struct VS_OUTPUT
 	float3 Bitangent	: TEXCOORD4;
 	int	albedoTexID		: TEXCOORD5;
 	int normalTexID		: TEXCOORD6;
+
+	int subMeshIndex	: TEXCOORD7;
+
+	int materialLayer1Albedo : TEXCOORD8;
+	int materialLayer2Albedo : TEXCOORD9;
+	int materialLayer3Albedo : TEXCOORD10;
+	int materialLayer4Albedo : TEXCOORD11;
 };
 
 [CxxSymbol("TestShader::gs")]
@@ -44,6 +51,12 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	Output.Colour	= s.colour;
 	Output.albedoTexID	= s.index[0];
 	Output.normalTexID = s.index[1];
+
+	Output.subMeshIndex = s.subMeshIndex;
+	Output.materialLayer1Albedo	= s.materialLayerAlbedos[0];
+	Output.materialLayer2Albedo = s.materialLayerAlbedos[1];
+	Output.materialLayer3Albedo	= s.materialLayerAlbedos[2];
+	Output.materialLayer4Albedo = s.materialLayerAlbedos[3];
 
 	return Output;
 }
