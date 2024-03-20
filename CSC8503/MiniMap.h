@@ -1,3 +1,4 @@
+#ifdef USEGL
 #pragma once
 #include "OGLRenderer.h"
 #include "OGLTexture.h"
@@ -79,9 +80,6 @@ namespace NCL {
             void SetViewRadius(float r);
 
         protected:
-
-            // void SetTexture(OGLTexture const* texture);
-
             void Initialize();
 
             void SearchWorld();
@@ -98,7 +96,6 @@ namespace NCL {
             void RenderWalls();
 
             Matrix3 GetMinimapToViewportMatrix() const;
-            // Matrix3 GetUVMatrix(Vector2 const& p) const;
             Matrix3 GetWorldToMinimapMatrix() const;
 
             Matrix3 GetItemTransformationMatrix(MiniMapItem const& item, bool& visible) const;
@@ -109,8 +106,7 @@ namespace NCL {
             bool mInitialized = false;
             bool mItemVisible = false;
             int worldStateID{ 0 };
-            OGLTexture const* mMiniMapTexture; // Texture to represent the mini-map
-            // OGLShader* mItemShader;
+
             OGLShader* mUnlitColorShader;
             OGLShader* mWallShader;
             OGLShader* mIconShader;
@@ -142,7 +138,7 @@ namespace NCL {
             Matrix3 mWorldToMinimapMatrix;
             Matrix3 mMinimapToViewportMatrix;
             Matrix3 mPlayerRotationMatrix;
-            // Matrix3 mUVMatrix;
         };
     }
 }
+#endif

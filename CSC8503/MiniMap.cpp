@@ -1,3 +1,4 @@
+#ifdef USEGL
 // MiniMap.cpp
 #include "MiniMap.h"
 
@@ -75,46 +76,46 @@ namespace NCL {
             mViewRadius(100.f)
         {
             mRenderer->SetMiniMap(this);
+            Initialize();
         }
 
         MiniMap::~MiniMap() {
             delete mIconShader;
-            delete mMiniMapTexture;
             delete mUnlitColorShader;
+            delete[] mItemTextures;
         }
         void MiniMap::Initialize() {
-            // fprintf(stderr, "===%d===%X\n", __LINE__, glGetError());
-            mMiniMapTexture = static_cast<OGLTexture*>(mRenderer->LoadTexture("Default.png"));
-            // mItemShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/minimap.frag"));
-            mUnlitColorShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/unlitcolor.frag"));
-            mWallShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/wall.frag"));
-            mIconShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/tex.frag"));
+            if (!mInitialized) {
+                mUnlitColorShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/unlitcolor.frag"));
+                mWallShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/wall.frag"));
+                mIconShader = static_cast<OGLShader*>(mRenderer->LoadShader("minimap/common.vert", "minimap/tex.frag"));
+                Texture* baseBuff = mRenderer->LoadTexture("buff.png");
+                for (int i = 0; i < MINIMAP_NUM; ++i) {
+                    mItemTextures[i] = baseBuff;
+                }
 
-            for(int i=0;i<MINIMAP_NUM;++i)
-            {
-                mItemTextures[i] = mRenderer->LoadTexture("buff.png");
+                mItemTextures[MINIMAP_BUFF_FLAGSIGHT] = mRenderer->LoadTexture("radar.png");
+                mItemTextures[MINIMAP_GUARD] = mRenderer->LoadTexture("guard.png");
+                mItemTextures[MINIMAP_ITEM_FLAG] = mRenderer->LoadTexture("item.png");
+
+                CreateItemRenderable();
+                CreateBackGround();
+
+                mPlayer.positions = {
+                    {0.,-0.05},
+                    {0.1,-0.1},
+                    {0,0.2},
+                    {-0.1,-0.1},
+                };
+                mPlayer.Create();
+                mInitialized = true;
             }
-
-            mItemTextures[MINIMAP_BUFF_FLAGSIGHT] = mRenderer->LoadTexture("radar.png");
-            mItemTextures[MINIMAP_GUARD] = mRenderer->LoadTexture("guard.png");
-            mItemTextures[MINIMAP_ITEM_FLAG] = mRenderer->LoadTexture("item.png");
-
-            CreateItemRenderable();
-            CreateBackGround();
-
-            mPlayer.positions = {
-                {0.,-0.05},
-                {0.1,-0.1},
-                {0,0.2},
-                {-0.1,-0.1},
-            };
-            mPlayer.Create();
         }
         void MiniMap::SetItemTexture(MiniMapItemType itemType, Texture* tex) {
             mItemTextures[itemType] = tex;
         }
         void MiniMap::SetViewRadius(float r) { mViewRadius = r; }
-        // void MiniMap::SetTexture(OGLTexture const* texture) { mMiniMapTexture = texture; }
+
         void MiniMap::SetCenter(float x, float y) {
             mCenter = { x,y };
         }
@@ -159,7 +160,6 @@ namespace NCL {
             mPlayerPosition = { p.x, p.z };
 
             mMinimapToViewportMatrix = GetMinimapToViewportMatrix();
-            // mUVMatrix = GetUVMatrix(mPlayerPosition);
 
             auto rad = DegreesToRadians(-mPlayerYawAngle);
             auto cosTheta = std::cos(rad);
@@ -168,10 +168,6 @@ namespace NCL {
             mPlayerRotationMatrix.SetColumn(0, Vector3(cosTheta, sinTheta, 0));
             mPlayerRotationMatrix.SetColumn(1, Vector3(-sinTheta, cosTheta, 0));
             mPlayerRotationMatrix.SetColumn(2, Vector3(0, 0, 1));
-
-            // mPlayerRotationMatrixInv.SetColumn(0, Vector3(cosTheta, -sinTheta, 0));
-            // mPlayerRotationMatrixInv.SetColumn(1, Vector3(sinTheta, cosTheta, 0));
-            // mPlayerRotationMatrixInv.SetColumn(2, Vector3(0, 0, 1));
         }
         void MiniMap::UpdateItemsState() {
             // check item visibility
@@ -361,13 +357,7 @@ namespace NCL {
                     }
                     mItems.emplace_back(item);
                 }
-                // {
-                //     player = p;
-                //     // auto&& transform = player->GetTransform().GetPosition();
-                // }
             }
-            // SetRect(worldPmin.x, worldPmin.y, worldPmax.x, worldPmax.y);
-            // mWall.initPositions = mWall.positions;
             mWall.Create();
             mInteractableDoor.Create();
             mInteractableDoor.color = { 0,1,1 };
@@ -378,11 +368,6 @@ namespace NCL {
         void MiniMap::Render() {
             auto&& gameWorld = mRenderer->gameWorld;
             if (gameWorld.GetWorldStateID() <= 0)return;
-            if (!mInitialized)
-            {
-                Initialize();
-                mInitialized = true;
-            }
 
             SearchWorld();
             UpdatePlayerState();
@@ -411,7 +396,6 @@ namespace NCL {
                 glDisable(GL_BLEND);
         }
         Matrix3 MiniMap::GetMinimapToViewportMatrix() const {
-            // auto windowSize = mRenderer->GetWindowSize();
             Vector2i windowSize = mRenderer->GetWindowSize();
             float c = float(windowSize.y) / windowSize.x;
             Matrix3 M = Matrix3::Scale(Maths::Vector3(mRadius * c, mRadius, 1));;
@@ -515,7 +499,6 @@ namespace NCL {
             glUniformMatrix3fv(glGetUniformLocation(mWallShader->GetProgramID(), "M"), 1, false, (float*)&m);
             glUniform1fv(glGetUniformLocation(mWallShader->GetProgramID(), "viewRadius"), 1, (float*)&mViewRadius);
             glUniform2fv(glGetUniformLocation(mWallShader->GetProgramID(), "mPlayerLocation"), 1, (float*)&mPlayerPosition);
-            // glUniformMatrix3fv(glGetUniformLocation(mUnlitColorShader->GetProgramID(), "M"), 1, false, (float*)&m);
 
             glUniform3fv(glGetUniformLocation(mWallShader->GetProgramID(), "color"), 1, (float*)&mPrisonDoor.color);
             mPrisonDoor.Draw();
@@ -534,5 +517,6 @@ namespace NCL {
                 mItemVisible = false;
             }
         }
-    }  // namespace CSC8503
-}  // namespace NCL
+    }
+}
+#endif

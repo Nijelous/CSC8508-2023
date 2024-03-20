@@ -104,7 +104,7 @@ LevelManager::LevelManager() {
 	loadLevels.join();
 	loadSoundManager.join();
 
-    InitialiseMiniMap();    
+    InitialiseMiniMap();
 }
 
 LevelManager::~LevelManager() {
