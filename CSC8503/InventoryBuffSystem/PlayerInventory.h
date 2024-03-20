@@ -86,7 +86,7 @@ namespace InventoryBuffSystem
 	private:
 
 		std::vector<item> mItemsInSingleplayerRandomPool = {
-			soundEmitter
+			soundEmitter, doorKey, screwdriver
 		};
 
 		std::vector<item> mItemsInMultiplayerRandomPool = {
