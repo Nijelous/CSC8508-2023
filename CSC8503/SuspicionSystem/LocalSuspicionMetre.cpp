@@ -110,16 +110,18 @@ void LocalSuspicionMetre::Update(float dt) {
     {
         if (GetLocalSusMetreValue(playerNo) != 0.0f ||
             mActiveLocalSusCauseVector[playerNo].size() > 0) {
-            const float unChangedSusValue = mPlayerMeters[playerNo];
+            float tempSusAmount = 0;
 
             const float guardDist = LevelManager::GetLevelManager()->GetNearestGuardToPlayerDistance(playerNo);
             const float guardDistPerc = GetPercentageBasedOnDistance(guardDist);
 
             for (activeLocalSusCause thisCause : mActiveLocalSusCauseVector[playerNo]) {
-                ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[thisCause] * dt * guardDistPerc);
+                tempSusAmount += mActiveLocalSusCauseSeverityMap[thisCause] * dt * guardDistPerc;
             }
 
-            if (mPlayerMeters[playerNo] <= unChangedSusValue){
+            ChangePlayerLocalSusMetre(playerNo,tempSusAmount);
+
+            if (tempSusAmount <= 0){
                 if (mRecoveryCooldowns[playerNo] == 0.0f)
                     ChangePlayerLocalSusMetre(playerNo, mActiveLocalSusCauseSeverityMap[passiveRecovery] * dt);
                 else
@@ -129,7 +131,7 @@ void LocalSuspicionMetre::Update(float dt) {
                 mRecoveryCooldowns[playerNo] = DT_UNTIL_LOCAL_RECOVERY;
             }
 
-            if ((int)(mPlayerMeters[playerNo]) != (int)(unChangedSusValue))
+            if ((int)(tempSusAmount) != 0)
                 HandleLocalSusChangeNetworking(mPlayerMeters[playerNo], playerNo);
         }
 
@@ -154,7 +156,7 @@ void LocalSuspicionMetre::SyncActiveSusCauses(int playerID, int localPlayerID, a
 void LocalSuspicionMetre::ChangePlayerLocalSusMetre(const int &playerNo, const float &ammount){
     mPlayerMeters[playerNo] = std::clamp(mPlayerMeters[playerNo] + ammount,
                                         mGlobalSusMeterPTR->GetGlobalSusMeter(),
-                                        100.0f);
+                                        99.0f);
 }
 
 void LocalSuspicionMetre::HandleLocalSusChangeNetworking(const int& changedValue, const int& playerNo) {

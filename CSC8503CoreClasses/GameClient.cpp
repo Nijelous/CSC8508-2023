@@ -129,4 +129,8 @@ void GameClient::WriteAndSendInventoryPacket(int playerNo, int invSlot, int inIt
 	ClientSyncItemSlotPacket packet(playerNo, invSlot, inItem, usageCount);
 	this->SendPacket(packet);
 }
+void GameClient::WriteAndSendSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) {
+	ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
+	this->SendPacket(packet);
+}
 #endif#

@@ -8,7 +8,7 @@
 
 using namespace NCL::CSC8503;
 namespace {
-	const float MIN_PLAYER_DIST = 150;
+	const float MIN_PLAYER_DIST = 125;
 }
 
 void CCTV::DrawDebugLines(const bool canSeePlayer){
@@ -108,7 +108,13 @@ const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
 	DrawDebugLines(false);
 	const int playerID = mPlayerObject->GetPlayerID();
 	if (hadSeenPlayer[playerID])
+	{
 		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::cameraLOS, mPlayerObject->GetPlayerID());
+		const float playerLocalSusVal = LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerObject->GetPlayerID());
+		const Vector3 thisPos = this->GetTransform().GetPosition();
+		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->SetMinLocationSusAmount(thisPos,playerLocalSusVal);
+	}
+		
 	hadSeenPlayer[playerID] = false;
 }
 
