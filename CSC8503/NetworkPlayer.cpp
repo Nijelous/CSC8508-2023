@@ -25,7 +25,7 @@ namespace {
 
 	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 20;
 
-	constexpr bool DEBUG_MODE = true;
+	constexpr bool DEBUG_MODE = false;
 }
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 

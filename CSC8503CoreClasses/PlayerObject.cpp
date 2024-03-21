@@ -58,7 +58,7 @@ namespace {
 
 	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 45;
 
-	constexpr bool DEBUG_MODE = true;
+	constexpr bool DEBUG_MODE = false;
 }
 
 PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
