@@ -215,10 +215,12 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
+		this->GetSoundObject()->CloseDoorTriggered();
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
+		this->GetSoundObject()->CloseDoorFinished();
 		mObjectState = Idle;
 
 		break;
