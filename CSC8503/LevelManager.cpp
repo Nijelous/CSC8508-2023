@@ -270,9 +270,11 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer, seed);
 	SendWallFloorInstancesToGPU();
-	
-	
-	mAnimation->SetGameObjectLists(mUpdatableObjects);
+
+	if (!isMultiplayer) {
+		mAnimation->SetGameObjectLists(mUpdatableObjects);
+	}
+
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
 
@@ -948,6 +950,10 @@ void LevelManager::SetPlayersForGuards() const {
 
 }
 
+void LevelManager::InitAnimationSystemObjects() const {
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
+}
+
 PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
 	PlayerObject* returnObj = &firstPlayer;
@@ -1477,17 +1483,20 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0,2.f,0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
-
 	playerObject.GetTransform()
 		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
 		.SetPosition(position);
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Farmer"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Basic"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1497,7 +1506,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0, 2.f, 0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
 
