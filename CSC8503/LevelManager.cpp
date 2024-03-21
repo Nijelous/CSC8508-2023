@@ -262,14 +262,6 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 		LoadDoorsInNavGrid();
 		std::cout << "Nav Mesh Set\n";
 		});
-	/*Transform offsetKey = Transform();
-	offsetKey.SetOrientation(Quaternion(0, 0.71, 0, 0.71));
-	offsetKey.SetScale(Vector3(-194.3, -2, 26.1));
-	offsetKey.SetPosition(mTempPlayer->GetTransform().GetPosition());
-	mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
-	Vector3 position = mTempPlayer->GetTransform().GetPosition();
-	position.z += 15;
-	mTempPlayer->GetTransform().SetPosition(position);*/
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	}
@@ -281,6 +273,16 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 		}
 	}
 #endif
+
+	Transform offsetKey = Transform();
+	offsetKey.SetOrientation(Quaternion(0, 0.71, 0, 0.71));
+	offsetKey.SetScale(Vector3(-194.3, -2, 26.1));
+	offsetKey.SetPosition(mTempPlayer->GetTransform().GetPosition());
+	mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
+	Vector3 position = mTempPlayer->GetTransform().GetPosition();
+	position.z += 15;
+	mTempPlayer->GetTransform().SetPosition(position);
+
 	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer,seed);
 	LoadCCTVs(seed,isMultiplayer);
   
