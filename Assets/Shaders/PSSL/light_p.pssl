@@ -17,12 +17,12 @@ RegularBuffer<LightData> lightBuffer		: register(t1);
 out float4 fragColour[2];
 
 [CxxSymbol("TestShader::ps")]
-void main(VS_OUTPUT vertex, float4 pixelPos : S_POSITION) : S_TARGET_OUTPUT
+void main(VS_OUTPUT vertex, float2 pixelPos : S_POSITION) : S_TARGET_OUTPUT
 {
 	LightData light = lightBuffer[vertex.LightID];
 	float2 fragCoord = pixelPos * Constants.pixelSize;
 	Texture2D<float4> depthTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffDepthIndex)]);
-	
+
 	float depth = depthTex.Sample(sampler, fragCoord).x;
 	float3 ndcPos = float3(fragCoord, depth) * 2.0 - 1.0;
 	float4 invClipPos = mul(Constants.inverseViewProjMatrix, float4(ndcPos, 1.0));
@@ -60,7 +60,6 @@ void main(VS_OUTPUT vertex, float4 pixelPos : S_POSITION) : S_TARGET_OUTPUT
 	else attenuated = light.lightColour * atten;
 	
 	fragColour[0] = float4(attenuated * lambert, 1.0);
-	//fragColour[0] = float4(1,0,0,1);
 	fragColour[1] = float4(attenuated * specFactor * 0.33, 1.0);
 	
 }
