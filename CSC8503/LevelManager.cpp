@@ -270,10 +270,10 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	Vector3 position = mTempPlayer->GetTransform().GetPosition();
 	position.z += 15;
 	mTempPlayer->GetTransform().SetPosition(position);*/
-#ifdef USEGL
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	}
+#ifdef USEGL
 	else {
 		if (!serverPlayersPtr) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
@@ -752,7 +752,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
+			//mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {
