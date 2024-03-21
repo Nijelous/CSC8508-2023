@@ -59,7 +59,6 @@ LevelManager::LevelManager() {
 	mRenderer = new GameTechAGCRenderer(*mWorld);
 #endif
 	mUi = new UISystem();
-	InitialiseAssets();
 
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
 	mBuilder = new RecastBuilder();
@@ -567,7 +566,7 @@ void LevelManager::InitialiseAssets() {
 		if (groupType == "") groupType = assetDetails[0];
 		if (groupType != assetDetails[0]) {
 			if (groupType == "anim") {
-				animLoadThread = std::thread([this, groupDetails] {
+				animLoadThread = std::thread([this, groupDetails, &animLines] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
 						animLines++;
@@ -665,7 +664,7 @@ void LevelManager::CheckRenderLoadScreen(bool& updateScreen, int linesDone, int 
 	if (updateScreen) {
 		updateScreen = false;
 		float percent = linesDone / (float)totalLines;
-		Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
+		//Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
 		mRenderer->Render();
 		Debug::UpdateRenderables(0);
 	}
@@ -820,7 +819,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			//mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {
@@ -1427,7 +1426,6 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
 	std::mt19937 seed,bool isMultiplayerLevel) {
-#ifdef USEGL
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 
 	flag->SetPoints(40);
@@ -1473,7 +1471,6 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	mUpdatableObjects.push_back(flag);
 
 	return flag;
-#endif
 }
 
 PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer)

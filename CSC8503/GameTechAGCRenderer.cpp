@@ -801,8 +801,8 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 					if (g->GetMatTextures().size() > 0) {
 						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
-						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x];
-						   state.materialLayerNormals[x] = g->GetMatTextures()[x];
+						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x * 2];
+						   state.materialLayerNormals[x] = g->GetMatTextures()[(x * 2) + 1];
 					   }
 						state.hasMaterials = 1;
 					}

@@ -85,7 +85,9 @@ void Vent::SetIsOpen(bool isOpen, bool isSettedByServer) {
 		SyncVentStatusInMultiplayer();
 	}
 	if (mIsOpen == true) {
+#ifdef USEGL
 		this->GetSoundObject()->LockDoorTriggered();
+#endif
 	}
 }
 

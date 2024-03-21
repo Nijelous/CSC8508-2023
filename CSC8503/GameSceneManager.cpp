@@ -76,7 +76,12 @@ void GameSceneManager::InitCamera() {
 void GameSceneManager::CreateLevel() {
 	std::random_device rd;
 	std::mt19937 g(rd());
+#ifdef USEGL
+	mLevelManager->LoadLevel(1, g, 0);
+#endif
+#ifdef USEPROSPERO
 	mLevelManager->LoadLevel(0, g, 0);
+#endif
 }
 
 bool GameSceneManager::PlayerWonGame() {

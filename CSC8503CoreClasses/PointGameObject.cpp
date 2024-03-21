@@ -96,7 +96,9 @@ void PointGameObject::OnCollisionBegin(GameObject* otherObject) {
 		mCooldown == 0) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		plObj->AddPlayerPoints(mPoints);
+#ifdef USEGL
 		this->GetSoundObject()->TriggerSoundEvent();
+#endif
 		mCooldown = INT_MAX;
 	}
 }

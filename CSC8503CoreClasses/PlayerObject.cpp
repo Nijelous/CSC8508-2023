@@ -245,12 +245,16 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) 
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
+#ifdef USEGL
 		this->GetSoundObject()->CloseDoorTriggered();
+#endif
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
+#ifdef USEGL
 		this->GetSoundObject()->CloseDoorFinished();
+#endif
 		mObjectState = Idle;
 
 		break;
@@ -280,7 +284,7 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveBackwards()){
-		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
@@ -290,7 +294,7 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveLeft()){
-		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 

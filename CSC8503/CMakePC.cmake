@@ -23,6 +23,7 @@ function(Create_PC_CSC8503_Files)
         "BaseUI.h"
         "WindowsUI.h"
         "ControllerInterface.h"
+        "MiniMap.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -74,6 +75,7 @@ function(Create_PC_CSC8503_Files)
         "BaseUI.cpp"
         "WindowsUI.cpp"
         "ControllerInterface.cpp"
+        "MiniMap.cpp"
     )
 
 

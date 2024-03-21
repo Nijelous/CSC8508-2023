@@ -474,6 +474,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 				LookTowardFocalPoint(direction);
 				this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 				if (mPointTimer <= 0) {
+#ifdef USEGL
 					if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
 						DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 						if (mPlayer) {
@@ -485,6 +486,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 							mPlayer->GetSoundObject()->TriggerSoundEvent();
 						}
 					}
+#endif
 					mPointTimer = POINTING_TIMER;
 					return Failure;
 				}

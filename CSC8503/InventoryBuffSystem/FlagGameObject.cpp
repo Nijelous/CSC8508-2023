@@ -1,5 +1,3 @@
-#ifdef USEGL
-
 #include "FlagGameObject.h"
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
@@ -61,7 +59,7 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 		Reset();
 		auto* sceneManager = SceneManager::GetSceneManager();
 		if (sceneManager->IsInSingleplayer()) break;
-
+#ifdef USEGL
 		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 
 		if (networkedGame->GetIsServer()) {
@@ -72,6 +70,7 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 			networkedGame->GetClient()->WriteAndSendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
 		}
 		break;
+#endif
 	}
 
 	default:
@@ -79,17 +78,17 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
-const bool FlagGameObject::IsMultiplayerAndIsNotServer(){
+const bool FlagGameObject::IsMultiplayerAndIsNotServer() {
+#ifdef USEGL
 	auto* sceneManager = SceneManager::GetSceneManager();
 	const bool isSingleplayer = sceneManager->IsInSingleplayer();
 	if (isSingleplayer)
 		return false;
-
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 	const bool isServer = networkedGame->GetIsServer();
 	if (!isServer)
 		return true;
-	
+#endif
 	return false;
 }
 
@@ -127,4 +126,3 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 		GetFlag(playerNo);
 	}
 }
-#endif
