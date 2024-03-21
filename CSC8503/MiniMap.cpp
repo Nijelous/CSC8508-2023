@@ -71,7 +71,7 @@ namespace NCL {
         }
 
         MiniMap::MiniMap(GameTechRenderer* renderer) : mRenderer(renderer),
-            mCenter(-0.8f, 0.55f),
+            mCenter(-0.8f, -0.55f),
             mRadius(0.3f),
             mViewRadius(100.f)
         {
