@@ -2,6 +2,7 @@
 #include "Scene.h"
 
 #include "DebugNetworkedGame.h"
+#include "LevelManager.h"
 #include "GameClient.h"
 #include "GameServer.h"
 #include "Window.h"

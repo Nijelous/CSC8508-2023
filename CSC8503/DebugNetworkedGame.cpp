@@ -14,10 +14,12 @@
 #include "NetworkPlayer.h"
 #include "PushdownMachine.h"
 #include "RenderObject.h"
+#include "LevelManager.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
 #include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "Vent.h"
+#include "Debug.h"
 
 namespace {
 	constexpr int MAX_PLAYER = 4;

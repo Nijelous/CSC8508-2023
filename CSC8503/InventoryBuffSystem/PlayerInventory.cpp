@@ -3,6 +3,7 @@
 #include "GameServer.h"
 #include "GameClient.h"
 #include "NetworkObject.h"
+#include "../LevelManager.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include <algorithm>

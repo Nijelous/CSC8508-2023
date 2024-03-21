@@ -6,13 +6,6 @@
 
 #include "GameWorld.h"
 #include "Frustum.h"
-#include "DirectionalLight.h"
-#include "PointLight.h"
-#include "SpotLight.h"
-
-
-#include "MeshAnimation.h"
-#include "MeshMaterial.h"
 
 #include "UISystem.h"
 #include "WindowsUI.h"
@@ -61,9 +54,11 @@ namespace NCL {
 			void SetUIObject(UISystem* ui) {
 				mUi = ui;
 			}
+#ifdef USEGL
             void SetMiniMap(MiniMap* minimap) {
                 mMiniMap = minimap;
             }
+#endif
 			std::function<void()>& GetImguiCanvasFunc();
 			void SetImguiCanvasFunc(std::function<void()> func);
 		protected:
@@ -104,7 +99,7 @@ namespace NCL {
 
 			
 			struct TextureHandleData {
-				GLuint64 handles[512] = { 0 };
+				GLuint64 handles[256] = { 0 };
 			};
 
 			struct TextureHandleIndices {
@@ -242,8 +237,9 @@ namespace NCL {
 
 			UISystem* mUi;
 			std::unordered_map<std::string, GLuint> mLoadedTextures;
-
+#ifdef USEGL
             MiniMap* mMiniMap{};
+#endif
 			//TODO(erendgrmnc): added after integrating Imgui lib. Refactor UISystem into this logic.
 			std::function<void()> mImguiCanvasFuncToRender = nullptr;
 			WindowsUI* mUIHandler;

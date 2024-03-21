@@ -3,6 +3,7 @@
 #include "../SceneManager.h"
 
 using namespace SuspicionSystem;
+using namespace NCL::CSC8503;
 
 void SuspicionSystem::GlobalSuspicionMetre::Init(){
     mGlobalSusMeter = 0;

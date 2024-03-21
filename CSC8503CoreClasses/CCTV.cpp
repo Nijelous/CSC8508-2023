@@ -5,6 +5,7 @@
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
 #include "GameWorld.h"
+#include "RenderObject.h"
 
 using namespace NCL::CSC8503;
 namespace {

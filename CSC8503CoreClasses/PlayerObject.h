@@ -9,7 +9,6 @@
 namespace NCL {
 	namespace CSC8503 {
 		class GameWorld;
-		class Interactable;
 		class PlayerObject : public GameObject, public PlayerBuffsObserver, public PlayerInventoryObserver {
 		public:
 

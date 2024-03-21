@@ -85,6 +85,15 @@ void GameWorld::UpdateWorld(float dt) {
 	}
 }
 
+void GameWorld::SortObjects() {
+	std::sort(gameObjects.begin(), gameObjects.end(), [](const GameObject* obj1, const GameObject* obj2) {
+		return obj1->GetName() < obj2->GetName();
+		});
+	for(int i = 0; i < gameObjects.size(); i++) {
+		gameObjects[i]->SetWorldID(i);
+	}
+}
+
 bool GameWorld::Raycast(Ray& r, RayCollision& closestCollision, bool closestObject, GameObject* ignoreThis, bool ignoreNotRendered) const {
 	//The simplest raycast just goes through each object and sees if there's a collision
 	RayCollision collision;

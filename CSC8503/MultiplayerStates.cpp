@@ -4,6 +4,8 @@
 #include "GameServer.h"
 #include "SceneManager.h"
 #include "SinglePlayerStates.h"
+#include "LevelManager.h"
+#include "Debug.h"
 
 MultiplayerLobby::MultiplayerLobby(DebugNetworkedGame* currentGameState) {
 	mGameSceneManager = currentGameState;

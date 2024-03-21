@@ -254,9 +254,9 @@ namespace NCL {
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
-
+#ifdef USEGL
             MiniMap* mMiniMap;
-
+#endif
 			FlagGameObject* mMainFlag;
 
 

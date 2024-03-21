@@ -4,6 +4,7 @@
 #include "MainMenuScene.h"
 #include "SceneStates.h"
 #include "GameSceneManager.h"
+#include "LevelManager.h"
 
 #ifdef USEGL
 

@@ -6,6 +6,8 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "AnimationObject.h"
+#include "LevelManager.h"
+#include "Debug.h"
 
 #include "SinglePlayerStates.h"
 

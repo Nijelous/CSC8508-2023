@@ -9,7 +9,13 @@
 #include "MshLoader.h"
 #include "UISystem.h"
 #include "Mesh.h"
+#include "Debug.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#ifdef USEGL
 #include "MiniMap.h"
+#endif
 
 using namespace NCL;
 using namespace Rendering;
@@ -393,8 +399,10 @@ void GameTechRenderer::RenderFrame() {
 
 	mUIHandler->RenderUI(mImguiCanvasFuncToRender);
 
+#ifdef USEGL
     if (mMiniMap)
         mMiniMap->Render();
+#endif
 }
 
 void GameTechRenderer::BuildObjectList() {

@@ -1,5 +1,6 @@
 #include "SinglePlayerStates.h"
 
+#include "LevelManager.h"
 #include "Window.h"
 
 using namespace NCL::CSC8503;

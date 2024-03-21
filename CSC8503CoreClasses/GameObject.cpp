@@ -4,8 +4,10 @@
 #include "PhysicsObject.h"
 #include "RenderObject.h"
 #include "NetworkObject.h"
+#include "../CSC8503/LevelManager.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
+#include "Debug.h"
 
 
 using namespace NCL::CSC8503;

@@ -17,6 +17,7 @@ namespace NCL {
 			HeistItem
 		};
 
+		class GameObject;
 		class Interactable{
 		public:
 			virtual void Interact(InteractType interactType, GameObject* interactingObject = nullptr) { 

@@ -2,6 +2,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
+#include "RenderObject.h"
 
 using namespace NCL::CSC8503;
 

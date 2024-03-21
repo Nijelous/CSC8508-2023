@@ -8,6 +8,7 @@
 #include "random"
 #include "InventoryBuffSystem.h"
 #include "PlayerObject.h"
+#include "SoundObject.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../NetworkPlayer.h"

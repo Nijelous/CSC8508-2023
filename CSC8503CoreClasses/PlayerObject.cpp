@@ -11,6 +11,8 @@
 #include "GameWorld.h"
 #include "UISystem.h"
 #include "Vent.h"
+#include "Door.h"
+#include "Debug.h"
 
 
 

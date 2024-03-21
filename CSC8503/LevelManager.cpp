@@ -16,6 +16,10 @@
 #include "Vent.h"
 #include "InteractableDoor.h"
 #include "PrisonDoor.h"
+#include "PointLight.h"
+#include "SpotLight.h"
+#include "DirectionalLight.h"
+#include "BaseLight.h"
 
 #include "InventoryBuffSystem/FlagGameObject.h"
 #include "InventoryBuffSystem/PickupGameObject.h"
@@ -27,7 +31,10 @@
 #include "NetworkObject.h"
 #include "UISystem.h"
 #include "Assets.h"
+#include "Debug.h"
+#ifdef USEGL
 #include "MiniMap.h"
+#endif
 #include <filesystem>
 #include <fstream>
 
@@ -139,7 +146,9 @@ LevelManager::~LevelManager() {
 	delete mSuspicionSystemClassPtr;
 
 	delete mSoundManager;
+#ifdef USEGL
 	delete mMiniMap;
+#endif
 }
 
 void LevelManager::ClearLevel() {
@@ -291,6 +300,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 
 	for (const auto buffsObserver : mPlayerBuffsObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+	mWorld->SortObjects();
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {
@@ -580,15 +590,15 @@ void LevelManager::InitialiseAssets() {
 
 	animLoadThread.join();
 	//preLoadList
-	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["RigStand"]));
-	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["RigWalk"]));
-	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["RigSprint"]));
-	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["RigPoint"]));
+	mPreAnimationList.insert(std::make_pair("GuardStand", mAnimations["GuardStand"]));
+	mPreAnimationList.insert(std::make_pair("GuardWalk", mAnimations["GuardWalk"]));
+	mPreAnimationList.insert(std::make_pair("GuardSprint", mAnimations["GuardSprint"]));
+	mPreAnimationList.insert(std::make_pair("GuardPoint", mAnimations["GuardPoint"]));
 
 
-	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["GuardStand"]));
-	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["GuardWalk"]));
-	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["GuardSprint"]));
+	mPreAnimationList.insert(std::make_pair("PlayerStand", mAnimations["PlayerStand"]));
+	mPreAnimationList.insert(std::make_pair("PlayerWalk", mAnimations["PlayerWalk"]));
+	mPreAnimationList.insert(std::make_pair("PlayerSprint", mAnimations["PlayerSprint"]));
 
 	//icons
 	vector<Texture*> keyTexVec = {
@@ -609,8 +619,8 @@ void LevelManager::InitialiseAssets() {
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
 		CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
-		if (key.substr(0, 5) == "Guard") {
-			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Guard"], *val);
+		if (key.substr(0, 6) == "Player") {
+			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Player"], *val);
 		}
 		else {
 			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
@@ -1089,8 +1099,11 @@ void LevelManager::InitialiseIcons() {
 		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
+
 void LevelManager::InitialiseMiniMap() {
+#ifdef USEGL
     mMiniMap = new MiniMap(mRenderer);
+#endif
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
@@ -1246,7 +1259,7 @@ Helipad* LevelManager::AddHelipadToWorld(const Vector3& position) {
 		.SetScale(wallSize * 2)
 		.SetPosition(position);
 
-	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Cube"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
+	helipad->SetRenderObject(new RenderObject(&helipad->GetTransform(), mMeshes["Helipad"], mTextures["HelipadAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	helipad->SetPhysicsObject(new PhysicsObject(&helipad->GetTransform(), helipad->GetBoundingVolume()));
 
@@ -1482,7 +1495,9 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
+#ifdef USEGL
     mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMiniMap);
+#endif
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
@@ -1501,10 +1516,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
 		.SetPosition(position);
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["Normal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
-	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"]));
 
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 
@@ -1526,12 +1540,12 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["Normal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
-	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"]));
+	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Player_Red"]);
 
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1630,9 +1644,9 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->GetPhysicsObject()->InitSphereInertia(false);
 	guard->SetCollisionLayer(Npc);
 
-	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Rig"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"], meshSize));
-	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["RigStand"], mMaterials["Rig"]));
-	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Rig"]);
+	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Guard"], mTextures["Basic"], mTextures["Normal"], mShaders["Animation"], meshSize));
+	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["GuardStand"]));
+	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	guard->SetPatrolNodes(nodes);
@@ -1683,7 +1697,7 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 		.SetPosition(position);
 
 	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 1));
-	
+
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
@@ -1703,7 +1717,7 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 }
 
 GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const std::string& meshName) {
-	GameObject* decoration = new GameObject(StaticObj, "Decoration");
+	GameObject* decoration = new GameObject(StaticObj, meshName);
 
 	Vector3 size = transform.GetScale() / 2;
 	AABBVolume* volume = new AABBVolume(size);
@@ -1717,7 +1731,7 @@ GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	else {
-		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["Basic"], mTextures["Normal"], mShaders["Instance"],
+		decoration->SetRenderObject(new RenderObject(&decoration->GetTransform(), mMeshes[meshName], mTextures["FloorAlbedo"], mTextures["Normal"], mShaders["Instance"],
 			std::sqrt(std::pow(size.x, 2) + std::powf(size.z, 2))));
 	}
 	if (mMeshMaterials.find(meshName) != mMeshMaterials.end()) {
