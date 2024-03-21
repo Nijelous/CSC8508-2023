@@ -1073,17 +1073,20 @@ void LevelManager::InitialiseIcons() {
 
 	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
+
+	UISystem::Icon* mNoticeTopRight = mUi->AddIcon(Vector2(52, 43), 8, 6, mTextures["HoldE"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICETOPRIGHT, *mNoticeTopRight);
   
 	mRenderer->SetUIObject(mUi);
 
 	mItemTextureMap = {
 		{PlayerInventory::item::none, mTextures["InventorySlot"]},
-		{PlayerInventory::item::disguise, mTextures["Stun"]},
-		{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
+		{PlayerInventory::item::disguise, mTextures["Disguise"]},
+		{PlayerInventory::item::soundEmitter,  mTextures["BoomBox"]},
 		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
 		{PlayerInventory::item::stunItem, mTextures["Stun"]},
-		{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
 void LevelManager::InitialiseMiniMap() {
