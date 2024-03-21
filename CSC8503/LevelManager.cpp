@@ -1518,7 +1518,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 
 	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["Normal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"], mMaterials["Player"]));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"]));
 
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 
@@ -1544,7 +1544,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"], mMaterials["Player_Red"]));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"]));
 	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Player_Red"]);
 
 
@@ -1645,7 +1645,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetCollisionLayer(Npc);
 
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Guard"], mTextures["Basic"], mTextures["Normal"], mShaders["Animation"], meshSize));
-	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["GuardStand"]));
 	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 

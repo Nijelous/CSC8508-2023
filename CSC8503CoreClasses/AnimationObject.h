@@ -17,7 +17,7 @@ namespace NCL {
                 guardAnimation
             };
 
-            AnimationObject(AnimationType animationType,MeshAnimation* animation, MeshMaterial* material);
+            AnimationObject(AnimationType animationType,MeshAnimation* animation);
             ~AnimationObject();
 
             void Update(float dt);
@@ -26,16 +26,8 @@ namespace NCL {
                 mAnimation = animation;
             }
 
-            void SetMaterial(MeshMaterial* material) {
-                mMaterial = material;
-            }
-
             MeshAnimation* GetAnimation() {
                 return mAnimation;
-            }
-
-            MeshMaterial* GetMaterial() {
-                return mMaterial;
             }
 
             int	GetCurrentFrame() {
@@ -61,7 +53,6 @@ namespace NCL {
             
         protected:
             MeshAnimation* mAnimation;
-            MeshMaterial* mMaterial;
             AnimationType mAnimationType;
            
             int		mCurrentFrame;
