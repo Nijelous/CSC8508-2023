@@ -854,7 +854,6 @@ void PlayerObject::UpdateGlobalUI(float dt){
 void PlayerObject::UpdateLocalUI(float dt){
 	//SusBar
 	float iconValue = SusLinerInterpolation(dt);
-	std::cout << iconValue << std::endl;
 	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 	if (mSusValue > 33) {
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
