@@ -391,7 +391,7 @@ void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, f
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
-		if (mPacketToSendQueue.size() > 1) {
+		if (mPacketToSendQueue.size() > 1 && !mPacketToSendQueue.empty()) {
 			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
