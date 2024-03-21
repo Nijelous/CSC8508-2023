@@ -128,7 +128,7 @@ void PlayerObject::UpdateObject(float dt) {
 
 	UpdateGlobalUI(dt);
 	UpdateLocalUI(dt);
-	if (mEnableDebugUI)
+	if (mIsDebugUIEnabled)
 	{
 		ShowDebugInfo(dt);
 	}
@@ -283,7 +283,7 @@ void PlayerObject::MovePlayer(float dt) {
 	StopSliding();
 
 	if(Window::GetKeyboard()->KeyPressed(KeyCodes::F6))
-		mEnableDebugUI = !mEnableDebugUI;
+		mIsDebugUIEnabled = !mIsDebugUIEnabled;
 }
 
 bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt){
@@ -296,19 +296,19 @@ bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& int
 	}
 	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
 		mInteractHeldDt += dt;
-		if (mEnableDebugUI)
+		if (mIsDebugUIEnabled)
 			Debug::Print(to_string(mInteractHeldDt), Vector2(55, 98));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if (mEnableDebugUI)
+			if (mIsDebugUIEnabled)
 				Debug::Print("PickPocket", Vector2(55, 95));
 			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::LongUse;
-			if (mEnableDebugUI)
+			if (mIsDebugUIEnabled)
 				Debug::Print("LongUse", Vector2(55, 95));
 			return true;
 		}

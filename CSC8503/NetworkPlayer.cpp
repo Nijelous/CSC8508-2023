@@ -109,7 +109,7 @@ void NetworkPlayer::UpdateObject(float dt) {
 	if (mIsLocalPlayer){
 		PlayerObject::UpdateGlobalUI(dt);
 		PlayerObject::UpdateLocalUI(dt);
-		if (mDebugEnabled)
+		if (mIsDebugUIEnabled)
 			PlayerObject::ShowDebugInfo(dt);
 	}
 }
@@ -285,7 +285,7 @@ bool NCL::CSC8503::NetworkPlayer::GotRaycastInput(NCL::CSC8503::InteractType& in
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if (mEnableDebugUI)
+			if (mIsDebugUIEnabled)
 				Debug::Print("PickPocket", Vector2(55, 95));
 
 			return true;
@@ -293,7 +293,7 @@ bool NCL::CSC8503::NetworkPlayer::GotRaycastInput(NCL::CSC8503::InteractType& in
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::LongUse;
-			if (mEnableDebugUI)
+			if (mIsDebugUIEnabled)
 				Debug::Print("LongUse", Vector2(55, 95));
 
 			return true;
@@ -427,6 +427,6 @@ void NetworkPlayer::ControlInventory() {
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F6))
-		mEnableDebugUI = !mEnableDebugUI;
+		mIsDebugUIEnabled = !mIsDebugUIEnabled;
 }
 #endif
