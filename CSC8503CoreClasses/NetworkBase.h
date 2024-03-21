@@ -33,7 +33,8 @@ enum BasicNetworkMessages {
 	SyncObjectState,
 	ClientInit,
 	SyncPlayerIdNameMap,
-	SyncAnnouncements
+	SyncAnnouncements,
+	GuardSpotSound
 };
 
 struct GamePacket {

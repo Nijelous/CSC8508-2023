@@ -26,7 +26,7 @@ namespace NCL {
             void SetIsForceQuit(bool isForceQuit);
             void SetIsServer(bool isServer);
             void SetChangeSceneTrigger(Scenes scene);
-
+            
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
             Scene* GetScene(Scenes sceneType);
