@@ -130,6 +130,8 @@ namespace NCL {
 
 			Texture* GetTexture(std::string name) { return mTextures[name]; }
 
+			vector<int> GetMeshMaterial(std::string name) { return mMeshMaterials[name]; }
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
