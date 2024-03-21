@@ -367,9 +367,12 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	for (GameObject* obj : objects) {
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		if (obj->GetCollisionLayer() == CollisionLayer::Player) {
-			GameObject::GameObjectState state = obj->GetGameOjbectState();
-			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
-			UpdateFootstepSounds(state, soundPos, channel);
+			bool isClose = obj->GetSoundObject()->GetIsClosed();
+			if (!isClose) {
+				GameObject::GameObjectState state = obj->GetGameOjbectState();
+				FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
+				UpdateFootstepSounds(state, soundPos, channel);
+			}
 			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
 			if (isTrigger) {
 				PlaySpottedSound();
