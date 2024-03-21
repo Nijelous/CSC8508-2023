@@ -1516,10 +1516,9 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
 		.SetPosition(position);
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["Normal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
-	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
-	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["PlayerStand"], mMaterials["Player"]));
 
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 
@@ -1541,7 +1540,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 		.SetPosition(playerTransform.GetPosition())
 		.SetOrientation(playerTransform.GetOrientation());
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Player"], mTextures["FleshyAlbedo"], mTextures["Normal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
