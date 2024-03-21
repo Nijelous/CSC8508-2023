@@ -113,7 +113,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
-		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -416,7 +416,7 @@ void DebugNetworkedGame::SendGuardSpotSoundPacket(int playerId) const {
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
-		if (mPacketToSendQueue.size() > 1) {
+		if (mPacketToSendQueue.size() > 1 && !mPacketToSendQueue.empty()) {
 			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
@@ -562,6 +562,8 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	SpawnPlayers();
 
 	mLevelManager->SetPlayersForGuards();
+
+	mLevelManager->InitAnimationSystemObjects();
 }
 
 void DebugNetworkedGame::HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID) {
