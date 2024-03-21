@@ -8,7 +8,7 @@
 
 using namespace NCL::CSC8503;
 namespace {
-	const float MIN_PLAYER_DIST = 150;
+	const float MIN_PLAYER_DIST = 125;
 }
 
 void CCTV::DrawDebugLines(const bool canSeePlayer){
@@ -89,8 +89,9 @@ const bool CCTV::PlayerInRaycast(PlayerObject* mPlayerObject){
 const bool CCTV::CanSeePlayer(PlayerObject* mPlayerObject) {
 	const Vector3 playerPos = mPlayerObject->GetTransform().GetPosition();
 	const float playerCullSphereR = mPlayerObject->GetRenderObject()->GetCullSphereRadius();
+	auto collisionVolume = mPlayerObject->GetBoundingVolume()->GetOffset();
 	if (mPlayerObject->GetRenderObject() != nullptr &&
-		mViewPyramid.SphereInsidePyramid(playerPos, playerCullSphereR)&&
+		mViewPyramid.SphereInsidePyramid(playerPos + collisionVolume, playerCullSphereR) &&
 		PlayerInRaycast(mPlayerObject))
 		return true;
 	return false;

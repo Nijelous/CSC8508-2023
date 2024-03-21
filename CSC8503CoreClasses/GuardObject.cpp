@@ -352,6 +352,16 @@ void GuardObject::SendAnnouncementToPlayer(){
 		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
 }
 
+bool GuardObject::IsPlayerSprintingNearby(Vector3 dir) {
+	float playerDist = dir.LengthSquared();
+	for (PlayerObject* player : mPlayerList) {
+		if (player->GetGameOjbectState() == Sprint && playerDist <= MAX_DIST_TO_SUS_LOCATION) {
+			return true;
+		}
+	}
+	return false;
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -393,28 +403,26 @@ BehaviourAction* GuardObject::Patrol() {
 
 		}
 		else if (state == Ongoing) {
-			if (IsHighEnoughLocationSus() == true) {
-				return Failure;
-			}
+			Vector3 playerDir = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+
+			if (IsHighEnoughLocationSus() == true) { return Failure; }
+			else if (IsPlayerSprintingNearby(playerDir)) { LookTowardFocalPoint(playerDir); }
 			else if (mCanSeePlayer == false) {
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
-
 				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
-					if (mCurrentNode == mNodes.size() - 1) {
-						mNextNode = 0;
+					if (mCurrentNode == mNodes.size() - 1) { 
+						mNextNode = 0; 
 					}
-					else {
-						mNextNode = mCurrentNode + 1;
+					else { 
+						mNextNode = mCurrentNode + 1; 
 					}
 				}
 			}
-			else if (mCanSeePlayer == true) {
-				return Failure;
-			}
+			else if (mCanSeePlayer == true) { return Failure; }
 		}
 		return state;
 		}
@@ -437,6 +445,7 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 				float* endPos = new float[3] {mSmallestDistanceVector.x, mSmallestDistanceVector.y, mSmallestDistanceVector.z};
 				MoveTowardFocalPoint(endPos);
 				if ((mSmallestDistanceVector - this->GetTransform().GetPosition()).LengthSquared() < MIN_DIST_TO_NEXT_POS) {
+					LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveSusLocation(mSmallestDistanceVector);
 					mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 					return Success;
 				}
@@ -476,6 +485,7 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 					return Failure;
 				}
 			}
+			else if (mCanSeePlayer == false) { return Failure; }
 		}
 		return state;
 		}
@@ -501,8 +511,8 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					GrabPlayer();
 					return Success;
 				}
-				else {
-					RunAfterPlayer(direction);
+				else { 
+					RunAfterPlayer(direction); 
 				}
 			}
 			else {
