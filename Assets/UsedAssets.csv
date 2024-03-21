@@ -122,6 +122,7 @@ tex,PavementAlbedo,PavementAlbedo.png,
 tex,PavementNormal,PavementNormal.png,
 tex,DoorLockedAlbedo,PolygonScifi_01_A_Locked.png,
 tex,BoomBox,boombox.png,
+tex,HoldE,holdE.png,
 tex,Disguise,disguise.png,
 sdr,Basic,scene.vert,scene.frag
 sdr,Instance,sceneInstanced.vert,scene.frag

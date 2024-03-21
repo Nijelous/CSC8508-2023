@@ -1062,6 +1062,9 @@ void LevelManager::InitialiseIcons() {
 
 	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
+
+	UISystem::Icon* mNoticeTopRight = mUi->AddIcon(Vector2(52, 43), 8, 6, mTextures["HoldE"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICETOPRIGHT, *mNoticeTopRight);
   
 	mRenderer->SetUIObject(mUi);
 

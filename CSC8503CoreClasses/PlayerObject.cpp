@@ -647,6 +647,23 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyBot);
 		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 	}
+
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
+			ChangeTransparency(true, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyTopRight);
+		mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+	}
+
 	//Use ScrewDriver
 	if ((objectHit->GetName() == "Vent") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::screwdriver)) {
 		auto* ventHit = (Vent*)objectHit;
