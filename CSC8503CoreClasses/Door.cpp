@@ -62,6 +62,12 @@ void Door::SetIsOpen(bool toOpen) {
 	}
 }
 void Door::SetNavMeshFlags(int flag) {
+	if (flag == 4) {
+		mRenderObject->SetAlbedoTexture(LevelManager::GetLevelManager()->GetTexture("DoorLockedAlbedo"));
+	}
+	else {
+		mRenderObject->SetAlbedoTexture(LevelManager::GetLevelManager()->GetTexture("DoorAlbedo"));
+	}
 	float* pos = new float[3] { mTransform.GetPosition().x, mTransform.GetPosition().y, mTransform.GetPosition().z };
 	AABBVolume* volume = (AABBVolume*)mBoundingVolume;
 	float* halfSize = new float[3] { volume->GetHalfDimensions().x, volume->GetHalfDimensions().y, volume->GetHalfDimensions().z };

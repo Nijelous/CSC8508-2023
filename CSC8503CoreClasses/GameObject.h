@@ -168,6 +168,8 @@ namespace NCL::CSC8503 {
 
 		void SetObjectState(GameObjectState state);
 
+		void DrawCollisionVolume();
+
 	protected:
 		Transform			mTransform;
 

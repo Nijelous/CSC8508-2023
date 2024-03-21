@@ -1,6 +1,7 @@
 #include "LocationBasedSuspicion.h"
 #include <algorithm>
 #include <limits>
+#include "GameCLient.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
@@ -12,6 +13,7 @@ void LocationBasedSuspicion::Init(){
 	mActiveLocationSusCauseMap.clear();
 	mVec3LocationSusAmountMap.clear();
 	mActiveLocationlSusCausesToRemove.clear();
+	locationsToClear.clear();
 }
 
 void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inCause, Vector3 pos){
@@ -86,8 +88,6 @@ void LocationBasedSuspicion::Update(float dt){
 	if (mActiveLocationSusCauseMap.empty())
 		return;
 
-	std::vector<CantorPair*> locationsToClear;
-
 	for (auto entry = mActiveLocationSusCauseMap.begin(); entry != mActiveLocationSusCauseMap.end(); ++entry){
 		std::vector<activeLocationSusCause> vector = entry->second;
 		auto pairedLocation = entry->first;
@@ -146,6 +146,22 @@ int LocationBasedSuspicion::GetLocationSusAmount(Vector3 pos){
 	}
 
 	return -1;
+}
+
+void SuspicionSystem::LocationBasedSuspicion::SetMinLocationSusAmount(Vector3 pos, float susValue)
+{
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
+
+	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
+	{
+		AddNewLocation(pairedLocation, susValue);
+		return;
+	}
+		
+	mLocationSusAmountMap[nearbyPairedLocation] = std::min(susValue, mLocationSusAmountMap[nearbyPairedLocation]);
+	HandleSusChangeNetworking(mLocationSusAmountMap[nearbyPairedLocation], nearbyPairedLocation);
+	UpdateVec3LocationSusAmountMap();
 }
 
 void LocationBasedSuspicion::UpdateVec3LocationSusAmountMap(){
@@ -214,6 +230,7 @@ void LocationBasedSuspicion::AddNewLocation(CantorPair pairedLocation, float ini
 		return;
 
 	mLocationSusAmountMap[pairedLocation] = initSusAmount;
+	HandleSusChangeNetworking(initSusAmount, pairedLocation);
 }
 
 bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation) {
@@ -254,8 +271,19 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 		if (isServer) {
 			game->SendClientSyncLocationSusChangePacket(pairedLocation, changedValue);
 		}
+		else{
+			game->GetClient()->WriteAndSendSyncLocationSusChangePacket(pairedLocation, changedValue);
+		}
 	}
 }
 
+void LocationBasedSuspicion::RemoveSusLocation(const Vector3 pos){
+	CantorPair pairedLocation(pos);
+	CantorPair nearbyPairedLocation;
 
+	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
+		return;
+
+	locationsToClear.push_back(&nearbyPairedLocation);
+}
 #endif

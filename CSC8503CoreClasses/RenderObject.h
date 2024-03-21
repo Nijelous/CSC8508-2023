@@ -116,11 +116,11 @@ namespace NCL {
 			}
 #ifdef USEGL
 
-			void SetMatTextures(vector<GLuint> matTextures) {
+			void SetMatTextures(vector<int> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<GLuint>  GetMatTextures() const {
+			vector<int>  GetMatTextures() const {
 				return mMatTextures;
 			}
 #endif
@@ -181,12 +181,9 @@ namespace NCL {
 			float mSqDistToCam;
 			bool mOutlined = false;
 			bool mIsInstanced = false;
-#ifdef USEGL
-			vector<GLuint>  mMatTextures;
-#endif
-#ifdef USEPROSPERO
-			vector<Texture*> mMatTextures;
-#endif
+
+			vector<int>  mMatTextures;
+
 			std::vector<std::vector<Matrix4>> mFrameMatricesVec;
 
 

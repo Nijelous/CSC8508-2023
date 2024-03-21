@@ -14,13 +14,11 @@ AnimationSystem::AnimationSystem(GameWorld& g, std::map<std::string, MeshAnimati
 	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
-	mAnimTexture = nullptr;
 	InitGuardStateAnimationMap();
 	InitPlayerStateAnimationMap();
 }
 
 AnimationSystem::~AnimationSystem() {
-
 
 }
 
@@ -30,13 +28,13 @@ void AnimationSystem::Clear() {
 	mPlayerList.clear();
 }
 
-void AnimationSystem::Update(float dt, vector<GameObject*> UpdatableObjects) {
+void AnimationSystem::Update(float dt, vector<GameObject*> updatableObjects) {
 	UpdateCurrentFrames(dt);
-	UpdateAllAnimationObjects(dt, UpdatableObjects);
+	UpdateAllAnimationObjects(dt, updatableObjects);
 }
 
-void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects) {
-	for (GameObject* obj : UpdatableObjects) {
+void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> updatableObjects) {
+	for (GameObject* obj : updatableObjects) {
 		if (obj->GetRenderObject()->GetAnimationObject()) {
 
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
@@ -72,7 +70,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> Up
 
 				frameMatricesVec.clear();
 			}
-			
 		}
 	}
 }
@@ -84,40 +81,17 @@ void AnimationSystem::UpdateCurrentFrames(float dt) {
 }
 
 #ifdef USEGL
-void AnimationSystem::PreloadMatTextures(GameTechRenderer& renderer, Mesh& mesh, MeshMaterial& meshMaterial, vector<GLuint>& mMatTextures) {
-
-	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
-		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
-		const string* filename = nullptr;
-		matEntry->GetEntry("Diffuse", &filename);
-		GLuint texID = 0;
-
-		if (filename) {
-			string path = *filename;
-			std::cout << path << std::endl;
-			mAnimTexture = renderer.LoadTexture(path.c_str());
-			texID = ((OGLTexture*)mAnimTexture)->GetObjectID();
-			std::cout << texID << endl;
-		}
-		mMatTextures.emplace_back(texID);
-	}
-}
-
-void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<GLuint> mPlayerTexture, vector<GLuint>& mGuardTextures) {
-	for (auto& obj : UpdatableObjects) {
+void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
+	for (auto& obj : updatableObjects) {
 		if (obj->GetName() == "Guard") {
 			mGuardList.emplace_back((GuardObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(mGuardTextures);
-
 		}
 		if (obj->GetName() == "Player") {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(mPlayerTexture);
-
 		}
 	}
 }
@@ -170,9 +144,13 @@ void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::Game
 		mPlayerStateAnimationMap : mGuardStateAnimationMap;
 
 	const std::string& animStr = animMap[objState];
-
 	MeshAnimation* anim = mPreAnimationList[animStr];
-
+	if (animStr == "GuardSprint"||animStr=="PlayerSprint") {
+		gameObject->GetRenderObject()->GetAnimationObject()->SetRate(2.0);
+	}
+	else {
+		gameObject->GetRenderObject()->GetAnimationObject()->SetRate(1.0);
+	}
 	gameObject->GetRenderObject()->GetAnimationObject()->SetAnimation(anim);
 }
 
@@ -181,7 +159,9 @@ void AnimationSystem::InitGuardStateAnimationMap() {
 	{GameObject::GameObjectState::Idle, "GuardStand"},
 	{GameObject::GameObjectState::Walk, "GuardWalk"},
 	{GameObject::GameObjectState::Sprint, "GuardSprint"},
+	{GameObject::GameObjectState::Point, "GuardPoint"},
 	};
+	
 }
 
 void AnimationSystem::InitPlayerStateAnimationMap() {

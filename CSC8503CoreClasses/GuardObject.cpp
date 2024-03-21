@@ -1,3 +1,6 @@
+//Created by Oliver Perrin
+//Edited by Chris Chen and Eren Degirmenci 
+
 #include "GuardObject.h"
 #include "PlayerObject.h"
 #include "Ray.h"
@@ -10,6 +13,7 @@
 #include "RecastBuilder.h"
 #include "InteractableDoor.h"
 #include "../CSC8503/SceneManager.h"
+#include "../CSC8503/NetworkPlayer.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -48,6 +52,7 @@ void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
 		if (mIsBTWillBeExecuted) {
 			RaycastToPlayer();
+			GuardSpeedMultiplier();
 			ExecuteBT();
 			if (mDoorRaycastInterval <= 0) {
 				mDoorRaycastInterval = RAYCAST_INTERVAL;
@@ -94,6 +99,18 @@ void GuardObject::RaycastToPlayer() {
 	}
 }
 
+void GuardObject::GuardSpeedMultiplier() {
+	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 && mCanSeePlayer == true) {
+		mGuardSpeedMultiplier = 45;
+		}
+	else if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 || mCanSeePlayer == true) {
+		mGuardSpeedMultiplier = 35;
+	}
+	else {
+		mGuardSpeedMultiplier = 25;
+	}
+}
+
 Vector3 GuardObject::GuardForwardVector() {
 	Vector3 rightAxis = this->mTransform.GetMatrix().GetColumn(0);
 	Vector3 fwdAxis = Vector3::Cross(Vector3(0, 1, 0), rightAxis);
@@ -128,13 +145,14 @@ void GuardObject::HandleAppliedBuffs(float dt) {
 PlayerObject* GuardObject::GetPlayerToChase() {
 	float minDist = INT_MAX;
 	PlayerObject* playerToChase = nullptr;
-	const Vector3& guardPos = GetTransform().GetPosition();
 
 	for (PlayerObject* player : mPlayerList) {
 		Vector3 dir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 		Vector3 dirNorm = dir.Normalised();
 		float ang = Vector3::Dot(dirNorm, GuardForwardVector());
-		if (ang > 2) {
+		float minAng = 0;
+		minAng = AngleValue(minAng);
+		if (ang > minAng) {
 			float distance = dir.LengthSquared();
 			if (distance < minDist) {
 				minDist = distance;
@@ -144,6 +162,16 @@ PlayerObject* GuardObject::GetPlayerToChase() {
 	}
 
 	return playerToChase;
+}
+
+int GuardObject::AngleValue(float minAng) {
+	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetGlobalSuspicionMetre()->GetGlobalSusMeter() > 50 && mCanSeePlayer == true) {
+		minAng = 1.5;
+	}
+	else {
+		minAng = 2;
+	}
+	return minAng;
 }
 
 bool GuardObject::CheckPolyDistance() {
@@ -295,6 +323,34 @@ void GuardObject::OpenDoor() {
 	}
 }
 
+bool GuardObject::IsHighEnoughLocationSus() {
+	mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
+	mSmallestDistanceVector = Vector3(100000000, 100000000, 100000000);
+	if (LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->empty() == true) { return false; }
+
+	for (auto it = LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->begin();
+		it != LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->GetVec3LocationSusAmountMapPtr()->end(); it++) {
+		if ((*it).second >= HIGH_SUSPICION) {
+			float distance = ((*it).first - this->GetTransform().GetPosition()).LengthSquared();
+			if (distance < mSmallestDistance) {
+				mSmallestDistance = distance;
+				mSmallestDistanceVector = (*it).first;
+			}
+		}
+	}
+
+	if (mSmallestDistance < MAX_DIST_TO_SUS_LOCATION) { return true; }
+	else { return false; }
+}
+
+void GuardObject::SendAnnouncementToPlayer(){
+	NetworkPlayer* networkPlayer = static_cast<NetworkPlayer*> (mPlayer);
+	if (typeid(networkPlayer) == typeid(NetworkPlayer*))
+		networkPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, networkPlayer->GetPlayerID());
+	else
+		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -302,6 +358,7 @@ void GuardObject::BehaviourTree() {
 	BehaviourSequence* CaughtPlayerSequence = new BehaviourSequence("Caught Player Sequence");
 	mRootSequence->AddChild(FirstSelect);
 	FirstSelect->AddChild(Patrol());
+	FirstSelect->AddChild(CheckSusLocation());
 	FirstSelect->AddChild(SeenPlayerSequence);
 	SeenPlayerSequence->AddChild(ChasePlayerSelector);
 	ChasePlayerSelector->AddChild(PointAtPlayer());
@@ -335,8 +392,10 @@ BehaviourAction* GuardObject::Patrol() {
 
 		}
 		else if (state == Ongoing) {
-			if (mCanSeePlayer == false) {
-				mGuardSpeedMultiplier = 25;
+			if (IsHighEnoughLocationSus() == true) {
+				return Failure;
+			}
+			else if (mCanSeePlayer == false) {
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
@@ -354,7 +413,6 @@ BehaviourAction* GuardObject::Patrol() {
 			}
 			else if (mCanSeePlayer == true) {
 				return Failure;
-
 			}
 		}
 		return state;
@@ -363,20 +421,48 @@ BehaviourAction* GuardObject::Patrol() {
 	return Patrol;
 }
 
+BehaviourAction* GuardObject::CheckSusLocation() {
+	BehaviourAction* CheckSusLocation = new BehaviourAction("Check Suspicious Location", [&](float dt, BehaviourState state)->BehaviourState {
+		if (state == Initialise) {
+			state = Ongoing;
+			SetObjectState(Walk);
+		}
+		else if (state == Ongoing) {
+			if (mCanSeePlayer == true) {
+				mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
+				return Failure;
+			}
+			else {
+				float* endPos = new float[3] {mSmallestDistanceVector.x, mSmallestDistanceVector.y, mSmallestDistanceVector.z};
+				MoveTowardFocalPoint(endPos);
+				if ((mSmallestDistanceVector - this->GetTransform().GetPosition()).LengthSquared() < MIN_DIST_TO_NEXT_POS) {
+					mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
+					return Success;
+				}
+			}
+		}
+		return state;
+		}
+	);
+	return CheckSusLocation;
+}
+
 BehaviourAction* GuardObject::PointAtPlayer() {
 	BehaviourAction* PointAtPlayer = new BehaviourAction("Point at Player", [&](float dt, BehaviourState state)->BehaviourState {
 		if (state == Initialise) {
 			state = Ongoing;
-			SetObjectState(Sprint);
+			SetObjectState(Point);
 		}
 		else if (state == Ongoing) {
-			mPointTimer -= dt;
-			Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
-			LookTowardFocalPoint(direction);
-			this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
-			if (mPointTimer <= 0) {
-				mPointTimer = POINTING_TIMER;
-				return Failure;
+			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
+				mPointTimer -= dt;
+				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+				LookTowardFocalPoint(direction);
+				this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
+				if (mPointTimer <= 0) {
+					mPointTimer = POINTING_TIMER;
+					return Failure;
+				}
 			}
 		}
 		return state;
@@ -393,7 +479,6 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 		}
 		else if (state == Ongoing) {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == false) {
-				mGuardSpeedMultiplier = 40;
 				Vector3 direction = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
 				float dist = direction.LengthSquared();
 
@@ -434,7 +519,7 @@ BehaviourAction* GuardObject::GoToLastKnownLocation() {
 			if (mCanSeePlayer == true) {
 				return Failure;
 			}
-			else if (dist < MIN_DIST_TO_NEXT_POS && GuardForwardVector() == direction.Normalised()) {
+			else if (dist < MIN_DIST_TO_NEXT_POS) {
 				if (mCanSeePlayer == false) {
 					return Success;
 				}
@@ -458,6 +543,7 @@ BehaviourAction* GuardObject::ConfiscateItems() {
 				GrabPlayer();
 				if (mConfiscateItemsTime == 0) {
 					mPlayerHasItems = false;
+					LevelManager::GetLevelManager()->GetInventoryBuffSystem()->GetPlayerInventoryPtr()->DropAllItemsFromPlayer(mPlayer->GetPlayerID());
 					return Success;
 				}
 			}
@@ -485,7 +571,8 @@ BehaviourAction* GuardObject::SendToPrison() {
 			if (mCanSeePlayer == true && mHasCaughtPlayer == true && mPlayerHasItems == false) {
 				mPlayer->GetTransform().SetPosition(LevelManager::GetLevelManager()->GetActiveLevel()->GetPrisonPosition());
 				mPlayer->GetPhysicsObject()->ClearForces();
-				mPlayer->ClosePrisonDoor();
+				SendAnnouncementToPlayer();
+				LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 				mHasCaughtPlayer = false;
 				return Success;
 			}

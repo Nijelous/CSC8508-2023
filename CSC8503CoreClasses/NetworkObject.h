@@ -51,7 +51,8 @@ namespace NCL::CSC8503 {
 
 	struct GameStartStatePacket : public GamePacket {
 		bool isGameStarted = false;
-		GameStartStatePacket(bool val);
+		std::string levelSeed;
+		GameStartStatePacket(bool val, const std::string& seed);
 	};
 
 	struct GameEndStatePacket : public GamePacket{
@@ -152,7 +153,27 @@ namespace NCL::CSC8503 {
 		SyncObjectStatePacket(int networkObjId, int objectState);
 	};
 
-	class NetworkObject	{
+	struct AnnouncementSyncPacket : public GamePacket {
+		int annType;
+		float time;
+		int playerNo;
+		AnnouncementSyncPacket(int annType, float time, int playerNo);
+	};
+
+	struct ClientInitPacket : public GamePacket {
+		std::string playerName;
+
+		ClientInitPacket(const std::string& playerName);
+	};
+
+	struct SyncPlayerIdNameMapPacket : public GamePacket {
+		int playerIds[4] = { -1 , -1, -1,-1 };
+		std::string playerNames[4];
+
+		SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap);
+	};
+
+	class NetworkObject {
 	public:
 		NetworkObject(GameObject& o, int id);
 		virtual ~NetworkObject();

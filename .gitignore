@@ -90,16 +90,11 @@ Prospero_Debug
 sce_module
 Generate.bat
 
-EntryPoint\Debug
-EntryPoint.dir
+/EntryPoint/Debug
+/EntryPoint/EntryPoint.dir
 /EntryPoint/Textures.vcxproj.filters
 /EntryPoint/EntryPoint.vcxproj.filters
 /EntryPoint/Shaders.vcxproj.filters
 /EntryPoint/EntryPoint.vcxproj.user
-
-Assets/Shaders/PSSL/Shadow_vv.ags
-Assets/Shaders/PSSL/Tech_p.ags
-Assets/Shaders/PSSL/Tech_vv.ags
-Assets/Shaders/PSSL/Shadow_vv.ags
 
 *ags

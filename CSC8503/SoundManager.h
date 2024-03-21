@@ -1,11 +1,8 @@
 #pragma once
 #include "Vector3.h"
-#include "../FMODCoreAPI/includes/fmod.hpp"
+#include "../CSC8503CoreClasses/SoundObject.h"
 #include "../CSC8503CoreClasses/GameObject.h"
-#include "../CSC8503CoreClasses/GuardObject.h"
 #include "../CSC8503CoreClasses/GameWorld.h"
-#include "../CSC8503CoreClasses/PlayerObject.h"
-#include "SoundObject.h"
 
 namespace NCL{
 	using namespace Maths;
@@ -25,6 +22,14 @@ namespace NCL{
 
 			void PlayPickUpSound(Vector3 soundPos);
 
+			void PlayLockDoorSound(Vector3 soundPos);
+
+			void PlayAlarmSound(Vector3 soundPos);
+
+			void PlayVentSound(Vector3 soundpos);
+
+			void PlaySound(Vector3 soundPos, FMOD::Sound* sound);
+
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
@@ -36,13 +41,16 @@ namespace NCL{
 			FMOD_VECTOR GetUpVector(Vector3 forward, Vector3 right);
 
 		protected:
-			GameWorld* mGameWorld;
+			GameWorld* mGameWorld = nullptr;
 			FMOD::System* mSystem = nullptr;
 			FMOD::Sound* mFootStepSound = nullptr;
 			FMOD::Sound* mDoorOpenSound = nullptr;
 			FMOD::Sound* mDoorCloseSound = nullptr;
 			FMOD::Sound* mSoundEmitterSound = nullptr;
 			FMOD::Sound* mPickUpSound = nullptr;
+			FMOD::Sound* mLockDoorSound = nullptr;
+			FMOD::Sound* mAlarmSound = nullptr;
+			FMOD::Sound* mVentSound = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

@@ -30,9 +30,9 @@ namespace NCL {
 
 			void Clear();
 
-			void Update(float dt, vector<GameObject*> mUpdatableObjects);
+			void Update(float dt, vector<GameObject*> updatableObjects);
 
-			void UpdateAllAnimationObjects(float dt, vector<GameObject*> UpdatableObjects);
+			void UpdateAllAnimationObjects(float dt, vector<GameObject*> updatableObjects);
 
 			void UpdateCurrentFrames(float dt);
 
@@ -58,7 +58,6 @@ namespace NCL {
 			Shader* mShader;
 			Mesh* mMesh;
 			MeshAnimation* mAnim;
-			Texture* mAnimTexture;	
 
 			GameObject::GameObjectState mGuardState;
 			GameObject::GameObjectState mPlayerState;

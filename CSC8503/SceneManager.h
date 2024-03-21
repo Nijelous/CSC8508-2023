@@ -27,9 +27,12 @@ namespace NCL {
             const bool IsClient() const;
             void SetIsForceQuit(bool isForceQuit);
             void SetIsServer(bool isServer);
+            void SetChangeSceneTrigger(Scenes scene);
 
             PushdownMachine* GetScenePushdownMachine();
             Scene* GetCurrentScene();
+            Scene* GetScene(Scenes sceneType);
+            Scenes GetCurrentSceneType() const;
             static SceneManager* GetSceneManager();
 
             ControllerInterface* GetControllerInterface() const { return mControllerInterface; }

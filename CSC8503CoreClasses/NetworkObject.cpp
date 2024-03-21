@@ -22,11 +22,12 @@ void SyncPlayerListPacket::SyncPlayerList(std::vector<int>& clientPlayerList) co
 	}
 }
 
-GameStartStatePacket::GameStartStatePacket(bool val) {
+GameStartStatePacket::GameStartStatePacket(bool val, const std::string& seed) {
 	type = BasicNetworkMessages::GameStartState;
 	size = sizeof(GameStartStatePacket);
 
 	isGameStarted = val;
+	this->levelSeed = seed;
 }
 
 GameEndStatePacket::GameEndStatePacket(bool val, int winningPlayerId){
@@ -158,13 +159,42 @@ SyncObjectStatePacket::SyncObjectStatePacket(int networkObjId, int objectState) 
 	this->objectState = objectState;
 }
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
-	deltaErrors = 0;
-	fullErrors  = 0;
-	networkID   = id;
+ClientInitPacket::ClientInitPacket(const std::string& playerName) {
+	type = ClientInit;
+	size = sizeof(ClientInitPacket);
+
+	this->playerName = playerName;
 }
 
-NetworkObject::~NetworkObject()	{
+SyncPlayerIdNameMapPacket::SyncPlayerIdNameMapPacket(const std::map<int, string>& playerIdNameMap) {
+	type = SyncPlayerIdNameMap;
+	size = sizeof(SyncPlayerIdNameMapPacket);
+
+	int counter = 0;
+	for (std::pair<int, std::string> playerIdName : playerIdNameMap) {
+		playerIds[counter] = playerIdName.first;
+		playerNames[counter] = playerIdName.second;
+		counter++;
+	}
+
+}
+
+AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int playerNo) {
+	type = SyncAnnouncements;
+	size = sizeof(AnnouncementSyncPacket);
+
+	this->annType = annType;
+	this->time = time;
+	this->playerNo = playerNo;
+}
+
+NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
+	deltaErrors = 0;
+	fullErrors = 0;
+	networkID = id;
+}
+
+NetworkObject::~NetworkObject() {
 }
 
 bool NetworkObject::ReadPacket(GamePacket& p) {

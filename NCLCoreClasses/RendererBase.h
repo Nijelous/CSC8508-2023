@@ -83,7 +83,11 @@ namespace NCL::Rendering {
 			mLights.clear();
 		}
 
+		void SetIsGameStarted(bool isGameStarted);
+
 	protected:
+		bool mIsGameStarted = false;
+
 		virtual void OnWindowResize(int w, int h) = 0;
 		virtual void OnWindowDetach() {}; //Most renderers won't care about this
 			

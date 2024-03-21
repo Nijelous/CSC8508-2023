@@ -11,12 +11,22 @@
 
 namespace NCL::CSC8503
 {
-	struct SyncObjectStatePacket;
+    struct SyncPlayerIdNameMapPacket;
+}
+
+namespace NCL::CSC8503
+{
+    struct ClientInitPacket;
+}
+
+namespace NCL::CSC8503
+{
+    struct SyncObjectStatePacket;
 }
 
 namespace NCL::CSC8503 {
-	struct SyncInteractablePacket;
-	struct ClientSyncItemSlotPacket;
+    struct SyncInteractablePacket;
+    struct ClientSyncItemSlotPacket;
 }
 
 namespace NCL{
@@ -35,6 +45,7 @@ namespace NCL{
         struct ClientSyncGlobalSusChangePacket;
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
+        struct AnnouncementSyncPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -48,14 +59,14 @@ namespace NCL{
 
             const int GetClientLastFullID() const;
 
-            void StartAsServer();
-            void StartAsClient(char a, char b, char c, char d);
+            bool StartAsServer(const std::string& playerName);
+            bool StartAsClient(char a, char b, char c, char d, const std::string& playerName);
 
             void UpdateGame(float dt) override;
 
-            void SetIsGameStarted(bool isGameStarted);
+            void SetIsGameStarted(bool isGameStarted, unsigned int seed = -1);
             void SetIsGameFinished(bool isGameFinished, int winningPlayerId);
-            void StartLevel();
+            void StartLevel(const std::mt19937& levelSeed);
 
             void AddEventOnGameStarts(std::function<void()> event);
 
@@ -73,6 +84,8 @@ namespace NCL{
             void SendClientSyncGlobalSusChangePacket(int changedValue) const;
             void SendClientSyncLocationActiveSusCausePacket(int cantorPairedLocation, int activeSusCause, bool toApply) const;
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
+
+            void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
             void SendPacketsThread();
 
@@ -95,10 +108,10 @@ namespace NCL{
             void UpdateMinimumState();
             int GetPlayerPeerID(int peerId = -2);
 
-            void SendStartGameStatusPacket();
+            void SendStartGameStatusPacket(const std::string& seed = "") const;
             void SendFinishGameStatusPacket();
             
-            void InitWorld() override;
+            void InitWorld(const std::mt19937& levelSeed);
 
             void HandleClientPlayerInput(ClientPlayerInputPacket* playerMovementPacket, int playerPeerID);
 
@@ -131,6 +144,17 @@ namespace NCL{
             void HandleGlobalSusChange(ClientSyncGlobalSusChangePacket* packet) const;
             void HandleLocationActiveSusCauseChange(ClientSyncLocationActiveSusCausePacket* packet) const;
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
+
+            void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
+
+            void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
+            void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);
+
+            void WriteAndSendSyncPlayerIdNameMapPacket() const;
+            void HandleSyncPlayerIdNameMapPacket(const SyncPlayerIdNameMapPacket* packet);
+
+            void ShowPlayerList() const;
+
             std::vector<std::function<void()>> mOnGameStarts;
 
             int mNetworkObjectCache = 10;
@@ -140,6 +164,8 @@ namespace NCL{
 
             std::queue<GamePacket*> mPacketToSendQueue;
             std::mutex mPacketToSendQueueMutex;
+
+            std::map<int, std::string> mPlayerPeerNameMap;
         private:
         };
     }
