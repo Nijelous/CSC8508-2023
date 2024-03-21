@@ -58,7 +58,6 @@ PushdownState::PushdownResult SingleplayerState::OnUpdate(float dt, PushdownStat
 void SingleplayerState::OnAwake() {
 	Window* w = Window::GetWindow();
 	w->ShowOSPointer(false);
-	w->LockMouseToWindow(true);
 
 	SceneManager::GetSceneManager()->SetCurrentScene(Scenes::Singleplayer);
 	SceneManager::GetSceneManager()->SetChangeSceneTrigger(Scenes::Singleplayer);
@@ -93,7 +92,6 @@ void ServerState::OnAwake(){
 	if (mHostedSuccessfully) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
-		w->LockMouseToWindow(true);
 
 		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
 		sceneManager->SetIsServer(true);
@@ -128,7 +126,6 @@ void ClientState::OnAwake() {
 	if (mIsClientConnected) {
 		Window* w = Window::GetWindow();
 		w->ShowOSPointer(false);
-		w->LockMouseToWindow(true);
 
 		sceneManager->SetCurrentScene(Scenes::Multiplayer);
 		LevelManager::GetLevelManager()->SetGameState(GameStates::LevelState);
