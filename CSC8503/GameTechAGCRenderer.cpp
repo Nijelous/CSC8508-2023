@@ -17,6 +17,7 @@
 class SpotLight;
 class PointLight;
 class DirectionLight;
+
 using namespace NCL;
 using namespace Rendering;
 using namespace CSC8503;
@@ -236,6 +237,7 @@ void GameTechAGCRenderer::DrawObjects() {
 	uint32_t startingIndex = 0;
 
 	AGCMesh* prevMesh = (AGCMesh*)activeObjects[0]->GetMesh();
+	int previousIgnoredSubMesh = -1;
 	int instanceCount = 0;
 
 	bool skipInstance = false;
@@ -252,14 +254,15 @@ void GameTechAGCRenderer::DrawObjects() {
 			frameContext->m_dcb.setNumInstances(instanceCount);
 			// draw by submesh
 			for (size_t x = 0; x < prevMesh->GetSubMeshCount(); x++) {
-				tempStruct->subMeshID = x;
-				frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
-				frameContext->drawIndex(prevMesh->GetSubMesh(x)->count, prevMesh->GetAGCIndexData() + (prevMesh->GetSubMesh(x)->start * sizeof(int)));
+				if (x != previousIgnoredSubMesh) {
+					tempStruct->subMeshID = x;
+					frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
+					frameContext->drawIndex(prevMesh->GetSubMesh(x)->count, prevMesh->GetAGCIndexData() + (prevMesh->GetSubMesh(x)->start * sizeof(int)));
+				}
 			}
 			frameContext->m_dcb.setNumInstances(1);
-
-			//DrawBoundMeshInstanced(*frameContext, *prevMesh, instanceCount);
 			prevMesh = objectMesh;
+			previousIgnoredSubMesh = activeObjects[i]->GetIgnoredSubmeshID();
 			instanceCount = 0;
 			startingIndex = i;
 		}
@@ -275,10 +278,14 @@ void GameTechAGCRenderer::DrawObjects() {
 
 			frameContext->m_dcb.setNumInstances(instanceCount);
 			// draw by submesh
-			for (size_t x = 0; x < prevMesh->GetSubMeshCount(); x++) {
-				tempStruct->subMeshID = x;
-				frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
-				frameContext->drawIndex(prevMesh->GetSubMesh(x)->count, prevMesh->GetAGCIndexData() + (prevMesh->GetSubMesh(x)->start * sizeof(int)));
+			for (size_t x = 0; x < objectMesh->GetSubMeshCount(); x++) {
+				if (x != activeObjects[i]->GetIgnoredSubmeshID()) {
+					if (x != activeObjects[i]->GetIgnoredSubmeshID()) {
+						tempStruct->subMeshID = x;
+						frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(tempStruct, 2);
+						frameContext->drawIndex(objectMesh->GetSubMesh(x)->count, objectMesh->GetAGCIndexData() + (objectMesh->GetSubMesh(x)->start * sizeof(int)));
+					}
+				}
 			}
 			frameContext->m_dcb.setNumInstances(1);
 		}
@@ -627,7 +634,6 @@ void GameTechAGCRenderer::UpdateObjectList() {
 						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
 						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x]->GetAssetID();
 					   }
-						state.materialLayerAlbedos[1] = 0;
 						state.hasMaterials = 1;
 					}
 					else {

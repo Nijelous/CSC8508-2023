@@ -45,7 +45,7 @@ int DetermineTextureID(int hasMaterials, int subMeshIndex, int texture1ID, int t
 	return defaultTex;
 }
 
-float4 FlipTexture(float4 currentTex, int isMaterial) {
+float2 FlipTexture(float2 currentTex, int isMaterial) {
 	if (isMaterial == 1) {
 		currentTex.y = currentTex.y * -1;
 	}

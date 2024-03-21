@@ -123,7 +123,6 @@ namespace NCL {
 			vector<GLuint>  GetMatTextures() const {
 				return mMatTextures;
 			}
-
 #endif
 
 #ifdef USEPROSPERO
@@ -134,6 +133,14 @@ namespace NCL {
 
 			vector<Texture*>  GetMatTextures() const {
 				return mMatTextures;
+			}
+
+			int GetIgnoredSubmeshID() const {
+				return ignoredSubMeshID;
+			}
+
+			void SetIgnoredSubmeshID(int x) {
+				ignoredSubMeshID = x;
 			}
 
 #endif
@@ -184,6 +191,8 @@ namespace NCL {
 
 
 			int		mCurrentFrame;
+
+			int ignoredSubMeshID = -1;
 		};
 	}
 }
