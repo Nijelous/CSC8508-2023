@@ -32,8 +32,6 @@ namespace NCL{
 
 			void PlayUnlockVentSound(Vector3 soundPos);
 
-			void PlaySound(Vector3 soundPos, FMOD::Sound* sound);
-
 			void UpdateSounds(vector<GameObject*> object);
 
 			void UpdateFootstepSounds(GameObject::GameObjectState state, Vector3 soundPos, FMOD::Channel* channel);
