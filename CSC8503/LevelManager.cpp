@@ -1067,8 +1067,8 @@ void LevelManager::InitialiseIcons() {
 
 	mItemTextureMap = {
 		{PlayerInventory::item::none, mTextures["InventorySlot"]},
-		{PlayerInventory::item::disguise, mTextures["Stun"]},
-		{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
+		{PlayerInventory::item::disguise, mTextures["Disguise"]},
+		{PlayerInventory::item::soundEmitter,  mTextures["BoomBox"]},
 		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
 		{PlayerInventory::item::stunItem, mTextures["Stun"]},
