@@ -109,7 +109,7 @@ void NetworkPlayer::UpdateObject(float dt) {
 	if (mIsLocalPlayer){
 		PlayerObject::UpdateGlobalUI(dt);
 		PlayerObject::UpdateLocalUI(dt);
-		if (DEBUG_MODE)
+		if (mDebugEnabled)
 			PlayerObject::ShowDebugInfo(dt);
 	}
 }
@@ -281,20 +281,20 @@ bool NCL::CSC8503::NetworkPlayer::GotRaycastInput(NCL::CSC8503::InteractType& in
 	else if (isPlayerHoldingInteract) {
 		//TODO(erendgrmnc): add config or get from entity for long interact duration.
 		mInteractHeldDt += dt;
-		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
+		Debug::Print(to_string(mInteractHeldDt), Vector2(55, 98));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if (DEBUG_MODE)
-				Debug::Print("PickPocket window", Vector2(40, 85));
+			if (mEnableDebugUI)
+				Debug::Print("PickPocket", Vector2(55, 95));
 
 			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::LongUse;
-			if (DEBUG_MODE)
-				Debug::Print("LongUse", Vector2(40, 85));
+			if (mEnableDebugUI)
+				Debug::Print("LongUse", Vector2(55, 95));
 
 			return true;
 		}
@@ -425,5 +425,8 @@ void NetworkPlayer::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && DEBUG_MODE) {
 		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F6))
+		mEnableDebugUI = !mEnableDebugUI;
 }
 #endif
