@@ -5,7 +5,9 @@
 #include "Camera.h"
 #include <algorithm>
 
+#ifdef USEPROSPERO
 #include "../PS5Core/PS5Controller.h"
+#endif
 
 
 using namespace NCL;
