@@ -8,7 +8,7 @@
 
 using namespace NCL::CSC8503;
 namespace {
-	const float MIN_PLAYER_DIST = 150;
+	const float MIN_PLAYER_DIST = 125;
 }
 
 void CCTV::DrawDebugLines(const bool canSeePlayer){
