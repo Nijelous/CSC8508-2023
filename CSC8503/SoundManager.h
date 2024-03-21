@@ -40,7 +40,7 @@ namespace NCL{
 
 			void PlaySpottedSound();
 
-			void UpdateCCTVSpotSound(bool isPlay, FMOD::Channel* channel);
+			void UpdateCCTVSpotSound(bool isPlay, Vector3 soundPos, FMOD::Channel* channel);
 
 			void UpdateListenerAttributes();
 
@@ -62,7 +62,7 @@ namespace NCL{
 			FMOD::Sound* mSpottedSound = nullptr;
 			FMOD::Sound* mUnlockVentSound = nullptr;
 			FMOD::Sound* mCCTVSpotSound = nullptr;
-			FMOD::Channel* mCCTVSpotChannel = nullptr;
+			FMOD::Channel* mCCTVChannel = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

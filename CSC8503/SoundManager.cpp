@@ -134,10 +134,15 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
+	/*mResult = mCCTVSpotSound->set3DMinMaxDistance(80.0f, 200.0f);
+	if (mResult != FMOD_OK) {
+		std::cout << "CCTV Attenuation Setting error" << std::endl;
+		return;
+	}*/
+
 }
 
 SoundManager::~SoundManager() {
-	mCCTVSpotChannel->stop();
 	mDoorOpenSound->release();
 	mDoorCloseSound->release();
 	mFootStepSound->release();
@@ -188,12 +193,13 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 
 FMOD::Channel* SoundManager::AddCCTVSpotSound() {
 	FMOD::Channel* CCTVSpotChannel = nullptr;
-	mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &CCTVSpotChannel);
+	mResult = mSystem->playSound(mSpottedSound, 0, true, &mCCTVChannel);
 	if (mResult != FMOD_OK) {
 		std::cout << "Play CCTV Spot sound error" << std::endl;
 		return nullptr;
 	}
-	return CCTVSpotChannel;
+	mSystem->update();
+	return mCCTVChannel;
 }
 
 void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
@@ -329,8 +335,30 @@ void SoundManager::PlaySpottedSound() {
 	mSystem->update();
 }
 
-void SoundManager::UpdateCCTVSpotSound(bool isPlay, Channel* channel) {
-	channel->setPaused(!isPlay);
+void SoundManager::UpdateCCTVSpotSound(bool isPlay, Vector3 soundPos, Channel* channel) {
+	FMOD_VECTOR pos = ConvertVector(soundPos);
+	//std::cout << isPlay;
+	if (isPlay) {
+		channel->set3DAttributes(&pos, nullptr);
+		channel->setFrequency(48000);
+		channel->setPaused(false);
+	}
+	else {
+		mResult = channel->setPaused(true);
+		if (mResult == FMOD_ERR_INVALID_HANDLE) {
+			std::cout << "yyyyyy" << std::endl;
+		}
+	}
+	//bool a = !isPlay;
+	//mResult = channel->setPaused(false);
+	///*if (mResult != FMOD_OK) {
+	//	std::cout << "ASDasddddddddddddddddddddddddddddddddddddddddddddddd" << std::endl;
+	//	std::cout << mResult << std::endl;
+	//	return;
+	//}*/
+	//if (mResult == FMOD_ERR_INVALID_HANDLE) {
+	//	std::cout << "yyyyyy" << std::endl;
+	//}
 }
 
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
@@ -352,6 +380,8 @@ void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
 void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 	UpdateListenerAttributes();
 	for (GameObject* obj : objects) {
+		bool isTrigger = obj->GetSoundObject()->GetisTiggered();
+
 		Vector3 soundPos = obj->GetTransform().GetPosition();
 		if (obj->GetCollisionLayer() == CollisionLayer::Player) {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
@@ -368,12 +398,22 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 			FMOD::Channel* channel = obj->GetSoundObject()->GetChannel();
 			UpdateFootstepSounds(state, soundPos, channel);
 		}
+		else if (obj->GetName() == "CCTV") {
+			Channel* channel = obj->GetSoundObject()->GetChannel();
+			/*if (!channel) {
+				std::cout << "empty" << std::endl;
+			}*/
+			/*else {
+				UpdateCCTVSpotSound(isTrigger, soundPos, channel);
+			}*/
+			
+		}
 		else {
-			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
-			if (obj->GetName() == "CCTV") {
-				Channel* channel = obj->GetSoundObject()->GetChannel();
-				UpdateCCTVSpotSound(isTrigger, channel);
-			}
+			//bool isTrigger = obj->GetSoundObject()->GetisTiggered();
+			//if (obj->GetName() == "CCTV") {
+			//	Channel* channel = obj->GetSoundObject()->GetChannel();
+			//	UpdateCCTVSpotSound(isTrigger, soundPos, channel);
+			//}
 			if (isTrigger) {
 				if (obj->GetName() == "InteractableDoor") {
 					PlayDoorOpenSound(soundPos);
