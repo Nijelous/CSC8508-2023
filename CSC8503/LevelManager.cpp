@@ -1701,7 +1701,7 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 }
 
 GameObject* LevelManager::AddDecorationToWorld(const Transform& transform, const std::string& meshName) {
-	GameObject* decoration = new GameObject(StaticObj, "Decoration");
+	GameObject* decoration = new GameObject(StaticObj, meshName);
 
 	Vector3 size = transform.GetScale() / 2;
 	AABBVolume* volume = new AABBVolume(size);
