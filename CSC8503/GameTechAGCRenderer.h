@@ -6,6 +6,9 @@
 #include "../PS5Core/AGCRenderer.h"
 
 #include "../PS5Core/AGCBuffer.h"
+#include "DirectionalLight.h"
+#include "PointLight.h"
+#include "SpotLight.h"
 
 #include "../Assets/Shaders/PSSL/Interop.h"		//Always include this before any PSSL headers
 #include "../Assets/Shaders/PSSL/ShaderConstants.psslh"
@@ -138,6 +141,7 @@ namespace NCL {
 			int currentFrameIndex;
 
 			NCL::PS5::AGCMesh* quadMesh;
+			NCL::PS5::AGCMesh* mSphereMesh;
 
 			sce::Agc::Core::Texture*	bindlessTextures;
 			sce::Agc::Core::Buffer*		bindlessBuffers;
@@ -146,6 +150,7 @@ namespace NCL {
 			std::map<std::string, NCL::PS5::AGCTexture*> textureMap;
 
 			sce::Agc::Core::Buffer arrayBuffer;
+			sce::Agc::Core::Buffer mLightBuffer;
 
 			NCL::PS5::AGCTexture* defaultTexture;
 			NCL::PS5::AGCTexture* skyboxTexture;
@@ -167,6 +172,12 @@ namespace NCL {
 			NCL::PS5::AGCShader* debugTextVertexShader;
 			NCL::PS5::AGCShader* debugTextPixelShader;
 
+			NCL::PS5::AGCShader* lightVertexShader;
+			NCL::PS5::AGCShader* lightPixelShader;
+
+			NCL::PS5::AGCShader* combineVertexShader;
+			NCL::PS5::AGCShader* combinePixelShader;			
+
 			NCL::PS5::AGCShader* gammaCompute;
 
 			sce::Agc::CxDepthRenderTarget		shadowTarget;
@@ -176,9 +187,17 @@ namespace NCL {
 			sce::Agc::CxRenderTarget			screenTarget;
 			sce::Agc::CxRenderTarget			mGBuffAlbedoTarget;
 			sce::Agc::CxRenderTarget			mGBuffNormalTarget;
+			sce::Agc::CxDepthRenderTarget		mGBuffDepthTarget;
+			sce::Agc::CxRenderTarget			mDiffLightTarget;
+			sce::Agc::CxRenderTarget			mSpecLightTarget;
+			sce::Agc::CxRenderTarget			mCombineTarget;
 			NCL::PS5::AGCTexture*				screenTex; //ptr into bindless array
 			NCL::PS5::AGCTexture*				mGBuffAlbedoTex;
 			NCL::PS5::AGCTexture*				mGBuffNormalTex;
+			NCL::PS5::AGCTexture*				mGBuffDepthTex;
+			NCL::PS5::AGCTexture*				mDiffLightTex;
+			NCL::PS5::AGCTexture*				mSpecLightTex;
+			NCL::PS5::AGCTexture*				mCombineTex;
 
 			std::vector<SkinningJob> frameJobs;
 

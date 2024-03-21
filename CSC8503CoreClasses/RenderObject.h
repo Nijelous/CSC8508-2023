@@ -90,6 +90,10 @@ namespace NCL {
 				return(a->mSqDistToCam < b->mSqDistToCam) ? true : false;
 			}
 
+			static bool CompareByMesh(const RenderObject* a, const RenderObject* b)	{
+				return(a->GetMesh() < b->GetMesh()) ? true : false;
+			}
+
 			void SetOutlined(bool outlined) {
 				mOutlined = outlined;
 			}

@@ -42,7 +42,10 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
 
 	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
-	bumpNormal = normalize(mul(TBN, normalize(bumpNormal * 2.0 - 1.0)));
+	bumpNormal = pow(bumpNormal, 1.0f / 2.2f);
+	bumpNormal = bumpNormal * 2.0 - 1.0;
+	
+	bumpNormal = normalize(mul(normalize(bumpNormal), TBN));
 
 	vertex.UV = FlipTexture(vertex.UV, vertex.hasMaterial);
 
@@ -50,5 +53,5 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
 
 	fragColour[0] = albedoSample;
-	fragColour[1] = normalSample;
+	fragColour[1].xyz = normalSample.xyz;
 }

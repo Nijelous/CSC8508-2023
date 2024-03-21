@@ -1,13 +1,12 @@
 #include "GameTechAGCRenderer.h"
+
+#include <algorithm>
+
 #include "GameObject.h"
 #include "RenderObject.h"
 #include "Camera.h"
-#include "DirectionalLight.h"
 #include "TextureLoader.h"
 #include "MshLoader.h"
-#include "PointLight.h"
-#include "RecastBuilder.h"
-#include "SpotLight.h"
 #include "../PS5Core/AGCMesh.h"
 #include "../PS5Core/AGCTexture.h"
 #include "../PS5Core/AGCShader.h"
@@ -55,6 +54,7 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	quadMesh = new AGCMesh();
 	CreateQuad(quadMesh);
 	quadMesh->UploadToGPU(this);
+	mSphereMesh = (AGCMesh*)LoadMesh("Sphere.msh");
 
 	skinningCompute = new AGCShader("Skinning_c.ags", allocator);
 	gammaCompute = new AGCShader("Gamma_c.ags", allocator);
@@ -74,6 +74,12 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 	debugTextVertexShader = new AGCShader("DebugText_vv.ags", allocator);
 	debugTextPixelShader = new AGCShader("DebugText_p.ags", allocator);
 
+	lightVertexShader = new AGCShader("light_vv.ags", allocator);
+	lightPixelShader = new AGCShader("light_p.ags", allocator);
+
+	combineVertexShader = new AGCShader("Combine_vv.ags", allocator);
+	combinePixelShader = new AGCShader("Combine_p.ags", allocator);
+
 	allFrames = new FrameData[FRAMES_IN_FLIGHT];
 	for (int i = 0; i < FRAMES_IN_FLIGHT; ++i) {
 
@@ -92,19 +98,33 @@ GameTechAGCRenderer::GameTechAGCRenderer(GameWorld& world)
 
 	Debug::CreateDebugFont("PressStart2P.fnt", *LoadTexture("PressStart2P.png"));
 
-	shadowTarget = CreateDepthBufferTarget(SHADOW_SIZE, SHADOW_SIZE);
-	shadowMap = CreateFrameBufferTextureSlot("Shadowmap");
+	mGBuffDepthTarget = CreateDepthBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y);
+	mGBuffDepthTex = CreateFrameBufferTextureSlot("depthTex");
 
 	screenTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
 	mGBuffAlbedoTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
-	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
-	mGBuffNormalTarget.setSlot(1);
+	mGBuffNormalTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true)
+		.setSlot(1);
+
+	mDiffLightTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+	mSpecLightTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true)
+		.setSlot(1);
+
+	mCombineTarget = CreateColourBufferTarget(Window::GetWindow()->GetScreenSize().x, Window::GetWindow()->GetScreenSize().y, true);
+
 	screenTex = CreateFrameBufferTextureSlot("Screen");
 	mGBuffAlbedoTex = CreateFrameBufferTextureSlot("albedoTex");
 	mGBuffNormalTex = CreateFrameBufferTextureSlot("normalTex");
+	mDiffLightTex = CreateFrameBufferTextureSlot("diffLight");
+	mSpecLightTex = CreateFrameBufferTextureSlot("specLightTex");
+	mCombineTex = CreateFrameBufferTextureSlot("combineTex");
+
 	error = sce::Agc::Core::translate(screenTex->GetAGCPointer(), &screenTarget, sce::Agc::Core::RenderTargetComponent::kData);
-	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget,	 sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mGBuffAlbedoTex->GetAGCPointer(), &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	error = sce::Agc::Core::translate(mGBuffNormalTex->GetAGCPointer(), &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mDiffLightTex->GetAGCPointer(), &mDiffLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mSpecLightTex->GetAGCPointer(), &mSpecLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	error = sce::Agc::Core::translate(mCombineTex->GetAGCPointer(), &mCombineTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	shadowSampler.init()
 		.setXyFilterMode(
 			sce::Agc::Core::Sampler::FilterMode::kPoint,	//magnification
@@ -219,7 +239,7 @@ void GameTechAGCRenderer::RenderFrame() {
 	currentFrame->globalDataOffset = 0;
 	currentFrame->objectStateOffset = sizeof(ShaderConstants);
 	currentFrame->debugLinesOffset = currentFrame->objectStateOffset; //We'll be pushing that out later
-
+	
 	//Step 1: Write the frame's constant data to the buffer
 	WriteRenderPassConstants();
 	//Step 2: Walk the object list and build up the object set and required buffer memory
@@ -230,9 +250,11 @@ void GameTechAGCRenderer::RenderFrame() {
 	//NO THANK YOU
 
 	//Step 5: Draw a skybox to our main scene render target
-	SkyboxPass();
+	
 	//Step 6: Draw the scene to our main scene render target
 	DeferredRenderingPass();
+	SkyboxPass();
+
 	//Step 7: Draw the debug data to the main scene render target
 	UpdateDebugData();
 	RenderDebugLines();
@@ -263,6 +285,12 @@ void GameTechAGCRenderer::WriteRenderPassConstants() {
 
 	frameData.orthoMatrix = Matrix4::Orthographic(0.0f, 100.0f, 100.0f, 0.0f, -1.0f, 1.0f);
 	frameData.pixelSize = Vector2(1.0f / hostWindow.GetScreenSize().x, 1.0f / hostWindow.GetScreenSize().y);
+
+	frameData.gBuffAlbedoIndex = mGBuffAlbedoTex->GetAssetID();
+	frameData.gBuffNormalIndex = mGBuffNormalTex->GetAssetID();
+	frameData.gBuffDepthIndex = mGBuffDepthTex->GetAssetID();
+	frameData.specularLightIndex = mSpecLightTex->GetAssetID();
+	frameData.diffuseLightIndex = mDiffLightTex->GetAssetID();
 
 	currentFrame->data.WriteData<ShaderConstants>(frameData); //Let's start filling up our frame data!
 
@@ -395,9 +423,9 @@ void GameTechAGCRenderer::SkyboxPass() {
 
 	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
 	frameContext->m_sb.setState(rtMask);
-	frameContext->m_sb.setState(screenTarget);
+	frameContext->m_sb.setState(mCombineTarget);
 
-	frameContext->m_sb.setState(depthTarget);
+	frameContext->m_sb.setState(mGBuffDepthTarget);
 
 	sce::Agc::CxDepthStencilControl depthControl;
 	depthControl.init();
@@ -411,7 +439,9 @@ void GameTechAGCRenderer::SkyboxPass() {
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
 		.setSamplers(0, 1, &defaultSampler)
-		.setTextures(1, 1, skyboxTexture->GetAGCPointer());
+		.setTextures(1, 1, skyboxTexture->GetAGCPointer())
+		.setBuffers(2, 1, &textureBuffer)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer);
 
 	quadMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
 	DrawBoundMesh(*frameContext, *quadMesh);
@@ -457,41 +487,40 @@ void GameTechAGCRenderer::ShadowmapPass() {
 	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
 
 	sce::Agc::Core::translate(&bindlessTextures[shadowMap->GetAssetID()], &shadowTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
-	
+
 }
 
-void GameTechAGCRenderer::DeferredRenderingPass(){
+void GameTechAGCRenderer::DeferredRenderingPass() {
+
 	FillGBuffer();
-	DrawLightVolumes();
+	if (mLights.size() > 0) DrawLightVolumes();
 	CombineBuffers();
 }
 
 
 void GameTechAGCRenderer::FillGBuffer() {
+	sce::Agc::Toolkit::Result tk1 = sce::Agc::Toolkit::clearDepthRenderTargetCs(&frameContext->m_dcb, &mGBuffDepthTarget);
+	sce::Agc::Toolkit::Result wat = frameContext->resetToolkitChangesAndSyncToGl2(tk1);
+
 	frameContext->setShaders(nullptr, defaultVertexShader->GetAGCPointer(), defaultPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
 
 	sce::Agc::CxViewport viewPort;
-	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 1.0f);
+	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 100.0f);
 	frameContext->m_sb.setState(viewPort);
-	frameContext->m_sb.setState(backBuffers[currentSwap].targetMask);
-	frameContext->m_sb.setState(backBuffers[currentSwap].renderTarget);
 
 	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
 	rtMask.setMask(1, 0xFF);
+
 	frameContext->m_sb.setState(rtMask);
 	frameContext->m_sb.setState(mGBuffAlbedoTarget);
-	
-	frameContext->m_sb.setState(depthTarget);
-
-	
 	frameContext->m_sb.setState(mGBuffNormalTarget);
+	frameContext->m_sb.setState(mGBuffDepthTarget);
 
 	sce::Agc::CxDepthStencilControl depthControl;
 	depthControl.init();
 	depthControl.setDepth(sce::Agc::CxDepthStencilControl::Depth::kEnable);
 	depthControl.setDepthFunction(sce::Agc::CxDepthStencilControl::DepthFunction::kLessEqual);
 	depthControl.setDepthWrite(sce::Agc::CxDepthStencilControl::DepthWrite::kEnable);
-
 	frameContext->m_sb.setState(depthControl);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs)
@@ -502,24 +531,119 @@ void GameTechAGCRenderer::FillGBuffer() {
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
 		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
 		.setBuffers(0, 1, &textureBuffer)
-		.setSamplers(0, 1, &defaultSampler)
-		.setSamplers(1, 1, &shadowSampler);
+		.setSamplers(0, 1, &defaultSampler);
 	DrawObjects();
 
 	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+	const bool htileTC = (mGBuffDepthTarget.getTextureCompatiblePlaneCompression() == sce::Agc::CxDepthRenderTarget::TextureCompatiblePlaneCompression::kEnable);
+	const sce::Agc::Core::MaintainCompression maintainCompression = htileTC ? sce::Agc::Core::MaintainCompression::kEnable : sce::Agc::Core::MaintainCompression::kDisable;
+	sce::Agc::Core::translate(&bindlessTextures[mGBuffDepthTex->GetAssetID()], &mGBuffDepthTarget, sce::Agc::Core::DepthRenderTargetComponent::kDepth, maintainCompression);
 
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushCompressedDepthBufferForTexture);
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffAlbedoTex->GetAssetID()], &mGBuffAlbedoTarget, sce::Agc::Core::RenderTargetComponent::kData);
 	sce::Agc::Core::translate(&bindlessTextures[mGBuffNormalTex->GetAssetID()], &mGBuffNormalTarget, sce::Agc::Core::RenderTargetComponent::kData);
+
 }
 
 void GameTechAGCRenderer::DrawLightVolumes() {
-	//set clear colour to black, and clear frame
-	//set blend function to on for all channels
-	//for each light, draw a sphere
+	sce::Agc::Core::Encoder::EncoderValue clearColor = sce::Agc::Core::Encoder::encode(backBuffers[currentSwap].spec.getFormat(), { 0,0,0,1 });
+	sce::Agc::Toolkit::Result tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mDiffLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
+	tk1 = sce::Agc::Toolkit::clearRenderTargetCs(&frameContext->m_dcb, &mSpecLightTarget, sce::Agc::Toolkit::RenderTargetClearOp::kAuto);
+	sce::Agc::Toolkit::Result wat = frameContext->resetToolkitChangesAndSyncToGl2(tk1);
+
+	frameContext->setShaders(nullptr, lightVertexShader->GetAGCPointer(), lightPixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
+
+	sce::Agc::CxViewport viewPort;
+	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 1.0f);
+	frameContext->m_sb.setState(viewPort);
+
+	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
+	rtMask.setMask(1, 0xFF);
+
+	frameContext->m_sb.setState(rtMask);
+	frameContext->m_sb.setState(mDiffLightTarget);
+	frameContext->m_sb.setState(mSpecLightTarget);
+
+	sce::Agc::CxPrimitiveSetup primState;
+	primState.init();
+	primState.setCullFace(sce::Agc::CxPrimitiveSetup::CullFace::kFront);
+	frameContext->m_sb.setState(primState);
+
+	sce::Agc::CxDepthStencilControl depthControl;
+	depthControl.init();
+	depthControl.setDepthFunction(sce::Agc::CxDepthStencilControl::DepthFunction::kAlways);
+	depthControl.setDepthWrite(sce::Agc::CxDepthStencilControl::DepthWrite::kDisable);
+	frameContext->m_sb.setState(depthControl);
+
+	sce::Agc::CxBlendControl blendControl;
+	blendControl.init();
+	blendControl.setBlend(sce::Agc::CxBlendControl::Blend::kEnable)
+		.setAlphaBlendFunc(sce::Agc::CxBlendControl::AlphaBlendFunc::kAdd)
+		.setColorBlendFunc(sce::Agc::CxBlendControl::ColorBlendFunc::kAdd)
+		.setAlphaSourceMultiplier(sce::Agc::CxBlendControl::AlphaSourceMultiplier::kOne)
+		.setColorSourceMultiplier(sce::Agc::CxBlendControl::ColorSourceMultiplier::kOne)
+		.setAlphaDestMultiplier(sce::Agc::CxBlendControl::AlphaDestMultiplier::kOne)
+		.setColorDestMultiplier(sce::Agc::CxBlendControl::ColorDestMultiplier::kOne);
+	frameContext->m_sb.setState(blendControl);
+
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
+		.setBuffers(0, 1, &currentFrame->objectBuffer)
+		.setBuffers(1, 1, &bindlessBuffers[128]);
+
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
+		.setBuffers(0, 1, &textureBuffer)
+		.setSamplers(0, 1, &defaultSampler)
+		.setBuffers(1, 1, &bindlessBuffers[128]);
+
+	mSphereMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
+	uint32_t* objID = static_cast<uint32_t*>(frameContext->m_dcb.allocateTopDown(sizeof(uint32_t), sce::Agc::Alignment::kBuffer));
+	for (int i = 0; i < mLights.size(); i++) {
+
+		*objID = i;
+		frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs).setUserSrtBuffer(objID, 1);
+		DrawBoundMesh(*frameContext, *mSphereMesh);
+	}
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+
+	sce::Agc::Core::translate(&bindlessTextures[mDiffLightTex->GetAssetID()], &mDiffLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+	sce::Agc::Core::translate(&bindlessTextures[mSpecLightTex->GetAssetID()], &mSpecLightTarget, sce::Agc::Core::RenderTargetComponent::kData);
+
+	sce::Agc::CxPrimitiveSetup primStateReset;
+	primStateReset.init();
+	frameContext->m_sb.setState(primStateReset);
 }
 
 void GameTechAGCRenderer::CombineBuffers() {
-	
+	frameContext->setShaders(nullptr, combineVertexShader->GetAGCPointer(), combinePixelShader->GetAGCPointer(), sce::Agc::UcPrimitiveType::Type::kTriList);
+
+
+	sce::Agc::CxViewport viewPort;
+	sce::Agc::Core::setViewport(&viewPort, SCREENWIDTH, SCREENHEIGHT, 0, 0, -1.0f, 1.0f);
+	frameContext->m_sb.setState(viewPort);
+
+	sce::Agc::CxRenderTargetMask rtMask = sce::Agc::CxRenderTargetMask().init().setMask(0, 0xFF);
+	frameContext->m_sb.setState(rtMask);
+	frameContext->m_sb.setState(mCombineTarget);
+
+	sce::Agc::CxBlendControl blendControl;
+	blendControl.init();
+	frameContext->m_sb.setState(blendControl);
+
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs);;
+
+	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kPs)
+		.setConstantBuffers(0, 1, &currentFrame->constantBuffer)
+		.setSamplers(0, 1, &defaultSampler)
+		.setBuffers(0, 1, &textureBuffer);
+
+	quadMesh->BindVertexBuffers(frameContext->m_bdr.getStage(sce::Agc::ShaderType::kGs));
+	DrawBoundMesh(*frameContext, *quadMesh);
+
+	sce::Agc::Core::gpuSyncEvent(&frameContext->m_dcb, sce::Agc::Core::SyncWaitMode::kDrainGraphics, sce::Agc::Core::SyncCacheOp::kFlushUncompressedColorBufferForTexture);
+	sce::Agc::Core::translate(&bindlessTextures[mCombineTex->GetAssetID()], &mCombineTarget, sce::Agc::Core::RenderTargetComponent::kData);
 }
 
 
@@ -566,7 +690,7 @@ void GameTechAGCRenderer::DisplayRenderPass() {
 	SceError error = sce::Agc::Core::translate(&outputTex, &backBuffers[currentSwap].renderTarget, sce::Agc::Core::RenderTargetComponent::kData);
 
 	frameContext->m_bdr.getStage(sce::Agc::ShaderType::kCs)
-		.setTextures(0, 1, screenTex->GetAGCPointer())
+		.setTextures(0, 1, mCombineTex->GetAGCPointer())
 		.setRwTextures(1, 1, &outputTex);
 	uint32_t xDims = (outputTex.getWidth() + 7) / 8;
 	uint32_t yDims = (outputTex.getHeight() + 7) / 8;
@@ -659,7 +783,7 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 					ObjectState state;
 					state.modelMatrix = g->GetTransform()->GetMatrix();
-
+					state.invModelMatrix = g->GetTransform()->GetMatrix().Inverse();
 					state.colour = g->GetColour();
 					state.index[0] = 0; //Albedo texture
 					state.index[1] = 0; //Normal texture
@@ -727,7 +851,6 @@ void GameTechAGCRenderer::UpdateObjectList() {
 			}
 		}
 	);
-
 	sce::Agc::Core::BufferSpec bufSpec;
 	bufSpec.initAsRegularBuffer(dataPos, sizeof(ObjectState), at);
 	sce::Agc::Core::initialize(&currentFrame->objectBuffer, &bufSpec);
@@ -755,7 +878,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 		break;
 		case Light::Point:
 		{
-			PointLight* pl = static_cast<PointLight*>(l);			
+			PointLight* pl = static_cast<PointLight*>(l);
 			lightData.lightPos = pl->GetPosition();
 			lightData.lightRadius = pl->GetRadius();
 			lightData.lightType = 'p';
@@ -776,7 +899,7 @@ void GameTechAGCRenderer::FillLightUBO() {
 			break;
 		}
 
-		allData.push_back(lightData);		
+		allData.push_back(lightData);
 	}
 	size_t lightSize = sizeof(LightData);
 	size_t lightCount = allData.size();
@@ -786,12 +909,8 @@ void GameTechAGCRenderer::FillLightUBO() {
 
 	sce::Agc::Core::BufferSpec bufSpec;
 	bufSpec.initAsRegularBuffer(lightDataPtr, lightSize, lightCount);
-
 	sce::Agc::Core::Buffer lBuffer;
 	SceError error = sce::Agc::Core::initialize(&lBuffer, &bufSpec);
-
-	lightDataPtr = (char*) &allData[0];
-	AGCBuffer* b = new AGCBuffer(lBuffer, lightDataPtr);
-
 	bindlessBuffers[bufferID] = lBuffer;
+	memcpy(lightDataPtr, allData.data(), bufferSize);
 }

@@ -1,15 +1,22 @@
+#include "ShaderConstants.psslh"
+
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float3 Direction	: TEXCOORD0;
 };
 
+RegularBuffer<sce::Agc::Core::Texture> textures : register(t2);
 TextureCube<float4> inputTexture	: register(t1);
 SamplerState sampler			: register(s0);
 
 [CxxSymbol("TestShader::ps")]
-float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+float4 main(VS_OUTPUT vertex, float4 pixelPos : S_POSITION) : S_TARGET_OUTPUT
 {
+	Texture2D<float4> depth = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffDepthIndex)]);
+	float2 fragCoord = pixelPos * Constants.pixelSize;
+	float depthSample = depth.Sample(sampler, fragCoord).x;
+	if(depthSample < 1.0) discard;
 	float4 texSample = inputTexture.Sample(sampler, vertex.Direction);
 	return texSample;  
 }

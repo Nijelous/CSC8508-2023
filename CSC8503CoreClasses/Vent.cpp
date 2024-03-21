@@ -109,6 +109,7 @@ bool Vent::CanBeInteractedWith(InteractType interactType, GameObject* interacted
 		return CanUseItem() && !mIsOpen;
 		break;
 	default:
+		return false;
 		break;
 	}
 }
