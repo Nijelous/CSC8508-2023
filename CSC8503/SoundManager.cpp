@@ -86,37 +86,37 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mFootStepSound->set3DMinMaxDistance(3.0f, 2.0f);
+	mResult = mFootStepSound->set3DMinMaxDistance(2.0f, 200.0f);
 	if (mResult != FMOD_OK) {
 		std::cout<<"FootStep Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorOpenSound->set3DMinMaxDistance(3.0f, 10.0f);
+	mResult = mDoorOpenSound->set3DMinMaxDistance(5.0f, 180.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Open Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mDoorCloseSound->set3DMinMaxDistance(3.0f, 10.0f);
+	mResult = mDoorCloseSound->set3DMinMaxDistance(5.0f, 180.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Door Close Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mSoundEmitterSound->set3DMinMaxDistance(60.0f, 150.0f);
+	mResult = mSoundEmitterSound->set3DMinMaxDistance(100.0f, 150.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Sound Emitter Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mPickUpSound->set3DMinMaxDistance(3.0f, 7.0f);
+	mResult = mPickUpSound->set3DMinMaxDistance(2.0f, 250.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Pick Up Sound Attenuation Setting error" << std::endl;
 		return;
 	}
 
-	mResult = mLockDoorSound->set3DMinMaxDistance(2.0f, 6.0f);
+	mResult = mLockDoorSound->set3DMinMaxDistance(2.0f, 240.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Lock Door Sound Attenuation Setting error" << std::endl;
 		return;
@@ -128,7 +128,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mVentSound->set3DMinMaxDistance(5.0f, 13.0f);
+	mResult = mVentSound->set3DMinMaxDistance(5.0f, 180.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Alarm Sound Attenuation Setting error" << std::endl;
 		return;
@@ -184,6 +184,16 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 	mSystem->update();
 	soundEmitterChannel->setPaused(false);
 	return soundEmitterChannel;
+}
+
+FMOD::Channel* SoundManager::AddCCTVSpotSound() {
+	FMOD::Channel* CCTVSpotChannel = nullptr;
+	mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &CCTVSpotChannel);
+	if (mResult != FMOD_OK) {
+		std::cout << "Play CCTV Spot sound error" << std::endl;
+		return nullptr;
+	}
+	return CCTVSpotChannel;
 }
 
 void SoundManager::PlayDoorOpenSound(Vector3 soundPos) {
@@ -319,16 +329,8 @@ void SoundManager::PlaySpottedSound() {
 	mSystem->update();
 }
 
-void SoundManager::PlayCCTVSpotSound(bool isPlay) {
-	if (mCCTVSpotChannel == nullptr) {
-		mResult = mSystem->playSound(mCCTVSpotSound, 0, !isPlay, &mCCTVSpotChannel);
-		if (mResult != FMOD_OK) {
-			std::cout << "Play CCTV Spot sound error" << std::endl;
-		}
-	}
-	else {
-		mCCTVSpotChannel->setPaused(!isPlay);
-	}
+void SoundManager::UpdateCCTVSpotSound(bool isPlay, Channel* channel) {
+	channel->setPaused(!isPlay);
 }
 
 void SoundManager::PlaySound(Vector3 soundPos, FMOD::Sound* sound) {
@@ -360,8 +362,6 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 				PlaySpottedSound();
 				obj->GetSoundObject()->SetNotTriggered();
 			}
-			bool isClose = obj->GetSoundObject()->GetIsClosed();
-			PlayCCTVSpotSound(isClose);
 		}
 		else if (obj->GetName() == "Guard") {
 			GameObject::GameObjectState state = obj->GetGameOjbectState();
@@ -370,6 +370,10 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 		}
 		else {
 			bool isTrigger = obj->GetSoundObject()->GetisTiggered();
+			if (obj->GetName() == "CCTV") {
+				Channel* channel = obj->GetSoundObject()->GetChannel();
+				UpdateCCTVSpotSound(isTrigger, channel);
+			}
 			if (isTrigger) {
 				if (obj->GetName() == "InteractableDoor") {
 					PlayDoorOpenSound(soundPos);

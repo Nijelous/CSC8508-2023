@@ -47,7 +47,6 @@ namespace NCL{
         struct ClientSyncLocationSusChangePacket;
         struct AnnouncementSyncPacket;
         struct GuardSpotSoundPacket;
-        struct CCTVSpotSoundPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -90,7 +89,6 @@ namespace NCL{
             void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
             void SendGuardSpotSoundPacket(int playerId) const;
-            void SendCCTVSpotSoundPacket(int playerId, bool isPlay) const;
 
             void SendPacketsThread();
 
@@ -153,7 +151,6 @@ namespace NCL{
             void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
 
             void HandleGuardSpotSound(GuardSpotSoundPacket* packet) const;
-            void HandleCCTVSpotSound(CCTVSpotSoundPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);

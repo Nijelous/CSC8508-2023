@@ -103,13 +103,7 @@ const void CCTV::OnPlayerSeen(PlayerObject* mPlayerObject){
 		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::cameraLOS, mPlayerObject->GetPlayerID());
 	hadSeenPlayer[playerID] = true;
 
-	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		game->SendCCTVSpotSoundPacket(mPlayerObject->GetPlayerID(), true);
-	}
-	else {
-		mPlayerObject->GetSoundObject()->CloseDoorTriggered();
-	}
+	this->GetSoundObject()->TriggerSoundEvent();
 }
 
 const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
@@ -124,13 +118,9 @@ const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
 	}
 		
 	hadSeenPlayer[playerID] = false;
-	if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
-		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
-		game->SendCCTVSpotSoundPacket(mPlayerObject->GetPlayerID(), false);
-	}
-	else {
-		mPlayerObject->GetSoundObject()->CloseDoorFinished();
-	}
+
+	this->GetSoundObject()->SetNotTriggered();
+
 }
 
 void CCTV::AngleToNormalisedCoords(float angle, float& x, float& y){

@@ -194,13 +194,6 @@ GuardSpotSoundPacket::GuardSpotSoundPacket(const int playerId) {
 	this->playerId = playerId;
 }
 
-CCTVSpotSoundPacket::CCTVSpotSoundPacket(const int playerId, bool isPlay) {
-	type = BasicNetworkMessages::CCTVSpotSound;
-	size = sizeof(CCTVSpotSoundPacket);
-	this->playerId = playerId;
-	this->isPlay = isPlay;
-}
-
 NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
 	deltaErrors = 0;
 	fullErrors = 0;

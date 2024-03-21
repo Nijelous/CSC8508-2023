@@ -16,6 +16,8 @@ namespace NCL{
 
 			FMOD::Channel* AddSoundEmitterSound(Vector3 soundPos);
 
+			FMOD::Channel* AddCCTVSpotSound();
+
 			void PlayDoorOpenSound(Vector3 soudPos);
 
 			void PlayDoorCloseSound(Vector3 soundPos);
@@ -38,7 +40,7 @@ namespace NCL{
 
 			void PlaySpottedSound();
 
-			void PlayCCTVSpotSound(bool isPlay);
+			void UpdateCCTVSpotSound(bool isPlay, FMOD::Channel* channel);
 
 			void UpdateListenerAttributes();
 

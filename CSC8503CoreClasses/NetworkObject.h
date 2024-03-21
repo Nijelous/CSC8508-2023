@@ -179,13 +179,6 @@ namespace NCL::CSC8503 {
 		GuardSpotSoundPacket(const int playerId);
 	};
 
-	struct CCTVSpotSoundPacket : public GamePacket {
-		int playerId;
-		bool isPlay;
-
-		CCTVSpotSoundPacket(const int playerId, bool isPlay);
-	};
-
 	class NetworkObject {
 	public:
 		NetworkObject(GameObject& o, int id);

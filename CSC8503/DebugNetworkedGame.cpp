@@ -114,7 +114,6 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
-		mThisClient->RegisterPacketHandler(BasicNetworkMessages::CCTVSpotSound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -152,7 +151,6 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
-		mThisClient->RegisterPacketHandler(BasicNetworkMessages::CCTVSpotSound, this);
 	}
 
 	return isConnected;
@@ -351,12 +349,6 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleGuardSpotSound(packet);
 		break;
 	}
-	case BasicNetworkMessages::CCTVSpotSound: {
-		CCTVSpotSoundPacket* packet = (CCTVSpotSoundPacket*)(payload);
-		HandleCCTVSpotSound(packet);
-		break;
-	}
-
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -419,11 +411,6 @@ void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, f
 
 void DebugNetworkedGame::SendGuardSpotSoundPacket(int playerId) const {
 	GuardSpotSoundPacket packet(playerId);
-	mThisServer->SendGlobalPacket(packet);
-}
-
-void DebugNetworkedGame::SendCCTVSpotSoundPacket(int playerId, bool isPlay) const {
-	CCTVSpotSoundPacket packet(playerId, isPlay);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -780,12 +767,6 @@ void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* pa
 void DebugNetworkedGame::HandleGuardSpotSound(GuardSpotSoundPacket* packet) const {
 	if (packet->playerId == mLocalPlayerId) {
 		mLevelManager->GetSoundManager()->PlaySpottedSound();
-	}
-}
-
-void DebugNetworkedGame::HandleCCTVSpotSound(CCTVSpotSoundPacket* packet) const {
-	if (packet->playerId == mLocalPlayerId) {
-		mLevelManager->GetSoundManager()->PlayCCTVSpotSound(packet->isPlay);
 	}
 }
 
