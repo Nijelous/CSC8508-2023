@@ -13,6 +13,7 @@
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include "MiniMap.h"
 
 using namespace NCL;
 using namespace Rendering;
@@ -395,6 +396,9 @@ void GameTechRenderer::RenderFrame() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	mUIHandler->RenderUI(mImguiCanvasFuncToRender);
+
+    if (mMiniMap)
+        mMiniMap->Render();
 }
 
 void GameTechRenderer::BuildObjectList() {

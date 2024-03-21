@@ -418,8 +418,9 @@ void DebugNetworkedGame::SendGuardSpotSoundPacket(int playerId) const {
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
+		std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 		if (mPacketToSendQueue.size() > 1 && !mPacketToSendQueue.empty()) {
-			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
+			
 			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
 				mThisServer->SendGlobalPacket(*packet);
@@ -499,6 +500,7 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)) {
 			if (newPacket != nullptr) {
+				std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 				mPacketToSendQueue.push(newPacket);
 			}
 		}
@@ -623,21 +625,21 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	switch (playerNum)
 	{
 	case 0:
-		colour = Vector4(1, 0, 0, 1); // RED
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Red"));
 		break;
 	case 1:
-		colour = Vector4(0, 1, 0, 1); //Green
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Blue"));
 		break;
 	case 2:
-		colour = Vector4(0, 0, 1, 1); //Blue
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Yellow"));
 		break;
 	case 3:
-		colour = Vector4(1, 1, 0, 1); //Yellow
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Green"));
 		break;
 	default:
 		break;
 	}
-	netPlayer->GetRenderObject()->SetColour(colour);
+	
 	return netPlayer;
 }
 

@@ -142,8 +142,8 @@ namespace NCL {
 			float mTransparencyBot = 0.0;
 			float mTransparencyBotLeft = 0.0;
 			float mTransparencyBotRight = 0.0;
+			bool mIsDebugUIEnabled = false;
 			float mTransparencyTopRight = 0.0;
-
 
 			std::map<std::string , float> mAnnouncementMap;
 			bool	IsSeenByGameObject(GameObject* otherGameObject);

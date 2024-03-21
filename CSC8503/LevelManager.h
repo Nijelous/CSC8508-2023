@@ -130,6 +130,8 @@ namespace NCL {
 
 			Texture* GetTexture(std::string name) { return mTextures[name]; }
 
+			vector<int> GetMeshMaterial(std::string name) { return mMeshMaterials[name]; }
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
@@ -165,6 +167,8 @@ namespace NCL {
 			void PrintDebug(float dt);
 
 			void InitialiseIcons();
+
+            void InitialiseMiniMap();
 
 			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation = 0);
 
@@ -250,6 +254,8 @@ namespace NCL {
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
+
+            MiniMap* mMiniMap;
 
 			FlagGameObject* mMainFlag;
 

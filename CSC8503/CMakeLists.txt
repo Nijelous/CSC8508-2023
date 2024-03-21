@@ -24,6 +24,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "MultiplayerStates.h"
         "BaseUI.h"
         "WindowsUI.h"
+        "MiniMap.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -75,6 +76,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
         "MultiplayerStates.cpp"
         "BaseUI.cpp"
         "WindowsUI.cpp"
+        "MiniMap.cpp"
     )
 
 
@@ -263,6 +265,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "SoundManager.h"
         "SoundObject.h"
         "TutorialGame.h"
+        "MiniMap.h"
     )
     source_group("Header Files" FILES ${Header_Files})
 
@@ -314,6 +317,7 @@ if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "Prospero")
         "SoundManager.cpp"
         "SoundObject.cpp"
         "TutorialGame.cpp"
+        "MiniMap.cpp"
     )
 
     source_group("Source Files" FILES ${Source_Files})
