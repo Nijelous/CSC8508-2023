@@ -440,7 +440,7 @@ void SoundManager::UpdateSounds(vector<GameObject*> objects) {
 					PlayLockDoorSound(soundPos);
 					obj->GetSoundObject()->LockDoorFinished();
 				}
-				if (obj->GetName() == "Vent") {
+				else if (obj->GetName() == "Vent") {
 					PlayUnlockVentSound(soundPos);
 					obj->GetSoundObject()->LockDoorFinished();
 				}
