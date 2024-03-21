@@ -132,7 +132,6 @@ Mesh* GameTechAGCRenderer::LoadMesh(const std::string& name) {
 	return m;
 }
 
-
 NCL::PS5::AGCTexture* GameTechAGCRenderer::CreateFrameBufferTextureSlot(const std::string& name) {
 	uint32_t index = textureMap.size();
 	AGCTexture* t = new AGCTexture(allocator);
@@ -156,6 +155,8 @@ Texture* GameTechAGCRenderer::LoadTexture(const std::string& name) {
 
 	bindlessTextures[t->GetAssetID()] = *t->GetAGCPointer();
 
+	mLoadedTextures[name] = t->GetAssetID();
+
 	return t;
 }
 
@@ -169,6 +170,45 @@ MeshAnimation* GameTechAGCRenderer::LoadAnimation(const std::string& name) {
 
 MeshMaterial* GameTechAGCRenderer::LoadMaterial(const std::string& name) {
 	return new MeshMaterial(name);
+}
+
+int GameTechAGCRenderer::LoadTextureGetID(const std::string& name) {
+	if (mLoadedTextures.find(name) != mLoadedTextures.end()) {
+		return mLoadedTextures[name];
+	}
+	Texture* texture = LoadTexture(name);
+	return ((AGCTexture*)texture)->GetAssetID();
+}
+
+std::vector<int> GameTechAGCRenderer::LoadMeshMaterial(Mesh& mesh, MeshMaterial& meshMaterial) {
+	std::vector<int> matTextures = std::vector<int>();
+	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
+		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
+		const string* filename = nullptr;
+		matEntry->GetEntry("Diffuse", &filename);
+		GLuint texID = 0;
+
+		if (filename) {
+			string path = *filename;
+			std::cout << path << std::endl;
+			texID = LoadTextureGetID(path.c_str());
+			std::cout << texID << endl;
+		}
+		matTextures.emplace_back(texID);
+
+		filename = nullptr;
+		matEntry->GetEntry("Normal", &filename);
+		texID = 0;
+
+		if (filename) {
+			string path = *filename;
+			std::cout << path << std::endl;
+			texID = LoadTextureGetID(path.c_str());
+			std::cout << texID << endl;
+		}
+		matTextures.emplace_back(texID);
+	}
+	return matTextures;
 }
 
 void GameTechAGCRenderer::RenderFrame() {
@@ -605,8 +645,13 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 	char* dataPos = currentFrame->data.data;
 	int at = 0;
+	const int MAXTEST = 3000;
 	gameWorld.OperateOnContents(
 		[&](GameObject* o) {
+			//if(at > MAXTEST)
+			//{
+			//	return;
+			//}
 			if (o->IsActive()) {
 				RenderObject* g = o->GetRenderObject();
 				if (g) {
@@ -632,7 +677,8 @@ void GameTechAGCRenderer::UpdateObjectList() {
 
 					if (g->GetMatTextures().size() > 0) {
 						for (size_t x = 0; x < g->GetMatTextures().size(); x++) {
-						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x]->GetAssetID();
+						   state.materialLayerAlbedos[x] = g->GetMatTextures()[x];
+						   state.materialLayerNormals[x] = g->GetMatTextures()[x];
 					   }
 						state.hasMaterials = 1;
 					}
@@ -672,8 +718,10 @@ void GameTechAGCRenderer::UpdateObjectList() {
 						frameJobs.push_back({ g, b->GetAssetID() });
 					}
 
-					currentFrame->data.WriteData<ObjectState>(state);
-					currentFrame->debugLinesOffset += sizeof(ObjectState);
+					if (at < MAXTEST) {
+						currentFrame->data.WriteData<ObjectState>(state);
+						currentFrame->debugLinesOffset += sizeof(ObjectState);
+					}
 					at++;
 				}
 			}

@@ -344,11 +344,13 @@ bool GuardObject::IsHighEnoughLocationSus() {
 }
 
 void GuardObject::SendAnnouncementToPlayer(){
+#ifdef USEGL
 	NetworkPlayer* networkPlayer = static_cast<NetworkPlayer*> (mPlayer);
 	if (typeid(networkPlayer) == typeid(NetworkPlayer*))
 		networkPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, networkPlayer->GetPlayerID());
 	else
 		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
+#endif
 }
 
 void GuardObject::BehaviourTree() {

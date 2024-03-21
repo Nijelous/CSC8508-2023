@@ -5,8 +5,8 @@ struct ObjectState {
 
 		int hasMaterials;
 
-		int materialLayerAlbedos[4];
-		int materialLayerNormals[4];
+		int materialLayerAlbedos[24];
+		int materialLayerNormals[24];
 };
 
 struct Temp {

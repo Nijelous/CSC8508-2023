@@ -13,6 +13,7 @@ MainMenuScene::MainMenuScene() : Scene() {
 	mCurrentOpenPanel = LevelSelection;
 	mMultiplayerLobbyState = Lobby;
 	mIsMultiplayerLobbyOnHost = false;
+#ifdef USEGL
 	ImGuiIO& imguiIO = ImGui::GetIO();
 	mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
 	mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
@@ -21,6 +22,7 @@ MainMenuScene::MainMenuScene() : Scene() {
 	InitPanelDrawFuncMap();
 	Scene::InitCamera();
 	InitIpAddress();
+#endif
 }
 
 MainMenuScene::~MainMenuScene() {
@@ -81,6 +83,7 @@ void MainMenuScene::InitPanelDrawFuncMap() {
 }
 
 void MainMenuScene::DrawLevelSelectionPanel() {
+#ifdef USEGL
 	ImVec2 windowSize = ImGui::GetWindowSize();
 
 	ImGui::PushFont(mButtonFont);
@@ -100,9 +103,11 @@ void MainMenuScene::DrawLevelSelectionPanel() {
 		mCurrentOpenPanel = MultiplayerLobby;
 	}
 	ImGui::PopFont();
+#endif
 }
 
 void MainMenuScene::DrawMultiplayerLobby() {
+#ifdef USEGL
 	ImGui::PushFont(mInputFont);
 	ImVec2 windowSize = ImGui::GetWindowSize();
 	ImGui::SetCursorPos(ImVec2(windowSize.x * .01f, windowSize.y * .01f));
@@ -181,6 +186,7 @@ void MainMenuScene::TranslateIpAddress() {
 		token = strtok_s(NULL, ".", &nextToken);
 		index++;
 	}
+#endif
 }
 
 void MainMenuScene::TranslatePlayerName() {

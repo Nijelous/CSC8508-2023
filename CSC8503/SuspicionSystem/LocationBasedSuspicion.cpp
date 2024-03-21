@@ -160,7 +160,9 @@ void SuspicionSystem::LocationBasedSuspicion::SetMinLocationSusAmount(Vector3 po
 	}
 		
 	mLocationSusAmountMap[nearbyPairedLocation] = std::min(susValue, mLocationSusAmountMap[nearbyPairedLocation]);
+#ifdef USEGL
 	HandleSusChangeNetworking(mLocationSusAmountMap[nearbyPairedLocation], nearbyPairedLocation);
+#endif
 	UpdateVec3LocationSusAmountMap();
 }
 
@@ -230,7 +232,9 @@ void LocationBasedSuspicion::AddNewLocation(CantorPair pairedLocation, float ini
 		return;
 
 	mLocationSusAmountMap[pairedLocation] = initSusAmount;
+#ifdef USEGL
 	HandleSusChangeNetworking(initSusAmount, pairedLocation);
+#endif
 }
 
 bool LocationBasedSuspicion::IsActiveLocationsSusCause(activeLocationSusCause inCause, CantorPair pairedLocation) {
@@ -276,6 +280,7 @@ void LocationBasedSuspicion::HandleSusChangeNetworking(const int& changedValue, 
 		}
 	}
 }
+#endif
 
 void LocationBasedSuspicion::RemoveSusLocation(const Vector3 pos){
 	CantorPair pairedLocation(pos);
@@ -286,4 +291,3 @@ void LocationBasedSuspicion::RemoveSusLocation(const Vector3 pos){
 
 	locationsToClear.push_back(&nearbyPairedLocation);
 }
-#endif

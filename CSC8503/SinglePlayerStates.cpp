@@ -105,7 +105,7 @@ PushdownState::PushdownResult MainMenuPushdownState::OnUpdate(float dt, Pushdown
 	return PushdownResult::NoChange;
 }
 
-void MainMenu::OnAwake() {
+void MainMenuPushdownState::OnAwake() {
 	auto* levelManager = LevelManager::GetLevelManager();
 	levelManager->GetRenderer()->SetIsGameStarted(false);
 	mGameSceneManager->SetMainMenu();

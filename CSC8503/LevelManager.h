@@ -274,6 +274,7 @@ namespace NCL {
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+#ifdef USEGL
 			bool mShowDebug = false;
 			bool mShowVolumes = false;
 
@@ -282,6 +283,7 @@ namespace NCL {
 			HANDLE mSelf;
 			double mUpdateObjectsTime, mRenderTime, mWorldTime, mPhysicsTime, mAnimationTime;
 			float mTakeNextTime = 0;
+#endif
 
 			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
 			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;

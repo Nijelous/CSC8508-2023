@@ -34,8 +34,10 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 
 		playerTransform.SetPosition(newPlayerPos);
 		playerTransform.SetOrientation(teleportOrient);
+#ifdef USEGL
 		this->GetSoundObject()->TriggerSoundEvent();
 		mConnectedVent->GetSoundObject()->TriggerSoundEvent();
+#endif
 		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().SetYaw(mTransform.GetOrientation().ToEuler().y);
 		SetIsOpen(false, true);
 	}

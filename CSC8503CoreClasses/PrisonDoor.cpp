@@ -48,10 +48,12 @@ void PrisonDoor::SetIsOpen(bool toOpen) {
 	const bool isSingleplayer = sceneManager->IsInSingleplayer();
 	if (!isSingleplayer)
 	{
+#ifdef USEGL
 		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 		const bool isServer = networkedGame->GetIsServer();
 		if (isServer)
 			SyncInteractableDoorStatusInMultiplayer(toOpen);
+#endif
 	}
 
 	if (toOpen) {

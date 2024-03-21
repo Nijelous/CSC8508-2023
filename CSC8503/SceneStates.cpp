@@ -30,7 +30,7 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 	MainMenuScene::MainMenuPanels currentMainMenuPanel = mMainMenuScene->GetOpenPanel();
 	MainMenuScene::LevelSelectionPanelStates currentLevelSelectionPanelState = mMainMenuScene->GetLevelSelectionPanelState();
 
-	if (currentLevelSelectionPanelState == MainMenuScene::StartSingleplayer) {
+	if (currentLevelSelectionPanelState == MainMenuScene::StartSingleplayer || SceneManager::GetSceneManager()->GetControllerInterface()->GetSelectPressed()) {
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}

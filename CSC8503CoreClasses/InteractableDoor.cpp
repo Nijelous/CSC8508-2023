@@ -19,14 +19,18 @@ InteractableDoor::InteractableDoor() {
 
 void InteractableDoor::Unlock() {
 	mIsLocked = false;
+#ifdef USEGL
 	this->GetSoundObject()->LockDoorTriggered();
+#endif
 	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(2);
 }
 
 void InteractableDoor::Lock() {
 	mIsLocked = true;
+#ifdef USEGL
 	this->GetSoundObject()->LockDoorTriggered();
+#endif
 	mLockCooldown = initLockCooldown;
 	SetNavMeshFlags(4);
 }

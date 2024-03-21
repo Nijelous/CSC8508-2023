@@ -127,11 +127,11 @@ namespace NCL {
 
 #ifdef USEPROSPERO
 
-			void SetMatTextures(vector<Texture*> matTextures) {
+			void SetMatTextures(vector<int> matTextures) {
 				mMatTextures = matTextures;
 			}
 
-			vector<Texture*>  GetMatTextures() const {
+			vector<int>  GetMatTextures() const {
 				return mMatTextures;
 			}
 

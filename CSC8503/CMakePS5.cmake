@@ -19,8 +19,8 @@ function(Create_PS5_CSC8503_Files)
         "SceneManager.h"
         "SceneStates.h"
         "MainMenuScene.h"
-        "SoundManager.h"
-        "SoundObject.h"
+        #"SoundManager.h"
+        #"SoundObject.h"
         "ControllerInterface.h"
     )
     source_group("Header Files" FILES ${Header_Files})
@@ -70,8 +70,8 @@ function(Create_PS5_CSC8503_Files)
         "SceneManager.cpp"
         "SceneStates.cpp"
         "MainMenuScene.cpp"
-        "SoundManager.cpp"
-        "SoundObject.cpp"
+        #"SoundManager.cpp"
+        #"SoundObject.cpp"
         "GameStart.cpp"
         "ControllerInterface.cpp"
     )

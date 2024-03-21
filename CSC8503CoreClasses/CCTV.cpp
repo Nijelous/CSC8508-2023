@@ -63,11 +63,13 @@ void CCTV::UpdateObject(float dt) {
 		UpdateForPlayerObject(mPlayerObject,dt);
 	}
 	//if Multiplayer
+#ifdef USEGL
 	else{
 		DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 		if(game->GetLocalPlayer() !=nullptr && game->GetLocalPlayer()->GetRenderObject()!=nullptr)
 			UpdateForPlayerObject(game->GetLocalPlayer(), dt);
 	}
+#endif
 }
 
 const bool CCTV::PlayerInRaycast(PlayerObject* mPlayerObject){

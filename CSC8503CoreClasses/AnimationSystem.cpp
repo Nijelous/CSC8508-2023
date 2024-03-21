@@ -80,7 +80,6 @@ void AnimationSystem::UpdateCurrentFrames(float dt) {
 	}
 }
 
-#ifdef USEGL
 void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
 	for (auto& obj : updatableObjects) {
 		if (obj->GetName() == "Guard") {
@@ -95,46 +94,6 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
 		}
 	}
 }
-#endif
-
-#ifdef USEPROSPERO
-void AnimationSystem::PreloadMatTextures(GameTechAGCRenderer& renderer, const Mesh& mesh, const MeshMaterial& meshMaterial, vector<Texture*>& matTextures) {
-	for (int i = 0; i < mesh.GetSubMeshCount(); ++i) {
-		const MeshMaterialEntry* matEntry = meshMaterial.GetMaterialForLayer(i);
-		const string* filename = nullptr;
-		matEntry->GetEntry("Diffuse", &filename);
-		Texture* texID = nullptr;
-
-		if (filename) {
-			string path = *filename;
-			std::cout << path << std::endl;
-			mAnimTexture = renderer.LoadTexture(path.c_str());
-			texID = mAnimTexture;
-			std::cout << texID << endl;
-		}
-		matTextures.emplace_back(texID);
-	}
-}
-
-void AnimationSystem::SetGameObjectLists(vector<GameObject*> UpdatableObjects, vector<Texture*> playerTexture, vector<Texture*>& guardTextures) {
-	for (auto& obj : UpdatableObjects) {
-		if (obj->GetName() == "Guard") {
-			mGuardList.emplace_back((GuardObject*)obj);
-			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
-			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(guardTextures);
-
-		}
-		if (obj->GetName() == "Player") {
-			mPlayerList.emplace_back((PlayerObject*)obj);
-			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
-			mAnimationList.emplace_back(animObj);
-			obj->GetRenderObject()->SetMatTextures(playerTexture);
-
-		}
-	}
-}
-#endif
 
 void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::GameObjectState objState) {
 	gameObject->GetRenderObject()->GetAnimationObject()->ReSetCurrentFrame();

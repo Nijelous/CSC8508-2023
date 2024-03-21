@@ -38,6 +38,8 @@ namespace NCL {
 			Shader*		LoadShader(const std::string& vertex, const std::string& fragment)	override;
 			MeshAnimation* LoadAnimation(const std::string& name) override;
 			MeshMaterial* LoadMaterial(const std::string& name) override;
+			int LoadTextureGetID(const std::string& name);
+			std::vector<int> LoadMeshMaterial(Mesh& mesh, MeshMaterial& meshMaterial);
 			void FillLightUBO() override;
 
 		protected:
@@ -179,6 +181,8 @@ namespace NCL {
 			NCL::PS5::AGCTexture*				mGBuffNormalTex;
 
 			std::vector<SkinningJob> frameJobs;
+
+			std::unordered_map<std::string, int> mLoadedTextures;
 		};
 	}
 }

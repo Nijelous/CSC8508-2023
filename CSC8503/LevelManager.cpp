@@ -1,6 +1,8 @@
 #include "LevelManager.h"
+#ifdef USEGL
 #include "Windows.h"
 #include "Psapi.h"
+#endif
 
 #include "GameWorld.h"
 #include "RecastBuilder.h"
@@ -182,7 +184,6 @@ void LevelManager::ClearLevel() {
 	mUpdatableObjects.clear();
 	mLevelLayout.clear();
 	mRenderer->ClearInstanceObjects();
-#ifdef USEGL
 	mAnimation->Clear();
 	mPlayerInventoryObservers.clear();
 	mPlayerBuffsObservers.clear();
@@ -225,6 +226,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	LoadLights((*mLevelList[levelID]).GetLights(), Vector3(0, 0, 0));
 	LoadCCTVList((*mLevelList[levelID]).GetCCTVTransforms(), Vector3(0, 0, 0));
 	LoadDecorations((*mLevelList[levelID]).GetDecorationMap(), Vector3(0, 0, 0));
+
 	mHelipad = AddHelipadToWorld((*mLevelList[levelID]).GetHelipadPosition());
 	mPrisonDoor = AddPrisonDoorToWorld((*mLevelList[levelID]).GetPrisonDoor(), isMultiplayer);
 	mUpdatableObjects.push_back(mPrisonDoor);
@@ -264,6 +266,14 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	if (!isMultiplayer) {
 		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
 	}
+	Transform offsetKey = Transform();
+	offsetKey.SetOrientation(Quaternion(0, 0.71, 0, 0.71));
+	offsetKey.SetScale(Vector3(-194.3, -2, 26.1));
+	offsetKey.SetPosition(mTempPlayer->GetTransform().GetPosition());
+	mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
+	Vector3 position = mTempPlayer->GetTransform().GetPosition();
+	position.z += 15;
+	mTempPlayer->GetTransform().SetPosition(position);
 #ifdef USEGL
 	else {
 		if (!serverPlayersPtr) {
@@ -271,11 +281,9 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 			serverPlayersPtr = game->GetServerPlayersPtr();
 		}
 	}
-
+#endif
 	LoadGuards((*mLevelList[levelID]).GetGuardCount(), isMultiplayer,seed);
 	LoadCCTVs(seed,isMultiplayer);
-
-#endif
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer, seed);
 	SendWallFloorInstancesToGPU();
@@ -320,8 +328,8 @@ void LevelManager::AddNetworkObject(GameObject& objToAdd) {
 #endif
 }
 
-
 void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
+#ifdef USEGL
 	if (mShowDebug) {
 		mTakeNextTime -= dt;
 		if (mTakeNextTime < 0) {
@@ -330,6 +338,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			return;
 		}
 	}
+#endif
 	if (isPlayingLevel) {
 		mGameState = LevelState;
 		if (mStartTimer > 0) {
@@ -356,6 +365,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 	else
 		mGameState = MenuState;
 
+#ifdef USEGL
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F3)) {
 		mShowDebug = !mShowDebug;
 	}
@@ -365,6 +375,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			mShowVolumes = !mShowVolumes;
 		}
 	}
+#endif
 
 	if (isPaused) {
 		mRenderer->Render();
@@ -379,7 +390,9 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 		}
 
 		if (mUpdatableObjects.size() > 0) {
+#ifdef USEGL
 			mSoundManager->UpdateSounds(mUpdatableObjects);
+#endif
 		}
 		mRenderer->Render();
 		Debug::UpdateRenderables(dt);
@@ -392,6 +405,7 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 }
 
 void NCL::CSC8503::LevelManager::DebugUpdate(float dt, bool isPlayingLevel, bool isPaused) {
+#ifdef USEGL
 	std::chrono::steady_clock::time_point start;
 	std::chrono::steady_clock::time_point end;
 	std::chrono::duration<double, std::milli> timeTaken;
@@ -468,11 +482,9 @@ void NCL::CSC8503::LevelManager::DebugUpdate(float dt, bool isPlayingLevel, bool
 			mPhysicsTime = 0;
 			mAnimationTime = 0;
 		}
-#ifdef USEGL
 		if (mUpdatableObjects.size() > 0) {
 			mSoundManager->UpdateSounds(mUpdatableObjects);
 		}
-#endif
 		start = std::chrono::high_resolution_clock::now();
 		mRenderer->Render();
 		end = std::chrono::high_resolution_clock::now();
@@ -486,6 +498,7 @@ void NCL::CSC8503::LevelManager::DebugUpdate(float dt, bool isPlayingLevel, bool
 			mDtSinceLastFixedUpdate = 0;
 		}
 	}
+#endif
 }
 
 void LevelManager::FixedUpdate(float dt) {
@@ -526,6 +539,12 @@ void LevelManager::InitialiseAssets() {
 			else if (groupType == "msh") {
 #ifdef USEGL
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+#endif
+#ifdef USEPROSPERO
+				for (int i = 0; i < groupDetails.size(); i += 3) {
+					mMeshes[groupDetails[i]] = mRenderer->LoadMesh(groupDetails[i + 1]);
+				}
+#endif
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
@@ -586,6 +605,7 @@ void LevelManager::InitialiseAssets() {
 }
 
 void LevelManager::InitialiseDebug() {
+#ifdef USEGL
 	SYSTEM_INFO sysInfo;
 	FILETIME ftime, fsys, fuser;
 
@@ -605,9 +625,11 @@ void LevelManager::InitialiseDebug() {
 	mWorldTime = 0;
 	mPhysicsTime = 0;
 	mAnimationTime = 0;
+#endif
 }
 
 void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
+#ifdef USEGL
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof(statex);
 	GlobalMemoryStatusEx(&statex);
@@ -658,6 +680,7 @@ void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
 			(*i)->DrawCollisionVolume();
 		}
 	}
+#endif
 }
 
 void LevelManager::LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation) {
@@ -732,7 +755,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
+			//mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {
@@ -963,11 +986,13 @@ float NCL::CSC8503::LevelManager::GetNearestGuardDistance(const Vector3& startPo
 
 float LevelManager::GetNearestGuardToPlayerDistance(const int playerNo) const {
 	Vector3 playerPos;
+#ifdef USEGL
 	if (serverPlayersPtr) {
 		if ((*serverPlayersPtr)[playerNo] == nullptr) return -1;
 		playerPos = (*serverPlayersPtr)[playerNo]->GetTransform().GetPosition();
 	}
 	else
+#endif
 		playerPos = mTempPlayer->GetTransform().GetPosition();
 
 	return GetNearestGuardDistance(playerPos);
@@ -1164,7 +1189,9 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 
 	camera->GenerateViewPyramid();
 	camera->SetInitAngle(transform.GetOrientation().ToEuler().y);
+#ifdef USEGL
 	camera->SetSoundObject(new SoundObject());
+#endif
 
 	if (!isMultiplayerLevel){
 		camera->SetPlayerObjectPtr(mTempPlayer);
@@ -1218,8 +1245,9 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 	newVent->SetRenderObject(new RenderObject(&newVent->GetTransform(), mMeshes["Vent"], mTextures["VentAlbedo"], mTextures["VentNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(size.x, 2) + std::powf(size.y, 2))));
 	newVent->SetPhysicsObject(new PhysicsObject(&newVent->GetTransform(), newVent->GetBoundingVolume(), 1, 1, 5));
+#ifdef USEGL
 	newVent->SetSoundObject(new SoundObject());
-
+#endif
 
 	newVent->GetPhysicsObject()->SetInverseMass(0);
 	newVent->GetPhysicsObject()->InitCubeInertia();
@@ -1311,6 +1339,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
 	std::mt19937 seed,bool isMultiplayerLevel) {
+#ifdef USEGL
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 
 	flag->SetPoints(40);
@@ -1356,7 +1385,7 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	mUpdatableObjects.push_back(flag);
 
 	return flag;
-
+#endif
 }
 
 PickupGameObject* LevelManager::AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer)
@@ -1402,8 +1431,9 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 
 	pointObject->SetRenderObject(new RenderObject(&pointObject->GetTransform(), mMeshes["Coins"], mTextures["CoinsAlbedo"], mTextures["CoinsNormal"], mShaders["Basic"], 1));
 	pointObject->SetPhysicsObject(new PhysicsObject(&pointObject->GetTransform(), pointObject->GetBoundingVolume()));
-
+#ifdef USEGL
 	pointObject->SetSoundObject(new SoundObject());
+#endif
 
 	pointObject->SetCollisionLayer(Collectable);
 
@@ -1420,7 +1450,12 @@ PointGameObject* LevelManager::AddPointObjectToWorld(const Vector3& position, in
 }
 
 PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const std::string& playerName) {
+#ifdef USEGL
 	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName);
+#endif
+#ifdef USEPROSPERO#
+	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, playerName);
+#endif
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 

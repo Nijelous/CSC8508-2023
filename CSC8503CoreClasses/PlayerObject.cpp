@@ -94,13 +94,11 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
 	UISystem* UI,
 	const std::string& objName,
-	PrisonDoor* prisonDoorPtr,
 	int playerID, int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
 	mName = objName;
 	mGameWorld = world;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
 	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
-	mPrisonDoorPtr = prisonDoorPtr;
 	SetUIObject(UI);
 	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
@@ -323,7 +321,6 @@ void PlayerObject::MovePlayer(float dt) {
 bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt){
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->GetInteractPressed()) {
-		isRaycastTriggered = true;
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
 		return true;

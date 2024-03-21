@@ -1,3 +1,5 @@
+#ifdef USEGL
+
 #include "FlagGameObject.h"
 #include "PlayerInventory.h"
 #include "PlayerObject.h"
@@ -125,3 +127,4 @@ void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 		GetFlag(playerNo);
 	}
 }
+#endif
