@@ -1,7 +1,6 @@
 #pragma once
 #include "GameObject.h"
 #include "Vector3.h"
-#include "StateMachine.h"
 #include "PlayerBuffs.h"
 #include "PlayerInventory.h"
 #include "InventoryBuffSystem.h"
@@ -11,6 +10,7 @@ using namespace InventoryBuffSystem;
 
 namespace NCL {
     namespace CSC8503 {
+        class StateMachine;
         class PickupGameObject : public GameObject {
         public:
             PickupGameObject() {};
@@ -28,6 +28,11 @@ namespace NCL {
             void ActivatePickup(int playerNo);
 
             virtual void OnCollisionBegin(GameObject* otherObject) override;
+
+            bool IsBuff() const { return mIsBuff; }
+
+            PlayerInventory::item GetItem() const { return mCurrentItem; }
+            PlayerBuffs::buff GetBuff() const { return mCurrentBuff; }
 
         protected:
             void Activate(float dt); //go over the surface

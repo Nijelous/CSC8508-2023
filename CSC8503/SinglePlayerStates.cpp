@@ -1,5 +1,6 @@
 #include "SinglePlayerStates.h"
 
+#include "LevelManager.h"
 #include "Window.h"
 #include "SceneManager.h"
 

@@ -4,8 +4,7 @@
 #include <queue>
 #include <mutex>
 #include <functional>
-#include "NetworkBase.h"
-#include "GameSceneManager.h"
+#include <random>
 #include "NetworkedGame.h"
 
 
@@ -46,6 +45,7 @@ namespace NCL{
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
         struct AnnouncementSyncPacket;
+        struct GuardSpotSoundPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -87,6 +87,8 @@ namespace NCL{
 
             void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
 
+            void SendGuardSpotSoundPacket(int playerId) const;
+
             void SendPacketsThread();
 
             GameClient* GetClient() const;
@@ -117,7 +119,7 @@ namespace NCL{
 
             void SpawnPlayers();
 
-        	NetworkPlayer* AddPlayerObject(const Vector3& position, int playerNum);
+        	NetworkPlayer* AddPlayerObject(const Maths::Vector3& position, int playerNum);
 
             void HandleFullPacket(FullPacket* fullPacket);
 
@@ -146,6 +148,8 @@ namespace NCL{
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
 
             void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
+
+            void HandleGuardSpotSound(GuardSpotSoundPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);

@@ -1,7 +1,9 @@
+#include "SceneManager.h"
 #ifdef USEGL
 #include "NetworkPlayer.h"
 
 #include "DebugNetworkedGame.h"
+#include "LevelManager.h"
 #include "GameClient.h"
 #include "Interactable.h"
 #include "NetworkedGame.h"
@@ -9,6 +11,8 @@
 #include "PhysicsObject.h"
 #include "InventoryBuffSystem/Item.h"
 #include "SoundManager.h"
+#include "PrisonDoor.h"
+#include "Debug.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -25,7 +29,7 @@ namespace {
 
 	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 20;
 
-	constexpr bool DEBUG_MODE = true;
+	constexpr bool DEBUG_MODE = false;
 }
 
 NetworkPlayer::NetworkPlayer(NetworkedGame* game, int num) : 
@@ -40,6 +44,8 @@ NetworkPlayer::NetworkPlayer(DebugNetworkedGame* game, int num, const std::strin
 	LevelManager::GetLevelManager()->GetUiSystem(), new SoundObject(LevelManager::GetLevelManager()->GetSoundManager()->AddWalkSound()), "") {
 	this->game = game;
 	mPlayerID = num;
+	this->SetName(objName);
+
 }
 
 NetworkPlayer::~NetworkPlayer() {
@@ -82,8 +88,6 @@ void NetworkPlayer::UpdateObject(float dt) {
 		else
 			PlayerObject::RayCastFromPlayerForUI(mGameWorld,dt);
 
-		ResetPlayerInput();
-
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
 
@@ -109,7 +113,7 @@ void NetworkPlayer::UpdateObject(float dt) {
 	if (mIsLocalPlayer){
 		PlayerObject::UpdateGlobalUI(dt);
 		PlayerObject::UpdateLocalUI(dt);
-		if (DEBUG_MODE)
+		if (mIsDebugUIEnabled)
 			PlayerObject::ShowDebugInfo(dt);
 	}
 }
@@ -118,6 +122,8 @@ void NetworkPlayer::MovePlayer(float dt) {
 	bool isServer = game->GetIsServer();
 
 	if (mIsLocalPlayer) {
+
+		ResetPlayerInput();
 		const Vector3 playerPos = mTransform.GetPosition();
 
 		//Debug::Print("Player Position: " + std::to_string(playerPos.x) + ", " + std::to_string(playerPos.y) + ", " + std::to_string(playerPos.z), Vector2(5, 30), Debug::MAGENTA);
@@ -186,6 +192,8 @@ void NetworkPlayer::MovePlayer(float dt) {
 		mPlayerInputs.cameraYaw = game->GetLevelManager()->GetGameWorld()->GetMainCamera().GetYaw();
 	}
 
+	const GameObjectState previousObjectState = mObjectState;
+
 	if (isServer == false && mIsLocalPlayer) {
 		//TODO(eren.degirmenci): is dynamic casting here is bad ?
 		const Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
@@ -194,16 +202,14 @@ void NetworkPlayer::MovePlayer(float dt) {
 		mPlayerInputs.rightAxis = rightAxis;
 		game->GetClient()->WriteAndSendClientInputPacket(game->GetClientLastFullID(), mPlayerInputs);
 	}
-	else {
-		const GameObjectState previousObjectState = mObjectState;
+	else if (isServer) {
 
 		HandleMovement(dt, mPlayerInputs);
 
-		if (previousObjectState != mObjectState)
-			ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
-
 		mIsClientInputReceived = false;
 	}
+
+	ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
 }
 
 void NCL::CSC8503::NetworkPlayer::AddAnnouncement(AnnouncementType announcementType, float time, int playerNo){
@@ -240,10 +246,10 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_LEFT_INDEX])
-		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_BACKWARDS_INDEX])
-		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_RIGHT_INDEX])
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
@@ -255,14 +261,14 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 
 	if (isIdle) {
 		if (mIsCrouched)
-			mObjectState = IdleCrouch;
+			SetObjectState(IdleCrouch);
 		else
-			mObjectState = Idle;
+			SetObjectState(Idle);
 	}
 	else {
 		ActivateSprint(playerInputs.isSprinting);
 		if (mIsCrouched)
-			mObjectState = Crouch;
+			SetObjectState(Crouch);
 	}
 	ToggleCrouch(playerInputs.isCrouching);
 
@@ -281,20 +287,20 @@ bool NCL::CSC8503::NetworkPlayer::GotRaycastInput(NCL::CSC8503::InteractType& in
 	else if (isPlayerHoldingInteract) {
 		//TODO(erendgrmnc): add config or get from entity for long interact duration.
 		mInteractHeldDt += dt;
-		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
+		Debug::Print(to_string(mInteractHeldDt), Vector2(55, 98));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if (DEBUG_MODE)
-				Debug::Print("PickPocket window", Vector2(40, 85));
+			if (mIsDebugUIEnabled)
+				Debug::Print("PickPocket", Vector2(55, 95));
 
 			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::LongUse;
-			if (DEBUG_MODE)
-				Debug::Print("LongUse", Vector2(40, 85));
+			if (mIsDebugUIEnabled)
+				Debug::Print("LongUse", Vector2(55, 95));
 
 			return true;
 		}
@@ -391,6 +397,17 @@ void NetworkPlayer::ControlInventory() {
 		mActiveItemSlot = (mActiveItemSlot > 0)
 		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
+	switch (mActiveItemSlot) {
+	case 0:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.25);
+		break;
+	case 1:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.25);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
+		break;
+	}
+
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
@@ -414,5 +431,8 @@ void NetworkPlayer::ControlInventory() {
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::P) && DEBUG_MODE) {
 		LevelManager::GetLevelManager()->GetPrisonDoor()->SetIsOpen(false);
 	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F6))
+		mIsDebugUIEnabled = !mIsDebugUIEnabled;
 }
 #endif

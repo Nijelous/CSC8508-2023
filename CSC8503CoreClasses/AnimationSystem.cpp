@@ -1,6 +1,7 @@
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
+#include "RenderObject.h"
 
 
 #define SHADERDIR	"../Assets/Shaders/"
@@ -11,7 +12,6 @@
 AnimationSystem::AnimationSystem(GameWorld& g, std::map<std::string, MeshAnimation*>& preAnimationList) : gameWorld(g),
 	mPreAnimationList(preAnimationList)
 {
-	mShader = nullptr;
 	mMesh = nullptr;
 	mAnim = nullptr;
 	InitGuardStateAnimationMap();
@@ -42,7 +42,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> up
 				int currentFrame = animObj->GetCurrentFrame();
 				mMesh = obj->GetRenderObject()->GetMesh();
 				mAnim = animObj->GetAnimation();
-				mShader = obj->GetRenderObject()->GetShader();
 
 				const Matrix4* invBindPose = mMesh->GetInverseBindPose().data();
 				const Matrix4* frameData = mAnim->GetJointData(currentFrame);
@@ -87,7 +86,7 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 		}
-		if (obj->GetName() == "Player") {
+		else if (obj->GetName().find("Player") != std::string::npos) {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
@@ -128,5 +127,7 @@ void AnimationSystem::InitPlayerStateAnimationMap() {
 	{GameObject::GameObjectState::Idle, "PlayerStand"},
 	{GameObject::GameObjectState::Walk, "PlayerWalk"},
 	{GameObject::GameObjectState::Sprint, "PlayerSprint"},
+	{GameObject::GameObjectState::Crouch, "PlayerStand"},
+	{GameObject::GameObjectState::IdleCrouch, "PlayerStand"},
 	};
 }

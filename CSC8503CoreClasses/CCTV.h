@@ -10,7 +10,7 @@ namespace NCL {
 		public:
 			CCTV(const float baseL = 5, GameWorld* world = nullptr, const std::string& name = ""){
 				mBaseL = baseL;
-				mName == "CCTV";
+				mName = "CCTV";
 				mWorld = world;
 				
 			};

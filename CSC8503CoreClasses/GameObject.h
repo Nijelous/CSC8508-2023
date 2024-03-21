@@ -170,6 +170,8 @@ namespace NCL::CSC8503 {
 
 		void DrawCollisionVolume();
 
+		const std::string& GetGameObjectStateStr() const;
+
 	protected:
 		Transform			mTransform;
 

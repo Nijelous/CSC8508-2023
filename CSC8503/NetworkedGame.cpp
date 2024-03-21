@@ -4,6 +4,7 @@
 #include "NetworkObject.h"
 #include "GameServer.h"
 #include "GameClient.h"
+#include "LevelManager.h"
 
 #define COLLISION_MSG 30
 

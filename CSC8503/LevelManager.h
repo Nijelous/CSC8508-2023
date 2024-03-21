@@ -64,6 +64,7 @@ namespace NCL {
 			static LevelManager* GetLevelManager();
 			void ResetLevel();
 			void ClearLevel();
+			void InitialiseGameAssets();
 			GameStates GetGameState() { return mGameState; }
 			std::vector<Level*> GetLevels() { return mLevelList; }
 			std::vector<Room*> GetRooms() { return mRoomList; }
@@ -128,18 +129,21 @@ namespace NCL {
 
 			Texture* GetTexture(std::string name) { return mTextures[name]; }
 
+			vector<int> GetMeshMaterial(std::string name) { return mMeshMaterials[name]; }
+
 			void LoadDoorInNavGrid(float* position, float* halfSize, PolyFlags flag);
 
 			void SetGameState(GameStates state);
 
 			void SetPlayersForGuards() const;
 
+			void InitAnimationSystemObjects() const;
+
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
 			float GetNearestGuardDistance(const Vector3& startPos) const;
 
 			float GetNearestGuardToPlayerDistance(const int playerNo) const;
-
 
 			PrisonDoor* GetPrisonDoor() const;
 
@@ -157,11 +161,15 @@ namespace NCL {
 
 			virtual void InitialiseAssets();
 
+			void CheckRenderLoadScreen(bool& updateScreen, int linesDone, int totalLines);
+
 			void InitialiseDebug();
 
 			void PrintDebug(float dt);
 
 			void InitialiseIcons();
+
+            void InitialiseMiniMap();
 
 			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation = 0);
 
@@ -246,7 +254,9 @@ namespace NCL {
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
-
+#ifdef USEGL
+            MiniMap* mMiniMap;
+#endif
 			FlagGameObject* mMainFlag;
 
 
@@ -276,6 +286,7 @@ namespace NCL {
 			std::thread mNavMeshThread;
 
 			bool mIsLevelInitialised;
+			bool mAreAssetsInitialised = false;
 #ifdef USEGL
 			bool mShowDebug = false;
 			bool mShowVolumes = false;

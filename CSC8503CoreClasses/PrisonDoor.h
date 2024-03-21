@@ -7,6 +7,8 @@ namespace NCL {
 		public:
 			PrisonDoor() {
 				mName = "Prison Door";
+				mTimer = initDoorTimer;
+				mIsOpen = false;
 			}
 
 			virtual void UpdateGlobalSuspicionObserver(SuspicionSystem::SuspicionMetre::SusBreakpoint susBreakpoint) override;

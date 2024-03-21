@@ -1,5 +1,4 @@
 #pragma once
-#ifdef USEGL
 #include "GameObject.h"
 #include "Vector3.h"
 #include "StateMachine.h"
@@ -12,9 +11,7 @@ using namespace SuspicionSystem;
 
 namespace NCL {
     namespace CSC8503 {
-        class FlagGameObject : public Item,
-    	public PlayerBuffsObserver,
-    	public NetworkObject {
+        class FlagGameObject : public Item, public PlayerBuffsObserver{
         public:
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
             ~FlagGameObject();
@@ -42,4 +39,3 @@ namespace NCL {
         };
     }
 }
-#endif

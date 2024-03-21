@@ -85,6 +85,9 @@ namespace NCL::Rendering {
 
 		void SetIsGameStarted(bool isGameStarted);
 
+		Vector2i GetWindowSize() const { return windowSize; }
+
+
 	protected:
 		bool mIsGameStarted = false;
 

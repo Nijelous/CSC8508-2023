@@ -1,5 +1,6 @@
 #pragma once
 #include "GameWorld.h"
+#include "QuadTree.h"
 
 namespace NCL {
 	namespace CSC8503 {

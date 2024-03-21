@@ -2,7 +2,7 @@
 #include <functional>
 #include <map>
 #include "Vector3.h"
-#include "Level.h"
+#include "LevelEnums.h"
 
 using namespace NCL::CSC8503;
 
@@ -91,7 +91,7 @@ namespace InventoryBuffSystem
 		};
 
 		std::vector<item> mItemsInMultiplayerRandomPool = {
-			doorKey, screwdriver
+			doorKey, screwdriver, soundEmitter
 		};
 
 		std::map<const item, const InventoryEvent > mOnItemAddedInventoryEventMap = {
@@ -111,13 +111,13 @@ namespace InventoryBuffSystem
 		};
 
 		std::map<const item, std::string> mItemNameMap = {
-			{ screwdriver, "Screwdriver" },
-			{ disguise, "Disguise" },
-			{ soundEmitter, "Sound Emitter" },
-			{ doorKey, "Door Key" },
-			{ stunItem, "Stun Item"},
-			{ flag, "Heist Item"},
-			{ none, "No Equipped Item" }
+			{ screwdriver,	"Screwdriver" },
+			{ disguise,		"  Disguise " },
+			{ soundEmitter, "  Boom Box " },
+			{ doorKey,		" Door Key  " },
+			{ stunItem,		" Stun Item " },
+			{ flag,			" Heist Item" },
+			{ none,			"  No Item  " }
 		};
 
 		std::map<const item, const int> mItemUsageToRemoveMap = {
@@ -143,7 +143,7 @@ namespace InventoryBuffSystem
 		int mItemUseCount[NCL::CSC8503::MAX_PLAYERS][MAX_INVENTORY_SLOTS];
 		std::list<PlayerInventoryObserver*> mInventoryObserverList;
 		std::map < item ,bool[NCL::CSC8503::MAX_PLAYERS]> PlayerAbleToUseItem;
-		void CreateItemPickup(item inItem, Vector3 Position) {}
+		void CreateItemPickup(item inItem, Maths::Vector3 Position) {}
 
 		void IncreaseUsageCount(const int& playerNo, const int& invSlot) {
 			mItemUseCount[playerNo][invSlot]++;

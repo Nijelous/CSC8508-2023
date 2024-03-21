@@ -2,9 +2,8 @@
 
 using namespace NCL;
 using namespace CSC8503;
-AnimationObject::AnimationObject(AnimationType animationType,MeshAnimation* animation, MeshMaterial* material){
+AnimationObject::AnimationObject(AnimationType animationType,MeshAnimation* animation){
 	this->mAnimation = animation;
-	this->mMaterial = material;
 	this->mAnimationType = animationType;
 
 	mCurrentFrame = 0;

@@ -1,14 +1,11 @@
 #pragma once
 #include "Room.h"
-#include "PrisonDoor.h"
 using namespace NCL::Maths;
 
 namespace NCL {
 	namespace CSC8503 {
-		constexpr int MAX_PLAYERS = 4;
-
 		class Vent;
-
+		class PrisonDoor;
 		class Level {
 		public:
 			Level(std::string levelPath);

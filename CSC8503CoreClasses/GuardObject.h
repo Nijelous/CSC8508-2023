@@ -7,7 +7,7 @@
 #include "BehaviourAction.h"
 #include <string>
 #include "../CSC8503/InventoryBuffSystem/PlayerBuffs.h"
-#include "../Detour/Include/DetourNavMeshQuery.h"
+
 using namespace std;
 using namespace InventoryBuffSystem;
 
@@ -81,6 +81,7 @@ namespace NCL {
             void GuardSpeedMultiplier();
             int AngleValue(float minAng);
             bool IsHighEnoughLocationSus();
+            bool IsPlayerSprintingNearby();
 
             void CheckForDoors(float dt);
             void OpenDoor();
@@ -95,6 +96,7 @@ namespace NCL {
             float mPointTimer;
             float mSmallestDistance;
             Vector3 mSmallestDistanceVector;
+            Vector3* mNearestSprintingPlayerDir;
 
             BehaviourAction* Patrol();
             BehaviourAction* CheckSusLocation();

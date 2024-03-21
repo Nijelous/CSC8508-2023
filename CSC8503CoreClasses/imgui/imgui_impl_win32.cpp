@@ -603,17 +603,6 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     }
     case WM_MOUSELEAVE:
     case WM_NCMOUSELEAVE:
-    {
-        const int area = (msg == WM_MOUSELEAVE) ? 1 : 2;
-        if (bd->MouseTrackedArea == area)
-        {
-            if (bd->MouseHwnd == hwnd)
-                bd->MouseHwnd = nullptr;
-            bd->MouseTrackedArea = 0;
-            io.AddMousePosEvent(-FLT_MAX, -FLT_MAX);
-        }
-        break;
-    }
     case WM_LBUTTONDOWN: case WM_LBUTTONDBLCLK:
     case WM_RBUTTONDOWN: case WM_RBUTTONDBLCLK:
     case WM_MBUTTONDOWN: case WM_MBUTTONDBLCLK:

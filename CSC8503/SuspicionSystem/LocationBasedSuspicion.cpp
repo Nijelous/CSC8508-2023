@@ -1,12 +1,12 @@
 #include "LocationBasedSuspicion.h"
 #include <algorithm>
 #include <limits>
-#include "GameCLient.h"
+#include "GameClient.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
-#include "../CSC8503/LevelManager.h"
 
 using namespace SuspicionSystem;
+using namespace NCL::CSC8503;
 
 void LocationBasedSuspicion::Init(){
 	mLocationSusAmountMap.clear();
@@ -23,6 +23,7 @@ void LocationBasedSuspicion::AddInstantLocalSusCause(instantLocationSusCause inC
 	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
 	{
 		AddNewLocation(pairedLocation, mInstantLocationSusCauseSeverityMap[inCause]);
+		UpdateVec3LocationSusAmountMap();
 		return;
 	}
 
@@ -85,7 +86,7 @@ bool LocationBasedSuspicion::RemoveActiveLocationSusCause(activeLocationSusCause
 }
 
 void LocationBasedSuspicion::Update(float dt){
-	if (mActiveLocationSusCauseMap.empty())
+	if (mActiveLocationSusCauseMap.empty() && mLocationSusAmountMap.empty())
 		return;
 
 	for (auto entry = mActiveLocationSusCauseMap.begin(); entry != mActiveLocationSusCauseMap.end(); ++entry){
@@ -96,9 +97,6 @@ void LocationBasedSuspicion::Update(float dt){
 		for (int i = 0; i < vector.size(); i++){
 			tempSusAmount += activeLocationSusCauseSeverityMap[vector[i]];
 		}
-
-		if (tempSusAmount <= 0)
-			tempSusAmount += activeLocationSusCauseSeverityMap[passiveRecovery];
 
 		if (tempSusAmount != 0){
 			ChangeSusLocationSusAmount(pairedLocation, tempSusAmount * dt);
@@ -114,23 +112,23 @@ void LocationBasedSuspicion::Update(float dt){
 			(std::remove(mActiveLocationSusCauseMap[pairedLocation].begin(),
 				mActiveLocationSusCauseMap[pairedLocation].end(), susCausesToRemoveVector[i]));
 		}
-	
-
-		if (mLocationSusAmountMap[pairedLocation] <= 0 &&
-			mActiveLocationSusCauseMap[pairedLocation].size() <= 1)
-		{
-			locationsToClear.push_back(&pairedLocation);
-		}
-
-		mActiveLocationlSusCausesToRemove[pairedLocation].clear();
 	}
 
-	for (CantorPair* thisLocation : locationsToClear)
-	{
+	for (auto entry = mLocationSusAmountMap.begin(); entry != mLocationSusAmountMap.end(); ++entry) {
+		auto pairedLocation = entry->first;
+		ChangeSusLocationSusAmount(entry->first, activeLocationSusCauseSeverityMap[passiveRecovery] * dt);
+
+		if (mLocationSusAmountMap[pairedLocation] <= 0 ) {
+			locationsToClear.push_back(pairedLocation);
+		}
+	}
+
+	for (CantorPair thisLocation : locationsToClear){
 		mLocationSusAmountMap.erase(*thisLocation);
 		mActiveLocationSusCauseMap[*thisLocation].clear();
 		mActiveLocationSusCauseMap.erase(*thisLocation);
 	}
+
 	locationsToClear.clear();
 	mActiveLocationlSusCausesToRemove.clear();
 	UpdateVec3LocationSusAmountMap();
@@ -167,6 +165,7 @@ void SuspicionSystem::LocationBasedSuspicion::SetMinLocationSusAmount(Vector3 po
 }
 
 void LocationBasedSuspicion::UpdateVec3LocationSusAmountMap(){
+	mVec3LocationSusAmountMap.clear();
 	for (auto it = mLocationSusAmountMap.begin(); it != mLocationSusAmountMap.end(); ++it)
 	{
 		mVec3LocationSusAmountMap[CantorPair::InverseCantorPair(it->first)] = it->second;
@@ -286,8 +285,13 @@ void LocationBasedSuspicion::RemoveSusLocation(const Vector3 pos){
 	CantorPair pairedLocation(pos);
 	CantorPair nearbyPairedLocation;
 
-	if (!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
+	auto it = std::find(locationsToClear.begin(),
+		locationsToClear.end(), pairedLocation);
+
+	if (it == locationsToClear.end()&&
+		!IsNearbySusLocation(pairedLocation, nearbyPairedLocation))
 		return;
 
-	locationsToClear.push_back(&nearbyPairedLocation);
+	locationsToClear.push_back(nearbyPairedLocation);
 }
+
