@@ -103,6 +103,8 @@ const void CCTV::OnPlayerSeen(PlayerObject* mPlayerObject){
 	if (!hadSeenPlayer[playerID])
 		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->AddActiveLocalSusCause(LocalSuspicionMetre::cameraLOS, mPlayerObject->GetPlayerID());
 	hadSeenPlayer[playerID] = true;
+
+	this->GetSoundObject()->TriggerSoundEvent();
 }
 
 const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
@@ -117,6 +119,9 @@ const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
 	}
 		
 	hadSeenPlayer[playerID] = false;
+
+	this->GetSoundObject()->SetNotTriggered();
+
 }
 
 void CCTV::AngleToNormalisedCoords(float angle, float& x, float& y){

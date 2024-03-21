@@ -6,6 +6,7 @@
 #include "Vector3.h"
 #include "map";
 #include "PlayerObject.h"
+#include "SoundObject.h"
 #include "State.h"
 
 using namespace NCL;
@@ -15,6 +16,7 @@ PointGameObject::PointGameObject(int pointsWorth, float initCooldown){
 	mCooldown = 0;
 	mPoints = pointsWorth;
 	mInitCooldown = initCooldown;
+	mName = "PickupGameObject";
 
 	mStateMachine = new StateMachine();
 	State* WaitingState = new State([&](float dt) -> void
@@ -94,6 +96,7 @@ void PointGameObject::OnCollisionBegin(GameObject* otherObject) {
 		mCooldown == 0) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
 		plObj->AddPlayerPoints(mPoints);
+		this->GetSoundObject()->TriggerSoundEvent();
 		mCooldown = INT_MAX;
 	}
 }
