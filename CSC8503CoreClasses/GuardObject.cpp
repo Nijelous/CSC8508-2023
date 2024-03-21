@@ -15,6 +15,7 @@
 #include "../CSC8503/SceneManager.h"
 #include "../CSC8503/NetworkPlayer.h"
 #include "PrisonDoor.h"
+#include "../CSC8503/DebugNetworkedGame.h"
 
 using namespace NCL;
 using namespace CSC8503;
@@ -31,6 +32,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mDoorRaycastInterval = RAYCAST_INTERVAL;
 	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 	mPointTimer = POINTING_TIMER;
+	mNearestSprintingPlayerDir = nullptr;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -46,6 +48,10 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
+	delete mNearestSprintingPlayerDir;
+	delete mSightedDoor;
+	delete mSightedPlayer;
+	delete[] mNextPoly;
 }
 
 void GuardObject::UpdateObject(float dt) {
@@ -97,6 +103,7 @@ void GuardObject::RaycastToPlayer() {
 	else {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
+		delete playerToChase;
 	}
 }
 
@@ -238,17 +245,7 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	dtPolyRef* path = new dtPolyRef[1000];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findPath(*startRef, *endRef, startPos, endPos, filter, path, pathCount, 1000);
 	float* firstPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
-	for (int i = 0; i < *pathCount; i++) {
-		bool* isPosOverPoly = new bool;
-		float* closestPos = new float[3];
-		LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->closestPointOnPoly(path[i], firstPos, closestPos, isPosOverPoly);
-		Debug::DrawLine(Vector3(firstPos[0], firstPos[1], firstPos[2]), Vector3(closestPos[0], closestPos[1], closestPos[2]));
-		firstPos[0] = closestPos[0];
-		firstPos[1] = closestPos[1];
-		firstPos[2] = closestPos[2];
-		delete isPosOverPoly;
-		delete[] closestPos;
-	}
+
 	delete[] startPos;
 	delete[] halfExt;
 	delete filter;
@@ -352,6 +349,20 @@ void GuardObject::SendAnnouncementToPlayer(){
 		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
 }
 
+bool GuardObject::IsPlayerSprintingNearby() {
+	mNearestSprintingPlayerDir = nullptr;
+	for (PlayerObject* player : mPlayerList) {
+		Vector3 playerDir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+		float playerDist = playerDir.LengthSquared();
+		if (player->GetGameOjbectState() == Sprint && playerDist <= MAX_DIST_TO_SUS_LOCATION) {
+			if (mNearestSprintingPlayerDir == nullptr) { mNearestSprintingPlayerDir = new Vector3(playerDir); }
+			else if (playerDist < (*mNearestSprintingPlayerDir).LengthSquared()){ *mNearestSprintingPlayerDir = playerDir; }
+		}
+	}
+	if (mNearestSprintingPlayerDir != nullptr) { return true; }
+	return false;
+}
+
 void GuardObject::BehaviourTree() {
 	BehaviourSelector* FirstSelect = new BehaviourSelector("First Selector");
 	BehaviourSequence* SeenPlayerSequence = new BehaviourSequence("Seen Player Sequence");
@@ -393,28 +404,27 @@ BehaviourAction* GuardObject::Patrol() {
 
 		}
 		else if (state == Ongoing) {
-			if (IsHighEnoughLocationSus() == true) {
-				return Failure;
+			if (IsHighEnoughLocationSus() == true) { return Failure; }
+			else if (IsPlayerSprintingNearby()) { 
+				
+				LookTowardFocalPoint(*mNearestSprintingPlayerDir); 
 			}
 			else if (mCanSeePlayer == false) {
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
-
 				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
-					if (mCurrentNode == mNodes.size() - 1) {
-						mNextNode = 0;
+					if (mCurrentNode == mNodes.size() - 1) { 
+						mNextNode = 0; 
 					}
-					else {
-						mNextNode = mCurrentNode + 1;
+					else { 
+						mNextNode = mCurrentNode + 1; 
 					}
 				}
 			}
-			else if (mCanSeePlayer == true) {
-				return Failure;
-			}
+			else if (mCanSeePlayer == true) { return Failure; }
 		}
 		return state;
 		}
@@ -437,6 +447,7 @@ BehaviourAction* GuardObject::CheckSusLocation() {
 				float* endPos = new float[3] {mSmallestDistanceVector.x, mSmallestDistanceVector.y, mSmallestDistanceVector.z};
 				MoveTowardFocalPoint(endPos);
 				if ((mSmallestDistanceVector - this->GetTransform().GetPosition()).LengthSquared() < MIN_DIST_TO_NEXT_POS) {
+					LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->RemoveSusLocation(mSmallestDistanceVector);
 					mSmallestDistance = MAX_DIST_TO_SUS_LOCATION;
 					return Success;
 				}
@@ -461,10 +472,22 @@ BehaviourAction* GuardObject::PointAtPlayer() {
 				LookTowardFocalPoint(direction);
 				this->GetPhysicsObject()->SetLinearVelocity(Vector3(0, 0, 0));
 				if (mPointTimer <= 0) {
+					if (!SceneManager::GetSceneManager()->IsInSingleplayer()) {
+						DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+						if (mPlayer) {
+							game->SendGuardSpotSoundPacket(mPlayer->GetPlayerID());
+						}
+					}
+					else {
+						if (mPlayer) {
+							mPlayer->GetSoundObject()->TriggerSoundEvent();
+						}
+					}
 					mPointTimer = POINTING_TIMER;
 					return Failure;
 				}
 			}
+			else if (mCanSeePlayer == false) { return Failure; }
 		}
 		return state;
 		}
@@ -490,8 +513,8 @@ BehaviourAction* GuardObject::ChasePlayerSetup() {
 					GrabPlayer();
 					return Success;
 				}
-				else {
-					RunAfterPlayer(direction);
+				else { 
+					RunAfterPlayer(direction); 
 				}
 			}
 			else {

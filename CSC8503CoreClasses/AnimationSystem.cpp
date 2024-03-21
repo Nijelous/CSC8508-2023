@@ -89,7 +89,7 @@ void AnimationSystem::SetGameObjectLists(vector<GameObject*> updatableObjects) {
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
 		}
-		if (obj->GetName() == "Player") {
+		else if (obj->GetName().find("Player") != std::string::npos) {
 			mPlayerList.emplace_back((PlayerObject*)obj);
 			AnimationObject* animObj = obj->GetRenderObject()->GetAnimationObject();
 			mAnimationList.emplace_back(animObj);
@@ -131,5 +131,7 @@ void AnimationSystem::InitPlayerStateAnimationMap() {
 	{GameObject::GameObjectState::Idle, "PlayerStand"},
 	{GameObject::GameObjectState::Walk, "PlayerWalk"},
 	{GameObject::GameObjectState::Sprint, "PlayerSprint"},
+	{GameObject::GameObjectState::Crouch, "PlayerStand"},
+	{GameObject::GameObjectState::IdleCrouch, "PlayerStand"},
 	};
 }

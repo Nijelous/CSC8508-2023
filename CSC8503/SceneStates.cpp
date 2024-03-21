@@ -15,7 +15,10 @@ using namespace NCL::CSC8503;
 
 void MainMenuSceneState::OnAwake() {
 	Window* w = Window::GetWindow();
+
+#ifdef USEGL
 	w->ShowOSPointer(true);
+#endif
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 	sceneManager->SetCurrentScene(Scenes::MainMenu);

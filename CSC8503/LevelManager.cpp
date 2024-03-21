@@ -68,7 +68,6 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
-	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	mDtSinceLastFixedUpdate = 0;
 
 	mActiveLevel = -1;
@@ -276,15 +275,19 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
   
 	LoadItems(itemPositions, roomItemPositions, isMultiplayer, seed);
 	SendWallFloorInstancesToGPU();
-	
-	
-	mAnimation->SetGameObjectLists(mUpdatableObjects);
+
+	if (!isMultiplayer) {
+		mAnimation->SetGameObjectLists(mUpdatableObjects);
+	}
+
 	mRenderer->FillLightUBO();
 	mRenderer->FillTextureDataUBO();
 
 	mTimer = INIT_TIMER_VALUE;
 
 	mIsLevelInitialised = true;
+	mPlayerInventoryObservers.push_back(this);
+	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	for (const auto invObserver : mPlayerInventoryObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
 
@@ -333,9 +336,11 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			if (mStartTimer <= 0) {
 				mNavMeshThread.join();
 			}
-			mRenderer->Render();
-			Debug::UpdateRenderables(dt);
-			return;
+			if (SceneManager::GetSceneManager()->IsInSingleplayer()) {
+				mRenderer->Render();
+				Debug::UpdateRenderables(dt);
+				return;
+			}
 		}
 		else {
 			if ((mUpdatableObjects.size() > 0)) {
@@ -950,6 +955,10 @@ void LevelManager::SetPlayersForGuards() const {
 
 }
 
+void LevelManager::InitAnimationSystemObjects() const {
+	mAnimation->SetGameObjectLists(mUpdatableObjects);
+}
+
 PlayerObject* LevelManager::GetNearestPlayer(const Vector3& startPos) const {
 	NetworkPlayer& firstPlayer = *serverPlayersPtr->at(0);
 	PlayerObject* returnObj = &firstPlayer;
@@ -1066,17 +1075,20 @@ void LevelManager::InitialiseIcons() {
 
 	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
+
+	UISystem::Icon* mNoticeTopRight = mUi->AddIcon(Vector2(52, 43), 8, 6, mTextures["HoldE"], 0.0);
+	mUi->SetEquippedItemIcon(NOTICETOPRIGHT, *mNoticeTopRight);
   
 	mRenderer->SetUIObject(mUi);
 
 	mItemTextureMap = {
 		{PlayerInventory::item::none, mTextures["InventorySlot"]},
-		{PlayerInventory::item::disguise, mTextures["Stun"]},
-		{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
+		{PlayerInventory::item::disguise, mTextures["Disguise"]},
+		{PlayerInventory::item::soundEmitter,  mTextures["BoomBox"]},
 		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
 		{PlayerInventory::item::stunItem, mTextures["Stun"]},
-		{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
 
@@ -1212,7 +1224,7 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 
 	camera->GenerateViewPyramid();
 	camera->SetInitAngle(transform.GetOrientation().ToEuler().y);
-	camera->SetSoundObject(new SoundObject());
+	camera->SetSoundObject(new SoundObject(mSoundManager->AddCCTVSpotSound()));
 
 	if (!isMultiplayerLevel){
 		camera->SetPlayerObjectPtr(mTempPlayer);
@@ -1278,6 +1290,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 		AddNetworkObject(*newVent);
 	}
 
+	mUpdatableObjects.push_back(newVent);
 	mWorld->AddGameObject(newVent);
 
 	return newVent;
@@ -1342,8 +1355,6 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 	newDoor->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
-
-	newDoor->Open();
 
 	if (isMultiplayerLevel) {
 		AddNetworkObject(*newDoor);
@@ -1480,17 +1491,20 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Vector3& position) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0,2.f,0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
-
 	playerObject.GetTransform()
 		.SetScale(Vector3(PLAYER_MESH_SIZE, PLAYER_MESH_SIZE, PLAYER_MESH_SIZE))
 		.SetPosition(position);
 
-	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Farmer"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Basic"],
+	playerObject.SetRenderObject(new RenderObject(&playerObject.GetTransform(), mMeshes["Guard"], mTextures["FleshyAlbedo"], mTextures["FleshyNormal"], mShaders["Animation"],
 		PLAYER_MESH_SIZE));
+	playerObject.GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::playerAnimation, mAnimations["GuardStand"], mMaterials["Guard"]));
+	playerObject.GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+
 	playerObject.SetPhysicsObject(new PhysicsObject(&playerObject.GetTransform(), playerObject.GetBoundingVolume(), 1, 1, 5));
+
 	playerObject.SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	playerObject.GetPhysicsObject()->SetInverseMass(PLAYER_INVERSE_MASS);
@@ -1500,7 +1514,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0, 2.f, 0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
 
@@ -1665,8 +1679,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Sphere"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
-		0.75f));
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 1));
+
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);

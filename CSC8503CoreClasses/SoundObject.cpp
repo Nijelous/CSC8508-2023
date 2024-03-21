@@ -10,7 +10,6 @@ SoundObject::SoundObject(Channel* channel) {
 	mIsTriggered = false;
 	mIsClosed = false;
 	mIsLocked = false;
-	mChannels.emplace_back(channel);
 }
 SoundObject::SoundObject() {
 	mIsTriggered = false;
@@ -19,15 +18,7 @@ SoundObject::SoundObject() {
 }
 
 SoundObject::~SoundObject() {
-	mChannels.clear();
-}
 
-void SoundObject::AddChannel(Channel* channel) {
-	mChannels.emplace_back(channel);
-}
-
-std::vector<Channel*> SoundObject::GetChannels() {
-	return mChannels;
 }
 
 Channel* SoundObject::GetChannel() {

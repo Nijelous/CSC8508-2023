@@ -142,6 +142,7 @@ namespace NCL {
 			float mTransparencyBot = 0.0;
 			float mTransparencyBotLeft = 0.0;
 			float mTransparencyBotRight = 0.0;
+			float mTransparencyTopRight = 0.0;
 
 
 			std::map<std::string , float> mAnnouncementMap;

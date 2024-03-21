@@ -1,4 +1,5 @@
 #include "GameObject.h"
+#include "GameObject.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -10,6 +11,20 @@
 
 
 using namespace NCL::CSC8503;
+
+namespace {
+	std::map<GameObject::GameObjectState, std::string> objectStateStrMap = {
+		{GameObject::GameObjectState::Idle, "Idle"},
+		{GameObject::GameObjectState::Walk, "Walk"},
+		{GameObject::GameObjectState::Crouch, "Crouch"},
+		{GameObject::GameObjectState::Sprint, "Sprint"},
+		{GameObject::GameObjectState::Happy, "Happy"},
+		{GameObject::GameObjectState::IdleCrouch, "IdleCrouch"},
+		{GameObject::GameObjectState::Point, "Point"},
+		{GameObject::GameObjectState::Default, "Default"},
+	};
+	
+}
 
 GameObject::GameObject(CollisionLayer collisionLayer, const std::string& objectName)	{
 
@@ -135,4 +150,8 @@ void GameObject::DrawCollisionVolume() {
 	}
 		break;
 	}
+}
+
+const std::string& GameObject::GetGameObjectStateStr() const {
+	return objectStateStrMap[mObjectState];
 }

@@ -111,13 +111,13 @@ namespace InventoryBuffSystem
 		};
 
 		std::map<const item, std::string> mItemNameMap = {
-			{ screwdriver, "Screwdriver" },
-			{ disguise, "Disguise" },
-			{ soundEmitter, "Sound Emitter" },
-			{ doorKey, "Door Key" },
-			{ stunItem, "Stun Item"},
-			{ flag, "Heist Item"},
-			{ none, "No Equipped Item" }
+			{ screwdriver,	"Screwdriver" },
+			{ disguise,		"  Disguise " },
+			{ soundEmitter, "  Boom Box " },
+			{ doorKey,		" Door Key  " },
+			{ stunItem,		" Stun Item " },
+			{ flag,			" Heist Item" },
+			{ none,			"  No Item  " }
 		};
 
 		std::map<const item, const int> mItemUsageToRemoveMap = {
