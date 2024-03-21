@@ -1072,7 +1072,7 @@ void LevelManager::InitialiseIcons() {
 		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
 		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
 		{PlayerInventory::item::stunItem, mTextures["Stun"]},
-		{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
 
