@@ -193,7 +193,7 @@ FMOD::Channel* SoundManager::AddSoundEmitterSound(Vector3 soundPos) {
 
 FMOD::Channel* SoundManager::AddCCTVSpotSound() {
 	FMOD::Channel* CCTVSpotChannel = nullptr;
-	mResult = mSystem->playSound(mCCTVSpotSound, 0, false, &CCTVSpotChannel);
+	mResult = mSystem->playSound(mCCTVSpotSound, 0, true, &CCTVSpotChannel);
 	if (mResult != FMOD_OK) {
 		std::cout << "Play CCTV Spot sound error" << std::endl;
 		return nullptr;
