@@ -331,9 +331,6 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			if (mStartTimer <= 0) {
 				mNavMeshThread.join();
 			}
-			mRenderer->Render();
-			Debug::UpdateRenderables(dt);
-			return;
 		}
 		else {
 			if ((mUpdatableObjects.size() > 0)) {
