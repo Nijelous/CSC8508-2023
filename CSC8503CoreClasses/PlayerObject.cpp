@@ -630,8 +630,10 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyTop);
 		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	}
-	//Use ScrewDriver
+  
+	//Unlock Door
 	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::doorKey)) {
+
 		auto* doorHit = (Door*)objectHit;
 		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyBot);
@@ -646,7 +648,24 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyBot);
 		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 	}
-	//Unlock Door
+
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
+			ChangeTransparency(true, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyTopRight);
+		mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+	}
+
+	//Use ScrewDriver
 	if ((objectHit->GetName() == "Vent") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::screwdriver)) {
 		auto* ventHit = (Vent*)objectHit;
 		if (!ventHit->IsOpen()) {
@@ -842,6 +861,7 @@ void PlayerObject::UpdateLocalUI(float dt) {
 	}
 	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
+	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
 	Debug::Print("Sus lvl:", Vector2(80, 95));
 	Debug::Print(std::to_string((int)mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)), Vector2(95, 95));
 
