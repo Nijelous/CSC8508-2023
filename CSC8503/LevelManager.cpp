@@ -139,7 +139,7 @@ LevelManager::~LevelManager() {
 	delete mSuspicionSystemClassPtr;
 
 	delete mSoundManager;
-
+	delete mMiniMap;
 }
 
 void LevelManager::ClearLevel() {
