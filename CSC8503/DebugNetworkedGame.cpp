@@ -416,8 +416,9 @@ void DebugNetworkedGame::SendGuardSpotSoundPacket(int playerId) const {
 
 void DebugNetworkedGame::SendPacketsThread() {
 	while (mThisServer) {
+		std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 		if (mPacketToSendQueue.size() > 1 && !mPacketToSendQueue.empty()) {
-			std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
+			
 			GamePacket* packet = mPacketToSendQueue.front();
 			if (packet) {
 				mThisServer->SendGlobalPacket(*packet);
@@ -497,6 +498,7 @@ void DebugNetworkedGame::BroadcastSnapshot(bool deltaFrame) {
 		GamePacket* newPacket = nullptr;
 		if (o->WritePacket(&newPacket, deltaFrame, mServerSideLastFullID)) {
 			if (newPacket != nullptr) {
+				std::lock_guard<std::mutex> lock(mPacketToSendQueueMutex);
 				mPacketToSendQueue.push(newPacket);
 			}
 		}
