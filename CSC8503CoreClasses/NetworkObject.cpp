@@ -53,7 +53,7 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	
 	this->playerInputs.movementButtons[0] = playerInputs.movementButtons[0];
 	this->playerInputs.movementButtons[1] = playerInputs.movementButtons[1];
-	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[3];
+	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[2];
 	this->playerInputs.movementButtons[3] = playerInputs.movementButtons[3];
 
 	this->playerInputs.fwdAxis.x = playerInputs.fwdAxis.x;
@@ -188,7 +188,13 @@ AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int play
 	this->playerNo = playerNo;
 }
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
+GuardSpotSoundPacket::GuardSpotSoundPacket(const int playerId) {
+	type = BasicNetworkMessages::GuardSpotSound;
+	size = sizeof(GuardSpotSoundPacket);
+	this->playerId = playerId;
+}
+
+NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
 	deltaErrors = 0;
 	fullErrors = 0;
 	networkID = id;
