@@ -149,12 +149,7 @@ void PlayerObject::ShowDebugInfo(float dt) {
 		Debug::Print("Stunned", Vector2(45, 80));
 		break;
 	}
-	const PlayerInventory::item equippedItem = GetEquippedItem();
-	//Handle Equipped Item Log
-	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-	Debug::Print(itemName, Vector2(10, 80));
-	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-	Debug::Print(usesLeft, Vector2(10, 85));
+
 }
 
 void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState, const GameObjectState& currentState) {
@@ -400,8 +395,6 @@ void PlayerObject::ControlInventory() {
 	}
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
 		mActiveItemSlot = 1;
-		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.5);
-		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
 	}
 	if (Window::GetMouse()->GetWheelMovement() > 0) {
 		mActiveItemSlot = (mActiveItemSlot + 1 < InventoryBuffSystem::MAX_INVENTORY_SLOTS)
@@ -411,6 +404,18 @@ void PlayerObject::ControlInventory() {
 		mActiveItemSlot = (mActiveItemSlot > 0)
 			? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 	}
+
+	switch (mActiveItemSlot) {
+	case 0:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.25);
+		break;
+	case 1:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.25);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
+		break;
+	}
+
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
@@ -424,38 +429,12 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 
+	const InventoryBuffSystem::PlayerInventory::item item = GetEquippedItem();
+	const int usesLeft = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot);
 
-	//Handle Equipped Item Log
-	const std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
-
-	Debug::Print(itemName, Vector2(10, 80));
-	const std::string& usesLeft = "UsesLeft : " + to_string(mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot));
-	Debug::Print(usesLeft, Vector2(10, 85));
-
-	if (mActiveItemSlot == FIRST_ITEM_SLOT) {
-		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
-		}
-		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
-		}
-		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[FIRST_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
-		}
+	if (item == InventoryBuffSystem::PlayerInventory::doorKey) {
+		mUi->GetIcons()[mActiveItemSlot]->mTexture = mUi->GetKeyTexVec()[usesLeft-1];
 	}
-
-	if (mActiveItemSlot == SECOND_ITEM_SLOT) {
-		if (usesLeft == "UsesLeft : 1" && itemName == "Door Key") {
-			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[0];
-		}
-		if (usesLeft == "UsesLeft : 2" && itemName == "Door Key") {
-			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[1];
-		}
-		if (usesLeft == "UsesLeft : 3" && itemName == "Door Key") {
-			mUi->GetIcons()[SECOND_ITEM_SLOT]->mTexture = mUi->GetKeyTexVec()[2];
-		}
-	}
-
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
@@ -474,6 +453,15 @@ void PlayerObject::ControlInventory() {
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(PlayerBuffs::speed, mPlayerID);
 	}
 
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM9) &&
+		DEBUG_MODE) {
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion()->SetMinLocationSusAmount(GetTransform().GetPosition(),20);
+	}
+
+	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM0) &&
+		DEBUG_MODE) {
+		mSuspicionSystemClassPtr->GetLocationBasedSuspicion()->RemoveSusLocation(GetTransform().GetPosition());
+	}
 }
 
 void PlayerObject::ToggleCrouch(bool crouchToggled) {
@@ -866,6 +854,17 @@ void PlayerObject::UpdateLocalUI(float dt) {
 	if (globalSusValue < 33 && mUi->GetIcons()[ALARM]->mTransparency>0) {
 		mUi->GetIcons()[ALARM]->mTransparency = mUi->GetIcons()[ALARM]->mTransparency - dt;
 		mAlarmTime = 0;
+	}
+	//Handle Equipped Item Log
+	const PlayerInventory::item equippedItem = GetEquippedItem();
+	std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
+
+	Debug::Print(itemName, Vector2(40, 85));
+	const int usesLeft = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot);
+
+	if(usesLeft>1){
+		const std::string& usesLeftStr = "UsesLeft : " + to_string(usesLeft);
+		Debug::Print(usesLeftStr, Vector2(39, 90));
 	}
 
 	Debug::Print(" Alert lvl:", Vector2(74, 98));

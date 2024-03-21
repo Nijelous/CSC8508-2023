@@ -394,6 +394,17 @@ void NetworkPlayer::ControlInventory() {
 		mActiveItemSlot = (mActiveItemSlot > 0)
 		? mActiveItemSlot - 1 : InventoryBuffSystem::MAX_INVENTORY_SLOTS - 1;
 
+	switch (mActiveItemSlot) {
+	case 0:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.25);
+		break;
+	case 1:
+		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 0.25);
+		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 1.0);
+		break;
+	}
+
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
 	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
