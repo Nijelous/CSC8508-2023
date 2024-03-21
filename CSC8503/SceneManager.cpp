@@ -22,12 +22,11 @@ SceneManager::~SceneManager() {
 }
 
 void SceneManager::InitScenes() {
-	GameSceneManager* singlePlayerScene = new GameSceneManager();
 	MainMenuScene* mainMenuScene = new MainMenuScene();
+	GameSceneManager* singlePlayerScene = new GameSceneManager();
 #ifdef USEGL
 	DebugNetworkedGame* multiplayerScene = new DebugNetworkedGame();
 #endif
-
 	mCurrentSceneType = Scenes::MainMenu;
 
 	gameScenesMap =
@@ -38,6 +37,7 @@ void SceneManager::InitScenes() {
 #endif
 		{Scenes::MainMenu, (Scene*)mainMenuScene}
 	};
+	LevelManager::GetLevelManager()->InitialiseGameAssets();
 }
 
 void SceneManager::InitPushdownMachine() {
