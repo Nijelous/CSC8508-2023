@@ -625,16 +625,16 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	switch (playerNum)
 	{
 	case 0:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Red"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Red"));
 		break;
 	case 1:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Blue"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Blue"));
 		break;
 	case 2:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Yellow"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Yellow"));
 		break;
 	case 3:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Green"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Green"));
 		break;
 	default:
 		break;
