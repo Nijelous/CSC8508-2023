@@ -32,7 +32,9 @@
 #include "UISystem.h"
 #include "Assets.h"
 #include "Debug.h"
+#ifdef USEGL
 #include "MiniMap.h"
+#endif
 #include <filesystem>
 #include <fstream>
 
@@ -144,7 +146,9 @@ LevelManager::~LevelManager() {
 	delete mSuspicionSystemClassPtr;
 
 	delete mSoundManager;
+#ifdef USEGL
 	delete mMiniMap;
+#endif
 }
 
 void LevelManager::ClearLevel() {
@@ -1095,8 +1099,11 @@ void LevelManager::InitialiseIcons() {
 		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
+
 void LevelManager::InitialiseMiniMap() {
+#ifdef USEGL
     mMiniMap = new MiniMap(mRenderer);
+#endif
 }
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
@@ -1488,7 +1495,9 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
 
+#ifdef USEGL
     mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMiniMap);
+#endif
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);
