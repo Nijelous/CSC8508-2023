@@ -62,7 +62,6 @@ namespace NCL{
 			FMOD::Sound* mSpottedSound = nullptr;
 			FMOD::Sound* mUnlockVentSound = nullptr;
 			FMOD::Sound* mCCTVSpotSound = nullptr;
-			FMOD::Channel* mCCTVChannel = nullptr;
 			FMOD_RESULT mResult;
 		};
 	}

@@ -1139,7 +1139,6 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 	camera->SetRenderObject(new RenderObject(&camera->GetTransform(), mMeshes["CCTV"], mTextures["FloorAlbedo"], mTextures["FloorNormal"], mShaders["Basic"],
 		std::sqrt(std::pow(wallSize.x, 2) + std::powf(wallSize.z, 2))));
 	camera->SetPhysicsObject(new PhysicsObject(&camera->GetTransform(), camera->GetBoundingVolume()));
-	//camera->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 
 	camera->GetPhysicsObject()->SetInverseMass(0);
 	camera->GetPhysicsObject()->InitCubeInertia();
@@ -1148,7 +1147,7 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 
 	camera->GenerateViewPyramid();
 	camera->SetInitAngle(transform.GetOrientation().ToEuler().y);
-	camera->SetSoundObject(new SoundObject());
+	camera->SetSoundObject(new SoundObject(mSoundManager->AddCCTVSpotSound()));
 
 	if (!isMultiplayerLevel){
 		camera->SetPlayerObjectPtr(mTempPlayer);
