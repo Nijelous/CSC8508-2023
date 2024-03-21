@@ -104,7 +104,7 @@ SoundManager::SoundManager(GameWorld* GameWorld) {
 		return;
 	}
 
-	mResult = mSoundEmitterSound->set3DMinMaxDistance(12.0f, 800.0f);
+	mResult = mSoundEmitterSound->set3DMinMaxDistance(12.0f, 650.0f);
 	if (mResult != FMOD_OK) {
 		std::cout << "Sound Emitter Sound Attenuation Setting error" << std::endl;
 		return;
