@@ -4,6 +4,7 @@
 
 #include "Debug.h"
 #include "Keyboard.h"
+#include "SceneManager.h"
 #include "Window.h"
 #include "imgui/imgui_internal.h"
 
@@ -98,6 +99,11 @@ void MainMenuScene::DrawLevelSelectionPanel() {
 	ImGui::SetCursorPos(ImVec2(windowSize.x * .35f, windowSize.y * .65f));
 	if (ImGui::Button("Multi-player", ImVec2(windowSize.x * .3f, windowSize.y * .1f))) {
 		mCurrentOpenPanel = MultiplayerLobby;
+	}
+
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .35f, windowSize.y * .75f));
+	if (ImGui::Button("Exit", ImVec2(windowSize.x * .3f, windowSize.y * .1f))) {
+		SceneManager::GetSceneManager()->SetIsForceQuit(true);
 	}
 	ImGui::PopFont();
 }
