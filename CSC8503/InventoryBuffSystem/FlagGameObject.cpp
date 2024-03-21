@@ -13,7 +13,7 @@ using namespace CSC8503;
 
 FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
-	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr), NetworkObject(this->GetGameObject(), 0) {
+	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr){
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;

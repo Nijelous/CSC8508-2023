@@ -40,20 +40,6 @@ using namespace NCL::CSC8503;
 LevelManager* LevelManager::instance = nullptr;
 
 LevelManager::LevelManager() {
-	mRoomList = std::vector<Room*>();
-	std::thread loadRooms([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
-			Room* newRoom = new Room(entry.path().string());
-			mRoomList.push_back(newRoom);
-		}
-		});
-	mLevelList = std::vector<Level*>();
-	std::thread loadLevels([this] {
-		for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
-			Level* newLevel = new Level(entry.path().string());
-			mLevelList.push_back(newLevel);
-		}
-		});
 	mWorld = new GameWorld();
 	std::thread loadSoundManager([this] {mSoundManager = new SoundManager(mWorld); });
 #ifdef USEGL
@@ -63,10 +49,10 @@ LevelManager::LevelManager() {
 	mRenderer = new GameTechAGCRenderer();
 #endif
 	mUi = new UISystem();
-	InitialiseAssets();
+
 #ifdef USEGL // remove after implemented
 	mAnimation = new AnimationSystem(*mWorld, mPreAnimationList);
-#endif
+#endif	
 	mBuilder = new RecastBuilder();
 	mPhysics = new PhysicsSystem(*mWorld);
 	mPhysics->UseGravity(true);
@@ -78,7 +64,6 @@ LevelManager::LevelManager() {
 	mInventoryBuffSystemClassPtr = new InventoryBuffSystemClass();
 	mPlayerInventoryObservers.push_back(this);
 	mSuspicionSystemClassPtr = new SuspicionSystemClass(mInventoryBuffSystemClassPtr);
-	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	mDtSinceLastFixedUpdate = 0;
 
 	mActiveLevel = -1;
@@ -88,20 +73,7 @@ LevelManager::LevelManager() {
 	mNetworkIdBuffer = NETWORK_ID_BUFFER_START;
 
 	mIsLevelInitialised = false;
-
-	InitialiseIcons();
-	InitialiseDebug();
-	mItemTextureMap = {
-	{PlayerInventory::item::none, mTextures["InventorySlot"]},
-	{PlayerInventory::item::disguise, mTextures["Stun"]},
-	{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
-	{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
-	{PlayerInventory::item::flag , mTextures["FlagIcon"]},
-    {PlayerInventory::item::stunItem, mTextures["Stun"]},
-    {PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
-	};
-	loadRooms.join();
-	loadLevels.join();
+  
 	loadSoundManager.join();
 
     InitialiseMiniMap();
@@ -191,6 +163,31 @@ void LevelManager::ClearLevel() {
 	mCCTVTransformList.clear();
 
 	ResetEquippedIconTexture();
+}
+
+void LevelManager::InitialiseGameAssets() {
+	if (!mAreAssetsInitialised) {
+		mRoomList = std::vector<Room*>();
+		std::thread loadRooms([this] {
+			for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Rooms")) {
+				Room* newRoom = new Room(entry.path().string());
+				mRoomList.push_back(newRoom);
+			}
+			});
+		mLevelList = std::vector<Level*>();
+		std::thread loadLevels([this] {
+			for (const filesystem::directory_entry& entry : std::filesystem::directory_iterator(Assets::LEVELDIR + "Levels")) {
+				Level* newLevel = new Level(entry.path().string());
+				mLevelList.push_back(newLevel);
+			}
+			});
+		InitialiseAssets();
+		InitialiseIcons();
+		InitialiseDebug();
+		loadRooms.join();
+		loadLevels.join();
+		mAreAssetsInitialised = true;
+	}
 }
 
 LevelManager* LevelManager::GetLevelManager() {
@@ -285,6 +282,8 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 	mTimer = INIT_TIMER_VALUE;
 
 	mIsLevelInitialised = true;
+	mPlayerInventoryObservers.push_back(this);
+	mPlayerBuffsObservers.push_back(mSuspicionSystemClassPtr->GetLocalSuspicionMetre());
 	for (const auto invObserver : mPlayerInventoryObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(invObserver);
 
@@ -332,6 +331,11 @@ void LevelManager::Update(float dt, bool isPlayingLevel, bool isPaused) {
 			Debug::Print(to_string((int)mStartTimer + 1), Vector2(50, 50), Vector4(1, 1, 1, 1), 40.0f);
 			if (mStartTimer <= 0) {
 				mNavMeshThread.join();
+			}
+			if (SceneManager::GetSceneManager()->IsInSingleplayer()) {
+				mRenderer->Render();
+				Debug::UpdateRenderables(dt);
+				return;
 			}
 		}
 		else {
@@ -492,7 +496,33 @@ void LevelManager::InitialiseAssets() {
 	std::string groupType = "";
 	std::thread animLoadThread;
 	std::thread matLoadThread;
+	int fileSize = 0;
 	while (getline(assetsFile, line)) {
+		fileSize++;
+		if (line.substr(0, line.find(",")) == "mat") fileSize++;
+	}
+	assetsFile.clear();
+	assetsFile.seekg(std::ifstream::beg);
+	bool updateScreen = true;
+	bool meshesLoaded = false;
+	int meshCount = 0;
+	bool loaded = false;
+	int lines = 0;
+	int animLines = 0;
+	int matLines = 0;
+	std::thread renderFlip([&updateScreen, &loaded, &meshesLoaded, &meshCount, &lines] {
+		int added = 0;
+		while (!loaded) {
+			updateScreen = true;
+			std::this_thread::sleep_for(16.7ms);
+			if (meshesLoaded && added != meshCount) {
+				added++;
+				lines++;
+			}
+		}
+		});
+	while (getline(assetsFile, line)) {
+		CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 		for (int i = 0; i < 3; i++) {
 			assetDetails[i] = line.substr(0, line.find(","));
 			line.erase(0, assetDetails[i].length() + 1);
@@ -502,31 +532,39 @@ void LevelManager::InitialiseAssets() {
 		if (groupType != assetDetails[0]) {
 			if (groupType == "anim") {
 #ifdef USEGL // remove after implemented
-				animLoadThread = std::thread([this, groupDetails] {
+				animLoadThread = std::thread([this, groupDetails, &animLines] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mAnimations[groupDetails[i]] = mRenderer->LoadAnimation(groupDetails[i + 1]);
+						animLines++;
 					}
 					});
 #endif
 			}
 			else if (groupType == "mat") {
-				matLoadThread = std::thread([this, groupDetails] {
+				matLoadThread = std::thread([this, groupDetails, &matLines] {
 					for (int i = 0; i < groupDetails.size(); i += 3) {
 						mMaterials[groupDetails[i]] = mRenderer->LoadMaterial(groupDetails[i + 1]);
+						matLines++;
 					}
 					});
 			}
 			else if (groupType == "msh") {
 				mRenderer->LoadMeshes(mMeshes, groupDetails);
+				meshCount = groupDetails.size() / 3;
+				meshesLoaded = true;
 			}
 			else if (groupType == "tex") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
+					CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 					mTextures[groupDetails[i]] = mRenderer->LoadTexture(groupDetails[i + 1]);
+					lines++;
 				}
 			}
 			else if (groupType == "sdr") {
 				for (int i = 0; i < groupDetails.size(); i += 3) {
+					CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 					mShaders[groupDetails[i]] = mRenderer->LoadShader(groupDetails[i + 1], groupDetails[i + 2]);
+					lines++;
 				}
 			}
 			groupType = assetDetails[0];
@@ -568,12 +606,27 @@ void LevelManager::InitialiseAssets() {
 
 	matLoadThread.join();
 	for (auto const& [key, val] : mMaterials) {
+		CheckRenderLoadScreen(updateScreen, lines + animLines + matLines, fileSize);
 		if (key.substr(0, 5) == "Guard") {
 			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes["Guard"], *val);
 		}
 		else {
 			mMeshMaterials[key] = mRenderer->LoadMeshMaterial(*mMeshes[key], *val);
 		}
+		lines++;
+	}
+	loaded = true;
+	renderFlip.join();
+	CheckRenderLoadScreen(updateScreen, 100, 100);
+}
+
+void LevelManager::CheckRenderLoadScreen(bool& updateScreen, int linesDone, int totalLines) {
+	if (updateScreen) {
+		updateScreen = false;
+		float percent = linesDone / (float)totalLines;
+		Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
+		mRenderer->Render();
+		Debug::UpdateRenderables(0);
 	}
 }
 
@@ -599,7 +652,7 @@ void LevelManager::InitialiseDebug() {
 	mAnimationTime = 0;
 }
 
-void NCL::CSC8503::LevelManager::PrintDebug(float dt) {
+void LevelManager::PrintDebug(float dt) {
 	MEMORYSTATUSEX statex;
 	statex.dwLength = sizeof(statex);
 	GlobalMemoryStatusEx(&statex);
@@ -1008,14 +1061,24 @@ void LevelManager::InitialiseIcons() {
 
 	UISystem::Icon* mNoticeBot = mUi->AddIcon(Vector2(45, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOT, *mNoticeBot);
-
+  
 	UISystem::Icon* mNoticeBotLeft = mUi->AddIcon(Vector2(39, 58), 8, 6, mTextures["UseScrewDriver"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOTLEFT, *mNoticeBotLeft);
 
 	UISystem::Icon* mNoticeBotRight = mUi->AddIcon(Vector2(52, 58), 8, 6, mTextures["UnLockDoor"], 0.0);
 	mUi->SetEquippedItemIcon(NOTICEBOTRIGHT, *mNoticeBotRight);
-
+  
 	mRenderer->SetUIObject(mUi);
+
+	mItemTextureMap = {
+		{PlayerInventory::item::none, mTextures["InventorySlot"]},
+		{PlayerInventory::item::disguise, mTextures["Stun"]},
+		{PlayerInventory::item::soundEmitter,  mTextures["Stun"]},
+		{PlayerInventory::item::doorKey,  mTextures["KeyIcon3"]},
+		{PlayerInventory::item::flag , mTextures["FlagIcon"]},
+		{PlayerInventory::item::stunItem, mTextures["Stun"]},
+		{PlayerInventory::item::screwdriver, mTextures["Stun"]}
+	};
 }
 void LevelManager::InitialiseMiniMap() {
     mMiniMap = new MiniMap(mRenderer);
@@ -1283,8 +1346,6 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 	newDoor->GetRenderObject()->SetColour(Vector4(1.0f, 0, 0, 1));
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
-
-	newDoor->Open();
 
 	if (isMultiplayerLevel) {
 		AddNetworkObject(*newDoor);
@@ -1608,8 +1669,8 @@ SoundEmitter* LevelManager::AddSoundEmitterToWorld(const Vector3& position, Loca
 		.SetScale(size * 2)
 		.SetPosition(position);
 
-	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Sphere"], mTextures["Basic"], mTextures["FloorNormal"], mShaders["Basic"],
-		0.75f));
+	soundEmitterObjectPtr->SetRenderObject(new RenderObject(&soundEmitterObjectPtr->GetTransform(), mMeshes["Toolbox"], mTextures["ToolboxAlbedo"], mTextures["ToolboxNormal"], mShaders["Basic"], 1));
+	
 	soundEmitterObjectPtr->SetPhysicsObject(new PhysicsObject(&soundEmitterObjectPtr->GetTransform(), soundEmitterObjectPtr->GetBoundingVolume()));
 
 	soundEmitterObjectPtr->SetCollisionLayer(Collectable);
