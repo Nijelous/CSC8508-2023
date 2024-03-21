@@ -24,7 +24,7 @@
 namespace {
 	constexpr int MAX_PLAYER = 4;
 	constexpr int DEMO_LEVEL_NUM = 0;
-	constexpr int LEVEL_NUM = 1;
+	constexpr int LEVEL_NUM = 0;
 	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
@@ -625,16 +625,16 @@ NetworkPlayer* DebugNetworkedGame::AddPlayerObject(const Vector3& position, int 
 	switch (playerNum)
 	{
 	case 0:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Red"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Red"));
 		break;
 	case 1:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Blue"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Blue"));
 		break;
 	case 2:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Yellow"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Yellow"));
 		break;
 	case 3:
-		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Guard_Green"));
+		netPlayer->GetRenderObject()->SetMatTextures(mLevelManager->GetMeshMaterial("Player_Green"));
 		break;
 	default:
 		break;
