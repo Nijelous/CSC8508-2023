@@ -113,7 +113,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
-		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 

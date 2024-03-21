@@ -243,10 +243,10 @@ void NetworkPlayer::HandleMovement(float dt, const PlayerInputs& playerInputs) {
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_LEFT_INDEX])
-		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_BACKWARDS_INDEX])
-		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
 
 	if (playerInputs.movementButtons[MOVE_RIGHT_INDEX])
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
