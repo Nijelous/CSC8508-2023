@@ -1,7 +1,7 @@
 #include "LocationBasedSuspicion.h"
 #include <algorithm>
 #include <limits>
-#include "GameCLient.h"
+#include "GameClient.h"
 #include "../DebugNetworkedGame.h"
 #include "../SceneManager.h"
 #include "../CSC8503/LevelManager.h"
