@@ -109,7 +109,13 @@ const void CCTV::OnPlayerNotSeen(PlayerObject* mPlayerObject){
 	DrawDebugLines(false);
 	const int playerID = mPlayerObject->GetPlayerID();
 	if (hadSeenPlayer[playerID])
+	{
 		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::cameraLOS, mPlayerObject->GetPlayerID());
+		const float playerLocalSusVal = LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerObject->GetPlayerID());
+		const Vector3 thisPos = this->GetTransform().GetPosition();
+		LevelManager::GetLevelManager()->GetSuspicionSystem()->GetLocationBasedSuspicion()->SetMinLocationSusAmount(thisPos,playerLocalSusVal);
+	}
+		
 	hadSeenPlayer[playerID] = false;
 }
 

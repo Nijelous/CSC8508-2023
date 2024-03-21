@@ -29,7 +29,7 @@ namespace NCL {
 			map<const AnnouncementType, const string> mAnnouncementTypeToStringMap{
 				{DefaultAnnouncement, "DefaultAnnouncementText"},
 				{FlagAddedAnnouncement,"The heist item was stolen by player : "},
-				{FlagDroppedAnnouncement,"The flag was dropped by player : "},
+				{FlagDroppedAnnouncement,"The heist item was dropped by player : "},
 				{CaughtByGuardAnnouncement,"A guard has caught player : "}
 			};
 

@@ -49,6 +49,7 @@ namespace InventoryBuffSystem
 		void RemoveItemFromPlayer(const int& playerNo, const int& invSlot);
 		void DropItemFromPlayer(const item &inItem, const int &playerNo);
 		void DropItemFromPlayer(const int &playerNo, const int &invSlot);
+		void DropAllItemsFromPlayer(const int& playerNo);
 		void UseItemInPlayerSlot(const int& playerNo, const int& invSlot);
 		void OnItemEquipped(const int playerID, const int localPlayerID, const int slot, const item equippedItem);
 		void ChangePlayerItem(const int playerID, const int localPlayerID, const int slotId, const item equippedItem, int usageCount);
@@ -86,7 +87,7 @@ namespace InventoryBuffSystem
 	private:
 
 		std::vector<item> mItemsInSingleplayerRandomPool = {
-			doorKey, screwdriver
+			doorKey, screwdriver, soundEmitter
 		};
 
 		std::vector<item> mItemsInMultiplayerRandomPool = {

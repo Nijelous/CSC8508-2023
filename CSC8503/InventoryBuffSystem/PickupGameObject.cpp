@@ -2,6 +2,7 @@
 #include "StateTransition.h"
 #include "StateMachine.h"
 #include "State.h"
+#include "../CSC8503/NetworkPlayer.h"
 #include "PhysicsObject.h"
 #include "Vector3.h"
 #include "random"
@@ -107,6 +108,13 @@ void PickupGameObject::ChangeToRandomPickup() {
 }
 
 void PickupGameObject::ActivatePickup(int playerNo) {
+	mCooldown = INT_MAX;	
+	//Simulate only in server
+	auto* sceneManager = SceneManager::GetSceneManager();
+	bool isSinglePlayer = sceneManager->IsInSingleplayer();
+	bool isServer = sceneManager->IsServer();
+	if (!isSinglePlayer && !isServer)
+		return;
 	GetSoundObject()->TriggerSoundEvent();
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
@@ -114,20 +122,12 @@ void PickupGameObject::ActivatePickup(int playerNo) {
 	else
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(mCurrentItem, playerNo);
 
-	mCooldown = INT_MAX;
 }
 
 void PickupGameObject::OnCollisionBegin(GameObject* otherObject) {
 	if ((!otherObject->GetCollisionLayer() & Player))
 		return;
-	//Simulate only in server
-	auto* sceneManager = SceneManager::GetSceneManager();
-	bool isSinglePlayer = sceneManager->IsInSingleplayer();
-	if (!isSinglePlayer) {
-		NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
-		if (!netPlayer->GetIsLocalPlayer())
-			return;
-	}
+
 	if (mCooldown == 0){
 		//ActivatePickup((*mPlayerObjectToPlayerNoMap)[otherObject]);
 		//TODO(erendgrmnc): add player id here for multiplayer.

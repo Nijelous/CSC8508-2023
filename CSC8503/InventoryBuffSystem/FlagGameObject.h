@@ -4,13 +4,14 @@
 #include "StateMachine.h"
 #include "InventoryBuffSystem.h"
 #include "Item.h"
+#include "NetworkObject.h"
 #include "../SuspicionSystem/SuspicionSystem.h"
 using namespace InventoryBuffSystem;
 using namespace SuspicionSystem;
 
 namespace NCL {
     namespace CSC8503 {
-        class FlagGameObject : public Item, public PlayerBuffsObserver{
+        class FlagGameObject : public Item, public PlayerBuffsObserver, public NetworkObject{
         public:
             FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, std::map<GameObject*, int>* playerObjectToPlayerNoMap = nullptr, int pointsWorth = 0);
             ~FlagGameObject();

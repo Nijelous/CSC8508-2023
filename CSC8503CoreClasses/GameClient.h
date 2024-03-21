@@ -34,6 +34,12 @@ namespace NCL {
 			bool GetIsConnected() const;
 
 			void WriteAndSendAnnouncementSyncPacket(int annType, float time, int playerNo);
+
+			void WriteAndSendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType);
+
+			void WriteAndSendInventoryPacket(int playerNo, int invSlot, int inItem, int usageCount);
+
+			void WriteAndSendSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue);
 		protected:
 			bool mIsConnected;
 

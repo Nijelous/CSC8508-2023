@@ -13,7 +13,8 @@ namespace NCL {
 		enum InteractableItems {
 			Default,
 			InteractableVents,
-			InteractableDoors
+			InteractableDoors,
+			HeistItem
 		};
 
 		class GameObject;

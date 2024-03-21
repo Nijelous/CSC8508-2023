@@ -1,6 +1,7 @@
 #include "PlayerInventory.h"
 
 #include "GameServer.h"
+#include "GameClient.h"
 #include "NetworkObject.h"
 #include "../LevelManager.h"
 #include "../DebugNetworkedGame.h"
@@ -68,6 +69,10 @@ int PlayerInventory::AddItemToPlayer(const item& inItem, const int& playerNo) {
 				if (game->GetIsServer()) {
 					game->SendClientSyncItemSlotPacket(playerNo, invSlot, inItem, DEFAULT_ITEM_USAGE_COUNT);
 				}
+				else
+				{
+					game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+				}
 			}
 #endif
 
@@ -113,6 +118,10 @@ void InventoryBuffSystem::PlayerInventory::RemoveItemFromPlayer(const int& playe
 		if (isServer) {
 			game->SendClientSyncItemSlotPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 		}
+		else
+		{
+			game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+		}
 	}
 
 	if (localPlayerId == playerNo) {
@@ -141,6 +150,11 @@ void PlayerInventory::DropItemFromPlayer(const int& playerNo, const int& invSlot
 	//Extra drop logic
 }
 
+void PlayerInventory::DropAllItemsFromPlayer(const int& playerNo){
+	for (int i = 0; i < MAX_INVENTORY_SLOTS; i++)
+		DropItemFromPlayer(playerNo,i);
+}
+
 void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlot) {
 	if (mOnItemUsedInventoryEventMap.find(mPlayerInventory[playerNo][invSlot]) != mOnItemUsedInventoryEventMap.end() &&
 		mItemPreconditionsMet[mPlayerInventory[playerNo][invSlot]](playerNo)) {
@@ -161,6 +175,10 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 			if (game->GetIsServer()) {
 				int usageCount = mItemUseCount[playerNo][invSlot];
 				game->SendClientSyncItemSlotPacket(playerNo, invSlot, usedItem, usageCount);
+			}
+			else
+			{
+				game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
 			}
 		}
 #endif

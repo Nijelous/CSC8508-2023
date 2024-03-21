@@ -3,6 +3,8 @@
 #include "PlayerObject.h"
 #include "../LevelManager.h"
 #include "../SuspicionSystem/GlobalSuspicionMetre.h"
+#include "GameClient.h"
+#include "Interactable.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
 #include "../CSC8503/NetworkPlayer.h"
@@ -11,7 +13,7 @@ using namespace CSC8503;
 
 FlagGameObject::FlagGameObject(InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr,
 	std::map<GameObject*, int>* playerObjectToPlayerNoMap, int pointsWorth)
-	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr) {
+	: Item(PlayerInventory::item::flag, *inventoryBuffSystemClassPtr), NetworkObject(this->GetGameObject(), 0) {
 	mName = "Flag";
 	mItemType = PlayerInventory::item::flag;
 	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
@@ -26,10 +28,9 @@ FlagGameObject::~FlagGameObject() {
 }
 
 void FlagGameObject::GetFlag(int playerNo) {
-	GetSoundObject()->TriggerSoundEvent();
-
-	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 	this->SetActive(false);
+	GetSoundObject()->TriggerSoundEvent();
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 }
 
 void FlagGameObject::Reset() {
@@ -48,12 +49,24 @@ void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId){
 
 
 void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved) {
-	if (IsMultiplayerAndIsNotServer())
-		return;
-
 	switch (invEvent) {
-	case InventoryBuffSystem::flagDropped:
+	case InventoryBuffSystem::flagDropped: {
 		Reset();
+		auto* sceneManager = SceneManager::GetSceneManager();
+		if (sceneManager->IsInSingleplayer()) break;
+
+		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
+
+		if (networkedGame->GetIsServer()) {
+			networkedGame->SendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
+		}
+		else
+		{
+			networkedGame->GetClient()->WriteAndSendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
+		}
+		break;
+	}
+
 	default:
 		break;
 	}
@@ -90,15 +103,20 @@ void FlagGameObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo
 void FlagGameObject::OnCollisionBegin(GameObject* otherObject) {
 	if ((otherObject->GetCollisionLayer() & Player)) {
 		PlayerObject* plObj = (PlayerObject*)otherObject;
-		auto* sceneManager = SceneManager::GetSceneManager();
-		bool isSinglePlayer = sceneManager->IsInSingleplayer();
-		if (!isSinglePlayer) {
-			NetworkPlayer* netPlayer = (NetworkPlayer*)otherObject;
-			if (!netPlayer->GetIsLocalPlayer())
-				return;
+		const float playerNo = plObj->GetPlayerID();
+
+		//To fix bug where the client would get 2 flags in multiplayer
+		if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->ItemInPlayerInventory(InventoryBuffSystem::PlayerInventory::flag, playerNo)) {
+			this->SetActive(false);
+			return;
 		}
+
+		if (mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->IsInventoryFull(playerNo))
+			return;
+
 		mSuspicionSystemClassPtr->GetGlobalSuspicionMetre()->SetMinGlobalSusMetre(GlobalSuspicionMetre::flagCaptured);
 		plObj->AddPlayerPoints(mPoints);
-		GetFlag(plObj->GetPlayerID());
+
+		GetFlag(playerNo);
 	}
 }

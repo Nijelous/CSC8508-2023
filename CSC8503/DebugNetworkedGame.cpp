@@ -16,6 +16,7 @@
 #include "RenderObject.h"
 #include "LevelManager.h"
 #include "../CSC8503/InventoryBuffSystem/InventoryBuffSystem.h"
+#include "../CSC8503/InventoryBuffSystem/FlagGameObject.h"
 #include "../CSC8503/SuspicionSystem/SuspicionSystem.h"
 #include "Vent.h"
 #include "Debug.h"
@@ -111,6 +112,9 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientPlayerInputState, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientInit, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
+		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -203,19 +207,26 @@ void DebugNetworkedGame::UpdateGame(float dt) {
 	}
 }
 
-void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted) {
+void DebugNetworkedGame::SetIsGameStarted(bool isGameStarted, unsigned int seed) {
 	if (mIsGameStarted == isGameStarted) {
 		return;
 	}
 	this->mIsGameStarted = isGameStarted;
 
+	int seedToUse = seed;
 	if (isGameStarted) {
-		std::random_device rd;
-		std::mt19937 g(rd());
 		mGameState = GameSceneState::InitialisingLevelState;
 		if (mThisServer) {
-			SendStartGameStatusPacket(&g);
+			std::random_device rd;
+			const unsigned int serverCreatedSeed = rd();
+
+			const std::string seedString = std::to_string(serverCreatedSeed);
+
+			SendStartGameStatusPacket(seedString);
+			seedToUse = serverCreatedSeed;
 		}
+
+		std::mt19937 g(seedToUse);
 		StartLevel(g);
 	}
 	else {
@@ -251,7 +262,10 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 	switch (type) {
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
-		SetIsGameStarted(packet->isGameStarted);
+		unsigned int seed = 0;
+
+		seed = std::stoul(packet->levelSeed);
+		SetIsGameStarted(packet->isGameStarted, seed);
 		break;
 	}
 	case BasicNetworkMessages::Full_State: {
@@ -520,8 +534,8 @@ const int DebugNetworkedGame::GetClientLastFullID() const {
 	return mClientSideLastFullID;
 }
 
-void DebugNetworkedGame::SendStartGameStatusPacket(std::mt19937* levelSeed) {
-	GameStartStatePacket state(mIsGameStarted, *levelSeed);
+void DebugNetworkedGame::SendStartGameStatusPacket(const std::string& seed) const {
+	GameStartStatePacket state(mIsGameStarted, seed);
 	mThisServer->SendGlobalPacket(state);
 }
 
@@ -534,7 +548,7 @@ void DebugNetworkedGame::InitWorld(const std::mt19937& levelSeed) {
 	mLevelManager->GetGameWorld()->ClearAndErase();
 	mLevelManager->GetPhysics()->Clear();
 
-	mLevelManager->LoadLevel(DEMO_LEVEL_NUM, levelSeed, 0, true);
+	mLevelManager->LoadLevel(LEVEL_NUM, levelSeed, 0, true);
 
 	SpawnPlayers();
 
@@ -686,10 +700,15 @@ void DebugNetworkedGame::HandleInteractablePacket(SyncInteractablePacket* packet
 		doorObj->SyncDoor(packet->isOpen);
 		break;
 	}
-	case InteractableItems::InteractableVents:
+	case InteractableItems::InteractableVents:{
 		Vent* ventObj = reinterpret_cast<Vent*>(interactedObj);
 		ventObj->SetIsOpen(packet->isOpen, false);
 		break;
+	}
+	case InteractableItems::HeistItem:{
+		LevelManager::GetLevelManager()->GetMainFlag()->Reset();
+		break;
+	}
 	}
 }
 void DebugNetworkedGame::HandlePlayerBuffChange(ClientSyncBuffPacket* packet) const {
