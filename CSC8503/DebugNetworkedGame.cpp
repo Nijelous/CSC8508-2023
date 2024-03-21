@@ -113,6 +113,7 @@ bool DebugNetworkedGame::StartAsServer(const std::string& playerName) {
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::SyncInteractable, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncItemSlot, this);
 		mThisServer->RegisterPacketHandler(BasicNetworkMessages::ClientSyncLocationSusChange, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
 
 		AddToPlayerPeerNameMap(SERVER_PLAYER_PEER, playerName);
 
@@ -149,6 +150,7 @@ bool DebugNetworkedGame::StartAsClient(char a, char b, char c, char d, const std
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncObjectState, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncPlayerIdNameMap, this);
 		mThisClient->RegisterPacketHandler(BasicNetworkMessages::SyncAnnouncements, this);
+		mThisClient->RegisterPacketHandler(BasicNetworkMessages::GuardSpotSound, this);
 	}
 
 	return isConnected;
@@ -256,7 +258,7 @@ void DebugNetworkedGame::AddEventOnGameStarts(std::function<void()> event) {
 }
 
 void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source) {
-
+	
 	switch (type) {
 	case BasicNetworkMessages::GameStartState: {
 		GameStartStatePacket* packet = (GameStartStatePacket*)payload;
@@ -342,7 +344,11 @@ void DebugNetworkedGame::ReceivePacket(int type, GamePacket* payload, int source
 		HandleAnnouncementSync(packet);
 		break;
 	}
-	break;
+	case BasicNetworkMessages::GuardSpotSound: {
+		GuardSpotSoundPacket* packet = (GuardSpotSoundPacket*)(payload);
+		HandleGuardSpotSound(packet);
+		break;
+	}
 	default:
 		std::cout << "Received unknown packet. Type: " << payload->type << std::endl;
 		break;
@@ -400,6 +406,11 @@ void DebugNetworkedGame::SendClientSyncLocationSusChangePacket(int cantorPairedL
 
 void NCL::CSC8503::DebugNetworkedGame::SendAnnouncementSyncPacket(int annType, float time, int playerNo){
 	NCL::CSC8503::AnnouncementSyncPacket packet(annType,time, playerNo);
+	mThisServer->SendGlobalPacket(packet);
+}
+
+void DebugNetworkedGame::SendGuardSpotSoundPacket(int playerId) const {
+	GuardSpotSoundPacket packet(playerId);
 	mThisServer->SendGlobalPacket(packet);
 }
 
@@ -751,6 +762,12 @@ void DebugNetworkedGame::HandleAnnouncementSync(const AnnouncementSyncPacket* pa
 		return;
 	const PlayerObject::AnnouncementType annType = static_cast<PlayerObject::AnnouncementType>(packet->annType);
 	GetLocalPlayer()->SyncAnnouncements(annType,packet->time,packet->playerNo);
+}
+
+void DebugNetworkedGame::HandleGuardSpotSound(GuardSpotSoundPacket* packet) const {
+	if (packet->playerId == mLocalPlayerId) {
+		mLevelManager->GetSoundManager()->PlaySpottedSound();
+	}
 }
 
 void DebugNetworkedGame::AddToPlayerPeerNameMap(int playerId, const std::string& playerName) {

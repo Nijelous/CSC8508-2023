@@ -247,12 +247,12 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)){
-		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
 	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)){
-		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
