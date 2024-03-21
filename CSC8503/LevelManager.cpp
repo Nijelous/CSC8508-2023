@@ -1440,7 +1440,7 @@ void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, cons
 }
 
 void LevelManager::CreatePlayerObjectComponents(PlayerObject& playerObject, const Transform& playerTransform) {
-	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f);
+	CapsuleVolume* volume = new CapsuleVolume(1.4f, 1.0f, Vector3(0, 2.f, 0));
 
 	playerObject.SetBoundingVolume((CollisionVolume*)volume);
 
