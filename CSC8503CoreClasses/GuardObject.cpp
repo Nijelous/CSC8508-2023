@@ -31,6 +31,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mDoorRaycastInterval = RAYCAST_INTERVAL;
 	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 	mPointTimer = POINTING_TIMER;
+	mNearestSprintingPlayerDir = nullptr;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -46,6 +47,10 @@ GuardObject::~GuardObject() {
 	delete mRootSequence;
 	delete[] mNextPoly;
 	delete[] mLastKnownPos;
+	delete mNearestSprintingPlayerDir;
+	delete mSightedDoor;
+	delete mSightedPlayer;
+	delete[] mNextPoly;
 }
 
 void GuardObject::UpdateObject(float dt) {
@@ -97,6 +102,7 @@ void GuardObject::RaycastToPlayer() {
 	else {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
+		delete playerToChase;
 	}
 }
 
@@ -238,17 +244,7 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	dtPolyRef* path = new dtPolyRef[1000];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findPath(*startRef, *endRef, startPos, endPos, filter, path, pathCount, 1000);
 	float* firstPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
-	for (int i = 0; i < *pathCount; i++) {
-		bool* isPosOverPoly = new bool;
-		float* closestPos = new float[3];
-		LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->closestPointOnPoly(path[i], firstPos, closestPos, isPosOverPoly);
-		Debug::DrawLine(Vector3(firstPos[0], firstPos[1], firstPos[2]), Vector3(closestPos[0], closestPos[1], closestPos[2]));
-		firstPos[0] = closestPos[0];
-		firstPos[1] = closestPos[1];
-		firstPos[2] = closestPos[2];
-		delete isPosOverPoly;
-		delete[] closestPos;
-	}
+
 	delete[] startPos;
 	delete[] halfExt;
 	delete filter;
@@ -352,13 +348,17 @@ void GuardObject::SendAnnouncementToPlayer(){
 		mPlayer->AddAnnouncement(PlayerObject::CaughtByGuardAnnouncement, 5, mPlayer->GetPlayerID());
 }
 
-bool GuardObject::IsPlayerSprintingNearby(Vector3 dir) {
-	float playerDist = dir.LengthSquared();
+bool GuardObject::IsPlayerSprintingNearby() {
+	mNearestSprintingPlayerDir = nullptr;
 	for (PlayerObject* player : mPlayerList) {
+		Vector3 playerDir = player->GetTransform().GetPosition() - this->GetTransform().GetPosition();
+		float playerDist = playerDir.LengthSquared();
 		if (player->GetGameOjbectState() == Sprint && playerDist <= MAX_DIST_TO_SUS_LOCATION) {
-			return true;
+			if (mNearestSprintingPlayerDir == nullptr) { mNearestSprintingPlayerDir = new Vector3(playerDir); }
+			else if (playerDist < (*mNearestSprintingPlayerDir).LengthSquared()){ *mNearestSprintingPlayerDir = playerDir; }
 		}
 	}
+	if (mNearestSprintingPlayerDir != nullptr) { return true; }
 	return false;
 }
 
@@ -403,10 +403,11 @@ BehaviourAction* GuardObject::Patrol() {
 
 		}
 		else if (state == Ongoing) {
-			Vector3 playerDir = mPlayer->GetTransform().GetPosition() - this->GetTransform().GetPosition();
-
 			if (IsHighEnoughLocationSus() == true) { return Failure; }
-			else if (IsPlayerSprintingNearby(playerDir)) { LookTowardFocalPoint(playerDir); }
+			else if (IsPlayerSprintingNearby()) { 
+				
+				LookTowardFocalPoint(*mNearestSprintingPlayerDir); 
+			}
 			else if (mCanSeePlayer == false) {
 				Vector3 direction = mNodes[mNextNode] - this->GetTransform().GetPosition();
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
