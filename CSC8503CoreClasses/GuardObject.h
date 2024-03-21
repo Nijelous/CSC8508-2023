@@ -21,6 +21,7 @@ namespace NCL {
         constexpr int HIGH_SUSPICION = 70;
         constexpr int MAX_DIST_TO_SUS_LOCATION = 6400;
         constexpr float POINTING_TIMER = 120;
+        constexpr int MAX_NUMBER_OF_FRAMES_GUARD_STUCK = 200;
       
         class GuardObject : public GameObject {
         public:
@@ -97,6 +98,8 @@ namespace NCL {
             float mSmallestDistance;
             Vector3 mSmallestDistanceVector;
             Vector3* mNearestSprintingPlayerDir;
+            float mLastDist;
+            int mDistCounter;
 
             BehaviourAction* Patrol();
             BehaviourAction* CheckSusLocation();

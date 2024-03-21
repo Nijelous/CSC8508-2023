@@ -31,6 +31,8 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mFumbleKeysCurrentTime = FUMBLE_KEYS_TIME;
 	mPointTimer = POINTING_TIMER;
 	mNearestSprintingPlayerDir = nullptr;
+	mLastDist = 0;
+	mDistCounter = 0;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -412,6 +414,9 @@ BehaviourAction* GuardObject::Patrol() {
 				float* endPos = new float[3] { mNodes[mNextNode].x, mNodes[mNextNode].y, mNodes[mNextNode].z };
 				MoveTowardFocalPoint(endPos);
 				float dist = direction.LengthSquared();
+				float changeInDist = mLastDist - dist;
+				if (changeInDist < 0) { changeInDist *= -1; }
+				if (changeInDist <= 0.2) { mDistCounter += 1; }
 				if (dist < MIN_DIST_TO_NEXT_POS) {
 					mCurrentNode = mNextNode;
 					if (mCurrentNode == mNodes.size() - 1) { 
@@ -420,10 +425,21 @@ BehaviourAction* GuardObject::Patrol() {
 					else { 
 						mNextNode = mCurrentNode + 1; 
 					}
+				}else if (mDistCounter >= MAX_NUMBER_OF_FRAMES_GUARD_STUCK){
+					mDistCounter = 0;
+					mCurrentNode = mNextNode;
+					if (mCurrentNode == mNodes.size() - 1) {
+						mNextNode = 0;
+					}
+					else {
+						mNextNode = mCurrentNode + 1;
+					}
 				}
+				mLastDist = dist;
 			}
 			else if (mCanSeePlayer == true) { return Failure; }
 		}
+		
 		return state;
 		}
 	);
