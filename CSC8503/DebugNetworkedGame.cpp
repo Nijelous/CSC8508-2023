@@ -24,7 +24,7 @@
 namespace {
 	constexpr int MAX_PLAYER = 4;
 	constexpr int DEMO_LEVEL_NUM = 0;
-	constexpr int LEVEL_NUM = 0;
+	constexpr int LEVEL_NUM = 1;
 	constexpr int SERVER_PLAYER_PEER = 0;
 
 	constexpr const char* PLAYER_PREFIX = "Player";
