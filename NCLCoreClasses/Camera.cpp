@@ -39,6 +39,19 @@ void Camera::UpdateCamera(float dt) {
 
 }
 
+#ifdef USEPROSPERO
+Vector3 Camera::GetForwardVector() {
+	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
+	return yawRotation * Vector3(0, 0, -activeController->GetNamedAxis("Forward"));
+}
+
+Vector3 Camera::GetRightVector() {
+	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
+	return yawRotation * Vector3(activeController->GetNamedAxis("Sidestep"), 0, 0);
+}
+#endif
+
+#ifdef USEGL
 Vector3 Camera::GetForwardVector() {
 	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
 	return yawRotation * Vector3(0, 0, -1);
@@ -48,6 +61,7 @@ Vector3 Camera::GetRightVector() {
 	Matrix4 yawRotation = Matrix4::Rotation(yaw, Vector3(0, 1, 0));
 	return yawRotation * Vector3(1, 0, 0);
 }
+#endif
 
 /*
 Generates a view matrix for the camera's viewpoint. This matrix can be sent

@@ -284,7 +284,10 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveBackwards()){
-		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
+#ifdef USEGL
+		fwdAxis -= fwdAxis;
+#endif
+		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
@@ -294,7 +297,10 @@ void PlayerObject::MovePlayer(float dt) {
 	}
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveLeft()){
-		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
+#ifdef USEGL
+		rightAxis -= rightAxis;
+#endif
+		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
