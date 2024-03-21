@@ -53,7 +53,7 @@ ClientPlayerInputPacket::ClientPlayerInputPacket(int lastId, const PlayerInputs&
 	
 	this->playerInputs.movementButtons[0] = playerInputs.movementButtons[0];
 	this->playerInputs.movementButtons[1] = playerInputs.movementButtons[1];
-	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[3];
+	this->playerInputs.movementButtons[2] = playerInputs.movementButtons[2];
 	this->playerInputs.movementButtons[3] = playerInputs.movementButtons[3];
 
 	this->playerInputs.fwdAxis.x = playerInputs.fwdAxis.x;

@@ -136,6 +136,8 @@ namespace NCL {
 
 			void SetPlayersForGuards() const;
 
+			void InitAnimationSystemObjects() const;
+
 			PlayerObject* GetNearestPlayer(const Vector3& startPos) const;
 
 			float GetNearestGuardDistance(const Vector3& startPos) const;
