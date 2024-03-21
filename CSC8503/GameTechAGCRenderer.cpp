@@ -206,9 +206,9 @@ void GameTechAGCRenderer::RenderFrame() {
 	SkyboxPass();
 
 	//Step 7: Draw the debug data to the main scene render target
-	/*UpdateDebugData();
+	UpdateDebugData();
 	RenderDebugLines();
-	RenderDebugText();*/
+	RenderDebugText();
 	//Step 8: Draw the main scene render target to the screen with a compute shader
 	DisplayRenderPass(); //Puts our scene on screen, uses a compute
 

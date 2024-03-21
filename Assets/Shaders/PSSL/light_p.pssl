@@ -20,6 +20,7 @@ out float4 fragColour[2];
 void main(VS_OUTPUT vertex, float2 pixelPos : S_POSITION) : S_TARGET_OUTPUT
 {
 	LightData light = lightBuffer[vertex.LightID];
+	
 	float2 fragCoord = pixelPos * Constants.pixelSize;
 	Texture2D<float4> depthTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffDepthIndex)]);
 
