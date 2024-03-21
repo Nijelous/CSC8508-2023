@@ -59,10 +59,10 @@ namespace NCL {
 			float mCellSize = 0.3f;
 			float mCellHeight = 0.2f;
 
-			float mGuardMaxSlope = 45.0f;
+			float mGuardMaxSlope = 10.0f;
 			float mGuardRadius = 3.0f;
 			float mGuardHeight = 3.0f;
-			float mGuardMaxClimb = 0.9f;
+			float mGuardMaxClimb = 0.1f;
 
 			float mMaxEdgeLength = 12.0f;
 			float mMaxEdgeError = 1.3f;

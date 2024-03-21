@@ -20,8 +20,8 @@ namespace {
 	constexpr float STOPPING_SPEED = 3.f;
 
 	constexpr float CHAR_STANDING_HEIGHT = 1.4f;
-	constexpr float CHAR_CROUCH_HEIGHT = .7f;
-	constexpr float CROUCH_OFFSET = 1;
+	constexpr float CHAR_CROUCH_HEIGHT = 1.f;
+	constexpr float CROUCH_OFFSET = 1.f;
 
 	constexpr int MAX_CROUCH_SPEED = 5;
 	constexpr int MAX_WALK_SPEED = 9;
@@ -76,7 +76,6 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mSprintSpeed = sprintSpeed;
 	mCrouchSpeed = crouchSpeed;
 	mMovementSpeed = walkSpeed;
-	mObjectState = Walk;
 	mPlayerSpeedState = Default;
 	mIsCrouched = false;
 	mActiveItemSlot = 0;
@@ -100,7 +99,7 @@ void PlayerObject::UpdateObject(float dt) {
 		MovePlayer(dt);
 
 		NCL::CSC8503::InteractType interactType;
-		if(GotRaycastInput(interactType,dt))
+		if (GotRaycastInput(interactType, dt))
 			RayCastFromPlayer(mGameWorld, interactType, dt);
 		else
 			RayCastFromPlayerForUI(mGameWorld, dt);
@@ -111,7 +110,7 @@ void PlayerObject::UpdateObject(float dt) {
 		}
 
 		if (previousObjectState != mObjectState)
-			ChangeActiveSusCausesBasedOnState(previousObjectState,mObjectState);
+			ChangeActiveSusCausesBasedOnState(previousObjectState, mObjectState);
 	}
 
 	AttachCameraToPlayer(mGameWorld);
@@ -126,6 +125,7 @@ void PlayerObject::UpdateObject(float dt) {
 		EnforceMaxSpeeds();
 	}
 
+
 	UpdateGlobalUI(dt);
 	UpdateLocalUI(dt);
 	if (mIsDebugUIEnabled)
@@ -134,8 +134,7 @@ void PlayerObject::UpdateObject(float dt) {
 	}
 }
 
-void PlayerObject::ShowDebugInfo(float dt)
-{
+void PlayerObject::ShowDebugInfo(float dt) {
 
 	if (mHasSilentSprintBuff)
 		Debug::Print("HasSilentSprint", Vector2(55, 75));
@@ -153,7 +152,7 @@ void PlayerObject::ShowDebugInfo(float dt)
 
 }
 
-void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState, const GameObjectState& currentState){
+void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& previousState, const GameObjectState& currentState) {
 	switch (previousState) {
 	case Walk:
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->RemoveActiveLocalSusCause(LocalSuspicionMetre::playerWalk, mPlayerID);
@@ -179,7 +178,7 @@ void PlayerObject::ChangeActiveSusCausesBasedOnState(const GameObjectState& prev
 	}
 }
 
-void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
+void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) {
 	if (mPlayerID != playerNo)
 		return;
 
@@ -213,12 +212,14 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo){
 	case silentSprintApplied:
 		mHasSilentSprintBuff = true;
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
-		RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
+			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
+		this->GetSoundObject()->CloseDoorTriggered();
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
+		this->GetSoundObject()->CloseDoorFinished();
 		mObjectState = Idle;
 
 		break;
@@ -233,7 +234,7 @@ PlayerInventory::item NCL::CSC8503::PlayerObject::GetEquippedItem() {
 
 void PlayerObject::AttachCameraToPlayer(GameWorld* world) {
 	Vector3 offset = GetTransform().GetPosition();
-	offset.y += 3;
+	offset.y += 5;
 	world->GetMainCamera().SetPosition(offset);
 }
 
@@ -241,41 +242,41 @@ void PlayerObject::MovePlayer(float dt) {
 	Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
 	bool isIdle = true;
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)){
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)) {
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)){
-		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)) {
+		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)){
-		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)) {
+		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)){
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)) {
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
 	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
 	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
-	
+
 	GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(mGameWorld->GetMainCamera().GetPitch(), mGameWorld->GetMainCamera().GetYaw(), 0));
 
-	if (isIdle){
+	if (isIdle) {
 		if (mIsCrouched)
-			mObjectState = IdleCrouch;
+			SetObjectState(IdleCrouch);
 		else
-			mObjectState = Idle;
+			SetObjectState(Idle);
 	}
 	else {
 		ActivateSprint(isSprinting);
 		if (mIsCrouched)
-			mObjectState = Crouch;
+			SetObjectState(Crouch);
 	}
 
 	ToggleCrouch(isCrouching);
@@ -286,10 +287,10 @@ void PlayerObject::MovePlayer(float dt) {
 		mIsDebugUIEnabled = !mIsDebugUIEnabled;
 }
 
-bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt){
+bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt) {
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
-		
+
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
 		return true;
@@ -442,7 +443,7 @@ void PlayerObject::ControlInventory() {
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::K) && DEBUG_MODE) {
-		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID,mActiveItemSlot,1);
+		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->TransferItemBetweenInventories(mPlayerID, mActiveItemSlot, 1);
 	}
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::F) &&
@@ -476,7 +477,7 @@ void PlayerObject::ToggleCrouch(bool crouchToggled) {
 	}
 	else if (crouchToggled && mObjectState == Walk) {
 		//Walk -> Crouch
-		StartCrouching(); 
+		StartCrouching();
 	}
 	else if (crouchToggled && mObjectState == IdleCrouch) {
 		//Crouch -> Idle
@@ -504,12 +505,12 @@ void PlayerObject::ActivateSprint(bool isSprinting) {
 void PlayerObject::StartWalking() {
 	if (!(mObjectState == Walk)) {
 		if (mObjectState == Crouch)
-			if(mPlayerSpeedState == SpedUp)
+			if (mPlayerSpeedState == SpedUp)
 				mMovementSpeed = SPED_UP_WALK_ACCELERATING_SPEED;
 			else
 				mMovementSpeed = WALK_ACCELERATING_SPEED;
-		
-		mObjectState = Walk;
+
+		SetObjectState(Walk);
 		mIsCrouched = false;
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
 	}
@@ -524,7 +525,7 @@ void PlayerObject::StartSprinting() {
 		else
 			mMovementSpeed = SPRINT_ACCELERATING_SPEED;
 
-		mObjectState = Sprint;
+		SetObjectState(Sprint);
 		mIsCrouched = false;
 
 		ChangeCharacterSize(CHAR_STANDING_HEIGHT);
@@ -536,9 +537,9 @@ void PlayerObject::StartSprinting() {
 void PlayerObject::StartCrouching() {
 	if (!(mObjectState == Crouch)) {
 		if (mObjectState == Walk)
-			mObjectState = Crouch;
+			SetObjectState(Crouch);
 		if (mObjectState == Idle)
-			mObjectState = IdleCrouch;
+			SetObjectState(IdleCrouch);
 
 		mIsCrouched = true;
 		mMovementSpeed = mCrouchSpeed;
@@ -577,7 +578,7 @@ void PlayerObject::EnforceMaxSpeeds() {
 
 void PlayerObject::ChangeTransparency(bool isUp, float& transparency)
 {
-	if (isUp == true && transparency<1) {
+	if (isUp == true && transparency < 1) {
 		transparency = transparency + 0.05;
 	}
 	if (isUp == false && transparency > 0) {
@@ -590,7 +591,7 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 	//Open Door
 	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
 		auto* doorHit = (Door*)objectHit;
-		if (!doorHit->GetIsOpen()&&!doorHit->GetIsLock()) {
+		if (!doorHit->GetIsOpen() && !doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyRight);
 			mUi->ChangeBuffSlotTransparency(NOTICERIGHT, mTransparencyRight);
 		}
@@ -622,7 +623,7 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 	//Lock Door
 	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::doorKey)) {
 		auto* doorHit = (Door*)objectHit;
-		if (!doorHit->GetIsOpen()&&!doorHit->GetIsLock()) {
+		if (!doorHit->GetIsOpen() && !doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyTop);
 			mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 		}
@@ -635,10 +636,12 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyTop);
 		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	}
-	//Use ScrewDriver
-	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15 )&&(GetEquippedItem() == PlayerInventory::item::doorKey)) {
+  
+	//Unlock Door
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::doorKey)) {
+
 		auto* doorHit = (Door*)objectHit;
-		if (!doorHit->GetIsOpen()&&doorHit->GetIsLock()) {
+		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyBot);
 			mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 		}
@@ -651,7 +654,24 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyBot);
 		mUi->ChangeBuffSlotTransparency(NOTICEBOT, mTransparencyBot);
 	}
-	//Unlock Door
+
+	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15)) {
+		auto* doorHit = (Door*)objectHit;
+		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
+			ChangeTransparency(true, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+		else {
+			ChangeTransparency(false, mTransparencyTopRight);
+			mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+		}
+	}
+	else {
+		ChangeTransparency(false, mTransparencyTopRight);
+		mUi->ChangeBuffSlotTransparency(NOTICETOPRIGHT, mTransparencyTopRight);
+	}
+
+	//Use ScrewDriver
 	if ((objectHit->GetName() == "Vent") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::screwdriver)) {
 		auto* ventHit = (Vent*)objectHit;
 		if (!ventHit->IsOpen()) {
@@ -681,7 +701,7 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 			mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
 		}
 	}
-	else{
+	else {
 		ChangeTransparency(false, mTransparencyBotLeft);
 		mUi->ChangeBuffSlotTransparency(NOTICEBOTLEFT, mTransparencyBotLeft);
 	}
@@ -722,11 +742,11 @@ float PlayerObject::SusLinerInterpolation(float dt)
 	return iconValue;
 }
 
-bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject){
+bool PlayerObject::IsSeenByGameObject(GameObject* otherGameObject) {
 	float thisPitch = GetTransform().GetOrientation().ToEuler().y;
-	float otherPitch= otherGameObject->GetTransform().GetOrientation().ToEuler().y;
+	float otherPitch = otherGameObject->GetTransform().GetOrientation().ToEuler().y;
 
-	float PitchDiff = abs(otherPitch-thisPitch);
+	float PitchDiff = abs(otherPitch - thisPitch);
 	return PitchDiff <= MAX_PICKPOCKET_PITCH_DIFF;
 }
 
@@ -750,40 +770,40 @@ void PlayerObject::EnforceSpedUpMaxSpeeds() {
 	}
 }
 
-void PlayerObject::ChangeToDefaultSpeeds(){
+void PlayerObject::ChangeToDefaultSpeeds() {
 	mCrouchSpeed = DEFAULT_CROUCH_SPEED;
 	mWalkSpeed = DEFAULT_WALK_SPEED;
 	mSprintSpeed = DEFAULT_SPRINT_SPEED;
 
 	mPlayerSpeedState = Default;
 
-	mObjectState = Idle;
+	SetObjectState(Idle);
 
 }
 
-void PlayerObject::ChangeToSlowedSpeeds(){
+void PlayerObject::ChangeToSlowedSpeeds() {
 	mCrouchSpeed = SLOWED_CROUCH_SPEED;
 	mWalkSpeed = SLOWED_WALK_SPEED;
 	mSprintSpeed = SLOWED_SPRINT_SPEED;
 
 	mPlayerSpeedState = SlowedDown;
 
-	mObjectState = Idle;
+	SetObjectState(Idle);
 
 }
 
-void PlayerObject::ChangeToSpedUpSpeeds(){
+void PlayerObject::ChangeToSpedUpSpeeds() {
 	mCrouchSpeed = SPED_UP_CROUCH_SPEED;
 	mWalkSpeed = SPED_UP_WALK_SPEED;
 	mSprintSpeed = SPED_UP_SPRINT_SPEED;
 
 	mPlayerSpeedState = SpedUp;
 
-	mObjectState = Idle;
+	SetObjectState(Idle);
 
 }
 
-void PlayerObject::ChangeToStunned(){
+void PlayerObject::ChangeToStunned() {
 	mCrouchSpeed = 0;
 	mWalkSpeed = 0;
 	mSprintSpeed = 0;
@@ -791,7 +811,7 @@ void PlayerObject::ChangeToStunned(){
 	mPhysicsObject->SetLinearVelocity(Vector3(0,0,0));
 	mPlayerSpeedState = Stunned;
 
-	mObjectState = Idle;
+	SetObjectState(Idle);
 
 }
 
@@ -822,7 +842,7 @@ void NCL::CSC8503::PlayerObject::UpdateInventoryObserver(InventoryEvent invEvent
 	}
 }
 
-void PlayerObject::UpdateGlobalUI(float dt){
+void PlayerObject::UpdateGlobalUI(float dt) {
 	int announcementY = 15;
 	for (auto& entry : mAnnouncementMap) {
 		if (entry.second > 0) {
@@ -835,7 +855,7 @@ void PlayerObject::UpdateGlobalUI(float dt){
 
 
 
-void PlayerObject::UpdateLocalUI(float dt){
+void PlayerObject::UpdateLocalUI(float dt) {
 	//SusBar
 	float iconValue = SusLinerInterpolation(dt);
 	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
@@ -847,6 +867,7 @@ void PlayerObject::UpdateLocalUI(float dt){
 	}
 	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
+	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
 	Debug::Print("Sus lvl:", Vector2(80, 95));
 	Debug::Print(std::to_string((int)mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID)), Vector2(95, 95));
 
