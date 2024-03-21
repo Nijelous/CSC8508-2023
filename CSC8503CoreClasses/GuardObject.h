@@ -83,6 +83,7 @@ namespace NCL {
             int AngleValue(float minAng);
             bool IsHighEnoughLocationSus();
             bool IsPlayerSprintingNearby();
+            void DebugMode();
 
             void CheckForDoors(float dt);
             void OpenDoor();
@@ -100,6 +101,7 @@ namespace NCL {
             Vector3* mNearestSprintingPlayerDir;
             float mLastDist;
             int mDistCounter;
+            bool mDebugMode;
 
             BehaviourAction* Patrol();
             BehaviourAction* CheckSusLocation();

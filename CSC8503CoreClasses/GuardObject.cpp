@@ -33,6 +33,7 @@ GuardObject::GuardObject(const std::string& objectName) {
 	mNearestSprintingPlayerDir = nullptr;
 	mLastDist = 0;
 	mDistCounter = 0;
+	mDebugMode = false;
 
 	SceneManager* sceneManager = SceneManager::GetSceneManager();
 
@@ -59,6 +60,7 @@ void GuardObject::UpdateObject(float dt) {
 	if (!mIsStunned) {
 		if (mIsBTWillBeExecuted) {
 			RaycastToPlayer();
+			DebugMode();
 			GuardSpeedMultiplier();
 			ExecuteBT();
 			if (mDoorRaycastInterval <= 0) {
@@ -85,7 +87,7 @@ void GuardObject::RaycastToPlayer() {
 		Ray r = Ray(this->GetTransform().GetPosition(), playerToChaseDir);
 		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
 			mSightedPlayer = (GameObject*)closestCollision.node;
-			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
+			if (mDebugMode == true){ Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt); }
 			if (mSightedPlayer->GetCollisionLayer() == CollisionLayer::Player) {
 				mPlayer = static_cast<PlayerObject*>(mSightedPlayer);
 				mCanSeePlayer = true;
@@ -103,6 +105,12 @@ void GuardObject::RaycastToPlayer() {
 		mCanSeePlayer = false;
 		mSightedPlayer = nullptr;
 		delete playerToChase;
+	}
+}
+
+void GuardObject::DebugMode() {
+	if (Window::GetKeyboard()->KeyDown(KeyCodes::F6)) {
+		mDebugMode = !mDebugMode;
 	}
 }
 
@@ -244,6 +252,20 @@ float* GuardObject::QueryNavmesh(float* endPos) {
 	dtPolyRef* path = new dtPolyRef[1000];
 	LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->findPath(*startRef, *endRef, startPos, endPos, filter, path, pathCount, 1000);
 	float* firstPos = new float[3] {this->GetTransform().GetPosition().x, this->GetTransform().GetPosition().y, this->GetTransform().GetPosition().z};
+
+	if (mDebugMode == true) {
+		for (int i = 0; i < *pathCount; i++) {
+			bool* isPosOverPoly = new bool;
+			float* closestPos = new float[3];
+			LevelManager::GetLevelManager()->GetBuilder()->GetNavMeshQuery()->closestPointOnPoly(path[i], firstPos, closestPos, isPosOverPoly);
+			Debug::DrawLine(Vector3(firstPos[0], firstPos[1], firstPos[2]), Vector3(closestPos[0], closestPos[1], closestPos[2]));
+			firstPos[0] = closestPos[0];
+			firstPos[1] = closestPos[1];
+			firstPos[2] = closestPos[2];
+			delete isPosOverPoly;
+			delete[] closestPos;
+		}
+	}
 
 	delete[] startPos;
 	delete[] halfExt;
