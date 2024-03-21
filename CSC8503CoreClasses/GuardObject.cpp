@@ -85,7 +85,6 @@ void GuardObject::RaycastToPlayer() {
 		Ray r = Ray(this->GetTransform().GetPosition(), playerToChaseDir);
 		if (LevelManager::GetLevelManager()->GetGameWorld()->Raycast(r, closestCollision, true, this, true)) {
 			mSightedPlayer = (GameObject*)closestCollision.node;
-			
 			Debug::DrawLine(this->GetTransform().GetPosition(), closestCollision.collidedAt);
 			if (mSightedPlayer->GetCollisionLayer() == CollisionLayer::Player) {
 				mPlayer = static_cast<PlayerObject*>(mSightedPlayer);
