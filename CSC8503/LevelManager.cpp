@@ -293,6 +293,7 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 
 	for (const auto buffsObserver : mPlayerBuffsObservers)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(buffsObserver);
+	mWorld->SortObjects();
 }
 
 void LevelManager::SendWallFloorInstancesToGPU() {

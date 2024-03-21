@@ -6,6 +6,7 @@
 #include "../SceneManager.h"
 
 using namespace SuspicionSystem;
+using namespace NCL::CSC8503;
 
 void LocationBasedSuspicion::Init(){
 	mLocationSusAmountMap.clear();

@@ -40,6 +40,8 @@ namespace NCL {
 				shuffleObjects = state;
 			}
 
+			void SortObjects();
+
 			bool Raycast(Ray& r, RayCollision& closestCollision, bool closestObject = false, GameObject* ignore = nullptr, bool ignoreNotRendered = false) const;
 
 			virtual void UpdateWorld(float dt);
