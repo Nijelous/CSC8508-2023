@@ -61,10 +61,7 @@ void GameWorld::GetObjectIterators(
 }
 
 void GameWorld::OperateOnContents(GameObjectFunc f) {
-	int count = 0;
 	for (GameObject* g : gameObjects) {
-		std::cout << count << std::endl;
-		count++;
 		f(g);
 	}
 }

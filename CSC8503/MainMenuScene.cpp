@@ -15,9 +15,9 @@ MainMenuScene::MainMenuScene() : Scene() {
 	mIsMultiplayerLobbyOnHost = false;
 #ifdef USEGL
 	ImGuiIO& imguiIO = ImGui::GetIO();
-	mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
-	mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
-	mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	//mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	//mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	//mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
 	imguiIO.Fonts->Build();
 	InitPanelDrawFuncMap();
 	Scene::InitCamera();
@@ -30,9 +30,7 @@ MainMenuScene::~MainMenuScene() {
 
 void MainMenuScene::UpdateGame(float dt) {
 #ifdef USEPROSPERO
-	Debug::Print("1-) Start Single Player", Vector2(30, 70));
-	Debug::Print("2-) Start Multi Player (Server)", Vector2(30, 75));
-	Debug::Print("3-) Start Multi Player (Client)", Vector2(30, 80));
+	Debug::Print("Press X to continue", Vector2(30, 70));
 #endif
 
 	Scene::UpdateGame(dt);

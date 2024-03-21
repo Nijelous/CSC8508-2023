@@ -1035,6 +1035,19 @@ void GameTechRenderer::SetUIiconBufferSizes(size_t newVertCount) {
 	}
 }
 
+void GameTechRenderer::AddLight(Light* lightPtr) {
+	if (mLights.size() >= MAX_POSSIBLE_LIGHTS) return;
+	mLights.push_back(lightPtr);
+
+}
+
+void GameTechRenderer::ClearLights() {
+	for (int i = 0; i < mLights.size(); i++) {
+		delete(mLights[i]);
+	}
+	mLights.clear();
+}
+
 int GameTechRenderer::FindTexHandleIndex(GLuint texId) {
 	for (int i = 0; i < mTextureHandles.size(); i++) {
 		if (texId == mTextureHandles[i].first) {

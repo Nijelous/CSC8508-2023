@@ -262,19 +262,18 @@ void LevelManager::LoadLevel(int levelID, std::mt19937 seed, int playerID, bool 
 		LoadDoorsInNavGrid();
 		std::cout << "Nav Mesh Set\n";
 		});
-
-	if (!isMultiplayer) {
-		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
-	}
-	Transform offsetKey = Transform();
+	/*Transform offsetKey = Transform();
 	offsetKey.SetOrientation(Quaternion(0, 0.71, 0, 0.71));
 	offsetKey.SetScale(Vector3(-194.3, -2, 26.1));
 	offsetKey.SetPosition(mTempPlayer->GetTransform().GetPosition());
 	mLevelLayout.push_back(AddDecorationToWorld(offsetKey, "Bed"));
 	Vector3 position = mTempPlayer->GetTransform().GetPosition();
 	position.z += 15;
-	mTempPlayer->GetTransform().SetPosition(position);
+	mTempPlayer->GetTransform().SetPosition(position);*/
 #ifdef USEGL
+	if (!isMultiplayer) {
+		AddPlayerToWorld((*mLevelList[levelID]).GetPlayerStartTransform(playerID), "Player");
+	}
 	else {
 		if (!serverPlayersPtr) {
 			DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
@@ -755,7 +754,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			//mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {

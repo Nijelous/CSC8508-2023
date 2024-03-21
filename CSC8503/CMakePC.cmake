@@ -19,8 +19,9 @@ function(Create_PC_CSC8503_Files)
         "SceneStates.h"
         "MainMenuScene.h"
         "SoundManager.h"
-        "SoundObject.h"
         "MultiplayerStates.h"
+        "BaseUI.h"
+        "WindowsUI.h"
         "ControllerInterface.h"
     )
     source_group("Header Files" FILES ${Header_Files})
@@ -52,13 +53,11 @@ function(Create_PC_CSC8503_Files)
         "SuspicionSystem/SuspicionMetre.h"
         "SuspicionSystem/SuspicionMetre.cpp"
         "SuspicionSystem/SuspicionSystem.h"
-        #"SuspicionSystem/SuspicionSystem.cpp"
     )
     source_group("Suspicion System" FILES ${Suspicion_System})
 
     set(Source_Files
         "GameTechRenderer.cpp"
-        "GameStart.cpp"
         "LevelManager.cpp"
         "NetworkedGame.cpp"
         "NetworkPlayer.cpp"
@@ -71,11 +70,23 @@ function(Create_PC_CSC8503_Files)
         "SceneStates.cpp"
         "MainMenuScene.cpp"
         "SoundManager.cpp"
-        "SoundObject.cpp"
         "MultiplayerStates.cpp"
+        "BaseUI.cpp"
+        "WindowsUI.cpp"
         "ControllerInterface.cpp"
     )
+
+
+    file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
+
     source_group("Source Files" FILES ${Source_Files})
+
+    set(ALL_FILES
+        ${Header_Files}
+        ${Source_Files}
+        ${Inventory_Buff_System}
+        ${Suspicion_System}
+    )
 
 
     file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)

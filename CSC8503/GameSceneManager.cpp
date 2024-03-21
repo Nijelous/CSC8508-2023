@@ -94,7 +94,12 @@ bool GameSceneManager::PlayerLostGame() {
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
 	Debug::Print("Welcome", Vector2(45, 50));
+#ifdef USEGL
 	Debug::Print("Press SPACE to continue", Vector2(30, 55));
+#endif
+#ifdef USEPROSEPERO
+	Debug::Print("Press X to continue", Vector2(30, 55));
+#endif
 }
 
 void GameSceneManager::DisplayVictory() {
