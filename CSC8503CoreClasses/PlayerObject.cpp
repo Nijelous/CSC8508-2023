@@ -630,8 +630,10 @@ void PlayerObject::RayCastIcon(GameObject* objectHit, float distance)
 		ChangeTransparency(false, mTransparencyTop);
 		mUi->ChangeBuffSlotTransparency(NOTICETOP, mTransparencyTop);
 	}
-	//Use ScrewDriver
+  
+	//Unlock Door
 	if ((objectHit->GetName() == "InteractableDoor") && (distance < 15) && (GetEquippedItem() == PlayerInventory::item::doorKey)) {
+
 		auto* doorHit = (Door*)objectHit;
 		if (!doorHit->GetIsOpen() && doorHit->GetIsLock()) {
 			ChangeTransparency(true, mTransparencyBot);
