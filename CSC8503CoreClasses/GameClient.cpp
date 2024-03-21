@@ -120,4 +120,17 @@ void GameClient::WriteAndSendAnnouncementSyncPacket(int annType, float time, int
 	AnnouncementSyncPacket packet(annType, time, playerNo);
 	this->SendPacket(packet);
 }
+
+void GameClient::WriteAndSendInteractablePacket(int networkObjectId, bool isOpen, int interactableItemType) {
+	SyncInteractablePacket packet(networkObjectId, isOpen, interactableItemType);
+	this->SendPacket(packet);
+}
+void GameClient::WriteAndSendInventoryPacket(int playerNo, int invSlot, int inItem, int usageCount){
+	ClientSyncItemSlotPacket packet(playerNo, invSlot, inItem, usageCount);
+	this->SendPacket(packet);
+}
+void GameClient::WriteAndSendSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) {
+	ClientSyncLocationSusChangePacket packet(cantorPairedLocation, changedValue);
+	this->SendPacket(packet);
+}
 #endif#

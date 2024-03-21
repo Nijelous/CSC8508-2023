@@ -721,7 +721,7 @@ void LevelManager::LoadItems(const std::vector<Vector3>& itemPositions, const st
 	int flagItem = dis(seed);
 	for (int i = 0; i < roomItemPositions.size(); i++) {
 		if (i == flagItem) {
-			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed);
+			mMainFlag = AddFlagToWorld(roomItemPositions[i], mInventoryBuffSystemClassPtr,mSuspicionSystemClassPtr,seed,isMultiplayer);
 			continue;
 		}
 		if (!isMultiplayer) {
@@ -1284,6 +1284,8 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 
 	newDoor->SetCollisionLayer(NoSpecialFeatures);
 
+	newDoor->Open();
+
 	if (isMultiplayerLevel) {
 		AddNetworkObject(*newDoor);
 	}
@@ -1295,7 +1297,7 @@ PrisonDoor* LevelManager::AddPrisonDoorToWorld(PrisonDoor* door, bool isMultipla
 }
 
 FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, SuspicionSystemClass* suspicionSystemClassPtr, 
-	std::mt19937 seed) {
+	std::mt19937 seed,bool isMultiplayerLevel) {
 	FlagGameObject* flag = new FlagGameObject(inventoryBuffSystemClassPtr, suspicionSystemClassPtr);
 
 	flag->SetPoints(40);
@@ -1335,7 +1337,9 @@ FlagGameObject* LevelManager::AddFlagToWorld(const Vector3& position, InventoryB
 	mPlayerInventoryObservers.push_back(flag);
 	mPlayerBuffsObservers.push_back(flag);
 	mWorld->AddGameObject(flag);
-
+	if (isMultiplayerLevel) {
+		AddNetworkObject(*flag);
+	}
 	mUpdatableObjects.push_back(flag);
 
 	return flag;
