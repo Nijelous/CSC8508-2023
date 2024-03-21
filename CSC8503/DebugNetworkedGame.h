@@ -46,6 +46,7 @@ namespace NCL{
         struct ClientSyncLocationActiveSusCausePacket;
         struct ClientSyncLocationSusChangePacket;
         struct AnnouncementSyncPacket;
+        struct GuardSpotSoundPacket;
 
         class DebugNetworkedGame : public NetworkedGame{
         public:
@@ -86,6 +87,8 @@ namespace NCL{
             void SendClientSyncLocationSusChangePacket(int cantorPairedLocation, int changedValue) const;
 
             void SendAnnouncementSyncPacket(int annType, float time,int playerNo);
+
+            void SendGuardSpotSoundPacket(int playerId) const;
 
             void SendPacketsThread();
 
@@ -146,6 +149,8 @@ namespace NCL{
             void HandleLocationSusChange(ClientSyncLocationSusChangePacket* packet) const;
 
             void HandleAnnouncementSync(const AnnouncementSyncPacket* packet) const;
+
+            void HandleGuardSpotSound(GuardSpotSoundPacket* packet) const;
 
             void AddToPlayerPeerNameMap(int playerId, const std::string& playerName);
             void HandleClientInitPacket(const ClientInitPacket* packet, int playerID);

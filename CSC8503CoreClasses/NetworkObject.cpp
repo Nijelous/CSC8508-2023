@@ -188,7 +188,13 @@ AnnouncementSyncPacket::AnnouncementSyncPacket(int annType, float time, int play
 	this->playerNo = playerNo;
 }
 
-NetworkObject::NetworkObject(GameObject& o, int id) : object(o)	{
+GuardSpotSoundPacket::GuardSpotSoundPacket(const int playerId) {
+	type = BasicNetworkMessages::GuardSpotSound;
+	size = sizeof(GuardSpotSoundPacket);
+	this->playerId = playerId;
+}
+
+NetworkObject::NetworkObject(GameObject& o, int id) : object(o) {
 	deltaErrors = 0;
 	fullErrors = 0;
 	networkID = id;

@@ -1216,7 +1216,7 @@ CCTV* LevelManager::AddCCTVToWorld(const Transform& transform, const bool isMult
 
 	camera->GenerateViewPyramid();
 	camera->SetInitAngle(transform.GetOrientation().ToEuler().y);
-	camera->SetSoundObject(new SoundObject());
+	camera->SetSoundObject(new SoundObject(mSoundManager->AddCCTVSpotSound()));
 
 	if (!isMultiplayerLevel){
 		camera->SetPlayerObjectPtr(mTempPlayer);
@@ -1282,6 +1282,7 @@ Vent* LevelManager::AddVentToWorld(Vent* vent, bool isMultiplayerLevel) {
 		AddNetworkObject(*newVent);
 	}
 
+	mUpdatableObjects.push_back(newVent);
 	mWorld->AddGameObject(newVent);
 
 	return newVent;
