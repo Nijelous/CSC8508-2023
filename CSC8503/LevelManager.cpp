@@ -27,6 +27,7 @@
 #include "NetworkObject.h"
 #include "UISystem.h"
 #include "Assets.h"
+#include "MiniMap.h"
 #include <filesystem>
 #include <fstream>
 
@@ -74,6 +75,8 @@ LevelManager::LevelManager() {
 	mIsLevelInitialised = false;
   
 	loadSoundManager.join();
+
+    InitialiseMiniMap();
 }
 
 LevelManager::~LevelManager() {
@@ -136,7 +139,7 @@ LevelManager::~LevelManager() {
 	delete mSuspicionSystemClassPtr;
 
 	delete mSoundManager;
-
+	delete mMiniMap;
 }
 
 void LevelManager::ClearLevel() {
@@ -1086,6 +1089,9 @@ void LevelManager::InitialiseIcons() {
 		{PlayerInventory::item::screwdriver, mTextures["ScrewDriver"]}
 	};
 }
+void LevelManager::InitialiseMiniMap() {
+    mMiniMap = new MiniMap(mRenderer);
+}
 
 GameObject* LevelManager::AddWallToWorld(const Transform& transform) {
 	GameObject* wall = new GameObject(StaticObj, "Wall");
@@ -1475,6 +1481,8 @@ PlayerObject* LevelManager::AddPlayerToWorld(const Transform& transform, const s
 	mTempPlayer = new PlayerObject(mWorld, mInventoryBuffSystemClassPtr, mSuspicionSystemClassPtr, mUi, new SoundObject(mSoundManager->AddWalkSound()), playerName);
 	CreatePlayerObjectComponents(*mTempPlayer, transform);
 	mWorld->GetMainCamera().SetYaw(transform.GetOrientation().ToEuler().y);
+
+    mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(mMiniMap);
 
 	mWorld->AddGameObject(mTempPlayer);
 	mUpdatableObjects.push_back(mTempPlayer);

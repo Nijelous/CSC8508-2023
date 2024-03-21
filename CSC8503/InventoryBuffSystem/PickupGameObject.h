@@ -29,6 +29,11 @@ namespace NCL {
 
             virtual void OnCollisionBegin(GameObject* otherObject) override;
 
+            bool IsBuff() const { return mIsBuff; }
+
+            PlayerInventory::item GetItem() const { return mCurrentItem; }
+            PlayerBuffs::buff GetBuff() const { return mCurrentBuff; }
+
         protected:
             void Activate(float dt); //go over the surface
             void Deactivate(float dt); // go under the surface

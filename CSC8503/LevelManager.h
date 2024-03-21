@@ -166,6 +166,8 @@ namespace NCL {
 
 			void InitialiseIcons();
 
+            void InitialiseMiniMap();
+
 			void LoadMap(const std::unordered_map<Transform, TileType>& tileMap, const Vector3& startPosition, int rotation = 0);
 
 			void LoadLights(const std::vector<Light*>& lights, const Vector3& centre, int rotation = 0);
@@ -250,6 +252,8 @@ namespace NCL {
 			std::vector<std::string> mShadersToLoad;
 
 			UISystem* mUi;
+
+            MiniMap* mMiniMap;
 
 			FlagGameObject* mMainFlag;
 
