@@ -664,7 +664,9 @@ void LevelManager::CheckRenderLoadScreen(bool& updateScreen, int linesDone, int 
 	if (updateScreen) {
 		updateScreen = false;
 		float percent = linesDone / (float)totalLines;
-		//Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
+#ifdef USEGL
+		Debug::Print(std::format("Loading: {:.0f}%", percent * 100), Vector2(25, 50), Vector4(1 - percent, percent, 0, 1), 40.0f);
+#endif
 		mRenderer->Render();
 		Debug::UpdateRenderables(0);
 	}
