@@ -854,7 +854,7 @@ void PlayerObject::UpdateGlobalUI(float dt){
 void PlayerObject::UpdateLocalUI(float dt){
 	//SusBar
 	float iconValue = SusLinerInterpolation(dt);
-
+	std::cout << iconValue << std::endl;
 	mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[0];
 	if (mSusValue > 33) {
 		mUi->GetIcons()[SUSPISION_BAR_SLOT]->mTexture = mUi->GetSusBarTexVec()[1];
@@ -870,19 +870,6 @@ void PlayerObject::UpdateLocalUI(float dt){
 	}
 	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[SUSPISION_INDICATOR_SLOT]);
 
-	//It have some problem here
-	mUiTime = mUiTime + dt;
-	mUiTime = std::fmod(mUiTime, 1.0f);
-
-	mSusValue = mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->GetLocalSusMetreValue(mPlayerID);
-
-	mSusValue = mSusValue + (mSusValue - mLastSusValue) * mUiTime;
-
-	iconValue = 100.00 - (mSusValue * 0.7 + 14.00);
-
-	mLastSusValue = mSusValue;
-
-	mUi->SetIconPosition(Vector2(90.00, iconValue), *mUi->GetIcons()[7]);
 
 	Debug::Print("POINTS: " + to_string(int(mPlayerPoints)), Vector2(0, 6));
 
