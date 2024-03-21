@@ -58,7 +58,7 @@ namespace {
 
 	constexpr float MAX_PICKPOCKET_PITCH_DIFF = 45;
 
-	constexpr bool DEBUG_MODE = true;
+	constexpr bool DEBUG_MODE = false;
 }
 
 PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
@@ -128,7 +128,7 @@ void PlayerObject::UpdateObject(float dt) {
 
 	UpdateGlobalUI(dt);
 	UpdateLocalUI(dt);
-	if (DEBUG_MODE)
+	if (mIsDebugUIEnabled)
 	{
 		ShowDebugInfo(dt);
 	}
@@ -137,16 +137,16 @@ void PlayerObject::UpdateObject(float dt) {
 void PlayerObject::ShowDebugInfo(float dt) {
 
 	if (mHasSilentSprintBuff)
-		Debug::Print("HasSilentSprint", Vector2(70, 95));
+		Debug::Print("HasSilentSprint", Vector2(55, 75));
 	switch (mPlayerSpeedState) {
 	case SpedUp:
-		Debug::Print("Sped Up", Vector2(45, 80));
+		Debug::Print("Sped Up", Vector2(55, 75));
 		break;
 	case SlowedDown:
-		Debug::Print("Slowed Down", Vector2(45, 80));
+		Debug::Print("Slowed Down", Vector2(55, 75));
 		break;
 	case Stunned:
-		Debug::Print("Stunned", Vector2(45, 80));
+		Debug::Print("Stunned", Vector2(55, 75));
 		break;
 	}
 
@@ -282,6 +282,9 @@ void PlayerObject::MovePlayer(float dt) {
 	ToggleCrouch(isCrouching);
 
 	StopSliding();
+
+	if(Window::GetKeyboard()->KeyPressed(KeyCodes::F6))
+		mIsDebugUIEnabled = !mIsDebugUIEnabled;
 }
 
 bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt) {
@@ -294,19 +297,20 @@ bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& int
 	}
 	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
 		mInteractHeldDt += dt;
-		Debug::Print(to_string(mInteractHeldDt), Vector2(40, 90));
+		if (mIsDebugUIEnabled)
+			Debug::Print(to_string(mInteractHeldDt), Vector2(55, 98));
 		if (mInteractHeldDt >= TIME_UNTIL_PICKPOCKET - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_PICKPOCKET + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::PickPocket;
-			if (DEBUG_MODE)
-				Debug::Print("PickPocket window", Vector2(40, 85));
+			if (mIsDebugUIEnabled)
+				Debug::Print("PickPocket", Vector2(55, 95));
 			return true;
 		}
 		if (mInteractHeldDt >= TIME_UNTIL_LONG_INTERACT - LONG_INTERACT_WINDOW &&
 			mInteractHeldDt <= TIME_UNTIL_LONG_INTERACT + LONG_INTERACT_WINDOW) {
 			interactType = NCL::CSC8503::InteractType::LongUse;
-			if (DEBUG_MODE)
-				Debug::Print("LongUse", Vector2(40, 85));
+			if (mIsDebugUIEnabled)
+				Debug::Print("LongUse", Vector2(55, 95));
 			return true;
 		}
 	}
@@ -881,12 +885,12 @@ void PlayerObject::UpdateLocalUI(float dt) {
 	const PlayerInventory::item equippedItem = GetEquippedItem();
 	std::string& itemName = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemName(equippedItem);
 
-	Debug::Print(itemName, Vector2(40, 85));
+	Debug::Print(itemName, Vector2(40, 82));
 	const int usesLeft = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUsesLeft(mPlayerID, mActiveItemSlot);
 
 	if(usesLeft>1){
 		const std::string& usesLeftStr = "UsesLeft : " + to_string(usesLeft);
-		Debug::Print(usesLeftStr, Vector2(39, 90));
+		Debug::Print(usesLeftStr, Vector2(39, 87));
 	}
 
 	Debug::Print(" Alert lvl:", Vector2(74, 98));
