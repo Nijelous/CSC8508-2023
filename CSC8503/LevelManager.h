@@ -4,7 +4,7 @@
 #include "GameTechRenderer.h"
 #endif
 #ifdef USEPROSPERO
-#include "../PS5Starter/GameTechAGCRenderer.h"
+#include "GameTechAGCRenderer.h"
 #endif
 #include "PhysicsSystem.h"
 #include "AnimationSystem.h"
@@ -36,9 +36,6 @@ namespace NCL {
 		class InteractableDoor;
 		class PointGameObject;
 		class NetworkPlayer;
-		class InventoryBuffSystem::PlayerInventoryObserver;
-		class InventoryBuffSystem::PlayerBuffsObserver;
-		class SuspicionSystem::GlobalSuspicionObserver;
 		struct GameResults {
 			bool mGameWon;
 			int mCurrentPoints;
@@ -93,7 +90,9 @@ namespace NCL {
 			SuspicionSystemClass* GetSuspicionSystem();
 
 			UISystem* GetUiSystem() { return mUi; };
+#ifdef USEGL
 			SoundManager* GetSoundManager() { return mSoundManager; };
+#endif
 			AnimationSystem* GetAnimationSystem() { return mAnimation; }
 
 			virtual void UpdateInventoryObserver(InventoryEvent invEvent, int playerNo, int invSlot, bool isItemRemoved = false) override;
@@ -152,6 +151,8 @@ namespace NCL {
 
 			std::vector<PlayerInventoryObserver*> GetPlayerInventoryObservers() { return mPlayerInventoryObservers; };
 			std::vector<PlayerBuffsObserver*> GetPlayerBuffsObservers() { return mPlayerBuffsObservers; };
+
+			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
 		protected:
 			LevelManager();
 			~LevelManager();
@@ -208,7 +209,7 @@ namespace NCL {
 
 			PickupGameObject* AddPickupToWorld(const Vector3& position, InventoryBuffSystemClass* inventoryBuffSystemClassPtr, const bool& isMultiplayer);
 
-			PointGameObject* AddPointObjectToWorld(const Vector3& position, int pointsWorth = 5, float initCooldown = 10);
+		
 
 			PlayerObject* AddPlayerToWorld(const Transform& transform, const std::string& playerName);
 
@@ -236,9 +237,8 @@ namespace NCL {
 
 			GameWorld* mWorld;
 			PhysicsSystem* mPhysics;
-#ifdef USEGL // remove when converted to PS5 also
+
 			AnimationSystem* mAnimation;
-#endif
 
 			SoundManager* mSoundManager;
 
@@ -287,6 +287,7 @@ namespace NCL {
 
 			bool mIsLevelInitialised;
 			bool mAreAssetsInitialised = false;
+#ifdef USEGL
 			bool mShowDebug = false;
 			bool mShowVolumes = false;
 
@@ -295,6 +296,7 @@ namespace NCL {
 			HANDLE mSelf;
 			double mUpdateObjectsTime, mRenderTime, mWorldTime, mPhysicsTime, mAnimationTime;
 			float mTakeNextTime = 0;
+#endif
 
 			std::vector<PlayerInventoryObserver*> mPlayerInventoryObservers;
 			std::vector<PlayerBuffsObserver*> mPlayerBuffsObservers;

@@ -1,0 +1,31 @@
+#include "ShaderConstants.psslh"
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	float2 UV			: TEXCOORD0;
+};
+
+SamplerState sampler			: register(s0);
+
+RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
+
+out float4 fragColour;
+
+[CxxSymbol("TestShader::ps")]
+void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+{
+	Texture2D<float4> diffuseTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffAlbedoIndex)]);
+	Texture2D<float4> diffuseLight = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.diffuseLightIndex)]);
+	Texture2D<float4> specLight = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.specularLightIndex)]);
+	float2 texCoords = vertex.UV;
+	texCoords.y = -vertex.UV.y;
+	float3 diffTexSample = diffuseTex.Sample(sampler, texCoords).xyz;
+	float3 diffLightSample = diffuseLight.Sample(sampler,texCoords).xyz;
+	float3 specLightsSample = specLight.Sample(sampler,texCoords).xyz;
+
+	fragColour.xyz = diffTexSample * 0.1;
+	fragColour.xyz += diffTexSample * diffLightSample;
+	fragColour.xyz += specLightsSample;
+	fragColour.a = 1.0;
+}

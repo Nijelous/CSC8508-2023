@@ -1,5 +1,7 @@
 #include "GameObject.h"
-#include "GameObject.h"
+
+#include "AnimationSystem.h"
+#include "../CSC8503/LevelManager.h"
 #include "CollisionDetection.h"
 #include "PhysicsObject.h"
 #include "RenderObject.h"
@@ -48,11 +50,14 @@ GameObject::~GameObject()	{
 	delete mBoundingVolume;
 	delete mPhysicsObject;
 	delete mRenderObject;
+#ifdef USEGL
 	delete mNetworkObject;
 	delete mSoundObject;
+#endif
 
 }
 
+#ifdef USEGL
 void GameObject::SetIsSensed(bool sensed){
 	mRenderObject->SetOutlined(sensed);
 }
@@ -65,7 +70,7 @@ void GameObject::SetNetworkObject(NetworkObject* netObj) {
 	mNetworkObject = netObj;
 	netObj->SetGameObject(*this);
 }
-
+#endif
 bool GameObject::GetBroadphaseAABB(Vector3&outSize) const {
 	if (!mBoundingVolume) {
 		return false;
@@ -100,8 +105,9 @@ void GameObject::UpdateBroadphaseAABB() {
 
 void GameObject::UpdateObject(float dt) {
 #ifdef USEPROSPERO
-	if (mRenderObject && GetRenderObject()->) {
-		mRenderObject->UpdateAnimation(dt);
+	if (mRenderObject) {
+		if(mRenderObject->GetAnimationObject())
+			mRenderObject->GetAnimationObject()->Update(dt);
 	}
 #endif
 }
@@ -112,12 +118,12 @@ void GameObject::SetObjectState(GameObjectState state) {
 	}
 	
 	mObjectState = state;
-
 	if (mRenderObject->GetAnimationObject() != nullptr ) {
 		AnimationSystem* animSystem = LevelManager::GetLevelManager()->GetAnimationSystem();
 		animSystem->SetAnimationState(this, mObjectState);
 	}
 
+#ifdef USEGL
 	if (mNetworkObject) {
 		SceneManager* sceneManager = SceneManager::GetSceneManager();
 		bool isServer = sceneManager->IsServer();
@@ -126,6 +132,7 @@ void GameObject::SetObjectState(GameObjectState state) {
 			scene->SendObjectStatePacket(mNetworkObject->GetnetworkID(), mObjectState);
 		}
 	}
+#endif
 }
 
 void GameObject::DrawCollisionVolume() {

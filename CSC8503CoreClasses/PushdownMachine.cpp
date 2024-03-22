@@ -6,6 +6,7 @@ using namespace NCL::CSC8503;
 PushdownMachine::PushdownMachine(PushdownState* initialState)
 {
 	this->initialState = initialState;
+	this->activeState = nullptr;
 }
 
 PushdownMachine::~PushdownMachine()
@@ -13,7 +14,7 @@ PushdownMachine::~PushdownMachine()
 }
 
 bool PushdownMachine::Update(float dt) {
-	if (activeState) {
+	if (activeState != nullptr) {
 		PushdownState* newState = nullptr;
 		PushdownState::PushdownResult result = activeState->OnUpdate(dt, &newState);
 

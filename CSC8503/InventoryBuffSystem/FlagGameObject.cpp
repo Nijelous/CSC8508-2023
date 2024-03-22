@@ -28,8 +28,13 @@ FlagGameObject::~FlagGameObject() {
 }
 
 void FlagGameObject::GetFlag(int playerNo) {
-	this->SetActive(false);
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
+#ifdef USEGL
 	GetSoundObject()->TriggerSoundEvent();
+#endif
+
+
+	this->SetActive(false);
 	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->AddItemToPlayer(InventoryBuffSystem::PlayerInventory::flag, playerNo);
 }
 
@@ -40,7 +45,7 @@ void FlagGameObject::Reset() {
 	}
 }
 
-void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId){
+void NCL::CSC8503::FlagGameObject::OnPlayerInteract(int playerId) {
 	if (this->IsRendered()) {
 		GetFlag(playerId);
 		this->SetActive(false);
@@ -54,7 +59,7 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 		Reset();
 		auto* sceneManager = SceneManager::GetSceneManager();
 		if (sceneManager->IsInSingleplayer()) break;
-
+#ifdef USEGL
 		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 
 		if (networkedGame->GetIsServer()) {
@@ -65,6 +70,7 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 			networkedGame->GetClient()->WriteAndSendInteractablePacket(this->GetNetworkObject()->GetnetworkID(), this->IsRendered(), InteractableItems::HeistItem);
 		}
 		break;
+#endif
 	}
 
 	default:
@@ -72,17 +78,17 @@ void FlagGameObject::UpdateInventoryObserver(InventoryEvent invEvent, int player
 	}
 }
 
-const bool FlagGameObject::IsMultiplayerAndIsNotServer(){
+const bool FlagGameObject::IsMultiplayerAndIsNotServer() {
+#ifdef USEGL
 	auto* sceneManager = SceneManager::GetSceneManager();
 	const bool isSingleplayer = sceneManager->IsInSingleplayer();
 	if (isSingleplayer)
 		return false;
-
 	DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
 	const bool isServer = networkedGame->GetIsServer();
 	if (!isServer)
 		return true;
-	
+#endif
 	return false;
 }
 

@@ -4,6 +4,7 @@
 #include "DebugNetworkedGame.h"
 #include "LevelManager.h"
 #include "GameClient.h"
+#include "GameSceneManager.h"
 #include "GameServer.h"
 #include "Window.h"
 #include "SceneManager.h"
@@ -11,7 +12,6 @@
 
 using namespace NCL::CSC8503;
 
-#ifdef USEGL
 
 void MainMenuSceneState::OnAwake() {
 	Window* w = Window::GetWindow();
@@ -34,15 +34,16 @@ PushdownState::PushdownResult MainMenuSceneState::OnUpdate(float dt, PushdownSta
 	MainMenuScene::MainMenuPanels currentMainMenuPanel = mMainMenuScene->GetOpenPanel();
 	MainMenuScene::LevelSelectionPanelStates currentLevelSelectionPanelState = mMainMenuScene->GetLevelSelectionPanelState();
 
-	if (currentLevelSelectionPanelState == MainMenuScene::StartSingleplayer) {
+	if (currentLevelSelectionPanelState == MainMenuScene::StartSingleplayer || SceneManager::GetSceneManager()->GetControllerInterface()->GetSelectPressed()) {
 		*newState = new SingleplayerState();
 		return PushdownResult::Push;
 	}
-
+#ifdef USEGL
 	if (currentMainMenuPanel == MainMenuScene::MultiplayerLobby) {
 		*newState = new MultiplayerLobbyState();
 		return PushdownResult::Push;
 	}
+#endif
 
 	if (Window::GetKeyboard()->KeyPressed(KeyCodes::ESCAPE)) {
 		SceneManager::GetSceneManager()->SetIsForceQuit(true);
@@ -68,7 +69,7 @@ void SingleplayerState::OnAwake() {
 	SceneManager::GetSceneManager()->SetChangeSceneTrigger(Scenes::Singleplayer);
 	GameSceneManager* gameScene = (GameSceneManager*)(SceneManager::GetSceneManager()->GetCurrentScene());
 }
-
+#ifdef USEGL
 PushdownState::PushdownResult ServerState::OnUpdate(float dt, PushdownState** newState) {
 	if (!mHostedSuccessfully) {
 		*newState = new MainMenuSceneState();

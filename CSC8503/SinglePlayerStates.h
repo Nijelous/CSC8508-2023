@@ -75,9 +75,9 @@ public:
 	GameSceneManager* mGameSceneManager;
 };
 
-class MainMenu : public PushdownState {
+class MainMenuPushdownState : public PushdownState {
 public:
-	MainMenu(GameSceneManager* currentGameState) {
+	MainMenuPushdownState(GameSceneManager* currentGameState) {
 		mGameSceneManager = currentGameState;
 	}
 

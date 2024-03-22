@@ -1,0 +1,66 @@
+#include "ShaderConstants.psslh"
+#include "LightData.psslh"
+
+
+struct VS_OUTPUT
+{
+	float4 Position		: S_POSITION;
+	uint LightID		: TEXCOORD0;
+};
+
+SamplerState sampler			: register(s0);
+
+RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
+RegularBuffer<LightData> lightBuffer		: register(t1);
+
+
+out float4 fragColour[2];
+
+[CxxSymbol("TestShader::ps")]
+void main(VS_OUTPUT vertex, float2 pixelPos : S_POSITION) : S_TARGET_OUTPUT
+{
+	LightData light = lightBuffer[vertex.LightID];
+	
+	float2 fragCoord = pixelPos * Constants.pixelSize;
+	Texture2D<float4> depthTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffDepthIndex)]);
+
+	float depth = depthTex.Sample(sampler, fragCoord).x;
+	float3 ndcPos = float3(fragCoord, depth) * 2.0 - 1.0;
+	float4 invClipPos = mul(Constants.inverseViewProjMatrix, float4(ndcPos, 1.0));
+	float3 worldPos = invClipPos.xyz / invClipPos.w;
+
+	float dist = length(light.lightPos - worldPos);
+	float atten = 1.0 - clamp(dist / light.lightRadius, 0.0, 1.0);
+
+	if(atten == 0.0) {discard;}
+	
+	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(Constants.gBuffNormalIndex)]);
+	float3 normal = normalize(normalTex.Sample(sampler, fragCoord).xyz * 2.0 - 1.0);
+	float3 incident;
+	
+	if(light.lightType == 'd') incident = normalize(-light.lightDirection); 
+	else incident = normalize(light.lightPos - worldPos);
+
+	
+	float3 viewDir = normalize(Constants.cameraPos - worldPos);
+	float3 halfDir = normalize(incident + viewDir);
+
+	float lambert = clamp(dot(incident, normal), 0.0, 1.0);
+	float specFactor = clamp(dot(halfDir, normal), 0.0, 1.0);
+	specFactor = pow(specFactor, 60.0);
+	float3 attenuated = float3(0.0,0.0,0.0);
+	
+	if(light.lightType == 's') {
+		
+	float fragDotProd = dot(-light.lightDirection, incident);
+		if(fragDotProd < light.minDotProd) discard;
+		float ringDiff = light.dimDotProd - light.minDotProd;
+		float edgeDimFactor = clamp((fragDotProd - light.minDotProd) / ringDiff, 0.0, 1.0);
+		attenuated = light.lightColour * atten * edgeDimFactor;		
+	}
+	else attenuated = light.lightColour * atten;
+	
+	fragColour[0] = float4(attenuated * lambert, 1.0);
+	fragColour[1] = float4(attenuated * specFactor * 0.33, 1.0);
+	
+}

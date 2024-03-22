@@ -1,46 +1,63 @@
 #include "ShaderConstants.psslh"
+#include "VertexAttributes.psslh"
+#include "Skinning.psslh"
+#include "TechObject.psslh"
+#include "Bindless.psslh"
+#include "Vertex.psslh"
 
 struct VS_OUTPUT
 {
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
-	float4 Colour		: TEXCOORD1;
-	int	texID			: TEXCOORD2;
-	float4 ShadowClip	: TEXCOORD2;
+	float4 Colour		: TEXCOORD1;	
+	float3 Tangent		: TEXCOORD2;
+	float3 Normal		: TEXCOORD3;
+	float3 Bitangent	: TEXCOORD4;
+	int	albedoTexID		: TEXCOORD5;
+	int normalTexID		: TEXCOORD6;
+
+	int subMeshIndex	: TEXCOORD7;
+	int hasMaterial		: TEXCOORD8;
+
+	int materialLayer1Albedo : TEXCOORD9;
+	int materialLayer2Albedo : TEXCOORD10;
+	int materialLayer3Albedo : TEXCOORD11;
+	int materialLayer4Albedo : TEXCOORD12;
+
+	int materialLayer1Norm : TEXCOORD13;
+	int materialLayer2Norm : TEXCOORD14;
+	int materialLayer3Norm : TEXCOORD15;
+	int materialLayer4Norm : TEXCOORD16;
 };
 
 SamplerState sampler			: register(s0);
-SamplerState shadowSampler		: register(s1);
 
 RegularBuffer<sce::Agc::Core::Texture> textures : register(t0);
 
+out float4 fragColour[2];
+
 [CxxSymbol("TestShader::ps")]
-float4 main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
+void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 {
-	Texture2D<float4> tex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.texID)]);
+	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
 
-	float4 texSample = tex.Sample(sampler, vertex.UV) * vertex.Colour;
+	int finalTextureID = DetermineTextureID(vertex.hasMaterial, vertex.subMeshIndex, vertex.materialLayer1Albedo, vertex.materialLayer2Albedo, vertex.materialLayer3Albedo, vertex.materialLayer4Albedo, vertex.albedoTexID);
+	//int finalNormalID  = DetermineTextureID(vertex.hasMaterial, vertex.subMeshIndex, vertex.materialLayer1Norm, vertex.materialLayer2Norm, vertex.materialLayer3Norm, vertex.materialLayer4Norm, vertex.albedoTexID);
 
-	//Shadow mapping		
-	Texture2D<float> shadowTex = Texture2D<float>(textures[Constants.shadowID]);
+	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(finalTextureID)]);
+	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
 
-	float3 shadowNDC		= vertex.ShadowClip.xyz / vertex.ShadowClip.w;
-
-	shadowNDC.xy = (shadowNDC.xy * 0.5f) + float2(0.5f);
-	shadowNDC.y = 1.0f - shadowNDC.y;
-
-	float  shadowSample		= shadowTex.Sample(shadowSampler, shadowNDC.xy);
-
-	float shadow = 1.0f;
-	float offset        = -0.001f;
-
-	if(shadowNDC.x > 0.0f && shadowNDC.x < 1.0f && 
-       shadowNDC.y > 0.0f && shadowNDC.y < 1.0f &&
-	   shadowNDC.z > 0.0f && shadowNDC.z < 1.0f) {
-        if(shadowSample < shadowNDC.z + offset) {
-            shadow = 0.5f;
-        }
-    } 
+	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
+	bumpNormal = pow(bumpNormal, 1.0f / 2.2f);
+	bumpNormal = bumpNormal * 2.0 - 1.0;
 	
-	return texSample * float4(shadow,shadow,shadow,1);  
+	bumpNormal = normalize(mul(normalize(bumpNormal), TBN));
+
+	vertex.UV = FlipTexture(vertex.UV, vertex.hasMaterial);
+
+	float4 albedoSample = albedoTex.Sample(sampler, vertex.UV);
+	float4 normalSample = float4(bumpNormal * 0.5 + 0.5, 1.0);
+
+	fragColour[0] = albedoSample;
+	fragColour[1].xyz = normalSample.xyz;
 }

@@ -1,0 +1,25 @@
+#include "ShaderConstants.psslh"
+#include "VertexAttributes.psslh"
+#include "Skinning.psslh"
+#include "TechObject.psslh"
+#include "LightData.psslh"
+
+RegularBuffer<LightData> lightBuffer		: register(t1);
+
+struct VS_OUTPUT
+{
+	float4 Position	: S_POSITION;
+	uint LightID	: TEXCOORD0;
+};
+
+[CxxSymbol("TestShader::gs")]
+VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA)
+{	
+	VS_OUTPUT Output;
+
+	float3 scale = float3(lightBuffer[objID].lightRadius,lightBuffer[objID].lightRadius,lightBuffer[objID].lightRadius);
+	float3 worldPos = (Positions[vertID] * scale) + lightBuffer[objID].lightPos; 
+	Output.Position = mul(Constants.viewProjMatrix,float4(worldPos,1));
+	Output.LightID = objID;
+	return Output;
+}

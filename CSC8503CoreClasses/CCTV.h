@@ -2,6 +2,7 @@
 #include "GameObject.h"
 #include "Pyramid.h"
 #include "../CSC8503/NetworkPlayer.h"
+#include "PlayerObject.h"
 
 namespace NCL {
 	namespace CSC8503 {

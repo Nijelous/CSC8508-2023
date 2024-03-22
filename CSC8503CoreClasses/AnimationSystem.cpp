@@ -1,5 +1,3 @@
-#ifdef USEGL
-
 #include "AnimationSystem.h"
 #include "Camera.h"
 #include "AnimationObject.h"
@@ -70,7 +68,6 @@ void AnimationSystem::UpdateAllAnimationObjects(float dt, vector<GameObject*> up
 				obj->GetRenderObject()->SetFrameMatricesVec(frameMatricesVec);
 
 				frameMatricesVec.clear();
-
 			}
 		}
 	}
@@ -114,7 +111,6 @@ void AnimationSystem::SetAnimationState(GameObject* gameObject, GameObject::Game
 	}
 	gameObject->GetRenderObject()->GetAnimationObject()->SetAnimation(anim);
 }
-#endif
 
 void AnimationSystem::InitGuardStateAnimationMap() {
 	mGuardStateAnimationMap = {

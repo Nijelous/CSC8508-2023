@@ -115,7 +115,9 @@ void PickupGameObject::ActivatePickup(int playerNo) {
 	bool isServer = sceneManager->IsServer();
 	if (!isSinglePlayer && !isServer)
 		return;
+#ifdef USEGL
 	GetSoundObject()->TriggerSoundEvent();
+#endif
 	if (mIsBuff)
 		mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->ApplyBuffToPlayer(mCurrentBuff, playerNo);
 

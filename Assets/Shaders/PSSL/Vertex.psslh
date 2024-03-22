@@ -3,8 +3,8 @@ void TransformVertexToWorld(ObjectState s, uint vertID, out float4 position, out
 	float3 vNormal;
 	float4 vTangent;
 	
-	if(s.index[1] > 0) {
-		RegularBuffer<SkinnedVertex> skinBuffer = bindlessBuffers[s.index[1]];
+	if(s.index[2] > 0) {
+		RegularBuffer<SkinnedVertex> skinBuffer = bindlessBuffers[s.index[2]];
 		SkinnedVertex v = skinBuffer[vertID];
 
 		vPos		= v.position;
@@ -15,11 +15,39 @@ void TransformVertexToWorld(ObjectState s, uint vertID, out float4 position, out
 		vPos		= Positions[vertID];
 		vNormal		= Normals[vertID];
 		vTangent	= Tangents[vertID];
+		
 	}		
 	
+	normal = vNormal;
+	tangent = vTangent;
 	position = mul(s.modelMatrix,float4(vPos.xyz, 1));
 }
 
 float4 TransformWorldToClip(in float4 world) {
 	return mul(Constants.projMatrix,mul(Constants.viewMatrix,world));
+}
+
+int DetermineTextureID(int hasMaterials, int subMeshIndex, int texture1ID, int texture2ID, int texture3ID, int texture4ID, int defaultTex) {
+	if (hasMaterials == 1) {
+		if (subMeshIndex == 0){
+			return texture1ID;
+		}
+		if (subMeshIndex == 1){
+			return texture2ID;
+		}
+		if (subMeshIndex == 2){
+			return texture3ID;
+		}
+		if (subMeshIndex == 3){
+			return texture4ID;
+		}
+	}
+	return defaultTex;
+}
+
+float2 FlipTexture(float2 currentTex, int isMaterial) {
+	if (isMaterial == 1) {
+		currentTex.y = currentTex.y * -1;
+	}
+	return currentTex;
 }

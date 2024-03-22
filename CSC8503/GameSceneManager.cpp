@@ -61,7 +61,7 @@ void GameSceneManager::UpdateGame(float dt) {
 }
 
 void GameSceneManager::InitInGameMenuManager() {
-	auto* mainMenu = new MainMenu(this);
+	auto* mainMenu = new MainMenuPushdownState(this);
 	mPushdownMachine = new PushdownMachine(mainMenu);
 }
 
@@ -76,7 +76,12 @@ void GameSceneManager::InitCamera() {
 void GameSceneManager::CreateLevel() {
 	std::random_device rd;
 	std::mt19937 g(rd());
+#ifdef USEGL
 	mLevelManager->LoadLevel(1, g, 0);
+#endif
+#ifdef USEPROSPERO
+	mLevelManager->LoadLevel(0, g, 0);
+#endif
 }
 
 bool GameSceneManager::PlayerWonGame() {
@@ -96,7 +101,12 @@ bool GameSceneManager::PlayerLostGame() {
 void GameSceneManager::DisplayMainMenu() {
 	// to be replaced by proper UI
 	Debug::Print("Welcome", Vector2(45, 50));
+#ifdef USEGL
 	Debug::Print("Press SPACE to continue", Vector2(30, 55));
+#endif
+#ifdef USEPROSEPERO
+	Debug::Print("Press X to continue", Vector2(30, 55));
+#endif
 }
 
 void GameSceneManager::DisplayVictory() {

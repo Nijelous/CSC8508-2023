@@ -1,5 +1,16 @@
 struct ObjectState {
 		matrix modelMatrix;
+		matrix invModelMatrix;
 		float4 colour;
 		int index[4];
+
+		int hasMaterials;
+
+		int materialLayerAlbedos[24];
+		int materialLayerNormals[24];
+};
+
+struct Temp {
+	int objID;
+	int subMeshID;
 };

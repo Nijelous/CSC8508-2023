@@ -9,7 +9,9 @@ using namespace NCL::CSC8503;
 void Door::Open() {
 	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0, 7.25, 0));
 	SetNavMeshFlags(1);
+#ifdef USEGL
 	this->GetSoundObject()->TriggerSoundEvent();
+#endif
 	mTimer = initDoorTimer;
 	mIsOpen = true;
 }
@@ -17,7 +19,9 @@ void Door::Open() {
 void Door::Close() {
 	GetTransform().SetPosition(GetTransform().GetPosition() + Vector3(0,-7.25,0));
 	SetNavMeshFlags(2);
+#ifdef USEGL
 	this->GetSoundObject()->CloseDoorTriggered();
+#endif
 	mTimer = -1;
 	mIsOpen = false;
 }
@@ -41,6 +45,7 @@ void Door::SetIsOpen(bool toOpen) {
 
 	auto* sceneManager = SceneManager::GetSceneManager();
 	const bool isSingleplayer = sceneManager->IsInSingleplayer();
+#ifdef USEGL
 	if (!isSingleplayer)
 	{
 		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(sceneManager->GetCurrentScene());
@@ -48,6 +53,7 @@ void Door::SetIsOpen(bool toOpen) {
 		if (!isServer)
 			return;
 	}
+#endif
 
 	if(toOpen) {
 		Open();

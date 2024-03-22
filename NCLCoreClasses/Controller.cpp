@@ -36,7 +36,7 @@ float	Controller::GetNamedButtonAnalogue(const std::string& button) const {
 	return 0.0f;
 }
 
-bool	Controller::GetNamedButton(const std::string& button) const {
+ bool	Controller::GetNamedButton(const std::string& button) const {
 	auto a = buttonMappings.find(button);
 	if (a != buttonMappings.end()) {
 		return GetButton(a->second);

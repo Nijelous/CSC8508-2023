@@ -1,0 +1,9 @@
+struct LightData {
+				float3 lightDirection = { 0,0,0 };
+				float minDotProd = 0.0f;
+				float3 lightPos = { 0,0,0 };
+				float dimDotProd = 0.0f;
+				float3 lightColour = { 0,0,0 };
+				float lightRadius = 0.0f;
+				char lightType = '0';
+			};

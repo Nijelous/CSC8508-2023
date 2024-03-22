@@ -231,8 +231,6 @@ namespace NCL {
 			GLuint iconVertVBO;
 			GLuint iconTexVBO;
 
-			vector<Light*> mLights;
-
 			Frustum mFrameFrustum;
 
 			UISystem* mUi;

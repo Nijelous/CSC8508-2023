@@ -1,5 +1,7 @@
 ﻿#include <map>
 
+#include "ControllerInterface.h"
+
 namespace NCL {
     namespace CSC8503 {
 		
@@ -32,6 +34,9 @@ namespace NCL {
             Scene* GetScene(Scenes sceneType);
             Scenes GetCurrentSceneType() const;
             static SceneManager* GetSceneManager();
+
+            ControllerInterface* GetControllerInterface() const { return mControllerInterface; }
+
         protected:
             bool isForceQuit = false;
             bool mIsInSingleplayer = false;
@@ -46,6 +51,8 @@ namespace NCL {
             PushdownMachine* pushdownMachine = nullptr;
 
             std::map<Scenes, Scene*> gameScenesMap;
+
+            ControllerInterface* mControllerInterface;
         };
     }
 }

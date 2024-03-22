@@ -34,8 +34,10 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 
 		playerTransform.SetPosition(newPlayerPos);
 		playerTransform.SetOrientation(teleportOrient);
+#ifdef USEGL
 		this->GetSoundObject()->TriggerSoundEvent();
 		mConnectedVent->GetSoundObject()->TriggerSoundEvent();
+#endif
 		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().SetYaw(mTransform.GetOrientation().ToEuler().y);
 #ifdef PROSPERO
 		SetIsOpen(false, true);
@@ -107,7 +109,9 @@ void Vent::SetIsOpen(bool isOpen, bool isSettedByServer) {
 		SyncVentStatusInMultiplayer();
 	}
 	if (mIsOpen == true) {
+#ifdef USEGL
 		this->GetSoundObject()->LockDoorTriggered();
+#endif
 	}
 }
 
@@ -134,6 +138,7 @@ bool Vent::CanBeInteractedWith(InteractType interactType, GameObject* interacted
 		return CanUseItem() && !mIsOpen;
 		break;
 	default:
+		return false;
 		break;
 	}
 }

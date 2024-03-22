@@ -24,7 +24,7 @@ namespace NCL {
 
             void OnAwake() override;
         };
-
+#ifdef USEGL
         class ServerState : public PushdownState {
         public:
             ServerState() {}
@@ -58,5 +58,6 @@ namespace NCL {
 
             MainMenuScene* mMainMenuScene;
         };
+#endif
     }
 }

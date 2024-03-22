@@ -29,7 +29,9 @@ void SoundEmitter::UpdateObject(float dt) {
 		NCL::Maths::Vector3 pos = GetTransform().GetPosition();
 		mLocationBasedSuspicionPTR->RemoveActiveLocationSusCause(LocationBasedSuspicion::continouousSound, pos);
 		this->SetActive(false);
+#ifdef USEGL
 		this->GetSoundObject()->GetChannel()->setPaused(true);
+#endif
 	}
 }
 

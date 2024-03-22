@@ -25,8 +25,10 @@ void PlayerBuffs::ApplyBuffToPlayer(const buff& inBuff, const int& playerNo){
 	{
 		mActiveBuffDurationMap[playerNo][inBuff] = mBuffInitDurationMap[inBuff];
 	}
-
+#ifdef USEGL
 	HandleBuffNetworking(inBuff, playerNo,true);
+#endif
+	Notify(mOnBuffAppliedBuffEventMap[inBuff], playerNo);
 }
 
 void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
@@ -35,8 +37,10 @@ void PlayerBuffs::RemoveBuffFromPlayer(const buff& inBuff, const int& playerNo){
 	if (foundBuff != mActiveBuffDurationMap[playerNo].end())
 	{
 		mBuffsToRemove[playerNo].push_back(inBuff);
-
+#ifdef USEGL
 		HandleBuffNetworking(inBuff, playerNo, false);
+#endif
+
 	}
 };
 
@@ -132,6 +136,7 @@ float PlayerBuffs::GetBuffDuration(PlayerBuffs::buff inBuff) {
 }
 
 void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSync, bool toApply){
+#ifdef USEGL
 	DebugNetworkedGame* game = reinterpret_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
 	const bool isServer = game->GetIsServer();
 	if (localPlayerID != playerID && !isServer)
@@ -141,4 +146,5 @@ void PlayerBuffs::SyncPlayerBuffs(int playerID, int localPlayerID, buff buffToSy
 		ApplyBuffToPlayer(buffToSync, playerID);
 	else
 		RemoveBuffFromPlayer(buffToSync, playerID);
+#endif
 }

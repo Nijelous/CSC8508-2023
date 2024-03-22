@@ -15,24 +15,24 @@ MainMenuScene::MainMenuScene() : Scene() {
 	mCurrentOpenPanel = LevelSelection;
 	mMultiplayerLobbyState = Lobby;
 	mIsMultiplayerLobbyOnHost = false;
+#ifdef USEGL
 	ImGuiIO& imguiIO = ImGui::GetIO();
-	mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	/*mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
 	mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
-	mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());*/
 	imguiIO.Fonts->Build();
 	InitPanelDrawFuncMap();
 	Scene::InitCamera();
 	InitIpAddress();
+#endif
 }
 
 MainMenuScene::~MainMenuScene() {
 }
 
 void MainMenuScene::UpdateGame(float dt) {
-#ifdef USEPRESPERO
-	Debug::Print("1-) Start Single Player", Vector2(30, 70));
-	Debug::Print("2-) Start Multi Player (Server)", Vector2(30, 75));
-	Debug::Print("3-) Start Multi Player (Client)", Vector2(30, 80));
+#ifdef USEPROSPERO
+	Debug::Print("Press X to continue", Vector2(30, 70));
 #endif
 
 	Scene::UpdateGame(dt);
@@ -83,6 +83,7 @@ void MainMenuScene::InitPanelDrawFuncMap() {
 }
 
 void MainMenuScene::DrawLevelSelectionPanel() {
+#ifdef USEGL
 	ImVec2 windowSize = ImGui::GetWindowSize();
 
 	ImGui::PushFont(mButtonFont);
@@ -111,9 +112,11 @@ void MainMenuScene::DrawLevelSelectionPanel() {
 	ImGui::SetCursorPos(ImVec2(windowSize.x * .005f, windowSize.y * .96f));
 	ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<OGLTexture*>(LevelManager::GetLevelManager()->GetTexture("1pStudios"))->GetObjectID());
 	ImGui::Image(texID, ImVec2(windowSize.x * .2f, windowSize.y * 0.025f));
+#endif
 }
 
 void MainMenuScene::DrawMultiplayerLobby() {
+#ifdef USEGL
 	ImGui::PushFont(mInputFont);
 	ImVec2 windowSize = ImGui::GetWindowSize();
 	ImGui::SetCursorPos(ImVec2(windowSize.x * .01f, windowSize.y * .01f));
@@ -192,6 +195,7 @@ void MainMenuScene::TranslateIpAddress() {
 		token = strtok_s(NULL, ".", &nextToken);
 		index++;
 	}
+#endif
 }
 
 void MainMenuScene::TranslatePlayerName() {

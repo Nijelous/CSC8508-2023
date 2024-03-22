@@ -6,8 +6,6 @@
 #include "GameSceneManager.h"
 #include "LevelManager.h"
 
-#ifdef USEGL
-
 using namespace NCL::CSC8503;
 
 SceneManager* SceneManager::instance = nullptr;
@@ -16,6 +14,7 @@ SceneManager::SceneManager() {
 	currentScene = nullptr;
 	InitScenes();
 	InitPushdownMachine();
+	mControllerInterface = new ControllerInterface();
 }
 
 SceneManager::~SceneManager() {
@@ -107,4 +106,3 @@ SceneManager* SceneManager::GetSceneManager() {
 	}
 	return instance;
 }
-#endif

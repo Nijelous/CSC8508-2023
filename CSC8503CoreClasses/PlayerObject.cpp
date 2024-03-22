@@ -13,6 +13,7 @@
 #include "Vent.h"
 #include "Door.h"
 #include "Debug.h"
+#include "../CSC8503/SceneManager.h"
 
 
 
@@ -29,8 +30,8 @@ namespace {
 	constexpr int MAX_WALK_SPEED = 9;
 	constexpr int MAX_SPRINT_SPEED = 20;
 
-	constexpr int SPED_UP_MAX_CROUCH_SPEED = 7.5;
-	constexpr int SPED_UP_MAX_WALK_SPEED = 13.5;
+	constexpr float SPED_UP_MAX_CROUCH_SPEED = 7.5;
+	constexpr float SPED_UP_MAX_WALK_SPEED = 13.5;
 	constexpr int SPED_UP_MAX_SPRINT_SPEED = 30;
 
 	constexpr int DEFAULT_CROUCH_SPEED = 35;
@@ -90,6 +91,34 @@ PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffS
 	mAnnouncementMap.clear();
 }
 
+PlayerObject::PlayerObject(GameWorld* world, InventoryBuffSystem::InventoryBuffSystemClass* inventoryBuffSystemClassPtr,
+	SuspicionSystem::SuspicionSystemClass* suspicionSystemClassPtr,
+	UISystem* UI,
+	const std::string& objName,
+	int playerID, int walkSpeed, int sprintSpeed, int crouchSpeed, Vector3 boundingVolumeOffset) {
+	mName = objName;
+	mGameWorld = world;
+	mInventoryBuffSystemClassPtr = inventoryBuffSystemClassPtr;
+	mSuspicionSystemClassPtr = suspicionSystemClassPtr;
+	SetUIObject(UI);
+	mInventoryBuffSystemClassPtr->GetPlayerBuffsPtr()->Attach(this);
+	mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->Attach(this);
+	mWalkSpeed = walkSpeed;
+	mSprintSpeed = sprintSpeed;
+	mCrouchSpeed = crouchSpeed;
+	mMovementSpeed = walkSpeed;
+	mObjectState = Walk;
+	mPlayerSpeedState = Default;
+	mIsCrouched = false;
+	mActiveItemSlot = 0;
+
+	mPlayerID = playerID;
+	mPlayerPoints = 0;
+	mIsPlayer = true;
+	mHasSilentSprintBuff = false;
+	mInteractHeldDt = 0;
+}
+
 PlayerObject::~PlayerObject() {
 }
 
@@ -107,7 +136,7 @@ void PlayerObject::UpdateObject(float dt) {
 			RayCastFromPlayerForUI(mGameWorld, dt);
 		if (mInventoryBuffSystemClassPtr != nullptr)
 			ControlInventory();
-		if (!Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
+		if (!SceneManager::GetSceneManager()->GetControllerInterface()->GetInteractHeld()) {
 			mInteractHeldDt = 0;
 		}
 
@@ -216,12 +245,16 @@ void PlayerObject::UpdatePlayerBuffsObserver(BuffEvent buffEvent, int playerNo) 
 		mSuspicionSystemClassPtr->GetLocalSuspicionMetre()->
 			RemoveActiveLocalSusCause(SuspicionSystem::LocalSuspicionMetre::playerSprint, mPlayerID);
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 1.0);
+#ifdef USEGL
 		this->GetSoundObject()->CloseDoorTriggered();
+#endif
 		break;
 	case silentSprintRemoved:
 		mHasSilentSprintBuff = false;
 		mUi->ChangeBuffSlotTransparency(SILENT_BUFF_SLOT, 0.3);
+#ifdef USEGL
 		this->GetSoundObject()->CloseDoorFinished();
+#endif
 		mObjectState = Idle;
 
 		break;
@@ -244,29 +277,36 @@ void PlayerObject::MovePlayer(float dt) {
 	Vector3 fwdAxis = mGameWorld->GetMainCamera().GetForwardVector();
 	Vector3 rightAxis = mGameWorld->GetMainCamera().GetRightVector();
 	bool isIdle = true;
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::W)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveForward()){
+		Vector3 force = fwdAxis * mMovementSpeed;
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::S)) {
-		mPhysicsObject->AddForce(-fwdAxis * mMovementSpeed);
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveBackwards()){
+#ifdef USEGL
+		fwdAxis = fwdAxis * -1;
+#endif
+		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::A)) {
-		mPhysicsObject->AddForce(-rightAxis * mMovementSpeed);
-		isIdle = false;
-	}
-
-	if (Window::GetKeyboard()->KeyDown(KeyCodes::D)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveRight()){
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
 	}
 
-	bool isSprinting = Window::GetKeyboard()->KeyDown(KeyCodes::SHIFT);
-	bool isCrouching = Window::GetKeyboard()->KeyPressed(KeyCodes::CONTROL);
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveLeft()){
+#ifdef USEGL
+		rightAxis = rightAxis * -1;
+#endif
+		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
+		isIdle = false;
+	}
 
+	bool isSprinting = SceneManager::GetSceneManager()->GetControllerInterface()->GetSprintDown();
+	bool isCrouching = SceneManager::GetSceneManager()->GetControllerInterface()->GetCrouchPressed();
+	
 	GetTransform().SetOrientation(Quaternion::EulerAnglesToQuaternion(mGameWorld->GetMainCamera().GetPitch(), mGameWorld->GetMainCamera().GetYaw(), 0));
 
 	if (isIdle) {
@@ -291,13 +331,12 @@ void PlayerObject::MovePlayer(float dt) {
 
 bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& interactType, float dt) {
 	//TODO(erendgrmnc): not a best way to handle, need to refactor here later.
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::E)) {
-
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->GetInteractPressed()) {
 		interactType = NCL::CSC8503::InteractType::Use;
 		mInteractHeldDt = 0;
 		return true;
 	}
-	else if (Window::GetKeyboard()->KeyHeld(KeyCodes::E)) {
+	else if (SceneManager::GetSceneManager()->GetControllerInterface()->GetInteractHeld()) {
 		mInteractHeldDt += dt;
 		if (mIsDebugUIEnabled)
 			Debug::Print(to_string(mInteractHeldDt), Vector2(55, 98));
@@ -316,7 +355,7 @@ bool NCL::CSC8503::PlayerObject::GotRaycastInput(NCL::CSC8503::InteractType& int
 			return true;
 		}
 	}
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left) && GetEquippedItem() != PlayerInventory::item::none) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->UseItemPressed() && GetEquippedItem() != PlayerInventory::item::none) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(GetEquippedItem());
 		if (equippedItemUseType != ItemUseType::NeedInteractableToUse)
 			return false;
@@ -345,7 +384,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inter
 			}
 
 			//Check if object is an item.
-#ifdef USEGL
 			Item* item = dynamic_cast<Item*>(objectHit);
 			if (item != nullptr) {
 				item->OnPlayerInteract(mPlayerID);
@@ -362,7 +400,6 @@ void PlayerObject::RayCastFromPlayer(GameWorld* world, const NCL::CSC8503::Inter
 
 				return;
 			}
-#endif
 			if (interactType == PickPocket)
 			{
 				GameObject* otherPlayerObject = dynamic_cast<GameObject*>(objectHit);
@@ -396,12 +433,12 @@ void PlayerObject::RayCastFromPlayerForUI(GameWorld* world, const float dt) {
 }
 
 void PlayerObject::ControlInventory() {
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM1)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->CheckSwitchItemOne()) {
 		mActiveItemSlot = 0;
 		mUi->ChangeBuffSlotTransparency(FIRST_ITEM_SLOT, 1.0);
 		mUi->ChangeBuffSlotTransparency(SECOND_ITEM_SLOT, 0.5);
 	}
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::NUM2)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->CheckSwitchItemTwo()) {
 		mActiveItemSlot = 1;
 	}
 	if (Window::GetMouse()->GetWheelMovement() > 0) {
@@ -426,14 +463,14 @@ void PlayerObject::ControlInventory() {
 
 	PlayerInventory::item equippedItem = GetEquippedItem();
 
-	if (Window::GetMouse()->ButtonPressed(MouseButtons::Left)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->UseItemPressed()) {
 		ItemUseType equippedItemUseType = mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->GetItemUseType(equippedItem);
 		if (equippedItemUseType == DirectUse) {
 			mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->UseItemInPlayerSlot(mPlayerID, mActiveItemSlot);
 		}
 	}
 
-	if (Window::GetKeyboard()->KeyPressed(KeyCodes::Q)) {
+	if (SceneManager::GetSceneManager()->GetControllerInterface()->GetDropItemPressed()) {
 		mInventoryBuffSystemClassPtr->GetPlayerInventoryPtr()->DropItemFromPlayer(mPlayerID, mActiveItemSlot);
 	}
 

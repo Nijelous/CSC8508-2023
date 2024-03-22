@@ -6,7 +6,7 @@ InventoryBuffSystem::Item::Item(PlayerInventory::item itemType, InventoryBuffSys
 	mInventoryBuffSystemClassPtr = &inventoryBuffSystemClass;
 }
 
-void InventoryBuffSystem::Item::OnPlayerInteract(int playerId) {
-}
+//void InventoryBuffSystem::Item::OnPlayerInteract(int playerId) {
+//}
 
 

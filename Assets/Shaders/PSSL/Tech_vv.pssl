@@ -10,17 +10,32 @@ struct VS_OUTPUT
 	float4 Position		: S_POSITION;
 	float2 UV			: TEXCOORD0;
 	float4 Colour		: TEXCOORD1;	
-	int	texID			: TEXCOORD2;
+	float3 Tangent		: TEXCOORD2;
+	float3 Normal		: TEXCOORD3;
+	float3 Bitangent	: TEXCOORD4;
+	int	albedoTexID		: TEXCOORD5;
+	int normalTexID		: TEXCOORD6;
 
-	float4 ShadowClip	: TEXCOORD2;
+	int subMeshIndex	: TEXCOORD7;
+	int hasMaterial		: TEXCOORD8;
+
+	int materialLayer1Albedo : TEXCOORD9;
+	int materialLayer2Albedo : TEXCOORD10;
+	int materialLayer3Albedo : TEXCOORD11;
+	int materialLayer4Albedo : TEXCOORD12;
+
+	int materialLayer1Norm : TEXCOORD13;
+	int materialLayer2Norm : TEXCOORD14;
+	int materialLayer3Norm : TEXCOORD15;
+	int materialLayer4Norm : TEXCOORD16;
 };
 
 [CxxSymbol("TestShader::gs")]
-VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instanceID : S_INSTANCE_ID)
+VS_OUTPUT main(uint vertID : S_VERTEX_ID, Temp tempStruct : S_SRT_DATA, uint instanceID : S_INSTANCE_ID)
 {
 	VS_OUTPUT Output;
-
-	uint id = objID + instanceID;
+	
+	uint id = tempStruct.objID + instanceID;
 
 	ObjectState s = objects[id];
 
@@ -28,15 +43,35 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, uint objID : S_SRT_DATA, uint instance
 	float3 normal;
 	float4 tangent;
 	float3 bitangent;
-
+	
 	TransformVertexToWorld(s, vertID, position, normal, tangent, bitangent);
+	float3x3 normalMatrix = float3x3(s.invModelMatrix);
+	normal = normalize (mul(normal, normalMatrix));	
+	tangent.xyz = normalize(mul(tangent.xyz, normalMatrix));
+	bitangent = cross(normal, tangent.xyz) * tangent.w;
 
+
+	Output.Normal = normal;
+	Output.Tangent = tangent.xyz;
+	Output.Bitangent = bitangent;
 	Output.Position = TransformWorldToClip(position);
 	Output.UV		= TextureCoords[vertID];
 	Output.Colour	= s.colour;
-	Output.texID	= s.index[0];
+	Output.albedoTexID	= s.index[0];
+	Output.normalTexID = s.index[1];
 
-	Output.ShadowClip = mul(Constants.shadowMatrix, position);
+	Output.subMeshIndex = tempStruct.subMeshID;
+	Output.hasMaterial = s.hasMaterials;
+
+	Output.materialLayer1Albedo	= s.materialLayerAlbedos[0];
+	Output.materialLayer2Albedo = s.materialLayerAlbedos[1];
+	Output.materialLayer3Albedo	= s.materialLayerAlbedos[2];
+	Output.materialLayer4Albedo = s.materialLayerAlbedos[3];
+
+	Output.materialLayer1Norm = s.materialLayerNormals[0];
+	Output.materialLayer2Norm = s.materialLayerNormals[1];
+	Output.materialLayer3Norm = s.materialLayerNormals[2];
+	Output.materialLayer4Norm = s.materialLayerNormals[3];
 
 	return Output;
 }

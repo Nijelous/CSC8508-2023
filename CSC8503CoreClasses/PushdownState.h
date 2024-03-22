@@ -18,5 +18,14 @@ namespace NCL {
 			
 		protected:
 		};
+
+		class DefaultState : public PushdownState {
+			DefaultState() {}
+			~DefaultState() {}
+
+			PushdownResult OnUpdate(float dt, PushdownState** pushFunc) {}
+			void OnAwake() {}
+			void OnSleep() {}
+		};
 	}
 }

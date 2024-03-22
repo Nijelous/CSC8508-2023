@@ -5,6 +5,10 @@
 #include "Camera.h"
 #include <algorithm>
 
+#ifdef USEPROSPERO
+#include "../PS5Core/PS5Controller.h"
+#endif
+
 
 using namespace NCL;
 using namespace NCL::CSC8503;
@@ -66,12 +70,6 @@ void GameWorld::OperateOnContents(GameObjectFunc f) {
 
 void GameWorld::UpdateWorld(float dt) {
 	auto rng = std::default_random_engine{};
-
-#ifdef USEPROSPERO
-	for (GameObject* g : gameObjects) {
-		g->UpdateObject(dt);
-	}
-#endif
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 	std::default_random_engine e(seed);
