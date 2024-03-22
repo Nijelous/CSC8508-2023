@@ -46,8 +46,10 @@ NCLCoreClasses/Release
 NCLCoreClasses/NCLCoreClasses.dir/Release
 
 CSC8503/CSC8503.dir/Debug
+CSC8503/Release
 CSC8503/CSC8503.dir/Release
 CSC8503CoreClasses/CSC8503CoreClasses.dir/Release
+CSC8503CoreClasses/Release
 
 OpenGLRendering/Debug
 OpenGLRendering/OpenGLRendering.dir/Debug
