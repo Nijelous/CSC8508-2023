@@ -1700,6 +1700,7 @@ GuardObject* LevelManager::AddGuardToWorld(const vector<Vector3> nodes, const Ve
 	guard->SetRenderObject(new RenderObject(&guard->GetTransform(), mMeshes["Guard"], mTextures["Basic"], mTextures["Normal"], mShaders["Animation"], meshSize));
 	guard->GetRenderObject()->SetAnimationObject(new AnimationObject(AnimationObject::AnimationType::guardAnimation, mAnimations["GuardStand"]));
 	guard->GetRenderObject()->SetMatTextures(mMeshMaterials["Guard"]);
+	guard->GetRenderObject()->SetIgnoredSubmeshID(1);
 #ifdef USEGL
 	guard->SetSoundObject(new SoundObject(mSoundManager->AddWalkSound()));
 #endif
