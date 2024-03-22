@@ -90,18 +90,6 @@ function(Create_PC_CSC8503_Files)
         ${Suspicion_System}
     )
 
-
-    file(GLOB SHADER_FILES ${ASSET_ROOT}/Shaders/VK/*.*)
-
-    source_group("Source Files" FILES ${Source_Files})
-
-    set(ALL_FILES
-        ${Header_Files}
-        ${Source_Files}
-        ${Inventory_Buff_System}
-        ${Suspicion_System}
-    )
-
     foreach (file ${SHADER_FILES})
         get_filename_component(file_name ${file} NAME)
 	    get_filename_component(file_ext ${file} EXT)
