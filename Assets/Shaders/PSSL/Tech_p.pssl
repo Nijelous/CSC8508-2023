@@ -42,10 +42,10 @@ void main(VS_OUTPUT vertex) : S_TARGET_OUTPUT
 	float3x3 TBN = float3x3(vertex.Tangent, vertex.Bitangent, vertex.Normal);
 
 	int finalTextureID = DetermineTextureID(vertex.hasMaterial, vertex.subMeshIndex, vertex.materialLayer1Albedo, vertex.materialLayer2Albedo, vertex.materialLayer3Albedo, vertex.materialLayer4Albedo, vertex.albedoTexID);
-	int finalNormalID  = DetermineTextureID(vertex.hasMaterial, vertex.subMeshIndex, vertex.materialLayer1Norm, vertex.materialLayer2Norm, vertex.materialLayer3Norm, vertex.materialLayer4Norm, vertex.albedoTexID);
+	//int finalNormalID  = DetermineTextureID(vertex.hasMaterial, vertex.subMeshIndex, vertex.materialLayer1Norm, vertex.materialLayer2Norm, vertex.materialLayer3Norm, vertex.materialLayer4Norm, vertex.albedoTexID);
 
 	Texture2D<float4> albedoTex = Texture2D<float4>(textures[NonUniformResourceIndex(finalTextureID)]);
-	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(finalNormalID)]);
+	Texture2D<float4> normalTex = Texture2D<float4>(textures[NonUniformResourceIndex(vertex.normalTexID)]);
 
 	float3 bumpNormal = normalTex.Sample(sampler, vertex.UV).xyz;
 	bumpNormal = pow(bumpNormal, 1.0f / 2.2f);
