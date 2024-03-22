@@ -18,7 +18,14 @@ SoundObject::SoundObject() {
 }
 
 SoundObject::~SoundObject() {
+	
+}
 
+void SoundObject::Clear() {
+	mChannel->stop();
+	mIsTriggered = false;
+	mIsClosed = false;
+	mIsLocked = false;
 }
 
 Channel* SoundObject::GetChannel() {

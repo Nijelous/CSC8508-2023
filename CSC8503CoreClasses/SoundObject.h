@@ -12,6 +12,8 @@ namespace NCL {
 			SoundObject();
 			~SoundObject();
 
+			void Clear();
+
 			Channel* GetChannel();
 
 			void TriggerSoundEvent();
