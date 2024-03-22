@@ -23,6 +23,11 @@ struct VS_OUTPUT
 	int materialLayer2Albedo : TEXCOORD10;
 	int materialLayer3Albedo : TEXCOORD11;
 	int materialLayer4Albedo : TEXCOORD12;
+
+	int materialLayer1Norm : TEXCOORD13;
+	int materialLayer2Norm : TEXCOORD14;
+	int materialLayer3Norm : TEXCOORD15;
+	int materialLayer4Norm : TEXCOORD16;
 };
 
 [CxxSymbol("TestShader::gs")]
@@ -62,6 +67,11 @@ VS_OUTPUT main(uint vertID : S_VERTEX_ID, Temp tempStruct : S_SRT_DATA, uint ins
 	Output.materialLayer2Albedo = s.materialLayerAlbedos[1];
 	Output.materialLayer3Albedo	= s.materialLayerAlbedos[2];
 	Output.materialLayer4Albedo = s.materialLayerAlbedos[3];
+
+	Output.materialLayer1Norm = s.materialLayerNormals[0];
+	Output.materialLayer2Norm = s.materialLayerNormals[1];
+	Output.materialLayer3Norm = s.materialLayerNormals[2];
+	Output.materialLayer4Norm = s.materialLayerNormals[3];
 
 	return Output;
 }
