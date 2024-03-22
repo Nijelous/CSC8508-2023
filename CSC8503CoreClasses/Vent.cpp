@@ -5,6 +5,7 @@
 #include "../CSC8503/LevelManager.h"
 #include "../CSC8503/DebugNetworkedGame.h"
 #include "../CSC8503/SceneManager.h"
+#include "GameClient.h"
 
 using namespace NCL::CSC8503;
 
@@ -27,10 +28,9 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 		Transform& playerTransform = playerToTeleport->GetTransform();
 		const Vector3& playerPos = playerToTeleport->GetTransform().GetPosition();
 
-	const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
-	const Quaternion& teleportOrient = mConnectedVent->GetTransform().GetOrientation();
-	const Vector3 newPlayerPos = teleportPos + (teleportOrient * Vector3(5, 0, 0));
-
+		const Vector3& teleportPos = mConnectedVent->GetTransform().GetPosition();
+		const Quaternion& teleportOrient = mConnectedVent->GetTransform().GetOrientation();
+		const Vector3 newPlayerPos = teleportPos + (teleportOrient * Vector3(5, 0, 0));
 
 		playerTransform.SetPosition(newPlayerPos);
 		playerTransform.SetOrientation(teleportOrient);
@@ -39,7 +39,18 @@ void Vent::HandlePlayerUse(GameObject* userObj) {
 		mConnectedVent->GetSoundObject()->TriggerSoundEvent();
 #endif
 		LevelManager::GetLevelManager()->GetGameWorld()->GetMainCamera().SetYaw(mTransform.GetOrientation().ToEuler().y);
+#ifdef PROSPERO
 		SetIsOpen(false, true);
+#endif
+#ifdef USEGL
+		DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+		if (networkedGame) {
+			SetIsOpen(false, networkedGame->GetIsServer());
+		}
+		else {
+			SetIsOpen(false, true);
+		}
+#endif
 	}
 }
 
@@ -52,7 +63,20 @@ void Vent::HandleItemUse(GameObject* userObj) {
 
 			switch (usedItem) {
 			case InventoryBuffSystem::PlayerInventory::screwdriver:
+#ifdef PROSPERO
 				SetIsOpen(true, true);
+#endif
+#ifdef USEGL
+				{
+					DebugNetworkedGame* networkedGame = static_cast<DebugNetworkedGame*>(SceneManager::GetSceneManager()->GetCurrentScene());
+					if (networkedGame) {
+						SetIsOpen(true, networkedGame->GetIsServer());
+					}
+					else {
+						SetIsOpen(true, true);
+					}
+				}
+#endif
 				break;
 			default:
 				break;

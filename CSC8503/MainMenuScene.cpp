@@ -6,6 +6,7 @@
 #include "Keyboard.h"
 #include "SceneManager.h"
 #include "Window.h"
+#include "LevelManager.h"
 #include "imgui/imgui_internal.h"
 
 using namespace NCL::CSC8503;
@@ -88,8 +89,8 @@ void MainMenuScene::DrawLevelSelectionPanel() {
 	ImGui::PushFont(mButtonFont);
 
 	ImGui::PushFont(mHeaderFont);
-	ImGui::SetCursorPos(ImVec2(windowSize.x * .3f, windowSize.y * .1f));
-	ImGui::TextColored(ImVec4(1, 0, 0, 1), "Let's name our game!");
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .2f, windowSize.y * .1f));
+	ImGui::TextColored(ImVec4(1, 0, 0, 1), "This Should Only Take A Minute");
 	ImGui::PopFont();
 
 	ImGui::SetCursorPos(ImVec2(windowSize.x * .35f, windowSize.y * .55f));
@@ -107,6 +108,10 @@ void MainMenuScene::DrawLevelSelectionPanel() {
 		SceneManager::GetSceneManager()->SetIsForceQuit(true);
 	}
 	ImGui::PopFont();
+
+	ImGui::SetCursorPos(ImVec2(windowSize.x * .005f, windowSize.y * .96f));
+	ImTextureID texID = reinterpret_cast<ImTextureID>(static_cast<OGLTexture*>(LevelManager::GetLevelManager()->GetTexture("1pStudios"))->GetObjectID());
+	ImGui::Image(texID, ImVec2(windowSize.x * .2f, windowSize.y * 0.025f));
 #endif
 }
 

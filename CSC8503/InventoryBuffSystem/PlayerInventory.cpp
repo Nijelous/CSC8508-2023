@@ -177,7 +177,9 @@ void PlayerInventory::UseItemInPlayerSlot(const int& playerNo, const int& invSlo
 			}
 			else
 			{
-				game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item::none, DEFAULT_ITEM_USAGE_COUNT);
+				int item = mPlayerInventory[playerNo][invSlot];
+				int usageCount = mItemUseCount[playerNo][invSlot];
+				game->GetClient()->WriteAndSendInventoryPacket(playerNo, invSlot, item, usageCount);
 			}
 		}
 #endif
