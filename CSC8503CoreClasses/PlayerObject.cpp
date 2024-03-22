@@ -285,7 +285,7 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveBackwards()){
 #ifdef USEGL
-		fwdAxis -= fwdAxis;
+		fwdAxis = fwdAxis * -1;
 #endif
 		mPhysicsObject->AddForce(fwdAxis * mMovementSpeed);
 		isIdle = false;
@@ -298,7 +298,7 @@ void PlayerObject::MovePlayer(float dt) {
 
 	if (SceneManager::GetSceneManager()->GetControllerInterface()->MoveLeft()){
 #ifdef USEGL
-		rightAxis -= rightAxis;
+		rightAxis = rightAxis * -1;
 #endif
 		mPhysicsObject->AddForce(rightAxis * mMovementSpeed);
 		isIdle = false;
