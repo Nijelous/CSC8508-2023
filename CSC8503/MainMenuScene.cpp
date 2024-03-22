@@ -17,9 +17,9 @@ MainMenuScene::MainMenuScene() : Scene() {
 	mIsMultiplayerLobbyOnHost = false;
 #ifdef USEGL
 	ImGuiIO& imguiIO = ImGui::GetIO();
-	/*mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
+	mHeaderFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 100.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
 	mButtonFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 13.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
-	mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());*/
+	mInputFont = imguiIO.Fonts->AddFontFromFileTTF("fonts/BebasNeue-Regular.ttf", 26.f, NULL, imguiIO.Fonts->GetGlyphRangesDefault());
 	imguiIO.Fonts->Build();
 	InitPanelDrawFuncMap();
 	Scene::InitCamera();
