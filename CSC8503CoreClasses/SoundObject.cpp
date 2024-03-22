@@ -18,7 +18,7 @@ SoundObject::SoundObject() {
 }
 
 SoundObject::~SoundObject() {
-	mChannel->stop();
+	
 }
 
 void SoundObject::Clear() {

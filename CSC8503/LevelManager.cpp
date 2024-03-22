@@ -156,6 +156,9 @@ LevelManager::~LevelManager() {
 }
 
 void LevelManager::ClearLevel() {
+	for (GameObject* obj : mUpdatableObjects) {
+		obj->GetSoundObject()->Clear();
+	}
 	mIsLevelInitialised = false;
 	mRenderer->ClearLights();
 	mWorld->ClearAndErase();
